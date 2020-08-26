@@ -1,0 +1,35 @@
+spring:
+  profiles:
+    active: development
+  application:
+    name: future-messaging-service
+server:
+  port: 8083
+---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+---
+spring:
+  profiles: development
+  cloud:
+    config:
+      uri: http://localhost:8082
+      label: develop
+---
+spring:
+  profiles: staging
+  cloud:
+    config:
+      uri: http://config-server:80
+      label: staging
+---
+
+spring:
+  profiles: production
+  cloud:
+    config:
+      uri: http://config-server:80
+      label: master

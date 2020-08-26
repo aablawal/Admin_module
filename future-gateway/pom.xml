@@ -9,22 +9,24 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unionbankng.future</groupId>
-	<artifactId>eurekaserver</artifactId>
+	<artifactId>future-gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>eurekaserver</name>
-	<description>Eureka Server for Project Future</description>
+	<name>future-gateway</name>
+	<description>Zuul Gateway service for Project Future</description>
 
 	<properties>
 		<java.version>14</java.version>
 		<spring-cloud.version>Hoxton.SR7</spring-cloud.version>
-		<docker.image.prefix>marcusms.azurecr.io</docker.image.prefix>
-		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-zuul</artifactId>
 		</dependency>
 
 		<dependency>
@@ -54,20 +56,6 @@
 
 	<build>
 		<plugins>
-
-			<plugin>
-				<artifactId>jib-maven-plugin</artifactId>
-				<groupId>com.google.cloud.tools</groupId>
-				<version>${jib-maven-plugin.version}</version>
-				<configuration>
-					<from>
-						<image>openjdk:8-jre-alpine</image>
-					</from>
-					<to>
-						<image>${docker.image.prefix}/${project.artifactId}</image>
-					</to>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

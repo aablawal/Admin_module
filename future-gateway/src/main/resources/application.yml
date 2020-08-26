@@ -1,0 +1,54 @@
+spring:
+  profiles:
+    active: development
+  application:
+    name: future-gateway
+server:
+  port: 8080
+eureka:
+  client:
+    register-with-eureka: true
+---
+
+spring:
+  profiles: development
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8081/eureka}
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    authorization-server:
+      path: /authserv/**
+      service-id: authorization-server
+
+
+---
+spring:
+  profiles: staging
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://eureka-server/eureka}
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    authorization-server:
+      path: /authserv/**
+      service-id: authorization-server
+
+---
+spring:
+  profiles: production
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://eureka-server/eureka}
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    authorization-server:
+      path: /authserv/**
+      service-id: authorization-server
+
