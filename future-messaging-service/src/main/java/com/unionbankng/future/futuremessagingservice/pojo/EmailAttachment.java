@@ -1,9 +1,13 @@
 package com.unionbankng.future.futuremessagingservice.pojo;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public @Data class EmailAttachment {
+import java.io.Serializable;
 
+public @Data class EmailAttachment  implements Serializable{
+
+    private static final long serialVersionUID = -295422703255886286L;
     protected String cid;
     protected String content;
     protected boolean inline;

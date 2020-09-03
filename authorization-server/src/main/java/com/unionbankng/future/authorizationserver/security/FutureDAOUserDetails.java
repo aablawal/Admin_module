@@ -10,35 +10,35 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 
-public class FutureDAOUserDetails extends User implements UserDetails {
+public class FutureDAOUserDetails implements UserDetails {
 
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private User user;
 
 	public FutureDAOUserDetails(User user) {
-		
-        super(user);
+		this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
     	Collection<SimpleGrantedAuthority> c = new ArrayList<>();
-    	c.add(new SimpleGrantedAuthority(this.getUserType().name()));
+    	c.add(new SimpleGrantedAuthority(user.getUserType().name()));
     	return c;
     }
 
     @Override
     public String getPassword() {
-        return super.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return super.getEmail();
+        return user.getEmail();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class FutureDAOUserDetails extends User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return super.getIsEnabled();
+        return user.getIsEnabled();
     }
    
     

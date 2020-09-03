@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Table(name = "app_user")
 @Getter
 @Setter
 @Builder
@@ -52,10 +53,6 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public User(User user){
-
-        id = user.getId();
-    }
 
     @PrePersist
     private void setCreatedAt() {

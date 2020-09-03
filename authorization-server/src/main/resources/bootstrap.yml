@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: development
+    active: ${FUTURE_ENV}
   application:
     name: authorization-server
   liquibase:

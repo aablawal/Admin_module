@@ -1,31 +1,9 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet author="chokeme (generated)" id="1598997247684-1">
-        <createTable tableName="oauth_access_token">
-            <column name="authentication_id" type="varchar(255)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="oauth_access_tokenPK"/>
-            </column>
-            <column name="authentication" type="varbinary(255)"/>
-            <column name="client_id" type="varchar(255)"/>
-            <column name="refresh_token" type="varchar(1)"/>
-            <column name="token" type="varbinary(255)"/>
-            <column name="token_id" type="varchar(1)"/>
-            <column name="user_name" type="varchar(255)"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1598997247684-2">
-        <createTable tableName="refresh_token">
-            <column name="token_id" type="varchar(255)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="refresh_tokenPK"/>
-            </column>
-            <column name="authentication" type="varbinary(255)"/>
-            <column name="token" type="varbinary(255)"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1598997247684-3">
-        <createTable tableName="user">
+    <changeSet author="chokeme (generated)" id="1599134832030-1">
+        <createTable tableName="app_user">
             <column autoIncrement="true" name="id" type="bigint">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="userPK"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="app_userPK"/>
             </column>
             <column name="account_number" type="varchar(12)"/>
             <column name="created_at" type="datetime2"/>
@@ -57,10 +35,32 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1598997247684-4">
-        <addUniqueConstraint columnNames="email" constraintName="UC_USEREMAIL_COL" tableName="user"/>
+    <changeSet author="chokeme (generated)" id="1599134832030-2">
+        <createTable tableName="oauth_access_token">
+            <column name="authentication_id" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="oauth_access_tokenPK"/>
+            </column>
+            <column name="authentication" type="varbinary(max)"/>
+            <column name="client_id" type="varchar(255)"/>
+            <column name="refresh_token" type="varchar (max)"/>
+            <column name="token" type="varbinary(max)"/>
+            <column name="token_id" type="varchar (max)"/>
+            <column name="user_name" type="varchar(255)"/>
+        </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1598997247684-5">
-        <addUniqueConstraint columnNames="uuid" constraintName="UC_USERUUID_COL" tableName="user"/>
+    <changeSet author="chokeme (generated)" id="1599134832030-3">
+        <createTable tableName="oauth_refresh_token">
+            <column name="token_id" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="oauth_refresh_tokenPK"/>
+            </column>
+            <column name="authentication" type="varbinary(max)"/>
+            <column name="token" type="varbinary(max)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599134832030-4">
+        <addUniqueConstraint columnNames="email" constraintName="UC_APP_USEREMAIL_COL" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599134832030-5">
+        <addUniqueConstraint columnNames="uuid" constraintName="UC_APP_USERUUID_COL" tableName="app_user"/>
     </changeSet>
 </databaseChangeLog>

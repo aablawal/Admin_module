@@ -1,5 +1,6 @@
 package com.unionbankng.future.authorizationserver.security;
 
+import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -14,13 +15,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FutureDAOUserDetailsService implements UserDetailsService {
 
-	private final UserService userService;
+	private final UserRepository userRepository;
 	private final MessageSource messageSource;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		com.unionbankng.future.authorizationserver.entities.User user = userService.findByEmail(username).orElseThrow(() -> new BadCredentialsException(
+		System.out.println(username);
+		com.unionbankng.future.authorizationserver.entities.User user = userRepository.findByEmail(username).orElseThrow(() -> new BadCredentialsException(
 				messageSource.getMessage("username.invalid", null, LocaleContextHolder.getLocale())));
 		return new FutureDAOUserDetails(user);
 

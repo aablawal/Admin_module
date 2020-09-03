@@ -12,8 +12,6 @@ public class RegistrationRequest {
     @NotNull
     private String lastName;
     @NotNull
-    private String uuid;
-    @NotNull
     private String email;
     @NotNull
     private String password;
@@ -23,6 +21,4 @@ public class RegistrationRequest {
     private String phoneNumber;
     @NotNull
     private UserType userType;
-    @NotNull
-    private String accountNumber;
 }

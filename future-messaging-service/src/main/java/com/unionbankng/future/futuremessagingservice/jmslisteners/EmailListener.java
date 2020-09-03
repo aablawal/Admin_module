@@ -1,11 +1,14 @@
 package com.unionbankng.future.futuremessagingservice.jmslisteners;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
 import com.unionbankng.future.futuremessagingservice.pojo.EmailBody;
 import com.unionbankng.future.futuremessagingservice.smsproviders.UnionEmailProvider;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -22,10 +25,13 @@ public class EmailListener {
 
     private final TemplateEngine templateEngine;
 
+    private final ObjectMapper mapper;
 
 
     @JmsListener(destination = QUEUE_NAME, containerFactory = "jmsListenerContainerFactory")
-    public void receiveMessage(EmailBody emailBody) {
+    public void receiveMessage(String json) throws JsonProcessingException {
+
+        EmailBody emailBody = mapper.readValue(json, EmailBody.class);
         logger.info("Received message: {}", emailBody.getSubject());
         EmailProvider emailProvider = new UnionEmailProvider();
         try {
