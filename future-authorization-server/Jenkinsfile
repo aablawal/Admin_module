@@ -41,6 +41,7 @@ pipeline {
             }
 
             steps {
+                echo env.JAVA_HOME
                 echo 'Building..' + GLOBAL_ENVIRONMENT
                  script {
                     if (GLOBAL_ENVIRONMENT == 'NO_DEPLOYMENT') {
