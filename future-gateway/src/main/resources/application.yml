@@ -36,7 +36,7 @@ zuul:
   routes:
     authorization-server:
       path: /authserv/**
-      service-id: authorization-server
+      url: http://future-auth-server
 
 ---
 spring:
@@ -50,5 +50,5 @@ zuul:
   routes:
     authorization-server:
       path: /authserv/**
-      service-id: authorization-server
+      url: http://future-auth-server
 
