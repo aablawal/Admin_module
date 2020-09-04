@@ -14,6 +14,9 @@ pipeline {
     
     steps {
                 echo 'Determine Environment'
+                env.JAVA_HOME="${tool 'JDK14'}"
+                env.PATH="${env.JAVA_HOME}/bin:${env.PATH}"
+                sh "java -version"
                 script {
                     // Determine whether this is a test or a staging / production build              
                     switch (env.GIT_BRANCH) {
