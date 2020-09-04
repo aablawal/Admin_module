@@ -59,13 +59,13 @@ pipeline {
                   if (GLOBAL_ENVIRONMENT == 'staging') {
                     
                     sh "kubectl config use-context marcus-developement-cluster"
-					sh "kubectl set image deployment/future-gateway future-gateway=${ACR_LOGINSERVER}/future-gateway --namespace future"
-					sh "kubectl rollout restart deployment/future-gateway --namespace future"
+					sh "kubectl set image deployment/future-gateway future-gateway=${ACR_LOGINSERVER}/future-gateway --namespace project-future"
+					sh "kubectl rollout restart deployment/future-gateway --namespace project-future"
 					
                   } else {
                     sh "kubectl config use-context MarcusProdAKSCluster"
-                    sh "kubectl set image deployment/future-gateway future-gateway=${ACR_LOGINSERVER}/future-gateway --namespace future"
-                    sh "kubectl rollout restart deployment/future-gateway --namespace future"
+                    sh "kubectl set image deployment/future-gateway future-gateway=${ACR_LOGINSERVER}/future-gateway --namespace project-future"
+                    sh "kubectl rollout restart deployment/future-gateway --namespace project-future"
                   }
                 }
             

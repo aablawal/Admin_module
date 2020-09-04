@@ -30,7 +30,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URI:http://eurekaserver/eureka}
+      defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
 zuul:
   sensitiveHeaders: Cookie,Set-Cookie
   routes:
@@ -44,7 +44,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URI:http://eurekaserver/eureka}
+      defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
 zuul:
   sensitiveHeaders: Cookie,Set-Cookie
   routes:
