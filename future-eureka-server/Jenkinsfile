@@ -84,7 +84,7 @@ def build(ENVIRONMENT) {
     
     	 withMaven( maven: 'maven-3.6.3' ) {
     	 	withEnv(["FUTURE_ENV=staging","ACR_SERVER=${ACR_LOGINSERVER}"]){
-				sh 'cd eurekaserver && mvn clean compile jib:build'
+				sh 'cd future-eureka-server && mvn clean compile jib:build'
 			}
 
     	 } 
@@ -96,7 +96,7 @@ def build(ENVIRONMENT) {
      
      	withMaven( maven: 'maven-3.6.3' ) {
      		withEnv(["FUTURE_ENV=production","ACR_SERVER=${ACR_LOGINSERVER}"]){
-     			sh 'cd eurekaserver && mvn clean compile jib:build'
+     			sh 'cd future-eureka-server && mvn clean compile jib:build'
      		}
 
     	 } 
