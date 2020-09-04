@@ -61,7 +61,7 @@
 				<version>${jib-maven-plugin.version}</version>
 				<configuration>
 					<from>
-						<image>openjdk:14-jre-alpine</image>
+						<image>openjdk:14-alpine</image>
 					</from>
 					<to>
 						<auth>
