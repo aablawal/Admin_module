@@ -17,7 +17,7 @@ pipeline {
 
                 script {
 
-                    sh "update-java-alternatives -s java-1.14.0-openjdk-amd64"
+                    sh "sudo update-java-alternatives -s java-1.14.0-openjdk-amd64"
                     // Determine whether this is a test or a staging / production build              
                     switch (env.GIT_BRANCH) {
                         case 'origin/staging':
