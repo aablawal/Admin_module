@@ -50,7 +50,7 @@ pipeline {
             steps {
                 echo 'Testing..'
                  withMaven( maven: 'maven-3.6.3' ) {
-                                		sh 'mvn test'
+                 sh 'cd future-messaging-service && mvn test'
                                 }
 
             }
