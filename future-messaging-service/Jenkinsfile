@@ -8,6 +8,10 @@ pipeline {
         FUTURE_ENV = 'default'
     }
 
+    tools {
+                       jdk "jdk-14"
+                    }
+
     stages {
     
     stage('Determine Environment') {
