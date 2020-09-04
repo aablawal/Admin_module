@@ -59,7 +59,7 @@ pipeline {
                   if (GLOBAL_ENVIRONMENT == 'staging') {
                     
                     sh "kubectl config use-context marcus-developement-cluster"
-					sh "kubectl set image deployment/future-eureka-server future-eurekaserver=${ACR_LOGINSERVER}/future-eureka-server --namespace project-future"
+					sh "kubectl set image deployment/future-eureka-server future-eureka-server=${ACR_LOGINSERVER}/future-eureka-server --namespace project-future"
 					sh "kubectl rollout restart deployment/future-eureka-server --namespace project-future"
 					
                   } else {
