@@ -49,7 +49,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'mvn test'
+
             }
         }
         
@@ -60,13 +60,13 @@ pipeline {
                   if (GLOBAL_ENVIRONMENT == 'staging') {
                     
                     sh "kubectl config use-context marcus-developement-cluster"
-					sh "kubectl set image deployment/authorization-server authorization-server=${ACR_LOGINSERVER}/authorization-server --namespace future"
-					sh "kubectl rollout restart deployment/authorization-server --namespace future"
+					sh "kubectl set image deployment/future-config-server future-config-server=${ACR_LOGINSERVER}/future-config-server --namespace future"
+					sh "kubectl rollout restart deployment/future-config-server --namespace future"
 					
                   } else {
                     sh "kubectl config use-context MarcusProdAKSCluster"
-                    sh "kubectl set image deployment/authorization-server authorization-server=${ACR_LOGINSERVER}/authorization-server --namespace future"
-					sh "kubectl rollout restart deployment/authorization-server --namespace future"
+                    sh "kubectl set image deployment/future-config-server config-server=${ACR_LOGINSERVER}/future-config-server --namespace future"
+					sh "kubectl rollout restart deployment/future-config-server --namespace future"
                   }
                 }
             
@@ -84,7 +84,7 @@ def build(ENVIRONMENT) {
     
     	 withMaven( maven: 'maven-3.6.3' ) {
     	 	withEnv(["FUTURE_ENV=staging","ACR_SERVER=${ACR_LOGINSERVER}"]){
-				sh 'cd authorization-server && mvn clean compile jib:build'
+				sh 'cd config-server && mvn clean compile jib:build'
 			}
 
     	 } 
@@ -96,7 +96,7 @@ def build(ENVIRONMENT) {
      
      	withMaven( maven: 'maven-3.6.3' ) {
      		withEnv(["FUTURE_ENV=production","ACR_SERVER=${ACR_LOGINSERVER}"]){
-     			sh 'cd authorization-server && mvn clean compile jib:build'
+     			sh 'cd config-server && mvn clean compile jib:build'
      		}
 
     	 } 

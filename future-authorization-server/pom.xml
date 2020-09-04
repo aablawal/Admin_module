@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unionbankng.future</groupId>
-	<artifactId>authorization-server</artifactId>
+	<artifactId>future-authorization-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>authorization-server</name>
+	<name>future-authorization-server</name>
 	<description>Authorization server for Project Future</description>
 
 	<properties>
