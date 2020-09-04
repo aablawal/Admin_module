@@ -17,6 +17,7 @@
 	<properties>
 		<java.version>14</java.version>
 		<spring-cloud.version>Hoxton.SR7</spring-cloud.version>
+		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -91,6 +92,32 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>jib-maven-plugin</artifactId>
+				<groupId>com.google.cloud.tools</groupId>
+				<version>${jib-maven-plugin.version}</version>
+				<configuration>
+					<from>
+						<image>openjdk:14-jre-alpine</image>
+					</from>
+					<to>
+						<auth>
+							<!--suppress UnresolvedMavenProperty -->
+							<username>${ACR_USERNAME}</username>
+							<!--suppress UnresolvedMavenProperty -->
+							<password>${ACR_PASSWORD}</password>
+						</auth>
+						<!--suppress UnresolvedMavenProperty -->
+						<image>${ACR_SERVER}/${project.artifactId}</image>
+					</to>
+					<container>
+						<environment>
+							<!--suppress UnresolvedMavenProperty -->
+							<FUTURE_ENV>${FUTURE_ENV}</FUTURE_ENV>
+						</environment>
+					</container>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

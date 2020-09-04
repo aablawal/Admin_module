@@ -61,11 +61,24 @@
 				<version>${jib-maven-plugin.version}</version>
 				<configuration>
 					<from>
-						<image>openjdk:8-jre-alpine</image>
+						<image>openjdk:14-jre-alpine</image>
 					</from>
 					<to>
-						<image>${docker.image.prefix}/${project.artifactId}</image>
+						<auth>
+							<!--suppress UnresolvedMavenProperty -->
+							<username>${ACR_USERNAME}</username>
+							<!--suppress UnresolvedMavenProperty -->
+							<password>${ACR_PASSWORD}</password>
+						</auth>
+						<!--suppress UnresolvedMavenProperty -->
+						<image>${ACR_SERVER}/${project.artifactId}</image>
 					</to>
+					<container>
+						<environment>
+							<!--suppress UnresolvedMavenProperty -->
+							<FUTURE_ENV>${FUTURE_ENV}</FUTURE_ENV>
+						</environment>
+					</container>
 				</configuration>
 			</plugin>
 			<plugin>
