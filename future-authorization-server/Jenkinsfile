@@ -17,7 +17,6 @@ pipeline {
 
                 script {
 
-                    sh "sudo update-java-alternatives -s java-1.14.0-openjdk-amd64"
                     // Determine whether this is a test or a staging / production build              
                     switch (env.GIT_BRANCH) {
                         case 'origin/staging':
@@ -36,6 +35,11 @@ pipeline {
     }
     }
         stage('Build') {
+
+            tools {
+               jdk "jdk-14"
+            }
+
             steps {
                 echo 'Building..' + GLOBAL_ENVIRONMENT
                  script {
