@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.TemplateEngine;
 
+import java.util.Calendar;
+import java.util.Date;
+
 @Component
 @RequiredArgsConstructor
 public class EmailListener {
@@ -45,8 +48,9 @@ public class EmailListener {
 
         Context ctx = new Context(LocaleContextHolder.getLocale());
         if (emailBody.getRecipients().size() == 1) {
-            ctx.setVariable("name", "Hello " + emailBody.getRecipients().get(0).getDisplayName() + ",");
-            ctx.setVariable("footname", emailBody.getRecipients().get(0).getDisplayName() + ",");
+            ctx.setVariable("name", "Dear " + emailBody.getRecipients().get(0).getDisplayName().split(" ")[1] + ",");
+            ctx.setVariable("footname", emailBody.getRecipients().get(0).getDisplayName());
+            ctx.setVariable("year", Calendar.getInstance().get(Calendar.YEAR));
         } else {
             ctx.setVariable("name", emailBody.getSubject());
         }
