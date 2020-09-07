@@ -78,11 +78,11 @@ public class RegistrationTest extends AbstractTest {
     @Test
     public void registrationSuccessful() throws Exception {
         RegistrationRequest request = new RegistrationRequest();
-        request.setFirstName("aaa");
-        request.setLastName("aaa");
+        request.setFirstName("Okeme");
+        request.setLastName("Christian");
         request.setPassword("Pass@word123");
         request.setDialingCode("234");
-        request.setEmail("abc@gmail.com");
+        request.setEmail("chokeme@unionbankng.com");
         request.setPhoneNumber("8176267145");
         request.setUserType(UserType.EMPLOYER);
 
