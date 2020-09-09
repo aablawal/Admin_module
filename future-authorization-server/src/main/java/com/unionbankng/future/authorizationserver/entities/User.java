@@ -45,6 +45,13 @@ public class User implements Serializable {
     private UserType userType;
     @Column(length = 12)
     private String accountNumber;
+    private String address;
+    @Column(length = 3)
+    private String country;
+    @Column(length = 50)
+    private String stateOfResidence;
+    @Temporal(TemporalType.DATE)
+    private Date dateOfBirth;
     @Column(nullable = false)
     private Boolean isEnabled = true;
     @Column(updatable = false)

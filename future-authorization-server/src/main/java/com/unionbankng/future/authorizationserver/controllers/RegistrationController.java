@@ -2,10 +2,12 @@ package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.RecipientType;
+import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
+import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import org.slf4j.Logger;
@@ -16,11 +18,9 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 
 @RestController
@@ -32,30 +32,30 @@ public class RegistrationController {
     private final MessageSource messageSource;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-    private final EmailSender emailSender;
-
-    @Value("${email.sender}")
-    private String emailSenderAddress;
+    private final UserConfirmationTokenService userConfirmationTokenService;
 
     private PasswordValidator passwordValidator;
 
-    private RegistrationController(MessageSource messageSource, UserService userService, PasswordEncoder passwordEncoder, EmailSender emailSender){
+    private RegistrationController(MessageSource messageSource, UserService userService, PasswordEncoder passwordEncoder
+            ,UserConfirmationTokenService userConfirmationTokenService){
         this.messageSource = messageSource;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
-        this.emailSender = emailSender;
+        this.userConfirmationTokenService = userConfirmationTokenService;
         passwordValidator = PasswordValidator.buildValidator(false, true, true, 6, 40);
     }
 
 
     @PostMapping("/v1/registration/register")
-    public ResponseEntity register(@RequestBody RegistrationRequest request){
+    public ResponseEntity<APIResponse> register(@RequestBody RegistrationRequest request){
 
         if (userService.existsByEmail(request.getEmail()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()),false,null));
 
         if(!passwordValidator.validatePassword(request.getPassword()))
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(messageSource.getMessage("password.validation.error", null, LocaleContextHolder.getLocale()));
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse(messageSource.getMessage("password.validation.error", null, LocaleContextHolder.getLocale()),false,null));
 
         // generate uuid for user
         String generatedUuid = java.util.UUID.randomUUID().toString();
@@ -65,17 +65,34 @@ public class RegistrationController {
                 .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).build();
 
 
-        userService.save(user);
+        user = userService.save(user);
 
-        //send welcome email
-        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", null, LocaleContextHolder.getLocale())
-        ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
-                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(request.getEmail()).displayName(user.toString()).build())).build();
+        //send confirmation email
+        userConfirmationTokenService.sendConfirmationToken(user);
 
-        emailSender.sendEmail(emailBody);
+        logger.info("new registration");
+        return ResponseEntity.ok().body(
+                new APIResponse(messageSource.getMessage("success.registration.message", null, LocaleContextHolder.getLocale()),true, null));
 
-        return ResponseEntity.ok().body(messageSource.getMessage("success.registration.message", null, LocaleContextHolder.getLocale()));
 
+    }
+
+    @PostMapping("/v1/registration/confirmation")
+    public ResponseEntity<APIResponse> confirmUserAccount(@NotNull  @RequestParam String confirmationToken){
+
+        int confirmation = userConfirmationTokenService.confirmUserAccountByToken(confirmationToken);
+
+        if(confirmation == UserConfirmationTokenService.VERIFICATION_FAILED)
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse(messageSource.getMessage("confirmation.token.notfound", null, LocaleContextHolder.getLocale()),false,null));
+
+        if(confirmation == UserConfirmationTokenService.VERIFICATION_TOKEN_EXPIRED)
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()),false,null));
+
+
+        return ResponseEntity.ok().body(
+                new APIResponse(messageSource.getMessage("account.confirmation.success", null, LocaleContextHolder.getLocale()),true,null));
 
     }
 }
