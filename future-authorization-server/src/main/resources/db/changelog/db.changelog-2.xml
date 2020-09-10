@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1599673191008-1">
+        <createTable tableName="tag">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tagPK"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-2">
+        <createTable tableName="user_confirmation_token">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_confirmation_tokenPK"/>
+            </column>
+            <column name="expiry_date" type="datetime2"/>
+            <column name="token" type="varchar(255)"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-3">
+        <addColumn tableName="app_user">
+            <column name="address" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-4">
+        <addColumn tableName="app_user">
+            <column name="country" type="varchar(3)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-5">
+        <addColumn tableName="app_user">
+            <column name="date_of_birth" type="date"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-6">
+        <addColumn tableName="app_user">
+            <column name="state_of_residence" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-7">
+        <addUniqueConstraint columnNames="token" constraintName="UC_USER_CONFIRMATION_TOKENTOKEN_COL" tableName="user_confirmation_token"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-8">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_confirmation_token" constraintName="FK23f70bn1nnupeobqk4em641lh" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="app_user" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

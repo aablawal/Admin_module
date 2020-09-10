@@ -43,6 +43,7 @@ public class UserConfirmationTokenService {
 
     public void sendConfirmationToken(User user){
 
+        logger.debug("generating token for {}",user.toString());
         UserConfirmationToken confirmationToken = new UserConfirmationToken(user,tokenExpiryInMinute);
         userConfirmationTokenRepository.save(confirmationToken);
 

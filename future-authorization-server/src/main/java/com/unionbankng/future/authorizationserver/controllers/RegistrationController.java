@@ -1,18 +1,13 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
-import com.unionbankng.future.authorizationserver.pojos.EmailBody;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.services.UserService;
-import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -21,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping(path = "api")
@@ -66,6 +60,7 @@ public class RegistrationController {
 
 
         user = userService.save(user);
+
 
         //send confirmation email
         userConfirmationTokenService.sendConfirmationToken(user);
