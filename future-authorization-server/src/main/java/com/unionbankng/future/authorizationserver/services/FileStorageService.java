@@ -11,11 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @Service
-@RequiredArgsConstructor
 public class FileStorageService {
 
     @GrpcClient("blobStorageService")
-    private final BlobStorageServiceGrpc.BlobStorageServiceBlockingStub blobStorageServiceBlockingStub;
+    private  BlobStorageServiceGrpc.BlobStorageServiceBlockingStub blobStorageServiceBlockingStub;
 
     public String storeFile(MultipartFile file, Long userId,BlobType blobType) throws IOException {
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
