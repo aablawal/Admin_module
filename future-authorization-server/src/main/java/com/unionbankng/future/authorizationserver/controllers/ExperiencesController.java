@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,9 +41,9 @@ public class ExperiencesController {
     @PutMapping("/v1/experiences/update_existing")
     public ResponseEntity<APIResponse> updateExperience(@RequestBody ExperienceRequest request) {
 
-        Experience experience = experienceService.findById(request.getExperienceId()).orElse(null);
-        if(experience == null)
-            return ResponseEntity.ok().body(new APIResponse("Experience not found",false,null));
+        Experience experience = experienceService.findById(request.getExperienceId()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience not found")
+        );
 
         experience = experienceService.saveFromRequest(request,experience);
 

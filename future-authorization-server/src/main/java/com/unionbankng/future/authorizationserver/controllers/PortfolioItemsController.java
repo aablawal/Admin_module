@@ -8,8 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,21 +36,23 @@ public class PortfolioItemsController {
     }
 
     @PostMapping("/v1/portfolio_items/create_new")
-    public ResponseEntity<APIResponse> addNewPortfolioItem(@RequestBody PortfolioItemRequest request) {
+    public ResponseEntity<APIResponse> addNewPortfolioItem(@Nullable  @RequestParam("file") MultipartFile file,
+                                                           @RequestBody PortfolioItemRequest request) throws IOException {
 
-        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(request,new PortfolioItem());
+        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(file,request,new PortfolioItem());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItem));
 
     }
 
     @PutMapping("/v1/portfolio_items/update_existing")
-    public ResponseEntity<APIResponse> updateExperience(@RequestBody PortfolioItemRequest request) {
+    public ResponseEntity<APIResponse> updateExperience(@Nullable  @RequestParam("file") MultipartFile file,@RequestBody PortfolioItemRequest request)
+            throws IOException {
 
-        PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElse(null);
-        if(portfolioItem == null)
-            return ResponseEntity.ok().body(new APIResponse("PortfolioItem not found",false,null));
+        PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "PortfolioItem not found")
+        );
 
-        portfolioItem = portfolioItemService.saveFromRequest(request,portfolioItem);
+        portfolioItem = portfolioItemService.saveFromRequest(file,request,portfolioItem);
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItem));
 

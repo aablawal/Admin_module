@@ -22,7 +22,7 @@ public class PortfolioItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    @Column(nullable = false)
     private Long userId;
     private String title;
     @Column(columnDefinition="TEXT")

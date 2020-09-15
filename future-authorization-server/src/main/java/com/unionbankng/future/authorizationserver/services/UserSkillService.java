@@ -1,9 +1,7 @@
 package com.unionbankng.future.authorizationserver.services;
 
-import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.entities.Tag;
 import com.unionbankng.future.authorizationserver.entities.UserSkill;
-import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.pojos.UserSkillRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserSkillRepository;
 import lombok.RequiredArgsConstructor;

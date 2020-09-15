@@ -1,15 +1,18 @@
 package com.unionbankng.future.authorizationserver.services;
 
-import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.entities.Photo;
-import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
-import com.unionbankng.future.authorizationserver.pojos.PhotoRequest;
+import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.repositories.PhotoRepository;
+import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class PhotoService {
 
     private final PhotoRepository photoRepository;
+    private final FileStorageService fileStorageService;
 
     public Page<Photo> findAllByUserId (Long userId, Pageable pageable){
         return photoRepository.findByUserId(userId,pageable);
@@ -27,14 +31,23 @@ public class PhotoService {
     }
 
     public void deleteById (Long id){
+        Photo photo = photoRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo Not Found"));
+        int status = fileStorageService.deleteFileFromStorage(photo.getSource(),BlobType.IMAGE);
+        if(status != 200)
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         photoRepository.deleteById(id);
     }
 
-    public Photo saveFromRequest (PhotoRequest request, Photo photo){
+    public Photo saveFromRequest (MultipartFile file, PhotoAndVideoRequest request, Photo photo) throws IOException {
         photo.setUserId(request.getUserId());
         photo.setComment(request.getComment());
-        photo.setSource(request.getSource());
+        if (file != null){
+            String source = fileStorageService.storeFile(file, request.getUserId(), BlobType.IMAGE);
+            photo.setSource(source);
+        }
         photo.setTitle(request.getTitle());
         return photoRepository.save(photo);
     }
+
+
 }

@@ -8,8 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,22 +36,22 @@ public class QualificationsController {
     }
 
     @PostMapping("/v1/qualifications/create_new")
-    public ResponseEntity<APIResponse> addNewQualification(@RequestBody QualificationRequest request) {
+    public ResponseEntity<APIResponse> addNewQualification(@Nullable @RequestParam("file") MultipartFile file, @RequestBody QualificationRequest request)
+            throws IOException {
 
-        Qualification qualification = qualificationService.saveFromRequest(request,new Qualification());
+        Qualification qualification = qualificationService.saveFromRequest(file,request,new Qualification());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,qualification));
 
     }
 
     @PutMapping("/v1/qualifications/update_existing")
-    public ResponseEntity<APIResponse> updateQualification(@RequestBody QualificationRequest request) {
+    public ResponseEntity<APIResponse> updateQualification(@Nullable  @RequestParam("file") MultipartFile file,@RequestBody QualificationRequest request)
+            throws IOException {
 
-        Qualification qualification = qualificationService.findById(request.getQualificationId()).orElse(null);
+        Qualification qualification = qualificationService.findById(request.getQualificationId()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Qualification not found"));
 
-        if(qualification == null)
-            return ResponseEntity.ok().body(new APIResponse("Qualification not found",false,null));
-
-        qualification = qualificationService.saveFromRequest(request,qualification);
+        qualification = qualificationService.saveFromRequest(file,request,qualification);
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,qualification));
 

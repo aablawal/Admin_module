@@ -2,14 +2,20 @@ package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.Photo;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.PhotoRequest;
+import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.services.PhotoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,22 +35,21 @@ public class PhotosController {
     }
 
     @PostMapping("/v1/photos/create_new")
-    public ResponseEntity<APIResponse> addNewPhoto(@RequestBody PhotoRequest request) {
+    public ResponseEntity<APIResponse> addNewPhoto(@Nullable @RequestParam("file") MultipartFile file, @RequestBody PhotoAndVideoRequest request) throws IOException {
 
-        Photo photo = photoService.saveFromRequest(request,new Photo());
+        Photo photo = photoService.saveFromRequest(file,request,new Photo());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,photo));
 
     }
 
     @PutMapping("/v1/photos/update_existing")
-    public ResponseEntity<APIResponse> updatePhoto(@RequestBody PhotoRequest request) {
+    public ResponseEntity<APIResponse> updatePhoto(@RequestParam("file") MultipartFile file,@RequestBody PhotoAndVideoRequest request) throws IOException {
 
-        Photo photo = photoService.findById(request.getPhotoId()).orElse(null);
+        Photo photo = photoService.findById(request.getPhotoId()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found")
+        );
 
-        if(photo == null)
-            return ResponseEntity.ok().body(new APIResponse("Photo not found",false,null));
-
-        photo = photoService.saveFromRequest(request,photo);
+        photo = photoService.saveFromRequest(file,request,photo);
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,photo));
 
