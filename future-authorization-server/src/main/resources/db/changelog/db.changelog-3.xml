@@ -1,0 +1,141 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1600184256026-1">
+        <createTable tableName="experience">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="experiencePK"/>
+            </column>
+            <column name="company" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="current" type="bit"/>
+            <column name="description" type="varchar (max)"/>
+            <column name="employment_type" type="varchar(255)"/>
+            <column name="end_date" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="headline" type="varchar(255)"/>
+            <column name="media" type="varchar(255)"/>
+            <column name="start_date" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-2">
+        <createTable tableName="photo">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="photoPK"/>
+            </column>
+            <column name="comment" type="varchar (max)"/>
+            <column name="created_at" type="datetime2"/>
+            <column name="source" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-3">
+        <createTable tableName="portfolio_item">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="portfolio_itemPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="description" type="varchar (max)"/>
+            <column name="link" type="varchar(255)"/>
+            <column name="media" type="varchar(255)"/>
+            <column name="title" type="varchar(255)"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-4">
+        <createTable tableName="qualification">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="qualificationPK"/>
+            </column>
+            <column name="activities" type="varchar (max)"/>
+            <column name="created_at" type="datetime2"/>
+            <column name="degree" type="varchar(255)"/>
+            <column name="description" type="varchar (max)"/>
+            <column name="end_year" type="varchar(20)"/>
+            <column name="field_of_study" type="varchar(255)"/>
+            <column name="grade" type="varchar(255)"/>
+            <column name="media" type="varchar(255)"/>
+            <column name="school" type="varchar(255)"/>
+            <column name="start_year" type="varchar(20)"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-5">
+        <createTable tableName="user_skill">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_skillPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint"/>
+            <column name="skill_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-6">
+        <createTable tableName="video">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="videoPK"/>
+            </column>
+            <column name="comment" type="varchar (max)"/>
+            <column name="created_at" type="datetime2"/>
+            <column name="source" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-7">
+        <addColumn tableName="app_user">
+            <column name="bio" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-8">
+        <addColumn tableName="app_user">
+            <column name="img" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-9">
+        <addColumn tableName="app_user">
+            <column name="job_title" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-10">
+        <addColumn tableName="app_user">
+            <column name="price_per_hour" type="numeric(19, 2)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1600184256026-11">
+        <addForeignKeyConstraint baseColumnNames="skill_id" baseTableName="user_skill" constraintName="FKl491362ml4r53a9785tjiwwgo" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="tag" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

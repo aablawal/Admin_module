@@ -11,7 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,22 +34,24 @@ public class ExperiencesController {
 
     }
 
-    @PostMapping("/v1/experiences/create_new")
-    public ResponseEntity<APIResponse> addNewExperience(@RequestBody ExperienceRequest request) {
+    @PostMapping(value = "/v1/experiences/create_new", consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @RequestPart ExperienceRequest request)
+            throws IOException {
 
-        Experience experience = experienceService.saveFromRequest(request,new Experience());
+        Experience experience = experienceService.saveFromRequest(file,request,new Experience());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,experience));
 
     }
 
-    @PutMapping("/v1/experiences/update_existing")
-    public ResponseEntity<APIResponse> updateExperience(@RequestBody ExperienceRequest request) {
+    @PostMapping(value = "/v1/experiences/update_existing",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> updateExperience(@Nullable @RequestPart("file") MultipartFile file,@RequestPart ExperienceRequest request)
+            throws IOException {
 
         Experience experience = experienceService.findById(request.getExperienceId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience not found")
         );
 
-        experience = experienceService.saveFromRequest(request,experience);
+        experience = experienceService.saveFromRequest(file,request,experience);
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,experience));
 

@@ -35,8 +35,8 @@ public class QualificationsController {
 
     }
 
-    @PostMapping("/v1/qualifications/create_new")
-    public ResponseEntity<APIResponse> addNewQualification(@Nullable @RequestParam("file") MultipartFile file, @RequestBody QualificationRequest request)
+    @PostMapping(value = "/v1/qualifications/create_new",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> addNewQualification(@Nullable @RequestPart("file") MultipartFile file, @RequestPart QualificationRequest request)
             throws IOException {
 
         Qualification qualification = qualificationService.saveFromRequest(file,request,new Qualification());
@@ -44,8 +44,8 @@ public class QualificationsController {
 
     }
 
-    @PutMapping("/v1/qualifications/update_existing")
-    public ResponseEntity<APIResponse> updateQualification(@Nullable  @RequestParam("file") MultipartFile file,@RequestBody QualificationRequest request)
+    @PostMapping(value = "/v1/qualifications/update_existing",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@RequestPart QualificationRequest request)
             throws IOException {
 
         Qualification qualification = qualificationService.findById(request.getQualificationId()).orElseThrow(

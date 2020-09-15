@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class PhotoAndVideoRequest {
-    private Long photoId;
+    private Long id;
     @NotNull
     private Long userId;
     @NotNull

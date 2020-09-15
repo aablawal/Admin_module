@@ -35,17 +35,17 @@ public class PortfolioItemsController {
 
     }
 
-    @PostMapping("/v1/portfolio_items/create_new")
-    public ResponseEntity<APIResponse> addNewPortfolioItem(@Nullable  @RequestParam("file") MultipartFile file,
-                                                           @RequestBody PortfolioItemRequest request) throws IOException {
+    @PostMapping(value = "/v1/portfolio_items/create_new",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> addNewPortfolioItem(@Nullable  @RequestPart("file") MultipartFile file,
+                                                           @RequestPart PortfolioItemRequest request) throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(file,request,new PortfolioItem());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItem));
 
     }
 
-    @PutMapping("/v1/portfolio_items/update_existing")
-    public ResponseEntity<APIResponse> updateExperience(@Nullable  @RequestParam("file") MultipartFile file,@RequestBody PortfolioItemRequest request)
+    @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> updateExperience(@Nullable  @RequestPart("file") MultipartFile file,@RequestPart PortfolioItemRequest request)
             throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(

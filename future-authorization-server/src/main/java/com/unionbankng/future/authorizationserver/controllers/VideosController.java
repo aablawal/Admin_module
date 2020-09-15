@@ -34,18 +34,18 @@ public class VideosController {
 
     }
 
-    @PostMapping("/v1/videos/create_new")
-    public ResponseEntity<APIResponse> addNewPhoto(@Nullable @RequestParam("file") MultipartFile file, @RequestBody PhotoAndVideoRequest request) throws IOException {
+    @PostMapping(value = "/v1/videos/create_new",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> addNewPhoto(@RequestPart("file") MultipartFile file, @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Video videos = videoService.saveFromRequest(file,request,new Video());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,videos));
 
     }
 
-    @PutMapping("/v1/videos/update_existing")
-    public ResponseEntity<APIResponse> updatePhoto(@RequestParam("file") MultipartFile file,@RequestBody PhotoAndVideoRequest request) throws IOException {
+    @PostMapping(value = "/v1/videos/update_existing",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> updatePhoto(@Nullable @RequestPart("file") MultipartFile file,@RequestPart PhotoAndVideoRequest request) throws IOException {
 
-        Video video = videoService.findById(request.getPhotoId()).orElseThrow(
+        Video video = videoService.findById(request.getId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Video not found")
         );
 

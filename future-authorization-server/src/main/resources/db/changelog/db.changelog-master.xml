@@ -6,4 +6,5 @@
         <sqlFile dbms="h2,mssql"
                  path="db/migrations/migration-1.sql" />
     </changeSet>
+    <include file="db/changelog/db.changelog-3.xml" />
 </databaseChangeLog>

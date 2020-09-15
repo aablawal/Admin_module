@@ -34,18 +34,18 @@ public class PhotosController {
 
     }
 
-    @PostMapping("/v1/photos/create_new")
-    public ResponseEntity<APIResponse> addNewPhoto(@Nullable @RequestParam("file") MultipartFile file, @RequestBody PhotoAndVideoRequest request) throws IOException {
+    @PostMapping(value = "/v1/photos/create_new",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> addNewPhoto(@RequestPart("file") MultipartFile file, @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Photo photo = photoService.saveFromRequest(file,request,new Photo());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,photo));
 
     }
 
-    @PutMapping("/v1/photos/update_existing")
-    public ResponseEntity<APIResponse> updatePhoto(@RequestParam("file") MultipartFile file,@RequestBody PhotoAndVideoRequest request) throws IOException {
+    @PostMapping(value = "/v1/photos/update_existing",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> updatePhoto(@Nullable @RequestPart("file") MultipartFile file,@RequestPart PhotoAndVideoRequest request) throws IOException {
 
-        Photo photo = photoService.findById(request.getPhotoId()).orElseThrow(
+        Photo photo = photoService.findById(request.getId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found")
         );
 
