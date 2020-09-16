@@ -4,8 +4,10 @@ import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.entities.UserConfirmationToken;
 import com.unionbankng.future.authorizationserver.enums.UserType;
 import com.unionbankng.future.authorizationserver.repositories.UserConfirmationTokenRepository;
+import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.services.UserService;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +26,9 @@ public class RegistrationConfirmationTest extends AbstractTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     @Before
     public void setUp() {
@@ -37,6 +42,7 @@ public class RegistrationConfirmationTest extends AbstractTest {
         Assert.assertEquals(0,result);
 
     }
+
 
     @Test
     public void expiredTokenTest() throws InterruptedException {
@@ -59,6 +65,12 @@ public class RegistrationConfirmationTest extends AbstractTest {
         int result = userConfirmationTokenService.confirmUserAccountByToken(confirmationToken.getToken());
         Assert.assertEquals(1,result);
 
+    }
+
+    @After
+    public  void tearDown(){
+        userConfirmationTokenRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
