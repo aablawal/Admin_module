@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -37,7 +38,7 @@ public class PortfolioItemsController {
 
     @PostMapping(value = "/v1/portfolio_items/create_new",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse> addNewPortfolioItem(@Nullable  @RequestPart("file") MultipartFile file,
-                                                           @RequestPart PortfolioItemRequest request) throws IOException {
+                                                           @Valid @RequestPart PortfolioItemRequest request) throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(file,request,new PortfolioItem());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItem));
@@ -45,7 +46,7 @@ public class PortfolioItemsController {
     }
 
     @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateExperience(@Nullable  @RequestPart("file") MultipartFile file,@RequestPart PortfolioItemRequest request)
+    public ResponseEntity<APIResponse> updateExperience(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart PortfolioItemRequest request)
             throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(

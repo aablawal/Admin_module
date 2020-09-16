@@ -2,6 +2,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -25,6 +27,15 @@ public class UsersController {
 
         User user = userService.updateProfileImage(image,userId);
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,user));
+        return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
+    }
+
+    @PostMapping(value = "/v1/users/{userId}/upload_profile")
+    public ResponseEntity<APIResponse> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
+
+
+        User user = userService.updateProfile(userId, request);
+
+        return ResponseEntity.ok().body(new APIResponse("Profile updated successful",true,user));
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -35,7 +36,7 @@ public class PhotosController {
     }
 
     @PostMapping(value = "/v1/photos/create_new",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> addNewPhoto(@RequestPart("file") MultipartFile file, @RequestPart PhotoAndVideoRequest request) throws IOException {
+    public ResponseEntity<APIResponse> addNewPhoto(@RequestPart("file") MultipartFile file,@Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Photo photo = photoService.saveFromRequest(file,request,new Photo());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,photo));
@@ -43,7 +44,7 @@ public class PhotosController {
     }
 
     @PostMapping(value = "/v1/photos/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updatePhoto(@Nullable @RequestPart("file") MultipartFile file,@RequestPart PhotoAndVideoRequest request) throws IOException {
+    public ResponseEntity<APIResponse> updatePhoto(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Photo photo = photoService.findById(request.getId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found")

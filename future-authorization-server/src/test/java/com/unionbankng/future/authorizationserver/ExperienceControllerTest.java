@@ -56,6 +56,7 @@ public class ExperienceControllerTest extends AbstractTest {
 
         User user = User.builder().userType(UserType.EMPLOYER).firstName("abc").lastName("bbc")
                 .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.TRUE)
+                .username("djbabs")
                 .uuid("12323344555").password(passwordEncoder.encode("password")).build();
 
         userRepository.save(user);

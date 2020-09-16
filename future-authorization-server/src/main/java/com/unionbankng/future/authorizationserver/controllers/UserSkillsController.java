@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "api")
@@ -30,7 +32,7 @@ public class UserSkillsController {
     }
 
     @PostMapping("/v1/user_skills/create_new")
-    public ResponseEntity<APIResponse> addNewSkill(@RequestBody UserSkillRequest request) {
+    public ResponseEntity<APIResponse> addNewSkill(@Valid @RequestBody UserSkillRequest request) {
 
         UserSkill userSkill = userSkillService.saveFromRequest(request,new UserSkill());
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,userSkill));

@@ -2,6 +2,7 @@ package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.entities.Photo;
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
@@ -55,9 +56,41 @@ public class UserService {
 
         String source = fileStorageService.storeFile(image,userId,BlobType.IMAGE);
         user.setImg(source);
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
+    }
+
+    public User updateProfile(Long userId, ProfileUpdateRequest request) throws IOException {
+
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+
+        if(request.getLastName() != null)
+            user.setLastName(request.getLastName());
+        if(request.getFirstName() != null)
+            user.setFirstName(request.getFirstName());
+        if(request.getBio() != null)
+            user.setBio(request.getBio());
+        if(request.getStateOfResidence() != null)
+            user.setStateOfResidence(request.getStateOfResidence());
+        if(request.getAddress() != null)
+            user.setAddress(request.getAddress());
+        if(request.getCountry() != null)
+            user.setCountry(request.getCountry());
+        if(request.getDateOfBirth() != null)
+            user.setDateOfBirth(request.getDateOfBirth());
+        if(request.getDialingCode() != null)
+            user.setDialingCode(request.getDialingCode());
+        if(request.getPhoneNumber() != null)
+            user.setPhoneNumber(request.getPhoneNumber());
+        if(request.getPricePerHour() != null)
+            user.setPricePerHour(request.getPricePerHour());
+        if(request.getJobTitle() != null)
+            user.setJobTitle(request.getJobTitle());
+
+        return userRepository.save(user);
     }
 
 
+    public boolean existsByUsername(String username){
+        return userRepository.existsByUsername(username);
+    }
 }

@@ -48,6 +48,7 @@ public class RegistrationConfirmationTest extends AbstractTest {
     public void expiredTokenTest() throws InterruptedException {
 
         User user = User.builder().userType(UserType.EMPLOYER).firstName("abc").lastName("bbc")
+                .username("djbabs")
                 .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.FALSE)
                 .uuid("12323344555").password(passwordEncoder.encode("password")).build();
 
@@ -77,6 +78,7 @@ public class RegistrationConfirmationTest extends AbstractTest {
     public void successTokenTest() {
 
         User user = User.builder().userType(UserType.EMPLOYER).firstName("abc").lastName("bbc")
+                .username("djbabs")
                 .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.FALSE)
                 .uuid("12323344555").password(passwordEncoder.encode("password")).build();
 
