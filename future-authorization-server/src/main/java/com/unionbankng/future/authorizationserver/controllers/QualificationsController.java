@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -36,7 +37,7 @@ public class QualificationsController {
     }
 
     @PostMapping(value = "/v1/qualifications/create_new",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> addNewQualification(@Nullable @RequestPart("file") MultipartFile file, @RequestPart QualificationRequest request)
+    public ResponseEntity<APIResponse> addNewQualification(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestPart QualificationRequest request)
             throws IOException {
 
         Qualification qualification = qualificationService.saveFromRequest(file,request,new Qualification());
@@ -45,7 +46,7 @@ public class QualificationsController {
     }
 
     @PostMapping(value = "/v1/qualifications/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@RequestPart QualificationRequest request)
+    public ResponseEntity<APIResponse> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart QualificationRequest request)
             throws IOException {
 
         Qualification qualification = qualificationService.findById(request.getQualificationId()).orElseThrow(

@@ -35,6 +35,7 @@ public class NegativeRegistrationTest extends AbstractTest {
         request.setLastName("aaa");
         request.setPassword("password");
         request.setDialingCode("234");
+        request.setUsername("djbabs");
         request.setEmail("abc@gmail.com");
         request.setPhoneNumber("8176267145");
         request.setUserType(UserType.EMPLOYER);
@@ -56,6 +57,7 @@ public class NegativeRegistrationTest extends AbstractTest {
         request.setFirstName("aaa");
         request.setLastName("aaa");
         request.setPassword("password");
+        request.setUsername("djbabs");
         request.setDialingCode("234");
         request.setEmail("abc@gmail.com");
         request.setPhoneNumber("8176267145");

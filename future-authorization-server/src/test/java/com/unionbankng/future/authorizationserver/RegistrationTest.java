@@ -36,9 +36,13 @@ public class RegistrationTest extends AbstractTest {
         request.setFirstName("Okeme");
         request.setLastName("Christian");
         request.setPassword("Pass@word123");
+        request.setUsername("djbabs");
         request.setDialingCode("234");
         request.setEmail("chokeme@unionbankng.com");
         request.setPhoneNumber("8176267145");
+        request.setCountry("NGN");
+        request.setStateOfResidence("Lagos");
+        request.setAddress("My test house");
         request.setUserType(UserType.EMPLOYER);
 
         String body = mapper.writeValueAsString(request);

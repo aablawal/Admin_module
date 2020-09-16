@@ -3,9 +3,7 @@ package com.unionbankng.future.authorizationserver.pojos;
 import com.unionbankng.future.authorizationserver.enums.UserType;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -20,6 +18,9 @@ public class RegistrationRequest {
     private String email;
     @NotNull
     private String password;
+    @NotNull
+    @Size(min = 6)
+    private String username;
     @NotNull
     private String dialingCode;
     @NotNull

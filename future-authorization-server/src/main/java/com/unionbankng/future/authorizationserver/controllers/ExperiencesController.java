@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -35,7 +36,7 @@ public class ExperiencesController {
     }
 
     @PostMapping(value = "/v1/experiences/create_new", consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @RequestPart ExperienceRequest request)
+    public ResponseEntity<APIResponse> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestPart ExperienceRequest request)
             throws IOException {
 
         Experience experience = experienceService.saveFromRequest(file,request,new Experience());
@@ -44,7 +45,7 @@ public class ExperiencesController {
     }
 
     @PostMapping(value = "/v1/experiences/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateExperience(@Nullable @RequestPart("file") MultipartFile file,@RequestPart ExperienceRequest request)
+    public ResponseEntity<APIResponse> updateExperience(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart ExperienceRequest request)
             throws IOException {
 
         Experience experience = experienceService.findById(request.getExperienceId()).orElseThrow(

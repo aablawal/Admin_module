@@ -56,6 +56,7 @@ public class VideosControllerTest extends AbstractTest {
         super.setUp();
 
         User user = User.builder().userType(UserType.EMPLOYER).firstName("abc").lastName("bbc")
+                .username("djbabs")
                 .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.TRUE)
                 .uuid("12323344555").password(passwordEncoder.encode("password")).build();
 

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @RestController
@@ -41,7 +42,11 @@ public class RegistrationController {
 
 
     @PostMapping("/v1/registration/register")
-    public ResponseEntity<APIResponse> register(@RequestBody RegistrationRequest request){
+    public ResponseEntity<APIResponse> register(@Valid @RequestBody RegistrationRequest request){
+
+        if (userService.existsByUsername(request.getUsername()))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    new APIResponse(messageSource.getMessage("username.exist", null, LocaleContextHolder.getLocale()),false,null));
 
         if (userService.existsByEmail(request.getEmail()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
@@ -58,7 +63,7 @@ public class RegistrationController {
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode()).stateOfResidence(request.getStateOfResidence())
                 .address(request.getAddress()).country(request.getCountry()).dateOfBirth(request.getDateOfBirth())
                 .email(request.getEmail()).dialingCode(request.getDialingCode()).phoneNumber(request.getPhoneNumber()).isEnabled(Boolean.FALSE)
-                .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).build();
+                .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername()).build();
 
 
         user = userService.save(user);
