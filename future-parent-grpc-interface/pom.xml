@@ -223,4 +223,15 @@
     <module>future-utilityservice-interface</module>
       
   </modules>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>nexus-snapshots</id>
+      <url>http://168.63.73.171:8081/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>nexus-releases</id>
+      <url>http://168.63.73.171:8081/nexus/content/repositories/releases/</url>
+    </repository>
+  </distributionManagement>
 </project>
