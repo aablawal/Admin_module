@@ -3,10 +3,12 @@ package com.unionbankng.future.authorizationserver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.authorizationserver.enums.UserType;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
+import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -15,9 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class NegativeRegistrationTest extends AbstractTest {
 
     @MockBean
-    UserService userService;
+    UserRepository userService;
 
-    @MockBean
+    @Autowired
     private ObjectMapper mapper;
 
     @Override

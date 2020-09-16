@@ -3,6 +3,9 @@ package com.unionbankng.future.authorizationserver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.authorizationserver.enums.UserType;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
+import com.unionbankng.future.authorizationserver.repositories.UserConfirmationTokenRepository;
+import com.unionbankng.future.authorizationserver.repositories.UserRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,11 @@ public class RegistrationTest extends AbstractTest {
         super.setUp();
     }
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserConfirmationTokenRepository userConfirmationTokenRepository;
 
     @Test
     public void registrationSuccessful() throws Exception {
@@ -41,5 +49,11 @@ public class RegistrationTest extends AbstractTest {
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
 
+    }
+
+    @After
+    public  void tearDown(){
+        userConfirmationTokenRepository.deleteAll();
+        userRepository.deleteAll();
     }
 }
