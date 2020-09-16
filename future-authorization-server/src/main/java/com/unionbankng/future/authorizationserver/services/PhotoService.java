@@ -5,6 +5,8 @@ import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.repositories.PhotoRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PhotoService {
 
+    Logger logger = LoggerFactory.getLogger(PhotoService.class);
     private final PhotoRepository photoRepository;
     private final FileStorageService fileStorageService;
 
@@ -33,6 +36,7 @@ public class PhotoService {
     public void deleteById (Long id){
         Photo photo = photoRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo Not Found"));
         int status = fileStorageService.deleteFileFromStorage(photo.getSource(),BlobType.IMAGE);
+        logger.info("GRPC photo delete status is {}",status);
         if(status != 200)
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         photoRepository.deleteById(id);

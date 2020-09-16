@@ -39,6 +39,7 @@ public class AzureBlobStorage implements BlobStorage {
 
     @Override
     public void delete(String identifier,BlobType blobType){
+
         BlobClient blobClient = blobType.equals(BlobType.IMAGE) ? imageContainerClient.getBlobClient(identifier)
                 : videoContainerClient.getBlobClient(identifier);
 
