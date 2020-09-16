@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.unionbankng.AppTest" time="0.024" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="14"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface/target/test-classes:/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface/target/classes:/home/chokeme/.m2/repository/junit/junit/4.11/junit-4.11.jar:/home/chokeme/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/chokeme/.m2/repository/io/grpc/grpc-stub/1.32.1/grpc-stub-1.32.1.jar:/home/chokeme/.m2/repository/io/grpc/grpc-api/1.32.1/grpc-api-1.32.1.jar:/home/chokeme/.m2/repository/io/grpc/grpc-context/1.32.1/grpc-context-1.32.1.jar:/home/chokeme/.m2/repository/com/google/guava/guava/29.0-android/guava-29.0-android.jar:/home/chokeme/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/chokeme/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/chokeme/.m2/repository/org/checkerframework/checker-compat-qual/2.5.5/checker-compat-qual-2.5.5.jar:/home/chokeme/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/chokeme/.m2/repository/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar:/home/chokeme/.m2/repository/org/codehaus/mojo/animal-sniffer-annotations/1.18/animal-sniffer-annotations-1.18.jar:/home/chokeme/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/chokeme/.m2/repository/io/grpc/grpc-protobuf/1.32.1/grpc-protobuf-1.32.1.jar:/home/chokeme/.m2/repository/com/google/protobuf/protobuf-java/3.12.0/protobuf-java-3.12.0.jar:/home/chokeme/.m2/repository/com/google/api/grpc/proto-google-common-protos/1.17.0/proto-google-common-protos-1.17.0.jar:/home/chokeme/.m2/repository/io/grpc/grpc-protobuf-lite/1.32.1/grpc-protobuf-lite-1.32.1.jar:/home/chokeme/.m2/repository/javax/annotation/javax.annotation-api/1.3.2/javax.annotation-api-1.3.2.jar:"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="14"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/java/jdk-14.0.1/lib"/>
+    <property name="sun.java.command" value="/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface/target/surefire/surefirebooter1020071620929524230.jar /home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface/target/surefire 2020-09-14T21-15-37_017-jvmRun1 surefire4180391242069713tmp surefire_014119649169737651133tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface/target/test-classes:/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface/target/classes:/home/chokeme/.m2/repository/junit/junit/4.11/junit-4.11.jar:/home/chokeme/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/chokeme/.m2/repository/io/grpc/grpc-stub/1.32.1/grpc-stub-1.32.1.jar:/home/chokeme/.m2/repository/io/grpc/grpc-api/1.32.1/grpc-api-1.32.1.jar:/home/chokeme/.m2/repository/io/grpc/grpc-context/1.32.1/grpc-context-1.32.1.jar:/home/chokeme/.m2/repository/com/google/guava/guava/29.0-android/guava-29.0-android.jar:/home/chokeme/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/chokeme/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/chokeme/.m2/repository/org/checkerframework/checker-compat-qual/2.5.5/checker-compat-qual-2.5.5.jar:/home/chokeme/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/chokeme/.m2/repository/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar:/home/chokeme/.m2/repository/org/codehaus/mojo/animal-sniffer-annotations/1.18/animal-sniffer-annotations-1.18.jar:/home/chokeme/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/chokeme/.m2/repository/io/grpc/grpc-protobuf/1.32.1/grpc-protobuf-1.32.1.jar:/home/chokeme/.m2/repository/com/google/protobuf/protobuf-java/3.12.0/protobuf-java-3.12.0.jar:/home/chokeme/.m2/repository/com/google/api/grpc/proto-google-common-protos/1.17.0/proto-google-common-protos-1.17.0.jar:/home/chokeme/.m2/repository/io/grpc/grpc-protobuf-lite/1.32.1/grpc-protobuf-lite-1.32.1.jar:/home/chokeme/.m2/repository/javax/annotation/javax.annotation-api/1.3.2/javax.annotation-api-1.3.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/chokeme"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2020-04-14"/>
+    <property name="java.home" value="/usr/java/jdk-14.0.1"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface/target/surefire/surefirebooter1020071620929524230.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="14.0.1+7"/>
+    <property name="user.name" value="chokeme"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="4.18.0-80.1.2.el8_0.x86_64"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/chokeme/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="14.0.1"/>
+    <property name="user.dir" value="/home/chokeme/Documents/Projects/ubn/future/future-backend/future-parent-grpc-interface/future-utilityservice-interface"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="14.0.1+7"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="58.0"/>
+  </properties>
+  <testcase name="shouldAnswerWithTrue" classname="com.unionbankng.AppTest" time="0.002"/>
+</testsuite>

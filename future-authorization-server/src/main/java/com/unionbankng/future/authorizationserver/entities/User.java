@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -25,6 +26,7 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String img;
     @NotNull
     @Column(length=32, nullable = false)
     private String firstName;
@@ -45,14 +47,25 @@ public class User implements Serializable {
     private UserType userType;
     @Column(length = 12)
     private String accountNumber;
+    private String address;
+    @Column(length = 3)
+    private String country;
+    @Column(length = 50)
+    private String stateOfResidence;
+    @Temporal(TemporalType.DATE)
+    private Date dateOfBirth;
     @Column(nullable = false)
     private Boolean isEnabled = true;
+    @Column(precision = 19, scale = 2)
+    private BigDecimal pricePerHour;
+    private String jobTitle;
+    @Column(columnDefinition="TEXT")
+    private  String bio;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-
 
     @PrePersist
     private void setCreatedAt() {
