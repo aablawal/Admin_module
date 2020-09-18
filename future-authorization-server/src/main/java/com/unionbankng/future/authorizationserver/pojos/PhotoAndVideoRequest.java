@@ -14,6 +14,4 @@ public class PhotoAndVideoRequest {
     @NotNull
     private String title;
     private String comment;
-    @NotNull
-    private String source;
 }

@@ -53,19 +53,7 @@ public class PhotosControllerTest extends AbstractTest {
 
         super.setUp();
 
-        User user = User.builder().userType(UserType.EMPLOYER).firstName("abc").lastName("bbc")
-                .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.TRUE)
-                .username("djbabs")
-                .uuid("12323344555").password(passwordEncoder.encode("password")).build();
-
-        userRepository.save(user);
-
         accessToken = obtainAccessToken("abc@gmail.com","password","web-client","password");
-    }
-
-    @After
-    public  void tearDown(){
-        userRepository.deleteAll();
     }
 
     @Test
@@ -111,8 +99,12 @@ public class PhotosControllerTest extends AbstractTest {
     @Test
     public void updatePhotoTest() throws Exception {
 
-        List<Photo> photos = photoRepository.findAll();
-        Photo photo = photos.get(0);
+        Photo photo = new Photo();
+        photo.setComment("Development specialist at UBN");
+        photo.setTitle("Development Specialist");
+        photo.setUserId(testUserId);
+        photo.setSource("test");
+        photo = photoRepository.save(photo);
 
         PhotoAndVideoRequest photoAndVideoRequest = new PhotoAndVideoRequest();
         photoAndVideoRequest.setComment("Development specialist at UBN");

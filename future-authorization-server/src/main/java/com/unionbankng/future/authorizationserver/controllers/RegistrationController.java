@@ -82,14 +82,8 @@ public class RegistrationController {
     @PostMapping("/v1/registration/confirmation")
     public ResponseEntity<APIResponse> confirmUserAccount(@NotNull  @RequestParam String confirmationToken){
 
-        int confirmation = userConfirmationTokenService.confirmUserAccountByToken(confirmationToken);
-
-        if(confirmation == UserConfirmationTokenService.VERIFICATION_FAILED)
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-                    new APIResponse(messageSource.getMessage("confirmation.token.notfound", null, LocaleContextHolder.getLocale()),false,null));
-
-        if(confirmation == UserConfirmationTokenService.VERIFICATION_TOKEN_EXPIRED)
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+        if (!userConfirmationTokenService.confirmUserAccountByToken(confirmationToken))
+             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new APIResponse(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()),false,null));
 
 
