@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class AuthorizationTest extends AbstractTest{
 
-    @MockBean
+    @Autowired
     UserRepository userRepository;
 
     @Override
@@ -58,14 +58,6 @@ public class AuthorizationTest extends AbstractTest{
 
     @Test
     public void authenticationSuccessful() throws Exception {
-
-        User user = User.builder().userType(UserType.EMPLOYER).firstName("abc").lastName("bbc")
-                .username("djbabs")
-                .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.TRUE)
-                .uuid("12323344555").password(passwordEncoder.encode("password")).build();
-
-        Mockito.when(userRepository.findByEmail("abc@gmail.com")).thenReturn(java.util.Optional.ofNullable(user));
-
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("username", "abc@gmail.com");

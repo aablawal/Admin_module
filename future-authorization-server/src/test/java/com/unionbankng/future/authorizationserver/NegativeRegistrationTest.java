@@ -31,11 +31,11 @@ public class NegativeRegistrationTest extends AbstractTest {
     @Test
     public void emailAlreadyExist() throws Exception {
         RegistrationRequest request = new RegistrationRequest();
-        request.setFirstName("aaa");
-        request.setLastName("aaa");
+        request.setFirstName("Okeme");
+        request.setLastName("Christian");
         request.setPassword("password");
         request.setDialingCode("234");
-        request.setUsername("djbabs");
+        request.setUsername("Baba100");
         request.setEmail("abc@gmail.com");
         request.setPhoneNumber("8176267145");
         request.setUserType(UserType.EMPLOYER);
@@ -57,9 +57,9 @@ public class NegativeRegistrationTest extends AbstractTest {
         request.setFirstName("aaa");
         request.setLastName("aaa");
         request.setPassword("password");
-        request.setUsername("djbabs");
+        request.setUsername("Baba10");
         request.setDialingCode("234");
-        request.setEmail("abc@gmail.com");
+        request.setEmail("johndoe@gmail.com");
         request.setPhoneNumber("8176267145");
         request.setUserType(UserType.EMPLOYER);
 

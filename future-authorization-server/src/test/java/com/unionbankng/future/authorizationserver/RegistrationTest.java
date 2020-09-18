@@ -3,12 +3,13 @@ package com.unionbankng.future.authorizationserver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.authorizationserver.enums.UserType;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
-import com.unionbankng.future.authorizationserver.repositories.UserConfirmationTokenRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
+import com.unionbankng.future.authorizationserver.services.MemcachedHelperService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,17 +19,15 @@ public class RegistrationTest extends AbstractTest {
     @Autowired
     private ObjectMapper mapper;
 
+    @MockBean
+    MemcachedHelperService memcachedHelperService;
+
     @Override
     @Before
     public void setUp() {
         super.setUp();
     }
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserConfirmationTokenRepository userConfirmationTokenRepository;
 
     @Test
     public void registrationSuccessful() throws Exception {
@@ -36,7 +35,7 @@ public class RegistrationTest extends AbstractTest {
         request.setFirstName("Okeme");
         request.setLastName("Christian");
         request.setPassword("Pass@word123");
-        request.setUsername("djbabs");
+        request.setUsername("baba100");
         request.setDialingCode("234");
         request.setEmail("chokeme@unionbankng.com");
         request.setPhoneNumber("8176267145");
@@ -55,9 +54,5 @@ public class RegistrationTest extends AbstractTest {
 
     }
 
-    @After
-    public  void tearDown(){
-        userConfirmationTokenRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+
 }

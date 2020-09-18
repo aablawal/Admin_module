@@ -1,11 +1,9 @@
 package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.entities.UserConfirmationToken;
 import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
-import com.unionbankng.future.authorizationserver.repositories.UserConfirmationTokenRepository;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -16,21 +14,17 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserConfirmationTokenService {
 
-    public static Integer VERIFICATION_FAILED = 0;
-    public static Integer VERIFICATION_TOKEN_EXPIRED = 1;
-    public static Integer VERIFICATION_TOKEN_VERIFIED = 2;
-
     private final Logger logger = LoggerFactory.getLogger(UserConfirmationTokenService.class);
     private final MessageSource messageSource;
     private final UserService userService;
-    private final UserConfirmationTokenRepository userConfirmationTokenRepository;
     private final EmailSender emailSender;
+    private final MemcachedHelperService memcachedHelperService;
 
 
 
@@ -44,11 +38,10 @@ public class UserConfirmationTokenService {
     public void sendConfirmationToken(User user){
 
         logger.debug("generating token for {}",user.toString());
-        UserConfirmationToken confirmationToken = new UserConfirmationToken(user,tokenExpiryInMinute);
-        userConfirmationTokenRepository.save(confirmationToken);
+        String token = UUID.randomUUID().toString();
+        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
 
-        String generatedURL = confirmationTokenURL+"?token="+confirmationToken.getToken();
-
+        String generatedURL = "%s?token=%s".formatted(confirmationTokenURL,token);
         logger.info("Sending confirmation to {}",user.toString());
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{generatedURL,Integer.toString(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
@@ -57,22 +50,22 @@ public class UserConfirmationTokenService {
         emailSender.sendEmail(emailBody);
     }
 
-    public Integer confirmUserAccountByToken(String token){
+    public Boolean confirmUserAccountByToken(String token){
 
-        UserConfirmationToken verificationToken = userConfirmationTokenRepository.findByToken(token).orElse(null);
-        if (verificationToken == null)
-            return VERIFICATION_FAILED;
+        String userEmail = memcachedHelperService.getValueByKey(token);
 
-        User user = verificationToken.getUser();
+        if(userEmail == null)
+            return false;
 
-        Calendar cal = Calendar.getInstance();
-        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0)
-            return VERIFICATION_TOKEN_EXPIRED;
+        User user  = userService.findByEmail(userEmail).orElse(null);
+
+        if (user == null)
+            return false;
 
         user.setIsEnabled(true);
         userService.save(user);
 
-        return VERIFICATION_TOKEN_VERIFIED;
+        return true;
     }
 
 

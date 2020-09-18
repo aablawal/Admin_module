@@ -48,6 +48,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Optional<User> findByEmailOrUsername(String identifier){
+        return userRepository.findByEmailOrUsername(identifier);
+    }
+
     public User updateProfileImage(MultipartFile image , Long userId) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
