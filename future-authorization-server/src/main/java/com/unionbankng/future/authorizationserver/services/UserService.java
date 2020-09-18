@@ -48,8 +48,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> findByEmailOrUsername(String identifier){
-        return userRepository.findByEmailOrUsername(identifier);
+    public Optional<User> findByEmailOrUsername(String email,String username){
+        return userRepository.findByEmailOrUsername(email,username);
     }
 
     public User updateProfileImage(MultipartFile image , Long userId) throws IOException {

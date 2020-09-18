@@ -41,7 +41,7 @@ public class UserConfirmationTokenService {
         String token = UUID.randomUUID().toString();
         memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
 
-        String generatedURL = "%s?token=%s".formatted(confirmationTokenURL,token);
+        String generatedURL = String.format("%s?token=%s",confirmationTokenURL,token);
         logger.info("Sending confirmation to {}",user.toString());
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{generatedURL,Integer.toString(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Registration Confirmation")

@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class NegativeRegistrationTest extends AbstractTest {
 
     @MockBean
-    UserRepository userService;
+    UserRepository userRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -42,7 +42,8 @@ public class NegativeRegistrationTest extends AbstractTest {
 
         String body = mapper.writeValueAsString(request);
 
-        Mockito.when(userService.existsByEmail("abc@gmail.com")).thenReturn(true);
+
+        Mockito.when(userRepository.existsByEmail("abc@gmail.com")).thenReturn(true);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +66,7 @@ public class NegativeRegistrationTest extends AbstractTest {
 
         String body = mapper.writeValueAsString(request);
 
-        Mockito.when(userService.existsByEmail("abc@gmail.com")).thenReturn(false);
+        Mockito.when(userRepository.existsByEmail("abc@gmail.com")).thenReturn(false);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)

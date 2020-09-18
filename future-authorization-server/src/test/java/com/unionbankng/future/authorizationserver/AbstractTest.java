@@ -41,7 +41,7 @@ public abstract class AbstractTest {
 
     protected MockMvc mvc;
 
-    @MockBean
+    @Autowired
     UserRepository userRepository;
 
     @Autowired

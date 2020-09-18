@@ -34,21 +34,21 @@ public class SecurityService {
 
     @Value("${email.sender}")
     private String emailSenderAddress;
-    @Value("${confirmation.token.minute.expiry}")
+    @Value("${forgot.token.seconds.expiry}")
     private int tokenExpiryInMinute;
     @Value("${forgot.password.url}")
     private String forgotPasswordURL;
 
     public void initiateForgotPassword(String identifier){
 
-        User user = userService.findByEmailOrUsername(identifier).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        User user = userService.findByEmailOrUsername(identifier,identifier).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         String token = UUID.randomUUID().toString();
         memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
 
-        String generatedURL = "%s?token=%s".formatted(forgotPasswordURL,token);
+        String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
 
-        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,"%s $s".formatted(tokenExpiryInMinute,"minutes")}, LocaleContextHolder.getLocale())
+        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,String.format("%s $s",tokenExpiryInMinute,"minutes")}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Reset Your Sidekick Password")
                 .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(user.getEmail()).displayName(user.toString()).build())).build();
 
