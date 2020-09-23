@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.services;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.ChangePasswordRequest;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
@@ -85,4 +86,28 @@ public class SecurityService {
 
     }
 
+    public ResponseEntity<APIResponse> changePassword(ChangePasswordRequest request){
+
+        if(!passwordValidator.validatePassword(request.getPassword()))
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse(messageSource.getMessage("password.validation.error",
+                            null, LocaleContextHolder.getLocale()),false,null));
+
+        if (request.getPassword().equals(request.getOldPassword()))
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse("New password and old password can't be the same",false,null));
+
+        User user = userService.findById(request.getUserId()).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+
+        if (!encoder.matches(request.getOldPassword(), user.getPassword()))
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse("You have entered an incorrect old password",false,null));
+
+
+        user.setPassword(encoder.encode(request.getPassword()));
+        userService.save(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request Successful",true,null));
+    }
 }
