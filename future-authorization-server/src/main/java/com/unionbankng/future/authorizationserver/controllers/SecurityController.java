@@ -1,6 +1,7 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.ChangePasswordRequest;
 import com.unionbankng.future.authorizationserver.services.SecurityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,4 +42,14 @@ public class SecurityController {
         return securityService.resetPassword(token,password);
 
     }
+
+    @PostMapping("v1/security/change_password")
+    public ResponseEntity<APIResponse> changePassword(@NotNull ChangePasswordRequest request){
+
+
+        return securityService.changePassword(request);
+
+    }
+
+
 }
