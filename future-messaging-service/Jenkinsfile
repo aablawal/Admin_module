@@ -36,6 +36,17 @@ pipeline {
                 }
     }
     }
+
+     stage('Test') {
+                steps {
+                    echo 'Testing..'
+                     withMaven( maven: 'maven-3.6.3' ) {
+                     sh 'cd future-messaging-service && mvn test'
+                                    }
+
+                }
+            }
+
         stage('Build') {
             steps {
                 echo 'Building..' + GLOBAL_ENVIRONMENT
@@ -50,15 +61,7 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-                 withMaven( maven: 'maven-3.6.3' ) {
-                 sh 'cd future-messaging-service && mvn test'
-                                }
 
-            }
-        }
         
         stage('Deploy') {
             steps {
