@@ -21,6 +21,9 @@ public class ValidationControllerAdvice extends ResponseEntityExceptionHandler {
             HttpStatus status,
             WebRequest request) {
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("message",ex.getLocalizedMessage());
+
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -29,8 +32,11 @@ public class ValidationControllerAdvice extends ResponseEntityExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
+        response.put("errors",errors);
+        response.put("status",HttpStatus.BAD_REQUEST);
+
         return handleExceptionInternal(
-                ex, errors, headers, HttpStatus.BAD_REQUEST, request);
+                ex, response, headers, HttpStatus.BAD_REQUEST, request);
     }
 
 
