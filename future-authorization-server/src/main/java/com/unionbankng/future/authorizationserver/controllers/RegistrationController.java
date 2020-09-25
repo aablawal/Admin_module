@@ -60,8 +60,7 @@ public class RegistrationController {
         String generatedUuid = java.util.UUID.randomUUID().toString();
 
         User user = User.builder().userType(request.getUserType()).firstName(request.getFirstName()).lastName(request.getLastName())
-                .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode()).stateOfResidence(request.getStateOfResidence())
-                .address(request.getAddress()).country(request.getCountry()).dateOfBirth(request.getDateOfBirth())
+                .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())
                 .email(request.getEmail()).dialingCode(request.getDialingCode()).phoneNumber(request.getPhoneNumber()).isEnabled(Boolean.FALSE)
                 .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername()).build();
 

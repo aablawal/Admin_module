@@ -27,10 +27,4 @@ public class RegistrationRequest {
     private String phoneNumber;
     @NotNull
     private UserType userType;
-    private String address;
-    @Size(min = 3,max = 3)
-    private String country;
-    @Size(max = 50)
-    private String stateOfResidence;
-    private Date dateOfBirth;
 }
