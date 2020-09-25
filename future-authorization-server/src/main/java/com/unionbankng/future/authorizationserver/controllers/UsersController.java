@@ -30,12 +30,19 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
     }
 
-    @PostMapping(value = "/v1/users/{userId}/upload_profile")
+    @PostMapping(value = "/v1/users/{userId}/update_profile")
     public ResponseEntity<APIResponse> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
 
 
         User user = userService.updateProfile(userId, request);
 
         return ResponseEntity.ok().body(new APIResponse("Profile updated successful",true,user));
+    }
+
+    @DeleteMapping("/v1/users/delete/{userId}")
+    public ResponseEntity<APIResponse> deleteUser(@PathVariable  Long userId){
+
+        userService.deleteById(userId);
+        return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
     }
 }

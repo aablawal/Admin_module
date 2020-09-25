@@ -48,6 +48,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public void deleteById(Long userId) {
+         userRepository.deleteById(userId);
+    }
+
     public Optional<User> findByEmailOrUsername(String email,String username){
         return userRepository.findByEmailOrUsername(email,username);
     }
