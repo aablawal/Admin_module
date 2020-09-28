@@ -21,11 +21,11 @@ pipeline {
                 script {
                     // Determine whether this is a test or a staging / production build              
                     switch (env.GIT_BRANCH) {
-                        case 'origin/staging':
+                        case 'staging':
                             GLOBAL_ENVIRONMENT = 'staging'
                             ACR_LOGINSERVER = env.ACR_DEV_LOGINSERVER
                             break
-                        case 'origin/master':
+                        case 'master':
                             GLOBAL_ENVIRONMENT = 'production'
                             ACR_LOGINSERVER = env.ACR_PROD_LOGINSERVER
                             break

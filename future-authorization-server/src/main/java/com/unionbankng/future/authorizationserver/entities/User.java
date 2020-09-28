@@ -58,6 +58,8 @@ public class User implements Serializable {
     private Date dateOfBirth;
     @Column(nullable = false)
     private Boolean isEnabled = true;
+    private Boolean isEmployer = false;
+    private Boolean isFreelancer = false;
     @Column(precision = 19, scale = 2)
     private BigDecimal pricePerHour;
     private String jobTitle;
