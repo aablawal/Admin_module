@@ -27,6 +27,7 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String img;
+    private String coverPhoto;
     @NotNull
     @Column(length=32, nullable = false)
     private String firstName;

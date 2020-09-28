@@ -30,6 +30,15 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
     }
 
+    @PostMapping(value = "/v1/users/{userId}/update_cover_photo",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> updateCoverPhoto(@Nullable @RequestPart("image") MultipartFile image,
+                                                          @PathVariable Long userId) throws IOException {
+
+        User user = userService.updateCoverPhoto(image,userId);
+
+        return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
+    }
+
     @PostMapping(value = "/v1/users/{userId}/update_profile")
     public ResponseEntity<APIResponse> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
 

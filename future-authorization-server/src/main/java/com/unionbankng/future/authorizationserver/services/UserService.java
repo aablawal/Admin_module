@@ -67,6 +67,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User updateCoverPhoto(MultipartFile image , Long userId) throws IOException {
+
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        if(user.getCoverPhoto() != null)
+            fileStorageService.deleteFileFromStorage(user.getCoverPhoto(), BlobType.IMAGE);
+
+        String source = fileStorageService.storeFile(image,userId,BlobType.IMAGE);
+        user.setCoverPhoto(source);
+        return userRepository.save(user);
+    }
+
     public User updateProfile(Long userId, ProfileUpdateRequest request) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
