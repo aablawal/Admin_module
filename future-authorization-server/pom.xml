@@ -109,6 +109,11 @@
 		</dependency>
 		<!--Caching -->
 		<dependency>
+			<groupId>com.google.code.simple-spring-memcached</groupId>
+			<artifactId>xmemcached-provider</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.googlecode.xmemcached</groupId>
 			<artifactId>xmemcached</artifactId>
 			<version>2.4.6</version>

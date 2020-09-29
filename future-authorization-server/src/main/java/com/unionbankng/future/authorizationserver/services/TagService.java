@@ -18,6 +18,7 @@ public class TagService {
         return tagRepository.findByTypeAndNameLike(tagType,likelyName,pageable);
     }
 
+
     public Page<Tag> getAllTagsByType (TagType tagType,Pageable pageable){
         return tagRepository.findByType(tagType,pageable);
     }
