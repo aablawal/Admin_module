@@ -7,20 +7,17 @@ import com.google.code.ssm.providers.xmemcached.MemcacheClientFactoryImpl;
 import com.google.code.ssm.providers.xmemcached.XMemcachedConfiguration;
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.rubyeye.xmemcached.XMemcachedClient;
-import net.rubyeye.xmemcached.auth.AuthInfo;
-import net.rubyeye.xmemcached.utils.AddrUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+
+@RefreshScope
 @Configuration
 public class MemcachedConfig extends AbstractSSMConfiguration {
 

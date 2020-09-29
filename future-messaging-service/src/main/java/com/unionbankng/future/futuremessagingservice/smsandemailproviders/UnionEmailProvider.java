@@ -1,4 +1,4 @@
-package com.unionbankng.future.futuremessagingservice.smsproviders;
+package com.unionbankng.future.futuremessagingservice.smsandemailproviders;
 
 import com.unionbankng.future.futuremessagingservice.config.UBNConfigurationProperties;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;

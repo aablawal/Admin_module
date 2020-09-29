@@ -2,6 +2,7 @@ package com.unionbankng.future.futuremessagingservice.config;
 
 import com.unionbankng.future.futuremessagingservice.pojo.UbnResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.*;
@@ -12,6 +13,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
+@RefreshScope
 @Component
 public class UBNConfigurationProperties {
 
