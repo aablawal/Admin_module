@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -88,6 +89,18 @@ public class RegistrationController {
 
         return ResponseEntity.ok().body(
                 new APIResponse(messageSource.getMessage("account.confirmation.success", null, LocaleContextHolder.getLocale()),true,null));
+
+    }
+
+    @PostMapping("/v1/registration/resend_confirmation")
+    public ResponseEntity<APIResponse> resendAccountConfirmationEmail(@NotNull  @RequestParam String userEmail){
+
+        User user = userService.findByEmail(userEmail).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        //send confirmation email
+        userConfirmationTokenService.sendConfirmationToken(user);
+
+        return ResponseEntity.ok().body(
+                new APIResponse("Link sent successfully",true,null));
 
     }
 }
