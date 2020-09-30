@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ExperienceControllerTest extends AbstractTest {
 
-    private Long testUserId = 1l;
+    private Long testProfileId = 1l;
 
     @Autowired
     UserRepository userRepository;
@@ -64,7 +64,7 @@ public class ExperienceControllerTest extends AbstractTest {
         experienceRequest.setEmploymentType(EmploymentType.FULL);
         experienceRequest.setHeadline("Development Specialist");
         experienceRequest.setTitle("Development Specialist");
-        experienceRequest.setProfileId(testUserId);
+        experienceRequest.setProfileId(testProfileId);
         experienceRequest.setStartDate("04/2020");
         experienceRequest.setEndDate("07/2020");
 
@@ -88,7 +88,7 @@ public class ExperienceControllerTest extends AbstractTest {
         experienceRequest.setEmploymentType(EmploymentType.FULL);
         experienceRequest.setHeadline("Development Specialist");
         experienceRequest.setTitle("Development Specialist");
-        experienceRequest.setProfileId(testUserId);
+        experienceRequest.setProfileId(testProfileId);
         experienceRequest.setStartDate("04/2020");
         experienceRequest.setEndDate("07/2020");
 
@@ -97,7 +97,7 @@ public class ExperienceControllerTest extends AbstractTest {
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/experiences/create_new")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -120,7 +120,7 @@ public class ExperienceControllerTest extends AbstractTest {
         experienceRequest.setEmploymentType(EmploymentType.FULL);
         experienceRequest.setHeadline("Development Specialist");
         experienceRequest.setTitle("Development Specialist");
-        experienceRequest.setProfileId(testUserId);
+        experienceRequest.setProfileId(testProfileId);
         experienceRequest.setStartDate("04/2020");
         experienceRequest.setEndDate("07/2020");
 
@@ -129,7 +129,7 @@ public class ExperienceControllerTest extends AbstractTest {
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/experiences/update_existing")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -145,7 +145,7 @@ public class ExperienceControllerTest extends AbstractTest {
         params.add("pageNo","0");
         params.add("limit","10");
 
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/experiences/find_by_user_id/"+testUserId)
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/experiences/find_by_profile_id/"+ testProfileId)
                 .params(params).header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 

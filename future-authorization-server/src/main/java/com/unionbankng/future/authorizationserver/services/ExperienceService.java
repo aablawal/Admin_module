@@ -1,5 +1,8 @@
 package com.unionbankng.future.authorizationserver.services;
 
+import com.google.code.ssm.api.InvalidateSingleCache;
+import com.google.code.ssm.api.ParameterValueKeyProvider;
+import com.google.code.ssm.api.ReadThroughSingleCache;
 import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.repositories.ExperienceRepository;
@@ -25,7 +28,8 @@ public class ExperienceService {
     private final FileStorageService fileStorageService;
 
 
-    public List<Experience> findByProfileId(Long profileId, Sort sort){
+    @ReadThroughSingleCache(namespace = "experiences_by_profile", expiration = 0)
+    public List<Experience> findByProfileId(@ParameterValueKeyProvider Long profileId, Sort sort){
         return experienceRepository.findByProfileId(profileId,sort);
     }
 
@@ -33,11 +37,13 @@ public class ExperienceService {
         return experienceRepository.save(experience);
     }
 
-    public Optional<Experience> findById (Long id){
+    @ReadThroughSingleCache(namespace = "experience", expiration = 0)
+    public Optional<Experience> findById (@ParameterValueKeyProvider Long id){
         return experienceRepository.findById(id);
     }
 
-    public void deleteById (Long id){
+    @InvalidateSingleCache(namespace = "experience")
+    public void deleteById (@ParameterValueKeyProvider Long id){
 
         Experience experience = experienceRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience Not Found"));
         int status = fileStorageService.deleteFileFromStorage(experience.getMedia(),BlobType.IMAGE);
@@ -47,6 +53,7 @@ public class ExperienceService {
         experienceRepository.deleteById(id);
     }
 
+    @InvalidateSingleCache(namespace = "experience")
     public Experience saveFromRequest (MultipartFile file,ExperienceRequest request, Experience experience) throws IOException {
         experience.setProfileId(request.getProfileId());
         experience.setCompany(request.getCompany());

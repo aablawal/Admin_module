@@ -27,7 +27,7 @@ public class FutureDAOUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
     	Collection<SimpleGrantedAuthority> c = new ArrayList<>();
-    	c.add(new SimpleGrantedAuthority(user.getProfileType().name()));
+    	c.add(new SimpleGrantedAuthority("USER"));
     	return c;
     }
 

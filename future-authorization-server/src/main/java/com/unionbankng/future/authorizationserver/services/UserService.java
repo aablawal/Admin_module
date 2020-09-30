@@ -1,5 +1,8 @@
 package com.unionbankng.future.authorizationserver.services;
 
+import com.google.code.ssm.api.InvalidateSingleCache;
+import com.google.code.ssm.api.ParameterValueKeyProvider;
+import com.google.code.ssm.api.ReadThroughSingleCache;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
@@ -22,15 +25,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    public Optional<User> findById(Long id) {
+    @ReadThroughSingleCache(namespace = "user", expiration = 0)
+    public Optional<User> findById(@ParameterValueKeyProvider Long id) {
         return userRepository.findById(id);
     }
 
-    public Optional<User> findByUuid(String uuId) {
+    @ReadThroughSingleCache(namespace = "user_uuid", expiration = 0)
+    public Optional<User> findByUuid(@ParameterValueKeyProvider String uuId) {
         return userRepository.findByUuid(uuId);
     }
 
-    public Optional<User> findByEmail(String email) {
+    @ReadThroughSingleCache(namespace = "user_email", expiration = 0)
+    public Optional<User> findByEmail(@ParameterValueKeyProvider String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -46,15 +52,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteById(Long userId) {
+    @InvalidateSingleCache(namespace = "user")
+    public void deleteById(@ParameterValueKeyProvider Long userId) {
          userRepository.deleteById(userId);
     }
 
-    public Optional<User> findByEmailOrUsername(String email,String username){
+    public Optional<User> findByEmailOrUsername(@ParameterValueKeyProvider String email, @ParameterValueKeyProvider String username){
         return userRepository.findByEmailOrUsername(email,username);
     }
 
-    public User updateProfileImage(MultipartFile image , Long userId) throws IOException {
+    @InvalidateSingleCache(namespace = "user")
+    public User updateProfileImage(MultipartFile image , @ParameterValueKeyProvider Long userId) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
         if(user.getImg() != null)
@@ -66,7 +74,8 @@ public class UserService {
     }
 
 
-    public User updatePersonalInfo(Long userId, PersonalInfoUpdateRequest request) throws IOException {
+    @InvalidateSingleCache(namespace = "user")
+    public User updatePersonalInfo(@ParameterValueKeyProvider Long userId, PersonalInfoUpdateRequest request) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 

@@ -37,7 +37,6 @@ public class RegistrationTest extends AbstractTest {
         request.setDialingCode("234");
         request.setEmail("chokeme@unionbankng.com");
         request.setPhoneNumber("8176267145");
-        request.setProfileType(ProfileType.EMPLOYER);
 
         String body = mapper.writeValueAsString(request);
 

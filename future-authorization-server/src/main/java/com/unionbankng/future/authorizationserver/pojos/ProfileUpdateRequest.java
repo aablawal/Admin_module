@@ -11,7 +11,6 @@ import java.util.Date;
 
 @Data
 public class ProfileUpdateRequest {
-    private String coverPhoto;
     private ProfileType profileType;
     private Boolean isEmployer;
     private Boolean isFreelancer;

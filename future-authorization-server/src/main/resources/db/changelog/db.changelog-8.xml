@@ -1,0 +1,104 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1601486582882-1">
+        <createTable tableName="profile">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="profilePK"/>
+            </column>
+            <column name="bio" type="varchar (max)"/>
+            <column name="cover_photo" type="varchar(255)"/>
+            <column name="created_at" type="datetime2"/>
+            <column name="is_employer" type="bit"/>
+            <column name="is_freelancer" type="bit"/>
+            <column name="job_title" type="varchar(255)"/>
+            <column name="price_per_hour" type="numeric(19, 2)"/>
+            <column name="profile_type" type="varchar(255)"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-2">
+        <addColumn tableName="experience">
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-3">
+        <addColumn tableName="photo">
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-4">
+        <addColumn tableName="portfolio_item">
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-5">
+        <addColumn tableName="qualification">
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-6">
+        <addColumn tableName="user_skill">
+            <column name="profile_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-7">
+        <addColumn tableName="video">
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-8">
+        <addUniqueConstraint columnNames="user_id" constraintName="UC_PROFILEUSER_ID_COL" tableName="profile"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-9">
+        <dropColumn columnName="bio" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-10">
+        <dropColumn columnName="cover_photo" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-11">
+        <dropColumn columnName="is_employer" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-12">
+        <dropColumn columnName="is_freelancer" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-13">
+        <dropColumn columnName="job_title" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-14">
+        <dropColumn columnName="price_per_hour" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-15">
+        <dropColumn columnName="user_id" tableName="experience"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-16">
+        <dropColumn columnName="user_id" tableName="photo"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-17">
+        <dropColumn columnName="user_id" tableName="portfolio_item"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-18">
+        <dropColumn columnName="user_id" tableName="qualification"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-19">
+        <dropColumn columnName="user_id" tableName="user_skill"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-20">
+        <dropColumn columnName="user_id" tableName="video"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601486582882-21">
+        <dropColumn columnName="user_type" tableName="app_user"/>
+    </changeSet>
+</databaseChangeLog>

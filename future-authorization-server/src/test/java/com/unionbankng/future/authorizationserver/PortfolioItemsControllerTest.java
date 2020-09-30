@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class PortfolioItemsControllerTest extends AbstractTest {
 
-    private Long testUserId = 1l;
+    private Long testProfileId = 1l;
 
     @Autowired
     UserRepository userRepository;
@@ -59,7 +59,7 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         photoAndVideoRequest.setDescription("Development specialist at UBN");
         photoAndVideoRequest.setLink("http://localhost:8080/test");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setProfileId(testUserId);
+        photoAndVideoRequest.setProfileId(testProfileId);
 
         String body = mapper.writeValueAsString(photoAndVideoRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
@@ -78,14 +78,14 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         photoAndVideoRequest.setDescription("Development specialist at UBN");
         photoAndVideoRequest.setLink("http://localhost:8080/test");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setProfileId(testUserId);
+        photoAndVideoRequest.setProfileId(testProfileId);
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
         String body = mapper.writeValueAsString(photoAndVideoRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/portfolio_items/create_new")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -102,13 +102,13 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         portfolioItem.setDescription("test");
         portfolioItem.setLink("http://localhost:8080");
         portfolioItem.setTitle("title");
-        portfolioItem.setUserId(testUserId);
+        portfolioItem.setProfileId(testProfileId);
         portfolioItem = portfolioItemRepository.save(portfolioItem);
 
         PortfolioItemRequest portfolioItemRequest = new PortfolioItemRequest();
         portfolioItemRequest.setDescription("Development specialist at UBN");
         portfolioItemRequest.setTitle("Development Specialist");
-        portfolioItemRequest.setProfileId(testUserId);
+        portfolioItemRequest.setProfileId(testProfileId);
         portfolioItemRequest.setMedia("http://localhost:8080/filename.txt");
         portfolioItemRequest.setLink("http://localhost:8080");
         portfolioItemRequest.setPortfolioItemId(portfolioItem.getId());
@@ -118,7 +118,7 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/portfolio_items/update_existing")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -134,7 +134,7 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         params.add("pageNo","0");
         params.add("limit","10");
 
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/portfolio_items/find_by_user_id/"+testUserId)
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/portfolio_items/find_by_profile_id/"+ testProfileId)
                 .params(params).header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 

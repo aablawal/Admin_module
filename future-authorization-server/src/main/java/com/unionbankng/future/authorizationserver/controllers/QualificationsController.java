@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class QualificationsController {
     @GetMapping("/v1/qualifications/find_by_profile_id/{profileId}")
     public ResponseEntity<APIResponse> findQualificationsByProfileId(@PathVariable Long profileId) {
 
-        Page<Qualification> qualifications = qualificationService.
+        List<Qualification> qualifications = qualificationService.
                 findAllByProfileId(profileId,Sort.by("createdAt").ascending());
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,qualifications));

@@ -37,7 +37,6 @@ public class NegativeRegistrationTest extends AbstractTest {
         request.setUsername("Baba100");
         request.setEmail("abc@gmail.com");
         request.setPhoneNumber("8176267145");
-        request.setProfileType(ProfileType.EMPLOYER);
 
         String body = mapper.writeValueAsString(request);
 
@@ -61,7 +60,6 @@ public class NegativeRegistrationTest extends AbstractTest {
         request.setDialingCode("234");
         request.setEmail("johndoe@gmail.com");
         request.setPhoneNumber("8176267145");
-        request.setProfileType(ProfileType.EMPLOYER);
 
         String body = mapper.writeValueAsString(request);
 

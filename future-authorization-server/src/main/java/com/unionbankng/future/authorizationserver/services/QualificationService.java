@@ -1,5 +1,8 @@
 package com.unionbankng.future.authorizationserver.services;
 
+import com.google.code.ssm.api.InvalidateSingleCache;
+import com.google.code.ssm.api.ParameterValueKeyProvider;
+import com.google.code.ssm.api.ReadThroughSingleCache;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
@@ -14,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,15 +27,18 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final FileStorageService fileStorageService;
 
-    public Page<Qualification> findAllByProfileId(Long userId, Sort sort){
+    @ReadThroughSingleCache(namespace = "qualifications_by_profile", expiration = 0)
+    public List<Qualification> findAllByProfileId(@ParameterValueKeyProvider Long userId, Sort sort){
         return qualificationRepository.findAllByProfileId(userId,sort);
     }
 
-    public Optional<Qualification> findById (Long id){
+    @ReadThroughSingleCache(namespace = "qualification", expiration = 0)
+    public Optional<Qualification> findById (@ParameterValueKeyProvider Long id){
         return qualificationRepository.findById(id);
     }
 
-    public void deleteById (Long id)
+    @InvalidateSingleCache(namespace = "qualification")
+    public void deleteById (@ParameterValueKeyProvider Long id)
     {
         Qualification qualification = qualificationRepository.findById(id).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Qualification not found"));
@@ -44,6 +51,7 @@ public class QualificationService {
         qualificationRepository.deleteById(id);
     }
 
+    @InvalidateSingleCache(namespace = "qualification")
     public Qualification saveFromRequest (MultipartFile file,QualificationRequest request, Qualification qualification) throws IOException {
         qualification.setProfileId(request.getProfileId());
         qualification.setActivities(request.getActivities());

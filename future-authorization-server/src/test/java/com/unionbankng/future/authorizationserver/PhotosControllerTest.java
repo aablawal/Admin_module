@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class PhotosControllerTest extends AbstractTest {
 
-    private Long testUserId = 1l;
+    private Long testProfileId = 1l;
 
     @Autowired
     UserRepository userRepository;
@@ -57,7 +57,7 @@ public class PhotosControllerTest extends AbstractTest {
         PhotoAndVideoRequest photoAndVideoRequest = new PhotoAndVideoRequest();
         photoAndVideoRequest.setComment("Development specialist at UBN");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setProfileId(testUserId);
+        photoAndVideoRequest.setProfileId(testProfileId);
 
         String body = mapper.writeValueAsString(photoAndVideoRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
@@ -75,14 +75,14 @@ public class PhotosControllerTest extends AbstractTest {
         PhotoAndVideoRequest photoAndVideoRequest = new PhotoAndVideoRequest();
         photoAndVideoRequest.setComment("Development specialist at UBN");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setProfileId(testUserId);
+        photoAndVideoRequest.setProfileId(testProfileId);
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
         String body = mapper.writeValueAsString(photoAndVideoRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/photos/create_new")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -97,14 +97,14 @@ public class PhotosControllerTest extends AbstractTest {
         Photo photo = new Photo();
         photo.setComment("Development specialist at UBN");
         photo.setTitle("Development Specialist");
-        photo.setUserId(testUserId);
+        photo.setProfileId(testProfileId);
         photo.setSource("test");
         photo = photoRepository.save(photo);
 
         PhotoAndVideoRequest photoAndVideoRequest = new PhotoAndVideoRequest();
         photoAndVideoRequest.setComment("Development specialist at UBN");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setProfileId(testUserId);
+        photoAndVideoRequest.setProfileId(testProfileId);
         photoAndVideoRequest.setId(photo.getId());
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
@@ -112,7 +112,7 @@ public class PhotosControllerTest extends AbstractTest {
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.IMAGE)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/photos/update_existing")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -128,7 +128,7 @@ public class PhotosControllerTest extends AbstractTest {
         params.add("pageNo","0");
         params.add("limit","10");
 
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/photos/find_by_user_id/"+testUserId)
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/photos/find_by_profile_id/"+ testProfileId)
                 .params(params).header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 

@@ -57,7 +57,7 @@ public abstract class AbstractTest {
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .addFilters(springSecurityFilterChain).build();
 
-        User user = User.builder().profileType(ProfileType.EMPLOYER).firstName("abc").lastName("bbc")
+        User user = User.builder().firstName("abc").lastName("bbc")
                 .username("djbabs")
                 .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.TRUE)
                 .uuid("12323344555").password(passwordEncoder.encode("password")).build();

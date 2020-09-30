@@ -1,5 +1,8 @@
 package com.unionbankng.future.authorizationserver.services;
 
+import com.google.code.ssm.api.InvalidateSingleCache;
+import com.google.code.ssm.api.ParameterValueKeyProvider;
+import com.google.code.ssm.api.ReadThroughSingleCache;
 import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.User;
@@ -27,9 +30,11 @@ public class ProfileService {
     private final FileStorageService fileStorageService;
 
 
-    public Optional<Profile> findByUserId (Long userId){
+    @ReadThroughSingleCache(namespace = "profile", expiration = 0)
+    public Optional<Profile> findByUserId (@ParameterValueKeyProvider Long userId){
         return profileRepository.findByUserId(userId);
     }
+
 
     public Profile save (Profile profile){
         return profileRepository.save(profile);
@@ -39,7 +44,8 @@ public class ProfileService {
         return profileRepository.findById(id);
     }
 
-    public Profile updateCoverPhoto(MultipartFile image , Long profileId) throws IOException {
+    @InvalidateSingleCache(namespace = "profile")
+    public Profile updateCoverPhoto(MultipartFile image , @ParameterValueKeyProvider Long profileId) throws IOException {
 
         Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
 
@@ -51,7 +57,8 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
-    public Profile updateProfile(Long profileId, ProfileUpdateRequest request) throws IOException {
+    @InvalidateSingleCache(namespace = "profile")
+    public Profile updateProfile(@ParameterValueKeyProvider Long profileId, ProfileUpdateRequest request) throws IOException {
 
         Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
 
@@ -61,14 +68,16 @@ public class ProfileService {
             profile.setPricePerHour(request.getPricePerHour());
         if(request.getBio() != null)
             request.setBio(request.getBio());
-        if(request.getCoverPhoto() != null)
-            request.setCoverPhoto(request.getCoverPhoto());
         if(request.getIsEmployer() != null)
             profile.setIsEmployer(request.getIsEmployer());
         if(request.getIsFreelancer() != null)
             profile.setIsFreelancer(request.getIsFreelancer());
 
         return profileRepository.save(profile);
+    }
+
+    public void deleteAllByUserId(Long userId){
+        profileRepository.deleteAllByUserId(userId);
     }
 
 }

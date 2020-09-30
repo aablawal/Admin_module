@@ -5,7 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 
 public interface QualificationRepository extends JpaRepository<Qualification, Long> {
-    Page<Qualification> findAllByProfileId(Long profileId, Sort sort);
+    List<Qualification> findAllByProfileId(Long profileId, Sort sort);
 }

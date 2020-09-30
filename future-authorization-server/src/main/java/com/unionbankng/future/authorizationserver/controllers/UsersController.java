@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
+import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.io.IOException;
 public class UsersController {
 
     private final UserService userService;
+    private final ProfileService profileService;
 
 
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
@@ -42,6 +44,7 @@ public class UsersController {
     @DeleteMapping("/v1/users/delete/{userId}")
     public ResponseEntity<APIResponse> deleteUser(@PathVariable  Long userId){
 
+        profileService.deleteAllByUserId(userId);
         userService.deleteById(userId);
         return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
     }

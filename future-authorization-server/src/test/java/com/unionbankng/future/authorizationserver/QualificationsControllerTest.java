@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class QualificationsControllerTest extends AbstractTest {
 
-    private Long testUserId = 1l;
+    private Long testProfileId = 1l;
 
     @Autowired
     UserRepository userRepository;
@@ -63,7 +63,7 @@ public class QualificationsControllerTest extends AbstractTest {
         qualificationRequest.setFieldOfStudy("Electronics And Computer Technology");
         qualificationRequest.setGrade("1st Class");
         qualificationRequest.setSchool("University Of Calabar");
-        qualificationRequest.setProfileId(testUserId);
+        qualificationRequest.setProfileId(testProfileId);
 
         String body = mapper.writeValueAsString(qualificationRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
@@ -87,14 +87,14 @@ public class QualificationsControllerTest extends AbstractTest {
         qualificationRequest.setFieldOfStudy("Electronics And Computer Technology");
         qualificationRequest.setGrade("1st Class");
         qualificationRequest.setSchool("University Of Calabar");
-        qualificationRequest.setProfileId(testUserId);
+        qualificationRequest.setProfileId(testProfileId);
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
         String body = mapper.writeValueAsString(qualificationRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/qualifications/create_new")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -115,7 +115,7 @@ public class QualificationsControllerTest extends AbstractTest {
         qualification.setFieldOfStudy("Electronics And Computer Technology");
         qualification.setGrade("1st Class");
         qualification.setSchool("University Of Calabar");
-        qualification.setUserId(testUserId);
+        qualification.setProfileId(testProfileId);
         qualification = qualificationRepository.save(qualification);
 
         QualificationRequest qualificationRequest = new QualificationRequest();
@@ -127,7 +127,7 @@ public class QualificationsControllerTest extends AbstractTest {
         qualificationRequest.setFieldOfStudy("Electronics And Computer Technology");
         qualificationRequest.setGrade("1st Class");
         qualificationRequest.setSchool("University Of Calabar");
-        qualificationRequest.setProfileId(testUserId);
+        qualificationRequest.setProfileId(testProfileId);
         qualificationRequest.setQualificationId(qualification.getId());
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
@@ -135,7 +135,7 @@ public class QualificationsControllerTest extends AbstractTest {
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
 
 
-        Mockito.when(fileStorageService.storeFile(firstFile,testUserId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
+        Mockito.when(fileStorageService.storeFile(firstFile, testProfileId, BlobType.VIDEO)).thenReturn("http://localhost:8080/filename.txt");
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/qualifications/update_existing")
                 .file(firstFile).file(bodyPart).header("Authorization", "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
@@ -151,7 +151,7 @@ public class QualificationsControllerTest extends AbstractTest {
         params.add("pageNo","0");
         params.add("limit","10");
 
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/qualifications/find_by_user_id/"+testUserId)
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/qualifications/find_by_profile_id/"+ testProfileId)
                 .params(params).header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 

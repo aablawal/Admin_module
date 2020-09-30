@@ -1,5 +1,8 @@
 package com.unionbankng.future.authorizationserver.services;
 
+import com.google.code.ssm.api.InvalidateSingleCache;
+import com.google.code.ssm.api.ParameterValueKeyProvider;
+import com.google.code.ssm.api.ReadThroughSingleCache;
 import com.unionbankng.future.authorizationserver.entities.Video;
 import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.repositories.VideoRepository;
@@ -26,11 +29,13 @@ public class VideoService {
         return videoRepository.findAllByProfileId(profileId,pageable);
     }
 
-    public Optional<Video> findById (Long id){
+    @ReadThroughSingleCache(namespace = "video", expiration = 0)
+    public Optional<Video> findById (@ParameterValueKeyProvider Long id){
         return videoRepository.findById(id);
     }
 
-    public void deleteById (Long id){
+    @InvalidateSingleCache(namespace = "video")
+    public void deleteById (@ParameterValueKeyProvider Long id){
         Video video = videoRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Video Not Found"));
         int status = fileStorageService.deleteFileFromStorage(video.getSource(),BlobType.VIDEO);
         if(status != 200)
