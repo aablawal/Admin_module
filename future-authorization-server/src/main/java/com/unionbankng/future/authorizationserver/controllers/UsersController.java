@@ -6,9 +6,11 @@ import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateReques
 import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -28,6 +30,14 @@ public class UsersController {
                                                           @PathVariable Long userId) throws IOException {
 
         User user = userService.updateProfileImage(image,userId);
+
+        return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
+    }
+
+    @GetMapping("/v1/users/{userId}")
+    public ResponseEntity<APIResponse> getUserById(@PathVariable Long userId) {
+
+        User user = userService.findById(userId).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
     }

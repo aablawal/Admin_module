@@ -75,6 +75,7 @@ public class SecurityService {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new APIResponse("Token expired or not found",false,null));
 
+        memcachedHelperService.clear(token);
 
         if(!passwordValidator.validatePassword(password))
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(

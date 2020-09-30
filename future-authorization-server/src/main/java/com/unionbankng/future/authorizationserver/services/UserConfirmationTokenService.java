@@ -62,6 +62,7 @@ public class UserConfirmationTokenService {
             return false;
 
         User user  = userService.findByEmail(userEmail).orElse(null);
+        memcachedHelperService.clear(token);
 
         if (user == null)
             return false;
