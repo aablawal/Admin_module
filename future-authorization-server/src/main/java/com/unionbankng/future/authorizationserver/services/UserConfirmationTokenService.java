@@ -42,7 +42,7 @@ public class UserConfirmationTokenService {
 
         logger.debug("generating token for {}",user.toString());
         String token = UUID.randomUUID().toString();
-        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
+        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
 
         String generatedURL = String.format("%s?token=%s",confirmationTokenURL,token);
         logger.info("Sending confirmation to {}",user.toString());
