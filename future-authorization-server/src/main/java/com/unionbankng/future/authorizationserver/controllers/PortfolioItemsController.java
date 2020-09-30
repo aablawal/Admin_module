@@ -26,10 +26,10 @@ public class PortfolioItemsController {
     private final PortfolioItemService portfolioItemService;
 
     @GetMapping("/v1/portfolio_items/find_by_profile_id/{profileId}")
-    public ResponseEntity<APIResponse> findPortfolioItemByUserId(@PathVariable Long userId,
+    public ResponseEntity<APIResponse> findPortfolioItemByUserId(@PathVariable Long profileId,
                                                               @RequestParam int pageNo, @RequestParam int limit) {
 
-        Page<PortfolioItem> portfolioItems = portfolioItemService.findAllByUserId(userId,PageRequest.of(pageNo, limit,
+        Page<PortfolioItem> portfolioItems = portfolioItemService.findAllByUserId(profileId,PageRequest.of(pageNo, limit,
                 Sort.by("createdAt").ascending()));
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItems));
