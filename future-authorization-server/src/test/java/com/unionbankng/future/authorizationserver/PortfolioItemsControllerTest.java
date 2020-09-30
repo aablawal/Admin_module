@@ -2,16 +2,11 @@ package com.unionbankng.future.authorizationserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.authorizationserver.entities.PortfolioItem;
-import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.entities.Video;
-import com.unionbankng.future.authorizationserver.enums.UserType;
-import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
 import com.unionbankng.future.authorizationserver.repositories.PortfolioItemRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.FileStorageService;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -64,7 +59,7 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         photoAndVideoRequest.setDescription("Development specialist at UBN");
         photoAndVideoRequest.setLink("http://localhost:8080/test");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setUserId(testUserId);
+        photoAndVideoRequest.setProfileId(testUserId);
 
         String body = mapper.writeValueAsString(photoAndVideoRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
@@ -83,7 +78,7 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         photoAndVideoRequest.setDescription("Development specialist at UBN");
         photoAndVideoRequest.setLink("http://localhost:8080/test");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setUserId(testUserId);
+        photoAndVideoRequest.setProfileId(testUserId);
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
         String body = mapper.writeValueAsString(photoAndVideoRequest);
@@ -113,7 +108,7 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         PortfolioItemRequest portfolioItemRequest = new PortfolioItemRequest();
         portfolioItemRequest.setDescription("Development specialist at UBN");
         portfolioItemRequest.setTitle("Development Specialist");
-        portfolioItemRequest.setUserId(testUserId);
+        portfolioItemRequest.setProfileId(testUserId);
         portfolioItemRequest.setMedia("http://localhost:8080/filename.txt");
         portfolioItemRequest.setLink("http://localhost:8080");
         portfolioItemRequest.setPortfolioItemId(portfolioItem.getId());

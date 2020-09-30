@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 public class ExperienceRequest {
     private Long experienceId;
     @NotNull
-    private Long userId;
+    private Long profileId;
     @NotNull
     private String title;
     @NotNull

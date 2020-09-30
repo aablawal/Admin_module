@@ -1,17 +1,12 @@
 package com.unionbankng.future.authorizationserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.authorizationserver.entities.PortfolioItem;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
-import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.enums.UserType;
-import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.FileStorageService;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -68,7 +63,7 @@ public class QualificationsControllerTest extends AbstractTest {
         qualificationRequest.setFieldOfStudy("Electronics And Computer Technology");
         qualificationRequest.setGrade("1st Class");
         qualificationRequest.setSchool("University Of Calabar");
-        qualificationRequest.setUserId(testUserId);
+        qualificationRequest.setProfileId(testUserId);
 
         String body = mapper.writeValueAsString(qualificationRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
@@ -92,7 +87,7 @@ public class QualificationsControllerTest extends AbstractTest {
         qualificationRequest.setFieldOfStudy("Electronics And Computer Technology");
         qualificationRequest.setGrade("1st Class");
         qualificationRequest.setSchool("University Of Calabar");
-        qualificationRequest.setUserId(testUserId);
+        qualificationRequest.setProfileId(testUserId);
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
         String body = mapper.writeValueAsString(qualificationRequest);
@@ -132,7 +127,7 @@ public class QualificationsControllerTest extends AbstractTest {
         qualificationRequest.setFieldOfStudy("Electronics And Computer Technology");
         qualificationRequest.setGrade("1st Class");
         qualificationRequest.setSchool("University Of Calabar");
-        qualificationRequest.setUserId(testUserId);
+        qualificationRequest.setProfileId(testUserId);
         qualificationRequest.setQualificationId(qualification.getId());
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());

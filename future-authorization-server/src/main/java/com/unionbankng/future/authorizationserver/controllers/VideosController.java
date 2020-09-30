@@ -25,11 +25,11 @@ public class VideosController {
 
     private final VideoService videoService;
 
-    @GetMapping("/v1/videos/find_by_user_id/{userId}")
-    public ResponseEntity<APIResponse> findExperienceByUserId(@PathVariable Long userId,
+    @GetMapping("/v1/videos/find_by_profile_id/{profileId}")
+    public ResponseEntity<APIResponse> findExperienceByProfileId(@PathVariable Long profileId,
                                                               @RequestParam int pageNo, @RequestParam int limit) {
 
-        Page<Video> videos = videoService.findAllByUserId(userId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
+        Page<Video> videos = videoService.findAllByProfileId(profileId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,videos));
 

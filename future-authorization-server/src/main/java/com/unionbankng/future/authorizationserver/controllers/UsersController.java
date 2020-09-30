@@ -2,7 +2,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
+import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,20 +30,11 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
     }
 
-    @PostMapping(value = "/v1/users/{userId}/update_cover_photo",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateCoverPhoto(@Nullable @RequestPart("image") MultipartFile image,
-                                                          @PathVariable Long userId) throws IOException {
-
-        User user = userService.updateCoverPhoto(image,userId);
-
-        return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
-    }
-
     @PostMapping(value = "/v1/users/{userId}/update_profile")
-    public ResponseEntity<APIResponse> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
+    public ResponseEntity<APIResponse> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody PersonalInfoUpdateRequest request) throws IOException {
 
 
-        User user = userService.updateProfile(userId, request);
+        User user = userService.updatePersonalInfo(userId, request);
 
         return ResponseEntity.ok().body(new APIResponse("Profile updated successful",true,user));
     }

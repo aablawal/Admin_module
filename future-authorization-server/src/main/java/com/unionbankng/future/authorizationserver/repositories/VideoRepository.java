@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface VideoRepository extends JpaRepository<Video, Long> {
-    Page<Video> findByUserId(Long userId, Pageable pageable);
+    Page<Video> findAllByProfileId(Long profileId, Pageable pageable);
 }

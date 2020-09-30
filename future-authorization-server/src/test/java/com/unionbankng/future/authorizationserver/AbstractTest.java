@@ -7,13 +7,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.enums.UserType;
+import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
@@ -58,7 +57,7 @@ public abstract class AbstractTest {
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .addFilters(springSecurityFilterChain).build();
 
-        User user = User.builder().userType(UserType.EMPLOYER).firstName("abc").lastName("bbc")
+        User user = User.builder().profileType(ProfileType.EMPLOYER).firstName("abc").lastName("bbc")
                 .username("djbabs")
                 .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.TRUE)
                 .uuid("12323344555").password(passwordEncoder.encode("password")).build();

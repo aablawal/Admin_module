@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 public class QualificationRequest {
     private Long qualificationId;
     @NotNull
-    private Long userId;
+    private Long profileId;
     @NotNull
     private String school;
     @NotNull

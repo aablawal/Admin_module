@@ -25,11 +25,11 @@ public class PhotosController {
 
     private final PhotoService photoService;
 
-    @GetMapping("/v1/photos/find_by_user_id/{userId}")
-    public ResponseEntity<APIResponse> findExperienceByUserId(@PathVariable Long userId,
+    @GetMapping("/v1/photos/find_by_profile_id/{profileId}")
+    public ResponseEntity<APIResponse> findExperienceByProfileId(@PathVariable Long profileId,
                                                               @RequestParam int pageNo, @RequestParam int limit) {
 
-        Page<Photo> photos = photoService.findAllByUserId(userId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
+        Page<Photo> photos = photoService.findAllByProfileId(profileId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,photos));
 

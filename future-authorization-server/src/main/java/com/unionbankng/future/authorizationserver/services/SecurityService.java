@@ -8,6 +8,7 @@ import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
+import com.unionbankng.future.authorizationserver.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -30,7 +31,8 @@ public class SecurityService {
     private final MessageSource messageSource;
     private final EmailSender emailSender;
     private final PasswordEncoder encoder;
-    private PasswordValidator passwordValidator = PasswordValidator.buildValidator(false, true, true, 6, 40);
+    private PasswordValidator passwordValidator = PasswordValidator.
+            buildValidator(false, true, true, 6, 40);
 
 
     @Value("${email.sender}")
@@ -42,16 +44,19 @@ public class SecurityService {
 
     public void initiateForgotPassword(String identifier){
 
-        User user = userService.findByEmailOrUsername(identifier,identifier).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        User user = userService.findByEmailOrUsername(identifier,identifier)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         String token = UUID.randomUUID().toString();
         memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
 
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
 
-        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,String.format("%s $s",tokenExpiryInMinute,"minutes")}, LocaleContextHolder.getLocale())
+        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,
+                Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Reset Your Sidekick Password")
-                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(user.getEmail()).displayName(user.toString()).build())).build();
+                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).
+                        email(user.getEmail()).displayName(user.toString()).build())).build();
 
         emailSender.sendEmail(emailBody);
     }
@@ -76,7 +81,8 @@ public class SecurityService {
                     new APIResponse(messageSource.getMessage("password.validation.error",
                             null, LocaleContextHolder.getLocale()),false,null));
 
-        User user  = userService.findByEmail(userEmail).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        User user  = userService.findByEmail(userEmail).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         user.setPassword(encoder.encode(password));
 
@@ -97,7 +103,8 @@ public class SecurityService {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new APIResponse("New password and old password can't be the same",false,null));
 
-        User user = userService.findById(request.getUserId()).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        User user = userService.findById(request.getUserId())
+                .orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         if (!encoder.matches(request.getOldPassword(), user.getPassword()))
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(

@@ -1,12 +1,10 @@
 package com.unionbankng.future.authorizationserver.pojos;
 
-import com.unionbankng.future.authorizationserver.enums.UserType;
+import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
 @Data
 public class RegistrationRequest {
@@ -25,6 +23,4 @@ public class RegistrationRequest {
     private String dialingCode;
     @NotNull
     private String phoneNumber;
-    @NotNull
-    private UserType userType;
 }

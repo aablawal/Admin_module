@@ -1,9 +1,12 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
+import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import org.slf4j.Logger;
@@ -27,16 +30,18 @@ public class RegistrationController {
 
     private final MessageSource messageSource;
     private final UserService userService;
+    private final ProfileService profileService;
     private final PasswordEncoder passwordEncoder;
     private final UserConfirmationTokenService userConfirmationTokenService;
 
     private PasswordValidator passwordValidator;
 
     private RegistrationController(MessageSource messageSource, UserService userService, PasswordEncoder passwordEncoder
-            ,UserConfirmationTokenService userConfirmationTokenService){
+            ,UserConfirmationTokenService userConfirmationTokenService,ProfileService profileService){
         this.messageSource = messageSource;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.profileService = profileService;
         this.userConfirmationTokenService = userConfirmationTokenService;
         passwordValidator = PasswordValidator.buildValidator(false, true, true, 6, 40);
     }
@@ -60,7 +65,7 @@ public class RegistrationController {
         // generate uuid for user
         String generatedUuid = java.util.UUID.randomUUID().toString();
 
-        User user = User.builder().userType(request.getUserType()).firstName(request.getFirstName()).lastName(request.getLastName())
+        User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())
                 .email(request.getEmail()).dialingCode(request.getDialingCode()).phoneNumber(request.getPhoneNumber()).isEnabled(Boolean.FALSE)
                 .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername()).build();
@@ -68,6 +73,9 @@ public class RegistrationController {
 
         user = userService.save(user);
 
+        //create basic profile
+        Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();
+        profileService.save(profile);
 
         //send confirmation email
         userConfirmationTokenService.sendConfirmationToken(user);

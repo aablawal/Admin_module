@@ -1,10 +1,9 @@
 package com.unionbankng.future.authorizationserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.authorizationserver.enums.UserType;
+import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
-import com.unionbankng.future.authorizationserver.services.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -38,7 +37,7 @@ public class NegativeRegistrationTest extends AbstractTest {
         request.setUsername("Baba100");
         request.setEmail("abc@gmail.com");
         request.setPhoneNumber("8176267145");
-        request.setUserType(UserType.EMPLOYER);
+        request.setProfileType(ProfileType.EMPLOYER);
 
         String body = mapper.writeValueAsString(request);
 
@@ -62,7 +61,7 @@ public class NegativeRegistrationTest extends AbstractTest {
         request.setDialingCode("234");
         request.setEmail("johndoe@gmail.com");
         request.setPhoneNumber("8176267145");
-        request.setUserType(UserType.EMPLOYER);
+        request.setProfileType(ProfileType.EMPLOYER);
 
         String body = mapper.writeValueAsString(request);
 

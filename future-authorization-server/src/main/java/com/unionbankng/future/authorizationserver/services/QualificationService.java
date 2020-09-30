@@ -7,6 +7,7 @@ import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,8 +23,8 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final FileStorageService fileStorageService;
 
-    public Page<Qualification> findAllByUserId (Long userId, Pageable pageable){
-        return qualificationRepository.findByUserId(userId,pageable);
+    public Page<Qualification> findAllByProfileId(Long userId, Sort sort){
+        return qualificationRepository.findAllByProfileId(userId,sort);
     }
 
     public Optional<Qualification> findById (Long id){
@@ -44,7 +45,7 @@ public class QualificationService {
     }
 
     public Qualification saveFromRequest (MultipartFile file,QualificationRequest request, Qualification qualification) throws IOException {
-        qualification.setUserId(request.getUserId());
+        qualification.setProfileId(request.getProfileId());
         qualification.setActivities(request.getActivities());
         qualification.setDegree(request.getDegree());
         qualification.setDescription(request.getDescription());
@@ -53,7 +54,7 @@ public class QualificationService {
         qualification.setFieldOfStudy(request.getFieldOfStudy());
         qualification.setSchool(request.getSchool());
         if (file != null){
-            String source = fileStorageService.storeFile(file, request.getUserId(), BlobType.IMAGE);
+            String source = fileStorageService.storeFile(file, request.getProfileId(), BlobType.IMAGE);
             qualification.setMedia(source);
         }
 

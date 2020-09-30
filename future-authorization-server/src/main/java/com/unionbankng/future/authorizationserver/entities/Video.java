@@ -24,7 +24,7 @@ public class Video implements Serializable {
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
-    private Long userId;
+    private Long profileId;
     @Column(columnDefinition="TEXT")
     private String comment;
     @Column(nullable = false)

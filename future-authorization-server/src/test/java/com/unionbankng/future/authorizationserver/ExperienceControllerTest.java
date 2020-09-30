@@ -2,15 +2,12 @@ package com.unionbankng.future.authorizationserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.authorizationserver.entities.Experience;
-import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.EmploymentType;
-import com.unionbankng.future.authorizationserver.enums.UserType;
 import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.repositories.ExperienceRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.FileStorageService;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -67,7 +64,7 @@ public class ExperienceControllerTest extends AbstractTest {
         experienceRequest.setEmploymentType(EmploymentType.FULL);
         experienceRequest.setHeadline("Development Specialist");
         experienceRequest.setTitle("Development Specialist");
-        experienceRequest.setUserId(testUserId);
+        experienceRequest.setProfileId(testUserId);
         experienceRequest.setStartDate("04/2020");
         experienceRequest.setEndDate("07/2020");
 
@@ -91,7 +88,7 @@ public class ExperienceControllerTest extends AbstractTest {
         experienceRequest.setEmploymentType(EmploymentType.FULL);
         experienceRequest.setHeadline("Development Specialist");
         experienceRequest.setTitle("Development Specialist");
-        experienceRequest.setUserId(testUserId);
+        experienceRequest.setProfileId(testUserId);
         experienceRequest.setStartDate("04/2020");
         experienceRequest.setEndDate("07/2020");
 
@@ -123,7 +120,7 @@ public class ExperienceControllerTest extends AbstractTest {
         experienceRequest.setEmploymentType(EmploymentType.FULL);
         experienceRequest.setHeadline("Development Specialist");
         experienceRequest.setTitle("Development Specialist");
-        experienceRequest.setUserId(testUserId);
+        experienceRequest.setProfileId(testUserId);
         experienceRequest.setStartDate("04/2020");
         experienceRequest.setEndDate("07/2020");
 

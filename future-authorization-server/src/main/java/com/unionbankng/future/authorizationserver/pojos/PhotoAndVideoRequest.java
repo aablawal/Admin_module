@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 public class PhotoAndVideoRequest {
     private Long id;
     @NotNull
-    private Long userId;
+    private Long profileId;
     @NotNull
     private String title;
     private String comment;

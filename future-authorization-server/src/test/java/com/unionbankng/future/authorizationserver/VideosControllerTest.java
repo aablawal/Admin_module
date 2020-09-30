@@ -1,16 +1,12 @@
 package com.unionbankng.future.authorizationserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.authorizationserver.entities.Photo;
-import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.entities.Video;
-import com.unionbankng.future.authorizationserver.enums.UserType;
 import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.repositories.VideoRepository;
 import com.unionbankng.future.authorizationserver.services.FileStorageService;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -18,12 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.event.annotation.AfterTestMethod;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,7 +58,7 @@ public class VideosControllerTest extends AbstractTest {
         PhotoAndVideoRequest photoAndVideoRequest = new PhotoAndVideoRequest();
         photoAndVideoRequest.setComment("Development specialist at UBN");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setUserId(testUserId);
+        photoAndVideoRequest.setProfileId(testUserId);
 
         String body = mapper.writeValueAsString(photoAndVideoRequest);
         MockMultipartFile bodyPart = new MockMultipartFile("request", "", "application/json", body.getBytes());
@@ -83,7 +76,7 @@ public class VideosControllerTest extends AbstractTest {
         PhotoAndVideoRequest photoAndVideoRequest = new PhotoAndVideoRequest();
         photoAndVideoRequest.setComment("Development specialist at UBN");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setUserId(testUserId);
+        photoAndVideoRequest.setProfileId(testUserId);
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
         String body = mapper.writeValueAsString(photoAndVideoRequest);
@@ -112,7 +105,7 @@ public class VideosControllerTest extends AbstractTest {
         PhotoAndVideoRequest photoAndVideoRequest = new PhotoAndVideoRequest();
         photoAndVideoRequest.setComment("Development specialist at UBN");
         photoAndVideoRequest.setTitle("Development Specialist");
-        photoAndVideoRequest.setUserId(testUserId);
+        photoAndVideoRequest.setProfileId(testUserId);
         photoAndVideoRequest.setId(video.getId());
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());

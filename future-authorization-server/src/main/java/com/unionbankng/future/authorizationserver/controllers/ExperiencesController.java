@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,11 +26,10 @@ public class ExperiencesController {
 
     private final ExperienceService experienceService;
 
-    @GetMapping("/v1/experiences/find_by_user_id/{userId}")
-    public ResponseEntity<APIResponse> findExperienceByUserId(@PathVariable Long userId,
-                                                              @RequestParam int pageNo, @RequestParam int limit) {
+    @GetMapping("/v1/experiences/find_by_profile_id/{profileId}")
+    public ResponseEntity<APIResponse> findExperienceByProfileId(@PathVariable Long profileId) {
 
-        Page<Experience> experiences = experienceService.findAllByUserId(userId,PageRequest.of(pageNo, limit, Sort.by("startDate").ascending()));
+        List<Experience> experiences = experienceService.findByProfileId(profileId,Sort.by("startDate").ascending());
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,experiences));
 

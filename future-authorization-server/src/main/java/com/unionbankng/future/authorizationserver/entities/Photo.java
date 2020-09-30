@@ -23,7 +23,7 @@ public class Photo implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private Long userId;
+    private Long profileId;
     @Column(nullable = false)
     private String title;
     @Column(columnDefinition="TEXT")

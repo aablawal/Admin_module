@@ -22,8 +22,8 @@ public class VideoService {
     private final VideoRepository videoRepository;
     private final FileStorageService fileStorageService;
 
-    public Page<Video> findAllByUserId (Long userId, Pageable pageable){
-        return videoRepository.findByUserId(userId,pageable);
+    public Page<Video> findAllByProfileId (Long profileId, Pageable pageable){
+        return videoRepository.findAllByProfileId(profileId,pageable);
     }
 
     public Optional<Video> findById (Long id){
@@ -39,10 +39,10 @@ public class VideoService {
     }
 
     public Video saveFromRequest (MultipartFile file, PhotoAndVideoRequest request, Video video) throws IOException {
-        video.setUserId(request.getUserId());
+        video.setProfileId(request.getProfileId());
         video.setComment(request.getComment());
         if (file != null){
-            String source = fileStorageService.storeFile(file, request.getUserId(), BlobType.VIDEO);
+            String source = fileStorageService.storeFile(file, request.getProfileId(), BlobType.VIDEO);
             video.setSource(source);
         }
         video.setTitle(request.getTitle());

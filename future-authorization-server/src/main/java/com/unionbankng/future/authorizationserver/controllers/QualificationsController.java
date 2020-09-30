@@ -6,7 +6,6 @@ import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.services.QualificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +24,11 @@ public class QualificationsController {
 
     private final QualificationService qualificationService;
 
-    @GetMapping("/v1/qualifications/find_by_user_id/{userId}")
-    public ResponseEntity<APIResponse> findQualificationsByUserId(@PathVariable Long userId,
-                                                              @RequestParam int pageNo, @RequestParam int limit) {
+    @GetMapping("/v1/qualifications/find_by_profile_id/{profileId}")
+    public ResponseEntity<APIResponse> findQualificationsByProfileId(@PathVariable Long profileId) {
 
         Page<Qualification> qualifications = qualificationService.
-                findAllByUserId(userId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
+                findAllByProfileId(profileId,Sort.by("createdAt").ascending());
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,qualifications));
 

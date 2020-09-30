@@ -17,8 +17,8 @@ public class UserSkillService {
 
     private final UserSkillRepository userSkillRepository;
 
-    public Page<UserSkill> findAllByUserId (Long userId, Pageable pageable){
-        return userSkillRepository.findByUserId(userId,pageable);
+    public Page<UserSkill> findAllByProfileId (Long profileId, Pageable pageable){
+        return userSkillRepository.findAllByProfileId(profileId,pageable);
     }
 
     public Optional<UserSkill> findById (Long id){
@@ -33,7 +33,7 @@ public class UserSkillService {
         Tag tag = new Tag();
         tag.setId(request.getSkillId());
 
-        userSkill.setUserId(request.getUserId());
+        userSkill.setProfileId(request.getProfileId());
         userSkill.setSkill(tag);
 
         return userSkillRepository.save(userSkill);

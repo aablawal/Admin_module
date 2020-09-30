@@ -1,11 +1,10 @@
 package com.unionbankng.future.authorizationserver.entities;
 
-import com.unionbankng.future.authorizationserver.enums.UserType;
+import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -27,7 +26,6 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String img;
-    private String coverPhoto;
     @NotNull
     @Column(length=32, nullable = false)
     private String firstName;
@@ -46,8 +44,6 @@ public class User implements Serializable {
     private String dialingCode;
     @Column(length=32, nullable = false)
     private String phoneNumber;
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
     @Column(length = 12)
     private String accountNumber;
     private String address;
@@ -59,13 +55,6 @@ public class User implements Serializable {
     private Date dateOfBirth;
     @Column(nullable = false)
     private Boolean isEnabled = true;
-    private Boolean isEmployer = false;
-    private Boolean isFreelancer = false;
-    @Column(precision = 19, scale = 2)
-    private BigDecimal pricePerHour;
-    private String jobTitle;
-    @Column(columnDefinition="TEXT")
-    private  String bio;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

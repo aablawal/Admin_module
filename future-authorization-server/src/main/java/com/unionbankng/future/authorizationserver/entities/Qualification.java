@@ -23,7 +23,7 @@ public class Qualification implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private Long userId;
+    private Long profileId;
     private String school;
     private String degree;
     private String fieldOfStudy;

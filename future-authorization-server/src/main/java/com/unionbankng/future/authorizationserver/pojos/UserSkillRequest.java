@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UserSkillRequest {
     @NotNull
-    private Long userId;
+    private Long profileId;
     @NotNull
     private Long skillId;
 }

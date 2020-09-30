@@ -25,8 +25,8 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final FileStorageService fileStorageService;
 
-    public Page<Photo> findAllByUserId (Long userId, Pageable pageable){
-        return photoRepository.findByUserId(userId,pageable);
+    public Page<Photo> findAllByProfileId(Long userId, Pageable pageable){
+        return photoRepository.findByProfileId(userId,pageable);
     }
 
     public Optional<Photo> findById (Long id){
@@ -43,10 +43,10 @@ public class PhotoService {
     }
 
     public Photo saveFromRequest (MultipartFile file, PhotoAndVideoRequest request, Photo photo) throws IOException {
-        photo.setUserId(request.getUserId());
+        photo.setProfileId(request.getProfileId());
         photo.setComment(request.getComment());
         if (file != null){
-            String source = fileStorageService.storeFile(file, request.getUserId(), BlobType.IMAGE);
+            String source = fileStorageService.storeFile(file, request.getProfileId(), BlobType.IMAGE);
             photo.setSource(source);
         }
         photo.setTitle(request.getTitle());

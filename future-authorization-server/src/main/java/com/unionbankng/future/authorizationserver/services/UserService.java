@@ -1,8 +1,7 @@
 package com.unionbankng.future.authorizationserver.services;
 
-import com.unionbankng.future.authorizationserver.entities.Photo;
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
+import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,18 +65,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateCoverPhoto(MultipartFile image , Long userId) throws IOException {
 
-        User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
-        if(user.getCoverPhoto() != null)
-            fileStorageService.deleteFileFromStorage(user.getCoverPhoto(), BlobType.IMAGE);
-
-        String source = fileStorageService.storeFile(image,userId,BlobType.IMAGE);
-        user.setCoverPhoto(source);
-        return userRepository.save(user);
-    }
-
-    public User updateProfile(Long userId, ProfileUpdateRequest request) throws IOException {
+    public User updatePersonalInfo(Long userId, PersonalInfoUpdateRequest request) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
@@ -86,8 +74,6 @@ public class UserService {
             user.setLastName(request.getLastName());
         if(request.getFirstName() != null)
             user.setFirstName(request.getFirstName());
-        if(request.getBio() != null)
-            user.setBio(request.getBio());
         if(request.getStateOfResidence() != null)
             user.setStateOfResidence(request.getStateOfResidence());
         if(request.getAddress() != null)
@@ -100,10 +86,6 @@ public class UserService {
             user.setDialingCode(request.getDialingCode());
         if(request.getPhoneNumber() != null)
             user.setPhoneNumber(request.getPhoneNumber());
-        if(request.getPricePerHour() != null)
-            user.setPricePerHour(request.getPricePerHour());
-        if(request.getJobTitle() != null)
-            user.setJobTitle(request.getJobTitle());
 
         return userRepository.save(user);
     }

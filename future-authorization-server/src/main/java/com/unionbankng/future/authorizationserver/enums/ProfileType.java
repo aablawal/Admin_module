@@ -1,6 +1,6 @@
 package com.unionbankng.future.authorizationserver.enums;
 
-public enum UserType {
+public enum ProfileType {
     FREELANCER,
     EMPLOYER,
     BASIC

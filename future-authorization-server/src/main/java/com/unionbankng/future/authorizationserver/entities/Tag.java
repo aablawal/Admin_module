@@ -1,13 +1,10 @@
 package com.unionbankng.future.authorizationserver.entities;
 
 import com.unionbankng.future.authorizationserver.enums.TagType;
-import com.unionbankng.future.authorizationserver.enums.UserType;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity
 @Getter

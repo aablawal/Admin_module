@@ -20,12 +20,12 @@ public class UserSkillsController {
 
     private final UserSkillService userSkillService;
 
-    @GetMapping("/v1/user_skills/find_by_user_id/{userId}")
-    public ResponseEntity<APIResponse> findQualificationsByUserId(@PathVariable Long userId,
+    @GetMapping("/v1/user_skills/find_by_profile_id/{profileId}")
+    public ResponseEntity<APIResponse> findQualificationsByProfileId(@PathVariable Long profileId,
                                                               @RequestParam int pageNo, @RequestParam int limit) {
 
         Page<UserSkill> userSkills = userSkillService.
-                findAllByUserId(userId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
+                findAllByProfileId(profileId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
 
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,userSkills));
 

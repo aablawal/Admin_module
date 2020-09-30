@@ -10,7 +10,7 @@ public class PortfolioItemRequest {
 
     private Long portfolioItemId;
     @NotNull
-    private Long userId;
+    private Long profileId;
     @NotNull
     private String title;
     @NotNull

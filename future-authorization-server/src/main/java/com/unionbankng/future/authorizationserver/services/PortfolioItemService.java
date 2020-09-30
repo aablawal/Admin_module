@@ -23,7 +23,7 @@ public class PortfolioItemService {
     private final FileStorageService fileStorageService;
 
     public Page<PortfolioItem> findAllByUserId (Long userId, Pageable pageable){
-        return portfolioItemRepository.findAllByUserId(userId,pageable);
+        return portfolioItemRepository.findAllByProfileId(userId,pageable);
     }
 
     public Optional<PortfolioItem> findById (Long id){
@@ -43,12 +43,12 @@ public class PortfolioItemService {
     }
 
     public PortfolioItem saveFromRequest (MultipartFile file,PortfolioItemRequest request, PortfolioItem portfolioItem) throws IOException {
-        portfolioItem.setUserId(request.getUserId());
+        portfolioItem.setProfileId(request.getProfileId());
         portfolioItem.setTitle(request.getTitle());
         portfolioItem.setDescription(request.getDescription());
         portfolioItem.setLink(request.getLink());
         if (file != null){
-            String source = fileStorageService.storeFile(file, request.getUserId(), BlobType.IMAGE);
+            String source = fileStorageService.storeFile(file, request.getProfileId(), BlobType.IMAGE);
             portfolioItem.setMedia(source);
         }
 
