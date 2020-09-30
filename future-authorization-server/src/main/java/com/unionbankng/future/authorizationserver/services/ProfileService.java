@@ -76,6 +76,7 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
+
     public void deleteAllByUserId(Long userId){
         profileRepository.deleteAllByUserId(userId);
     }
