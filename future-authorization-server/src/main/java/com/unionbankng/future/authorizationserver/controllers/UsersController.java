@@ -37,7 +37,7 @@ public class UsersController {
     @GetMapping("/v1/users/{userId}")
     public ResponseEntity<APIResponse> getUserById(@PathVariable Long userId) {
 
-        User user = userService.findById(userId).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = userService.findById(userId);
 
         return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
     }

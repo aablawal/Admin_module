@@ -26,8 +26,8 @@ public class UserService {
     private final FileStorageService fileStorageService;
 
     @ReadThroughSingleCache(namespace = "user", expiration = 0)
-    public Optional<User> findById(@ParameterValueKeyProvider Long id) {
-        return userRepository.findById(id);
+    public User findById(@ParameterValueKeyProvider Long id) {
+        return userRepository.findById(id).get();
     }
 
     @ReadThroughSingleCache(namespace = "user_uuid", expiration = 0)
