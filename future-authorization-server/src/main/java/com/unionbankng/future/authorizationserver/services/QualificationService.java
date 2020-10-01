@@ -30,17 +30,17 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final FileStorageService fileStorageService;
 
-    @Cacheable(value = "qualifications_by_profile", key="profileId")
+    @Cacheable(value = "qualifications_by_profile", key="#profileId")
     public List<Qualification> findAllByProfileId(Long profileId, Sort sort){
         return qualificationRepository.findAllByProfileId(profileId,sort);
     }
 
-    @Cacheable(value = "qualification", key="id")
+    @Cacheable(value = "qualification", key="#id")
     public Optional<Qualification> findById (Long id){
         return qualificationRepository.findById(id);
     }
 
-    @CacheEvict(value = "qualification", key="id")
+    @CacheEvict(value = "qualification", key="#id")
     public void deleteById (Long id)
     {
         Qualification qualification = qualificationRepository.findById(id).orElseThrow(

@@ -32,12 +32,12 @@ public class VideoService {
         return videoRepository.findAllByProfileId(profileId,pageable);
     }
 
-    @Cacheable(value = "video", key="id")
+    @Cacheable(value = "video", key="#id")
     public Optional<Video> findById (Long id){
         return videoRepository.findById(id);
     }
 
-    @CacheEvict(value = "video", key="id")
+    @CacheEvict(value = "video", key="#id")
     public void deleteById (Long id){
         Video video = videoRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Video Not Found"));
         int status = fileStorageService.deleteFileFromStorage(video.getSource(),BlobType.VIDEO);

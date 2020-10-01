@@ -31,7 +31,7 @@ public class ExperienceService {
     private final FileStorageService fileStorageService;
 
 
-    @Cacheable(value = "experiences", key="profileId")
+    @Cacheable(value = "experiences", key="#profileId")
     public List<Experience> findByProfileId(Long profileId, Sort sort){
         return experienceRepository.findByProfileId(profileId,sort);
     }
@@ -40,13 +40,13 @@ public class ExperienceService {
         return experienceRepository.save(experience);
     }
 
-    @Cacheable(value = "experience", key="id")
-    public Optional<Experience> findById (@ParameterValueKeyProvider Long id){
+    @Cacheable(value = "experience", key="#id")
+    public Optional<Experience> findById (Long id){
         return experienceRepository.findById(id);
     }
 
-    @CacheEvict(value = "experience", key="id")
-    public void deleteById (@ParameterValueKeyProvider Long id){
+    @CacheEvict(value = "experience", key="#id")
+    public void deleteById (Long id){
 
         Experience experience = experienceRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience Not Found"));
         int status = fileStorageService.deleteFileFromStorage(experience.getMedia(),BlobType.IMAGE);
@@ -56,7 +56,7 @@ public class ExperienceService {
         experienceRepository.deleteById(id);
     }
 
-    @CacheEvict(value = "experience")
+    @CacheEvict(value = "experience", allEntries = true)
     public Experience saveFromRequest (MultipartFile file,ExperienceRequest request, Experience experience) throws IOException {
         experience.setProfileId(request.getProfileId());
         experience.setCompany(request.getCompany());

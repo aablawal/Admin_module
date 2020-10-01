@@ -33,7 +33,7 @@ public class ProfileService {
     private final FileStorageService fileStorageService;
 
 
-    @Cacheable(value = "user_profile", key="userId")
+    @Cacheable(value = "user_profile", key="#userId")
     public Optional<Profile> findByUserId (Long userId){
         return profileRepository.findByUserId(userId);
     }
@@ -43,12 +43,12 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
-    @Cacheable(value = "profile", key="id")
+    @Cacheable(value = "profile", key="#id")
     public Optional<Profile> findById (Long id){
         return profileRepository.findById(id);
     }
 
-    @CachePut(value = "profile", key="profileId")
+    @CachePut(value = "profile", key="#profileId")
     public Profile updateCoverPhoto(MultipartFile image , Long profileId) throws IOException {
 
         Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
@@ -61,7 +61,7 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
-    @CachePut(value = "profile", key="profileId")
+    @CachePut(value = "profile", key="#profileId")
     public Profile updateProfile(Long profileId, ProfileUpdateRequest request) throws IOException {
 
         Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
@@ -81,7 +81,7 @@ public class ProfileService {
     }
 
 
-    @CacheEvict(value = "user_profile", key="userId")
+    @CacheEvict(value = "user_profile", key="#userId")
     public void deleteAllByUserId(Long userId){
         profileRepository.deleteAllByUserId(userId);
     }

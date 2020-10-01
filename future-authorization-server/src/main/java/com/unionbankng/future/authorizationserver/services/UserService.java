@@ -28,17 +28,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    @Cacheable(value = "user", key="id")
+    @Cacheable(value = "user", key="#id")
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
-    @Cacheable(value = "user", key="uuId")
+    @Cacheable(value = "user", key="#uuId")
     public Optional<User> findByUuid(String uuId) {
         return userRepository.findByUuid(uuId);
     }
 
-    @Cacheable(value = "user", key="email")
+    @Cacheable(value = "user", key="#email")
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
@@ -55,7 +55,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @CacheEvict(value = "user", key="userId")
+    @CacheEvict(value = "user", key="#userId")
     public void deleteById(@ParameterValueKeyProvider Long userId) {
          userRepository.deleteById(userId);
     }
@@ -64,7 +64,7 @@ public class UserService {
         return userRepository.findByEmailOrUsername(email,username);
     }
 
-    @CachePut(value = "user", key="userId")
+    @CachePut(value = "user", key="#userId")
     public User updateProfileImage(MultipartFile image , @ParameterValueKeyProvider Long userId) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
@@ -77,7 +77,7 @@ public class UserService {
     }
 
 
-    @CachePut(value = "user", key="userId")
+    @CachePut(value = "user", key="#userId")
     public User updatePersonalInfo(@ParameterValueKeyProvider Long userId, PersonalInfoUpdateRequest request) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
