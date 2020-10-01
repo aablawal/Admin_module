@@ -12,6 +12,9 @@ import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -30,8 +33,8 @@ public class ProfileService {
     private final FileStorageService fileStorageService;
 
 
-    @ReadThroughSingleCache(namespace = "profile", expiration = 0)
-    public Optional<Profile> findByUserId (@ParameterValueKeyProvider Long userId){
+    @Cacheable(value = "user_profile", key="userId")
+    public Optional<Profile> findByUserId (Long userId){
         return profileRepository.findByUserId(userId);
     }
 
@@ -40,12 +43,13 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
+    @Cacheable(value = "profile", key="id")
     public Optional<Profile> findById (Long id){
         return profileRepository.findById(id);
     }
 
-    @InvalidateSingleCache(namespace = "profile")
-    public Profile updateCoverPhoto(MultipartFile image , @ParameterValueKeyProvider Long profileId) throws IOException {
+    @CachePut(value = "profile", key="profileId")
+    public Profile updateCoverPhoto(MultipartFile image , Long profileId) throws IOException {
 
         Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
 
@@ -57,8 +61,8 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
-    @InvalidateSingleCache(namespace = "profile")
-    public Profile updateProfile(@ParameterValueKeyProvider Long profileId, ProfileUpdateRequest request) throws IOException {
+    @CachePut(value = "profile", key="profileId")
+    public Profile updateProfile(Long profileId, ProfileUpdateRequest request) throws IOException {
 
         Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
 
@@ -77,6 +81,7 @@ public class ProfileService {
     }
 
 
+    @CacheEvict(value = "user_profile", key="userId")
     public void deleteAllByUserId(Long userId){
         profileRepository.deleteAllByUserId(userId);
     }

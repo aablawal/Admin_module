@@ -8,6 +8,9 @@ import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,18 +30,18 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final FileStorageService fileStorageService;
 
-    @ReadThroughSingleCache(namespace = "qualifications_by_profile", expiration = 0)
-    public List<Qualification> findAllByProfileId(@ParameterValueKeyProvider Long userId, Sort sort){
-        return qualificationRepository.findAllByProfileId(userId,sort);
+    @Cacheable(value = "qualifications_by_profile", key="profileId")
+    public List<Qualification> findAllByProfileId(Long profileId, Sort sort){
+        return qualificationRepository.findAllByProfileId(profileId,sort);
     }
 
-    @ReadThroughSingleCache(namespace = "qualification", expiration = 0)
-    public Optional<Qualification> findById (@ParameterValueKeyProvider Long id){
+    @Cacheable(value = "qualification", key="id")
+    public Optional<Qualification> findById (Long id){
         return qualificationRepository.findById(id);
     }
 
-    @InvalidateSingleCache(namespace = "qualification")
-    public void deleteById (@ParameterValueKeyProvider Long id)
+    @CacheEvict(value = "qualification", key="id")
+    public void deleteById (Long id)
     {
         Qualification qualification = qualificationRepository.findById(id).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Qualification not found"));
@@ -51,7 +54,7 @@ public class QualificationService {
         qualificationRepository.deleteById(id);
     }
 
-    @InvalidateSingleCache(namespace = "qualification")
+    @CachePut(value = "qualification", key="qualification.id")
     public Qualification saveFromRequest (MultipartFile file,QualificationRequest request, Qualification qualification) throws IOException {
         qualification.setProfileId(request.getProfileId());
         qualification.setActivities(request.getActivities());

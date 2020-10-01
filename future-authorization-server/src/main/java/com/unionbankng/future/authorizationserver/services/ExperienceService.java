@@ -8,6 +8,9 @@ import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.repositories.ExperienceRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,8 +31,8 @@ public class ExperienceService {
     private final FileStorageService fileStorageService;
 
 
-    @ReadThroughSingleCache(namespace = "experiences_by_profile", expiration = 0)
-    public List<Experience> findByProfileId(@ParameterValueKeyProvider Long profileId, Sort sort){
+    @Cacheable(value = "experiences", key="profileId")
+    public List<Experience> findByProfileId(Long profileId, Sort sort){
         return experienceRepository.findByProfileId(profileId,sort);
     }
 
@@ -37,12 +40,12 @@ public class ExperienceService {
         return experienceRepository.save(experience);
     }
 
-    @ReadThroughSingleCache(namespace = "experience", expiration = 0)
+    @Cacheable(value = "experience", key="id")
     public Optional<Experience> findById (@ParameterValueKeyProvider Long id){
         return experienceRepository.findById(id);
     }
 
-    @InvalidateSingleCache(namespace = "experience")
+    @CacheEvict(value = "experience", key="id")
     public void deleteById (@ParameterValueKeyProvider Long id){
 
         Experience experience = experienceRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience Not Found"));
@@ -53,7 +56,7 @@ public class ExperienceService {
         experienceRepository.deleteById(id);
     }
 
-    @InvalidateSingleCache(namespace = "experience")
+    @CacheEvict(value = "experience")
     public Experience saveFromRequest (MultipartFile file,ExperienceRequest request, Experience experience) throws IOException {
         experience.setProfileId(request.getProfileId());
         experience.setCompany(request.getCompany());

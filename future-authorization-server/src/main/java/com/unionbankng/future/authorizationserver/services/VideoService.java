@@ -8,6 +8,9 @@ import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.repositories.VideoRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,13 +32,13 @@ public class VideoService {
         return videoRepository.findAllByProfileId(profileId,pageable);
     }
 
-    @ReadThroughSingleCache(namespace = "video", expiration = 0)
-    public Optional<Video> findById (@ParameterValueKeyProvider Long id){
+    @Cacheable(value = "video", key="id")
+    public Optional<Video> findById (Long id){
         return videoRepository.findById(id);
     }
 
-    @InvalidateSingleCache(namespace = "video")
-    public void deleteById (@ParameterValueKeyProvider Long id){
+    @CacheEvict(value = "video", key="id")
+    public void deleteById (Long id){
         Video video = videoRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Video Not Found"));
         int status = fileStorageService.deleteFileFromStorage(video.getSource(),BlobType.VIDEO);
         if(status != 200)
@@ -43,6 +46,7 @@ public class VideoService {
         videoRepository.deleteById(id);
     }
 
+    @CachePut(value = "video", key="video.id")
     public Video saveFromRequest (MultipartFile file, PhotoAndVideoRequest request, Video video) throws IOException {
         video.setProfileId(request.getProfileId());
         video.setComment(request.getComment());

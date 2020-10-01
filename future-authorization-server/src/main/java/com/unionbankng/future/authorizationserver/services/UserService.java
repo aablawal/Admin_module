@@ -8,6 +8,9 @@ import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateReques
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,18 +28,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    @ReadThroughSingleCache(namespace = "user", expiration = 0)
-    public Optional<User> findById(@ParameterValueKeyProvider Long id) {
+    @Cacheable(value = "user", key="id")
+    public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
-    @ReadThroughSingleCache(namespace = "user_uuid", expiration = 0)
-    public Optional<User> findByUuid(@ParameterValueKeyProvider String uuId) {
+    @Cacheable(value = "user", key="uuId")
+    public Optional<User> findByUuid(String uuId) {
         return userRepository.findByUuid(uuId);
     }
 
-    @ReadThroughSingleCache(namespace = "user_email", expiration = 0)
-    public Optional<User> findByEmail(@ParameterValueKeyProvider String email) {
+    @Cacheable(value = "user", key="email")
+    public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -52,7 +55,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @InvalidateSingleCache(namespace = "user")
+    @CacheEvict(value = "user", key="userId")
     public void deleteById(@ParameterValueKeyProvider Long userId) {
          userRepository.deleteById(userId);
     }
@@ -61,7 +64,7 @@ public class UserService {
         return userRepository.findByEmailOrUsername(email,username);
     }
 
-    @InvalidateSingleCache(namespace = "user")
+    @CachePut(value = "user", key="userId")
     public User updateProfileImage(MultipartFile image , @ParameterValueKeyProvider Long userId) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
@@ -74,7 +77,7 @@ public class UserService {
     }
 
 
-    @InvalidateSingleCache(namespace = "user")
+    @CachePut(value = "user", key="userId")
     public User updatePersonalInfo(@ParameterValueKeyProvider Long userId, PersonalInfoUpdateRequest request) throws IOException {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));

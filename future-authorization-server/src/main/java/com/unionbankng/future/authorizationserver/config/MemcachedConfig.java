@@ -1,25 +1,32 @@
 package com.unionbankng.future.authorizationserver.config;
 
+import com.google.code.ssm.Cache;
 import com.google.code.ssm.CacheFactory;
 import com.google.code.ssm.config.AbstractSSMConfiguration;
 import com.google.code.ssm.config.DefaultAddressProvider;
 import com.google.code.ssm.providers.xmemcached.MemcacheClientFactoryImpl;
 import com.google.code.ssm.providers.xmemcached.XMemcachedConfiguration;
+import com.google.code.ssm.spring.ExtendedSSMCacheManager;
+import com.google.code.ssm.spring.SSMCache;
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.rubyeye.xmemcached.XMemcachedClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 
 @RefreshScope
 @Configuration
+@EnableCaching
 public class MemcachedConfig extends AbstractSSMConfiguration {
 
     @Value( "${memcached.service.host}" )
@@ -61,6 +68,18 @@ public class MemcachedConfig extends AbstractSSMConfiguration {
         cf.setAddressProvider(new DefaultAddressProvider(serverString));
         cf.setConfiguration(conf);
         return cf;
+    }
+
+    @Bean
+    public CacheManager cacheManager() throws Exception {
+        // Use SSMCacheManager instead of ExtendedSSMCacheManager if you do not
+        // need to set per key expiration
+        ExtendedSSMCacheManager cacheManager = new ExtendedSSMCacheManager();
+        Cache cache = this.defaultMemcachedClient().getObject();
+        // SSMCache(cache, 0, false) creates a cache with default key expiration
+        // of 0 (no expiration) and flushing disabled (allowClear = false)
+        cacheManager.setCaches(Arrays.asList(new SSMCache(cache, 0, false)));
+        return cacheManager;
     }
 
 }
