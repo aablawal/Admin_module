@@ -37,7 +37,7 @@ public class UsersController {
     @GetMapping("/v1/users/{userId}")
     public ResponseEntity<APIResponse> getUserById(@PathVariable Long userId) {
 
-        User user = userService.findById(userId);
+        User user = userService.findByIId(userId);
 
         return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
     }
