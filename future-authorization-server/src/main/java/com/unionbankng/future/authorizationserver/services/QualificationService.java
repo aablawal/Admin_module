@@ -54,7 +54,7 @@ public class QualificationService {
         qualificationRepository.deleteById(id);
     }
 
-    @CachePut(value = "qualification", key="qualification.id")
+    @CachePut(value = "qualification", key="#qualification.id")
     public Qualification saveFromRequest (MultipartFile file,QualificationRequest request, Qualification qualification) throws IOException {
         qualification.setProfileId(request.getProfileId());
         qualification.setActivities(request.getActivities());

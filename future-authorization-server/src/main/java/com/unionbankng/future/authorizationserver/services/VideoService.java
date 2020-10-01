@@ -46,7 +46,7 @@ public class VideoService {
         videoRepository.deleteById(id);
     }
 
-    @CachePut(value = "video", key="video.id")
+    @CachePut(value = "video", key="#video.id")
     public Video saveFromRequest (MultipartFile file, PhotoAndVideoRequest request, Video video) throws IOException {
         video.setProfileId(request.getProfileId());
         video.setComment(request.getComment());
