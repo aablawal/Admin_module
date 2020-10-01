@@ -8,6 +8,7 @@ import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateReques
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,14 +26,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    @ReadThroughSingleCache(namespace = "user", expiration = 0)
-    public Optional<User> findById(@ParameterValueKeyProvider Long id) {
+    @Cacheable("default")
+    public Optional<User> findById(Long id) {
         return userRepository.findById(id);
-    }
-
-    @ReadThroughSingleCache(namespace = "users", expiration = 0)
-    public User findByIId(@ParameterValueKeyProvider Long id) {
-        return userRepository.findById(id).get();
     }
 
     @ReadThroughSingleCache(namespace = "user_uuid", expiration = 0)
