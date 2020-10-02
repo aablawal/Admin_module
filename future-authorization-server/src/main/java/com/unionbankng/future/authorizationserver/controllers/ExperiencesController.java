@@ -27,25 +27,25 @@ public class ExperiencesController {
     private final ExperienceService experienceService;
 
     @GetMapping("/v1/experiences/find_by_profile_id/{profileId}")
-    public ResponseEntity<APIResponse> findExperienceByProfileId(@PathVariable Long profileId) {
+    public ResponseEntity<APIResponse<List<Experience>>> findExperienceByProfileId(@PathVariable Long profileId) {
 
         List<Experience> experiences = experienceService.findByProfileId(profileId,Sort.by("startDate").ascending());
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,experiences));
+        return ResponseEntity.ok().body(new APIResponse<List<Experience>>("Request Successful",true,experiences));
 
     }
 
     @PostMapping(value = "/v1/experiences/create_new", consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestPart ExperienceRequest request)
+    public ResponseEntity<APIResponse<Experience>> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestPart ExperienceRequest request)
             throws IOException {
 
         Experience experience = experienceService.saveFromRequest(file,request,new Experience());
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,experience));
+        return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
 
     }
 
     @PostMapping(value = "/v1/experiences/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateExperience(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart ExperienceRequest request)
+    public ResponseEntity<APIResponse<Experience>> updateExperience(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart ExperienceRequest request)
             throws IOException {
 
         Experience experience = experienceService.findById(request.getExperienceId()).orElseThrow(
@@ -54,12 +54,12 @@ public class ExperiencesController {
 
         experience = experienceService.saveFromRequest(file,request,experience);
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,experience));
+        return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
 
     }
 
     @DeleteMapping("/v1/experiences/delete/{experienceId}")
-    public ResponseEntity<APIResponse> deleteExperience(@PathVariable Long experienceId){
+    public ResponseEntity<APIResponse<String>> deleteExperience(@PathVariable Long experienceId){
         experienceService.deleteById(experienceId);
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,null));
     }

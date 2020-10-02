@@ -26,27 +26,27 @@ public class PortfolioItemsController {
     private final PortfolioItemService portfolioItemService;
 
     @GetMapping("/v1/portfolio_items/find_by_profile_id/{profileId}")
-    public ResponseEntity<APIResponse> findPortfolioItemByUserId(@PathVariable Long profileId,
+    public ResponseEntity<APIResponse<Page<PortfolioItem>>> findPortfolioItemByUserId(@PathVariable Long profileId,
                                                               @RequestParam int pageNo, @RequestParam int limit) {
 
         Page<PortfolioItem> portfolioItems = portfolioItemService.findAllByUserId(profileId,PageRequest.of(pageNo, limit,
                 Sort.by("createdAt").ascending()));
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItems));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItems));
 
     }
 
     @PostMapping(value = "/v1/portfolio_items/create_new",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> addNewPortfolioItem(@Nullable  @RequestPart("file") MultipartFile file,
+    public ResponseEntity<APIResponse<PortfolioItem>> addNewPortfolioItem(@Nullable  @RequestPart("file") MultipartFile file,
                                                            @Valid @RequestPart PortfolioItemRequest request) throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(file,request,new PortfolioItem());
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItem));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
 
     }
 
     @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateExperience(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart PortfolioItemRequest request)
+    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart PortfolioItemRequest request)
             throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(
@@ -55,14 +55,14 @@ public class PortfolioItemsController {
 
         portfolioItem = portfolioItemService.saveFromRequest(file,request,portfolioItem);
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,portfolioItem));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
 
     }
 
     @DeleteMapping("/v1/portfolio_items/delete/{portfolioItemId}")
-    public ResponseEntity<APIResponse> deleteExperience(@PathVariable Long portfolioItemId){
+    public ResponseEntity<APIResponse<String>> deleteExperience(@PathVariable Long portfolioItemId){
         portfolioItemService.deleteById(portfolioItemId);
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,null));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,"Request Successful"));
     }
 
 }

@@ -26,26 +26,26 @@ public class QualificationsController {
     private final QualificationService qualificationService;
 
     @GetMapping("/v1/qualifications/find_by_profile_id/{profileId}")
-    public ResponseEntity<APIResponse> findQualificationsByProfileId(@PathVariable Long profileId) {
+    public ResponseEntity<APIResponse<List<Qualification>>> findQualificationsByProfileId(@PathVariable Long profileId) {
 
         List<Qualification> qualifications = qualificationService.
                 findAllByProfileId(profileId,Sort.by("createdAt").ascending());
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,qualifications));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,qualifications));
 
     }
 
     @PostMapping(value = "/v1/qualifications/create_new",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> addNewQualification(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestPart QualificationRequest request)
+    public ResponseEntity<APIResponse<Qualification>> addNewQualification(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestPart QualificationRequest request)
             throws IOException {
 
         Qualification qualification = qualificationService.saveFromRequest(file,request,new Qualification());
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,qualification));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,qualification));
 
     }
 
     @PostMapping(value = "/v1/qualifications/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart QualificationRequest request)
+    public ResponseEntity<APIResponse<Qualification>> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart QualificationRequest request)
             throws IOException {
 
         Qualification qualification = qualificationService.findById(request.getQualificationId()).orElseThrow(
@@ -53,7 +53,7 @@ public class QualificationsController {
 
         qualification = qualificationService.saveFromRequest(file,request,qualification);
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,qualification));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,qualification));
 
     }
 

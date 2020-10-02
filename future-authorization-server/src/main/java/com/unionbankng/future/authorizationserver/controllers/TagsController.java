@@ -22,22 +22,22 @@ public class TagsController {
     private final TagService tagService;
 
     @GetMapping("/v1/tags/find_by_type_likely_name")
-    public ResponseEntity<APIResponse> getTagsByTypeAndName(@RequestParam TagType type, @RequestParam String name,
+    public ResponseEntity<APIResponse<Page<Tag>>> getTagsByTypeAndName(@RequestParam TagType type, @RequestParam String name,
                                                             @RequestParam int pageNo, @RequestParam int limit) {
 
         Page<Tag> tags = tagService.getTagsByTypeAndNameLike(type,name, PageRequest.of(pageNo, limit, Sort.by("name").ascending()));
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,tags));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,tags));
 
     }
 
     @GetMapping("/v1/tags/find_by_type")
-    public ResponseEntity<APIResponse> getTagsByType(@RequestParam TagType type,
+    public ResponseEntity<APIResponse<Page<Tag>>> getTagsByType(@RequestParam TagType type,
                                                             @RequestParam int pageNo, @RequestParam int limit) {
 
         Page<Tag> tags = tagService.getAllTagsByType(type, PageRequest.of(pageNo, limit, Sort.by("name").ascending()));
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,tags));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,tags));
 
     }
 }

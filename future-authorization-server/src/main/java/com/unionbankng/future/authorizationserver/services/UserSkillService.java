@@ -1,8 +1,8 @@
 package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.entities.Tag;
-import com.unionbankng.future.authorizationserver.entities.UserSkill;
-import com.unionbankng.future.authorizationserver.pojos.UserSkillRequest;
+import com.unionbankng.future.authorizationserver.entities.ProfileSkill;
+import com.unionbankng.future.authorizationserver.pojos.EntitySkillRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserSkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,11 +17,11 @@ public class UserSkillService {
 
     private final UserSkillRepository userSkillRepository;
 
-    public Page<UserSkill> findAllByProfileId (Long profileId, Pageable pageable){
+    public Page<ProfileSkill> findAllByProfileId (Long profileId, Pageable pageable){
         return userSkillRepository.findAllByProfileId(profileId,pageable);
     }
 
-    public Optional<UserSkill> findById (Long id){
+    public Optional<ProfileSkill> findById (Long id){
         return userSkillRepository.findById(id);
     }
 
@@ -29,14 +29,14 @@ public class UserSkillService {
         userSkillRepository.deleteById(id);
     }
 
-    public UserSkill saveFromRequest (UserSkillRequest request, UserSkill userSkill){
+    public ProfileSkill saveFromRequest (EntitySkillRequest request, ProfileSkill profileSkill){
         Tag tag = new Tag();
         tag.setId(request.getSkillId());
 
-        userSkill.setProfileId(request.getProfileId());
-        userSkill.setSkill(tag);
+        profileSkill.setProfileId(request.getEntityId());
+        profileSkill.setSkill(tag);
 
-        return userSkillRepository.save(userSkill);
+        return userSkillRepository.save(profileSkill);
     }
 
 }

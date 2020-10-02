@@ -26,29 +26,29 @@ public class UsersController {
 
 
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
+    public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
                                                           @PathVariable Long userId) throws IOException {
 
         User user = userService.updateProfileImage(image,userId);
 
-        return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
     @GetMapping("/v1/users/{userId}")
-    public ResponseEntity<APIResponse> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<APIResponse<User>> getUserById(@PathVariable Long userId) {
 
         User user = userService.findById(userId).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        return ResponseEntity.ok().body(new APIResponse("Request successful",true,user));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
     @PostMapping(value = "/v1/users/{userId}/update_profile")
-    public ResponseEntity<APIResponse> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody PersonalInfoUpdateRequest request) throws IOException {
+    public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody PersonalInfoUpdateRequest request) throws IOException {
 
 
         User user = userService.updatePersonalInfo(userId, request);
 
-        return ResponseEntity.ok().body(new APIResponse("Profile updated successful",true,user));
+        return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
 
     @DeleteMapping("/v1/users/delete/{userId}")

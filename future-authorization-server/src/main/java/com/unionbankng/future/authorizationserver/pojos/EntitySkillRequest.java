@@ -5,9 +5,9 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class UserSkillRequest {
+public class EntitySkillRequest {
     @NotNull
-    private Long profileId;
+    private Long entityId;
     @NotNull
     private Long skillId;
 }

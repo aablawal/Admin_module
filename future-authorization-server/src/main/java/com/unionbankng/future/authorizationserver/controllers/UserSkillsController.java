@@ -1,8 +1,8 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
-import com.unionbankng.future.authorizationserver.entities.UserSkill;
+import com.unionbankng.future.authorizationserver.entities.ProfileSkill;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.UserSkillRequest;
+import com.unionbankng.future.authorizationserver.pojos.EntitySkillRequest;
 import com.unionbankng.future.authorizationserver.services.UserSkillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,21 +21,21 @@ public class UserSkillsController {
     private final UserSkillService userSkillService;
 
     @GetMapping("/v1/user_skills/find_by_profile_id/{profileId}")
-    public ResponseEntity<APIResponse> findQualificationsByProfileId(@PathVariable Long profileId,
+    public ResponseEntity<APIResponse<Page<ProfileSkill>>> findQualificationsByProfileId(@PathVariable Long profileId,
                                                               @RequestParam int pageNo, @RequestParam int limit) {
 
-        Page<UserSkill> userSkills = userSkillService.
+        Page<ProfileSkill> profileSkill = userSkillService.
                 findAllByProfileId(profileId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,userSkills));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,profileSkill));
 
     }
 
     @PostMapping("/v1/user_skills/create_new")
-    public ResponseEntity<APIResponse> addNewSkill(@Valid @RequestBody UserSkillRequest request) {
+    public ResponseEntity<APIResponse<ProfileSkill>> addNewSkill(@Valid @RequestBody EntitySkillRequest request) {
 
-        UserSkill userSkill = userSkillService.saveFromRequest(request,new UserSkill());
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,userSkill));
+        ProfileSkill profileSkill = userSkillService.saveFromRequest(request,new ProfileSkill());
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, profileSkill));
 
     }
 

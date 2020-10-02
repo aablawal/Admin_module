@@ -1,7 +1,7 @@
 package com.unionbankng.future.authorizationserver.enums;
 
 public enum TagType {
-    SPECIALIZATION,
+    INTEREST,
     SKILLS,
     COURSE_CATEGORY
 }

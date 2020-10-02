@@ -26,25 +26,25 @@ public class VideosController {
     private final VideoService videoService;
 
     @GetMapping("/v1/videos/find_by_profile_id/{profileId}")
-    public ResponseEntity<APIResponse> findExperienceByProfileId(@PathVariable Long profileId,
+    public ResponseEntity<APIResponse<Page<Video>>> findExperienceByProfileId(@PathVariable Long profileId,
                                                               @RequestParam int pageNo, @RequestParam int limit) {
 
         Page<Video> videos = videoService.findAllByProfileId(profileId,PageRequest.of(pageNo, limit, Sort.by("createdAt").ascending()));
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,videos));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,videos));
 
     }
 
     @PostMapping(value = "/v1/videos/create_new",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> addNewPhoto(@RequestPart("file") MultipartFile file, @Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
+    public ResponseEntity<APIResponse<Video>> addNewPhoto(@RequestPart("file") MultipartFile file, @Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Video videos = videoService.saveFromRequest(file,request,new Video());
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,videos));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,videos));
 
     }
 
     @PostMapping(value = "/v1/videos/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updatePhoto(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
+    public ResponseEntity<APIResponse<Video>> updatePhoto(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Video video = videoService.findById(request.getId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Video not found")
@@ -52,7 +52,7 @@ public class VideosController {
 
         video = videoService.saveFromRequest(file,request,video);
 
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true,video));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,video));
 
     }
 

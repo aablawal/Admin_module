@@ -32,16 +32,16 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @PostMapping(value = "/v1/profile/{profileId}/update_cover_photo",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse> updateCoverPhoto(@Nullable @RequestPart("image") MultipartFile image,
+    public ResponseEntity<APIResponse<Profile>> updateCoverPhoto(@Nullable @RequestPart("image") MultipartFile image,
                                                         @PathVariable Long profileId) throws IOException {
 
         Profile profile = profileService.updateCoverPhoto(image,profileId);
 
-        return ResponseEntity.ok().body(new APIResponse("Request successful",true,profile));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,profile));
     }
 
     @GetMapping("/v1/profile/get_profile_by_user_id/{userId}")
-    public ResponseEntity<APIResponse> getProfileByUserId(@PathVariable Long userId) throws IOException {
+    public ResponseEntity<APIResponse<RepresentationModel>> getProfileByUserId(@PathVariable Long userId) throws IOException {
 
         Profile profile = profileService.findByUserId(userId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
@@ -64,16 +64,16 @@ public class ProfileController {
         representationModel.add(videos);
         representationModel.add(skills);
 
-        return ResponseEntity.ok().body(new APIResponse("Request successful",true,representationModel));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,representationModel));
     }
 
     @PostMapping(value = "/v1/profile/update_profile/{profileId}")
-    public ResponseEntity<APIResponse> uploadProfileImage(@PathVariable Long profileId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
+    public ResponseEntity<APIResponse<Profile>> uploadProfileImage(@PathVariable Long profileId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
 
 
         Profile profile = profileService.updateProfile(profileId, request);
 
-        return ResponseEntity.ok().body(new APIResponse("Profile updated successful",true,profile));
+        return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,profile));
     }
 
 }

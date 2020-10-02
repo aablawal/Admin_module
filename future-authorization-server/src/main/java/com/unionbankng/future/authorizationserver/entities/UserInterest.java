@@ -14,14 +14,14 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSkill implements Serializable {
+public class UserInterest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long profileId;
+    private Long userId;
     @OneToOne
     private Tag skill;
     @Column(updatable = false)
@@ -41,8 +41,8 @@ public class UserSkill implements Serializable {
     }
 
     @Override
-    public boolean equals(Object userSkill) {
-        return this.id.equals(((UserSkill)userSkill).getId());
+    public boolean equals(Object userInterest) {
+        return this.id.equals(((UserInterest)userInterest).getId());
 
     }
 }
