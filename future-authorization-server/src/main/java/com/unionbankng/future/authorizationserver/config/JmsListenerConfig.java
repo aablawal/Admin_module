@@ -16,17 +16,13 @@ import javax.jms.ConnectionFactory;
 @Configuration
 public class JmsListenerConfig {
 
-    @Bean
-    public CachingConnectionFactory cachingConnectionFactory(ConnectionFactory connectionFactory) {
-        CachingConnectionFactory factory = new CachingConnectionFactory(connectionFactory);
-        factory.setReconnectOnException(true);
-        return factory;
-    }
 
     @Bean
-    public JmsTemplate jmsTemplate(CachingConnectionFactory factory, JsonMessageConverter converter) {
+    public JmsTemplate jmsTemplate(ConnectionFactory factory, JsonMessageConverter converter) {
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(factory);
+        cachingConnectionFactory.setReconnectOnException(true);
         JmsTemplate template = new JmsTemplate();
-        template.setConnectionFactory(factory);
+        template.setConnectionFactory(cachingConnectionFactory);
         template.setMessageConverter(converter);
         template.setPubSubDomain(false); // false for a Queue, true for a Topic
         return template;
