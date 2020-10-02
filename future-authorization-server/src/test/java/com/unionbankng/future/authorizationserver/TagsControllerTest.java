@@ -34,7 +34,7 @@ public class TagsControllerTest extends AbstractTest {
     public void getByTypeAndNameLikeTest() throws Exception {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap();
-        params.add("type","SPECIALIZATION");
+        params.add("type","INTEREST");
         params.add("name","Desi");
         params.add("pageNo","0");
         params.add("limit","10");
@@ -49,7 +49,7 @@ public class TagsControllerTest extends AbstractTest {
     public void getByType() throws Exception {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap();
-        params.add("type","SPECIALIZATION");
+        params.add("type","INTEREST");
         params.add("pageNo","0");
         params.add("limit","10");
 
