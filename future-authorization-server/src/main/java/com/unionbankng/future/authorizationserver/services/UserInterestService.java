@@ -7,6 +7,7 @@ import com.unionbankng.future.authorizationserver.repositories.UserInterestRepos
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,14 +29,23 @@ public class UserInterestService {
         userInterestRepository.deleteById(id);
     }
 
-    public UserInterest saveFromRequest (EntitySkillRequest request, UserInterest userInterest){
-        Tag tag = new Tag();
-        tag.setId(request.getSkillId());
+    public void saveInterestsFromRequest (EntitySkillRequest request){
 
-        userInterest.setUserId(request.getEntityId());
-        userInterest.setSkill(tag);
+        List<UserInterest> userInterests = new ArrayList<>();
+        for (Long skillId : request.getSkillIds()){
 
-        return userInterestRepository.save(userInterest);
+            Tag tag = new Tag();
+            tag.setId(skillId);
+
+            UserInterest userInterest = new UserInterest();
+            userInterest.setSkill(tag);
+            userInterest.setUserId(request.getEntityId());
+            userInterests.add(userInterest);
+        }
+
+        userInterestRepository.saveAll(userInterests);
     }
+
+
 
 }

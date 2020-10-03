@@ -5,6 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface UserSkillRepository extends JpaRepository<ProfileSkill, Long> {
+public interface ProfileSkillRepository extends JpaRepository<ProfileSkill, Long> {
     Page<ProfileSkill> findAllByProfileId(Long profileId, Pageable pageable);
 }

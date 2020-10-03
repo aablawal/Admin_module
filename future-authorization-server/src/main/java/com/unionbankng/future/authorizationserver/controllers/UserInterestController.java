@@ -1,15 +1,10 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
-import com.unionbankng.future.authorizationserver.entities.ProfileSkill;
 import com.unionbankng.future.authorizationserver.entities.UserInterest;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.EntitySkillRequest;
 import com.unionbankng.future.authorizationserver.services.UserInterestService;
-import com.unionbankng.future.authorizationserver.services.UserSkillService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,15 +25,15 @@ public class UserInterestController {
         List<UserInterest> userInterests = userInterestService.
                 findAllByUserId(userId);
 
-        return ResponseEntity.ok().body(new APIResponse<List<UserInterest>>("Request Successful",true,userInterests));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,userInterests));
 
     }
 
-    @PostMapping("/v1/user_interest/create_new")
-    public ResponseEntity<APIResponse<UserInterest>> addNewSkill(@Valid @RequestBody EntitySkillRequest request) {
+    @PostMapping("/v1/user_interest/add_for_user")
+    public ResponseEntity<APIResponse<String>> addUserInterests(@Valid @RequestBody EntitySkillRequest request) {
 
-        UserInterest userInterest = userInterestService.saveFromRequest(request,new UserInterest());
-        return ResponseEntity.ok().body(new APIResponse("Request Successful",true, userInterest));
+         userInterestService.saveInterestsFromRequest(request);
+        return ResponseEntity.ok().body(new APIResponse("Request Successful",true, "Request Successful"));
 
     }
 

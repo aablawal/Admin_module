@@ -1,14 +1,10 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.Profile;
-import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
-import com.unionbankng.future.authorizationserver.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
@@ -55,7 +51,7 @@ public class ProfileController {
                 .findExperienceByProfileId(profile.getId(),0,10)).withRel("photos");
         Link videos = linkTo(methodOn(VideosController.class)
                 .findExperienceByProfileId(profile.getId(),0,10)).withRel("videos");
-        Link skills = linkTo(methodOn(UserSkillsController.class)
+        Link skills = linkTo(methodOn(ProfileSkillsController.class)
                 .findQualificationsByProfileId(profile.getId(),0,10)).withRel("skills");
 
         representationModel.add(experiencesLink);
