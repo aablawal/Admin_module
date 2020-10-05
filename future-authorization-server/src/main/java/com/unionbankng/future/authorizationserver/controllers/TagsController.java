@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "api")
@@ -22,20 +24,18 @@ public class TagsController {
     private final TagService tagService;
 
     @GetMapping("/v1/tags/find_by_type_likely_name")
-    public ResponseEntity<APIResponse<Page<Tag>>> getTagsByTypeAndName(@RequestParam TagType type, @RequestParam String name,
-                                                            @RequestParam int pageNo, @RequestParam int limit) {
+    public ResponseEntity<APIResponse<List<Tag>>> getTagsByTypeAndName(@RequestParam TagType type, @RequestParam String name) {
 
-        Page<Tag> tags = tagService.getTagsByTypeAndNameLike(type,name, PageRequest.of(pageNo, limit, Sort.by("name").ascending()));
+        List<Tag> tags = tagService.getTagsByTypeAndNameLike(type,name);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,tags));
 
     }
 
     @GetMapping("/v1/tags/find_by_type")
-    public ResponseEntity<APIResponse<Page<Tag>>> getTagsByType(@RequestParam TagType type,
-                                                            @RequestParam int pageNo, @RequestParam int limit) {
+    public ResponseEntity<APIResponse<List<Tag>>> getTagsByType(@RequestParam TagType type) {
 
-        Page<Tag> tags = tagService.getAllTagsByType(type, PageRequest.of(pageNo, limit, Sort.by("name").ascending()));
+        List<Tag> tags = tagService.getAllTagsByType(type);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,tags));
 

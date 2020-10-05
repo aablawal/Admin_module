@@ -5,8 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
-    Page<Tag> findByTypeAndNameLike(TagType type, String likelyName, Pageable pageable);
-    Page<Tag> findByType(TagType type,Pageable pageable);
+    List<Tag> findByTypeAndNameLike(TagType type, String likelyName);
+    List<Tag> findByType(TagType type);
 }

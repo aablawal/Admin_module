@@ -19,8 +19,7 @@ public class UserInterestController {
     private final UserInterestService userInterestService;
 
     @GetMapping("/v1/user_interest/find_by_user_id/{userId}")
-    public ResponseEntity<APIResponse<List<UserInterest>>> findQualificationsByProfileId(@PathVariable Long userId,
-                                                              @RequestParam int pageNo, @RequestParam int limit) {
+    public ResponseEntity<APIResponse<List<UserInterest>>> findQualificationsByProfileId(@PathVariable Long userId) {
 
         List<UserInterest> userInterests = userInterestService.
                 findAllByUserId(userId);
