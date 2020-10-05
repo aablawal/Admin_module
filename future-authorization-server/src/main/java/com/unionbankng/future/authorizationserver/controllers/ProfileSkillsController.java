@@ -31,6 +31,7 @@ public class ProfileSkillsController {
 
     }
 
+
     @PostMapping("/v1/user_skills/add_skills")
     public ResponseEntity<APIResponse<String>> addSkills(@Valid @RequestBody EntitySkillRequest request) {
 
