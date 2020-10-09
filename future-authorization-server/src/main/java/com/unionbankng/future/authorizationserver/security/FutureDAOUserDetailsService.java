@@ -21,7 +21,6 @@ public class FutureDAOUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		System.out.println(username);
 		com.unionbankng.future.authorizationserver.entities.User user = userRepository.findByEmail(username).orElseThrow(() -> new BadCredentialsException(
 				messageSource.getMessage("username.invalid", null, LocaleContextHolder.getLocale())));
 		return new FutureDAOUserDetails(user);

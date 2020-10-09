@@ -1,7 +1,9 @@
 package com.unionbankng.future.authorizationserver.entities;
 
+import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -37,12 +39,11 @@ public class User implements Serializable {
     private String username;
     @Column(nullable = false, unique = true)
     private String email;
-    @Column(nullable = false)
+    @JsonIgnore
     private String password;
-    @NotNull
-    @Column(length=5, nullable = false)
+    @Column(length=5)
     private String dialingCode;
-    @Column(length=32, nullable = false)
+    @Column(length=32)
     private String phoneNumber;
     @Column(length = 12)
     private String accountNumber;
@@ -55,11 +56,26 @@ public class User implements Serializable {
     private Date dateOfBirth;
     @Column(nullable = false)
     private Boolean isEnabled = true;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    public User(User user){
+        this.isEnabled = user.getIsEnabled();
+        this.id = user.getId();
+        this.img = user.getImg();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.username = user.getUsername();
+        this.uuid = user.getUuid();
+        this.authProvider = user.getAuthProvider();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+    }
 
     @PrePersist
     private void setCreatedAt() {

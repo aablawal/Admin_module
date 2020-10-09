@@ -4,6 +4,7 @@ import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
+import com.unionbankng.future.authorizationserver.pojos.TokenConfirm;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import com.unionbankng.future.authorizationserver.utils.Utility;
 import lombok.RequiredArgsConstructor;
@@ -54,23 +55,31 @@ public class UserConfirmationTokenService {
         emailSender.sendEmail(emailBody);
     }
 
-    public Boolean confirmUserAccountByToken(String token){
+    public TokenConfirm confirmUserAccountByToken(String token){
+
+        TokenConfirm tokenConfirm = new TokenConfirm();
 
         String userEmail = memcachedHelperService.getValueByKey(token);
 
         if(userEmail == null)
-            return false;
+            tokenConfirm.setSuccess(false);
 
         User user  = userService.findByEmail(userEmail).orElse(null);
         memcachedHelperService.clear(token);
 
-        if (user == null)
-            return false;
+        if (user == null) {
 
-        user.setIsEnabled(true);
-        userService.save(user);
+            tokenConfirm.setSuccess(false);
 
-        return true;
+        }else{
+
+            tokenConfirm.setSuccess(true);
+            tokenConfirm.setUserId(user.getId());
+            user.setIsEnabled(true);
+            userService.save(user);
+        }
+
+        return tokenConfirm;
     }
 
 

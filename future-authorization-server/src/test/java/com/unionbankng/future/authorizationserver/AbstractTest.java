@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import org.junit.After;
@@ -59,6 +60,7 @@ public abstract class AbstractTest {
 
         User user = User.builder().firstName("abc").lastName("bbc")
                 .username("djbabs")
+                .authProvider(AuthProvider.EMAIL)
                 .email("abc@gmail.com").dialingCode("234").phoneNumber("8176267145").isEnabled(Boolean.TRUE)
                 .uuid("12323344555").password(passwordEncoder.encode("password")).build();
         userRepository.save(user);
