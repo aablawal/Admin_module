@@ -19,6 +19,7 @@ public class FutureDAOUserDetails extends User implements UserDetails {
 
 
 	public FutureDAOUserDetails(User user) {
+
 		super(user);
     }
 
@@ -32,12 +33,12 @@ public class FutureDAOUserDetails extends User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return getPassword();
+        return super.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return super.getEmail();
     }
 
     @Override
@@ -57,7 +58,7 @@ public class FutureDAOUserDetails extends User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return getIsEnabled();
+        return super.getIsEnabled();
     }
    
     

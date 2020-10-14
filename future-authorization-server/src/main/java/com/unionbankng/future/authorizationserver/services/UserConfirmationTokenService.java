@@ -31,7 +31,6 @@ public class UserConfirmationTokenService {
     private final MemcachedHelperService memcachedHelperService;
 
 
-
     @Value("${email.sender}")
     private String emailSenderAddress;
     @Value("${confirmation.token.minute.expiry}")
@@ -39,14 +38,14 @@ public class UserConfirmationTokenService {
     @Value("${confirmation.token.url}")
     private String confirmationTokenURL;
 
-    public void sendConfirmationToken(User user){
+    public void sendConfirmationToken(User user) {
 
-        logger.debug("generating token for {}",user.toString());
+        logger.debug("generating token for {}", user.toString());
         String token = UUID.randomUUID().toString();
-        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
+        memcachedHelperService.save(token, user.getEmail(), tokenExpiryInMinute * 60);
 
-        String generatedURL = String.format("%s?token=%s",confirmationTokenURL,token);
-        logger.info("Sending confirmation to {}",user.toString());
+        String generatedURL = String.format("%s?token=%s", confirmationTokenURL, token);
+        logger.info("Sending confirmation to {}", user.toString());
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{generatedURL,
                 Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
@@ -55,29 +54,32 @@ public class UserConfirmationTokenService {
         emailSender.sendEmail(emailBody);
     }
 
-    public TokenConfirm confirmUserAccountByToken(String token){
+    public TokenConfirm confirmUserAccountByToken(String token) {
 
         TokenConfirm tokenConfirm = new TokenConfirm();
 
         String userEmail = memcachedHelperService.getValueByKey(token);
 
-        if(userEmail == null)
+        if (userEmail == null) {
             tokenConfirm.setSuccess(false);
+            return tokenConfirm;
+        }
 
-        User user  = userService.findByEmail(userEmail).orElse(null);
+        User user = userService.findByEmail(userEmail).orElse(null);
         memcachedHelperService.clear(token);
 
         if (user == null) {
 
             tokenConfirm.setSuccess(false);
+            return tokenConfirm;
 
-        }else{
-
-            tokenConfirm.setSuccess(true);
-            tokenConfirm.setUserId(user.getId());
-            user.setIsEnabled(true);
-            userService.save(user);
         }
+
+        tokenConfirm.setSuccess(true);
+        tokenConfirm.setUserId(user.getId());
+        user.setIsEnabled(true);
+        userService.save(user);
+
 
         return tokenConfirm;
     }

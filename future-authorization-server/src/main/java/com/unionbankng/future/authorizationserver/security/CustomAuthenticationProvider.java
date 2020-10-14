@@ -2,6 +2,8 @@ package com.unionbankng.future.authorizationserver.security;
 
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.interfaceimpl.GoogleOauthProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     @Autowired
     private GoogleOauthProvider googleOauthProvider;
 
+
     @Override
     public Authentication authenticate(Authentication auth)
             throws AuthenticationException {
@@ -24,6 +27,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         Map<String, String> map = (Map<String,String>)auth.getDetails();
         String thirdPartyOauthToken = map.get("oauth_token");
 
+        this.logger.info(String.format("token is : %s",thirdPartyOauthToken));
         String username = auth.getPrincipal() == null ? "NONE_PROVIDED" : auth.getName();
         boolean cacheWasUsed = true;
         FutureDAOUserDetails user = (FutureDAOUserDetails)this.getUserCache().getUserFromCache(username);
@@ -32,22 +36,29 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             cacheWasUsed =false;
             user = (FutureDAOUserDetails) this.retrieveUser(auth.getName(),
                     (UsernamePasswordAuthenticationToken) auth);
+
         }
 
         this.getPreAuthenticationChecks().check(user);
 
         if(user.getAuthProvider().equals(AuthProvider.EMAIL)) {
+
+
             if(auth.getCredentials() == null && thirdPartyOauthToken != null)
                 throw new BadCredentialsException(this.messages.getMessage("wrong.authprovider.email.error", "Bad credentials"));
             additionalAuthenticationChecks(user, (UsernamePasswordAuthenticationToken) auth);
         }
 
         if(user.getAuthProvider().equals(AuthProvider.GOOGLE)) {
+
             if(thirdPartyOauthToken == null)
                 throw new BadCredentialsException(this.messages.getMessage("wrong.authprovider.google.error", "Bad credentials"));
 
+            this.logger.info("Using google");
             googleOauthProvider.authentcate(thirdPartyOauthToken);
         }
+
+        this.logger.info("Done with google auth");
 
         if (!cacheWasUsed) {
             this.getUserCache().putUserInCache(user);

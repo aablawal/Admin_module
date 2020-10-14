@@ -33,6 +33,8 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
 
         GoogleIdToken googleIdToken = null;
 
+        logger.error("Starting : {}",googleClientId);
+
         try {
             googleIdToken = getGoogleIdToken(idToken,googleClientId);
 
@@ -40,7 +42,7 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
             logger.error("Google Auth error: {}",e.getLocalizedMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         }
-
+        logger.error("Here : {}",idToken);
         GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
         ThirdPartyOauthResponse thirdPartyOauthResponse = new ThirdPartyOauthResponse();
@@ -62,6 +64,7 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
                 //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
                 .build();
 
+        logger.error("I am here : {}");
 
             return verifier.verify(googleIdTokenString);
 

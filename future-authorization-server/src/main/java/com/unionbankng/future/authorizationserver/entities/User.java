@@ -39,7 +39,6 @@ public class User implements Serializable {
     private String username;
     @Column(nullable = false, unique = true)
     private String email;
-    @JsonIgnore
     private String password;
     @Column(length=5)
     private String dialingCode;
