@@ -58,11 +58,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	       defaultTokenServices.setSupportRefreshToken(true);
 	       return defaultTokenServices;
 	   }
-	   
-	   @Bean
-	   public MultipleUserDetailsService multipleUserDetails() {
-		   return new MultipleUserDetailsService(futureDAOUserDetailsService);
-	   }
+
 	   
 	    @Override
 	    public void configure (AuthorizationServerEndpointsConfigurer endpoints) throws Exception {

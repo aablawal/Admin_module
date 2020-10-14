@@ -27,7 +27,7 @@ public class RegistrationConfirmationTest extends AbstractTest {
 
         Mockito.when(memcachedHelperService.getValueByKey("12233334444")).thenReturn(null);
 
-        boolean confirmed = userConfirmationTokenService.confirmUserAccountByToken("12233334444");
+        boolean confirmed = userConfirmationTokenService.confirmUserAccountByToken("12233334444").getSuccess();
         Assert.assertEquals(false,confirmed);
 
     }
@@ -37,7 +37,7 @@ public class RegistrationConfirmationTest extends AbstractTest {
     public void successTokenTest() {
 
         Mockito.when(memcachedHelperService.getValueByKey("12233334444")).thenReturn("abc@gmail.com");
-        boolean confirmed = userConfirmationTokenService.confirmUserAccountByToken("12233334444");
+        boolean confirmed = userConfirmationTokenService.confirmUserAccountByToken("12233334444").getSuccess();
 
         Assert.assertEquals(Boolean.TRUE,confirmed);
 

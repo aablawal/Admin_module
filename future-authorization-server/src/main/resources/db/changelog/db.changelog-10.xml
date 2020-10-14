@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1602259022118-4">
+        <addColumn tableName="app_user">
+            <column name="auth_provider" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1602259022118-1">
+        <dropNotNullConstraint columnDataType="varchar(5)" columnName="dialing_code" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1602259022118-2">
+        <dropNotNullConstraint columnDataType="varchar(255)" columnName="password" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1602259022118-3">
+        <dropNotNullConstraint columnDataType="varchar(32)" columnName="phone_number" tableName="app_user"/>
+    </changeSet>
+</databaseChangeLog>
