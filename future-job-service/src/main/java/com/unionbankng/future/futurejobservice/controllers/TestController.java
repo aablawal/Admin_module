@@ -14,14 +14,14 @@ public class TestController {
 
     private final TestService service;
 
-    @GetMapping("v1/test/list")
+    @GetMapping("/v1/test/list")
     public ResponseEntity<APIResponse>  getTests(){
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.getTests()));
 
     }
 
-    @PostMapping("v1/test/add")
+    @PostMapping("/v1/test/add")
     public ResponseEntity<APIResponse> addTest(@Valid @RequestBody Test test){
         service.addTest(test);
         return ResponseEntity.ok().body(
