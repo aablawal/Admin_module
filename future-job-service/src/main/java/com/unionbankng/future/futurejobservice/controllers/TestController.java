@@ -3,9 +3,9 @@ import com.unionbankng.future.futurejobservice.entities.Test;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.TestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,11 +18,11 @@ public class TestController {
     public ResponseEntity<APIResponse>  getTests(){
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.getTests()));
-
     }
 
     @PostMapping("/v1/test/add")
-    public ResponseEntity<APIResponse> addTest(@Valid @RequestBody Test test){
+
+    public ResponseEntity<APIResponse> addTest(@RequestBody Test test){
         service.addTest(test);
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,test));
