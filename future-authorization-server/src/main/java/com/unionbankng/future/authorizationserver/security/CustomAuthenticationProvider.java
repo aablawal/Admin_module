@@ -58,7 +58,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             googleOauthProvider.authentcate(thirdPartyOauthToken);
         }
 
-        this.logger.info("Done with google auth");
 
         if (!cacheWasUsed) {
             this.getUserCache().putUserInCache(user);
