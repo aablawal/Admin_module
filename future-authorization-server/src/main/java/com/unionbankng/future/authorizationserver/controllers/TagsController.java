@@ -9,10 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,6 +35,15 @@ public class TagsController {
         List<Tag> tags = tagService.getAllTagsByType(type);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,tags));
+
+    }
+
+    @PutMapping("/v1/tags/create")
+    public ResponseEntity<APIResponse<Tag>> createTag(@RequestBody Tag tag) {
+
+        Tag created = tagService.save(tag);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,created));
 
     }
 }

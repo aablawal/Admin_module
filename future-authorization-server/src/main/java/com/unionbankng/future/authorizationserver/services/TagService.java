@@ -4,6 +4,7 @@ import com.unionbankng.future.authorizationserver.entities.Tag;
 import com.unionbankng.future.authorizationserver.enums.TagType;
 import com.unionbankng.future.authorizationserver.repositories.TagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,5 +28,10 @@ public class TagService {
     @Cacheable(value = "tags", key="#tagType")
     public List<Tag> getAllTagsByType (TagType tagType){
         return tagRepository.findByType(tagType);
+    }
+
+    @CacheEvict(value = "tags")
+    public Tag save (Tag tag){
+        return tagRepository.save(tag);
     }
 }
