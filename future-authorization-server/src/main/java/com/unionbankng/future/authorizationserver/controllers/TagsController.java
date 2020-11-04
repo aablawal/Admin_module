@@ -38,7 +38,7 @@ public class TagsController {
 
     }
 
-    @PutMapping("/v1/tags/create")
+    @PostMapping("/v1/tags/create")
     public ResponseEntity<APIResponse<Tag>> createTag(@RequestBody Tag tag) {
 
         Tag created = tagService.save(tag);
