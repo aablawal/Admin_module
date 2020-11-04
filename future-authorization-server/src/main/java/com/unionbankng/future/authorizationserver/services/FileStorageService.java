@@ -16,7 +16,7 @@ public class FileStorageService {
 
     Logger logger = LoggerFactory.getLogger(FileStorageService.class);
 
-    @GrpcClient("blobStorageService")
+    @GrpcClient("utilityService")
     private  BlobStorageServiceGrpc.BlobStorageServiceBlockingStub blobStorageServiceBlockingStub;
 
 

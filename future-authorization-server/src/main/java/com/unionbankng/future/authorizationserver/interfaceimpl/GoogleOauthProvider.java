@@ -25,7 +25,7 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
     private final Logger logger = LoggerFactory.getLogger(GoogleOauthProvider.class);
     private static final JacksonFactory jacksonFactory = new JacksonFactory();
 
-    @Value("${sidekiq.goodle.client_id}")
+    @Value("${sidekiq.google.client_id}")
     private String googleClientId;
 
     @Override

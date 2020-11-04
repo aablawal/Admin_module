@@ -30,6 +30,12 @@ zuul:
     authorization-server:
       path: /authserv/**
       service-id: authorization-server
+    job-service:
+      path: /jobserv/**
+      service-id: job-service
+    learn-service:
+      path: /learnserv/**
+      service-id: learn-service
 
 
 ---
@@ -45,6 +51,12 @@ zuul:
     authorization-server:
       path: /authserv/**
       url: http://future-auth-server
+    job-service:
+      path: /jobserv/**
+      url: http://future-job-service
+    learn-service:
+      path: /learnserv/**
+      url: http://future-learn-service
 
 ---
 spring:
@@ -59,4 +71,10 @@ zuul:
     authorization-server:
       path: /authserv/**
       url: http://future-auth-server
+    job-service:
+      path: /jobserv/**
+      url: http://future-job-service
+    learn-service:
+      path: /learnserv/**
+      url: http://future-learn-service
 
