@@ -33,6 +33,9 @@ zuul:
     job-service:
       path: /jobserv/**
       service-id: job-service
+    learn-service:
+      path: /learnserv/**
+      service-id: learn-service
 
 
 ---
@@ -51,6 +54,9 @@ zuul:
     job-service:
       path: /jobserv/**
       url: http://future-job-service
+    learn-service:
+      path: /learnserv/**
+      url: http://future-learn-service
 
 ---
 spring:
@@ -68,4 +74,7 @@ zuul:
     job-service:
       path: /jobserv/**
       url: http://future-job-service
+    learn-service:
+      path: /learnserv/**
+      url: http://future-learn-service
 

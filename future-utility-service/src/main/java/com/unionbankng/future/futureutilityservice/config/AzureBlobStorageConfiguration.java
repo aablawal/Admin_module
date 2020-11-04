@@ -18,6 +18,7 @@ public class AzureBlobStorageConfiguration {
     @Value("${azure.storage.connectionstring}")
     private String azureBlobStorageConnectionString;
 
+    @Bean
     BlobServiceClient blobServiceClient(){
         // Create a BlobServiceClient object which will be used to create a container client
         return new BlobServiceClientBuilder().connectionString(azureBlobStorageConnectionString).buildClient();
@@ -39,6 +40,7 @@ public class AzureBlobStorageConfiguration {
         }
         return blobServiceClient().getBlobContainerClient(containerName);
     }
+
 
     @Bean
     @Primary

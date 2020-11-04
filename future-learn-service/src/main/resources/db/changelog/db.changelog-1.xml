@@ -1,0 +1,204 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1604339089051-1">
+        <createTable tableName="course">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="coursePK"/>
+            </column>
+            <column name="course_img" type="varchar(255)"/>
+            <column name="course_title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="creatoruuid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar (max)"/>
+            <column name="estimated_time_to_complete" type="varchar(255)"/>
+            <column defaultValueBoolean="false" name="is_paid" type="bit"/>
+            <column defaultValueBoolean="false" name="is_published" type="bit"/>
+            <column name="outcomes" type="varchar (max)"/>
+            <column name="price" type="numeric(19, 2)"/>
+            <column name="requirements" type="varchar (max)"/>
+            <column name="short_desc" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-2">
+        <createTable tableName="course_content">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="course_contentPK"/>
+            </column>
+            <column name="course_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="creatoruuid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="index" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-3">
+        <createTable tableName="course_content_lectures">
+            <column name="course_content_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lectures_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-4">
+        <createTable tableName="course_instructors">
+            <column name="course_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="instructors_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-5">
+        <createTable tableName="instructor">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="instructorPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="instructoruuid" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="number_of_courses" type="int"/>
+            <column defaultValueNumeric="0" name="number_of_learners" type="int"/>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-6">
+        <createTable tableName="lecture">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="lecturePK"/>
+            </column>
+            <column name="course_content_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="course_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="creatoruuid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.0" name="duration" type="float(53)"/>
+            <column name="index" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="output_asset_name" type="varchar(255)"/>
+            <column name="streaming_locator_name" type="varchar(255)"/>
+            <column name="type" type="int"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="quiz_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-7">
+        <createTable tableName="question">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="questionPK"/>
+            </column>
+            <column name="answer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="index" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_text" type="varchar (max)"/>
+            <column name="quiz_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-8">
+        <createTable tableName="question_option">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="question_optionPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="index" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="option_text" type="varchar (max)"/>
+            <column name="question_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-9">
+        <createTable tableName="question_options">
+            <column name="question_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="options_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-10">
+        <createTable tableName="quiz">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="quizPK"/>
+            </column>
+            <column name="answer_option_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="quiz_title" type="varchar (max)"/>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-11">
+        <addUniqueConstraint columnNames="instructoruuid" constraintName="UC_INSTRUCTORINSTRUCTORUUID_COL" tableName="instructor"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-12">
+        <addUniqueConstraint columnNames="options_id" constraintName="UK_pb9aj69m72t1y7x3ovlprhw5g" tableName="question_options"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-13">
+        <addUniqueConstraint columnNames="index, quiz_id" constraintName="UKf9jbcnug7qxdwc2cgbi9ljh7m" tableName="question"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-14">
+        <addUniqueConstraint columnNames="index, course_id" constraintName="UKkuu3139he2rxx64s668d7pgaq" tableName="course_content"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-15">
+        <addUniqueConstraint columnNames="index, course_content_id" constraintName="UKlp5row3fdj37x5ep6gox9pmfg" tableName="lecture"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-16">
+        <addUniqueConstraint columnNames="index, question_id" constraintName="UKpyfvccnqdf5cfnesstq53sv04" tableName="question_option"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-17">
+        <addForeignKeyConstraint baseColumnNames="instructors_id" baseTableName="course_instructors" constraintName="FK3depx2bbanwlhkkg6vrxqqdtx" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="instructor" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-18">
+        <addForeignKeyConstraint baseColumnNames="options_id" baseTableName="question_options" constraintName="FK8tcq8euuoe1jwuiwihivqnf2k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="question_option" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-19">
+        <addForeignKeyConstraint baseColumnNames="course_content_id" baseTableName="course_content_lectures" constraintName="FKch8bmas7fes4tuci31w3pwtnj" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="course_content" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-20">
+        <addForeignKeyConstraint baseColumnNames="lectures_id" baseTableName="course_content_lectures" constraintName="FKfefi299kb0piieg7n0dexl59j" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="lecture" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-21">
+        <addForeignKeyConstraint baseColumnNames="quiz_id" baseTableName="lecture" constraintName="FKj2w2gliuf9ek27awn4dl5rftn" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="quiz" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-22">
+        <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="question_options" constraintName="FKjk4v42xhyfv4ca1yyhorsg5tv" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="question" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1604339089051-23">
+        <addForeignKeyConstraint baseColumnNames="course_id" baseTableName="course_instructors" constraintName="FKr71flmbykqdxlnkdhdcx2tr4k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="course" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
