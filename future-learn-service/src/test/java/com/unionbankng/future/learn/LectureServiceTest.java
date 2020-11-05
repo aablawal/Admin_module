@@ -101,7 +101,7 @@ public class LectureServiceTest extends AbstractTest{
         request.setCourseContentId(1l);
         request.setQuestionList(questionList);
         request.setCourseId(1l);
-        request.setIndex(2);
+        request.setIndex(1);
         request.setCreatorUUID("1233344455555-87666665-ui8886677666");
         request.setType(LectureType.QUIZ);
         request.setTitle("Test");
@@ -121,7 +121,7 @@ public class LectureServiceTest extends AbstractTest{
         List<Question> questionList = new ArrayList<>();
         Question q = new Question();
         q.setLectureId(1l);
-        q.setIndex(0);
+        q.setIndex(1);
         q.setAnswerIndex(0);
         q.setQuestionText("What is your name ?");
 
