@@ -78,7 +78,7 @@ public class LecturesController {
 
     @PostMapping(value = "/v1/lectures/create_new_lecture", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<Lecture>> creatContent(@Nullable @RequestPart("file") MultipartFile file,
-                                                                   @RequestBody @Valid CreateLectureRequest request) throws IOException {
+                                                                   @Valid @RequestPart CreateLectureRequest request) throws IOException {
 
         Lecture lecture = lectureService.createNewLecture(file,request);
 
