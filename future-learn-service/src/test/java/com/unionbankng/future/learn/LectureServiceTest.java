@@ -101,7 +101,7 @@ public class LectureServiceTest extends AbstractTest{
         request.setCourseContentId(1l);
         request.setQuestionList(questionList);
         request.setCourseId(1l);
-        request.setIndex(1);
+        request.setIndex(3);
         request.setCreatorUUID("1233344455555-87666665-ui8886677666");
         request.setType(LectureType.QUIZ);
         request.setTitle("Test");
