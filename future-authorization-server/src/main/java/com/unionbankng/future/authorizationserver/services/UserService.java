@@ -38,7 +38,6 @@ public class UserService {
         return userRepository.findByUuid(uuId);
     }
 
-    @Cacheable(value = "user", key="#email")
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
