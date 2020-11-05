@@ -61,7 +61,7 @@ public class UserCourseTest extends AbstractTest{
     public void enrollForCourseNotFoundTest() {
 
         CourseEnrollmentRequest courseEnrollmentRequest = new CourseEnrollmentRequest();
-        courseEnrollmentRequest.setCourseEnrollingForId(3l);
+        courseEnrollmentRequest.setCourseEnrollingForId(100l);
         courseEnrollmentRequest.setUserUUID("122233389997");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
