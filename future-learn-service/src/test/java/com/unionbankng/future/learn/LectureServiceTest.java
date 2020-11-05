@@ -92,7 +92,7 @@ public class LectureServiceTest extends AbstractTest{
         Question q = new Question();
         q.setLectureId(1l);
         q.setAnswerIndex(0);
-        q.setIndex(0);
+        q.setIndexNo(0);
         q.setQuestionText("What is your name ?");
         questionList.add(q);
 
@@ -121,13 +121,13 @@ public class LectureServiceTest extends AbstractTest{
         List<Question> questionList = new ArrayList<>();
         Question q = new Question();
         q.setLectureId(1l);
-        q.setIndex(1);
+        q.setIndexNo(1);
         q.setAnswerIndex(0);
         q.setQuestionText("What is your name ?");
 
         for(int i = 0; i < 3; i++){
             QuestionOption questionOption = new QuestionOption();
-            questionOption.setIndex(i);
+            questionOption.setIndexNo(i);
             questionOption.setOptionText("sidekiq"+ (i == 0 ? "":Integer.toString(i)));
             q.getOptions().add(questionOption);
         }

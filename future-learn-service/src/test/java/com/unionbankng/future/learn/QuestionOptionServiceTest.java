@@ -40,7 +40,7 @@ public class QuestionOptionServiceTest extends AbstractTest{
 
         Question q = new Question();
         q.setLectureId(2l);
-        q.setIndex(0);
+        q.setIndexNo(0);
         q.setAnswerIndex(0);
         q.setQuestionText("What is your name ?");
 
@@ -48,7 +48,7 @@ public class QuestionOptionServiceTest extends AbstractTest{
 
        QuestionOption questionOption = new QuestionOption();
        questionOption.setOptionText("John");
-       questionOption.setIndex(0);
+       questionOption.setIndexNo(0);
 
        q = questionOptionService.addToQuestion(q.getId(),questionOption);
 

@@ -23,7 +23,7 @@ public class CourseContentServiceTest extends AbstractTest{
 
         CourseContent courseContent = courseContentService.createNewContent(courseContentRequest);
 
-        Assert.assertEquals(Integer.valueOf(1),courseContent.getIndex());
+        Assert.assertEquals(Integer.valueOf(1),courseContent.getIndexNo());
 
     }
 
