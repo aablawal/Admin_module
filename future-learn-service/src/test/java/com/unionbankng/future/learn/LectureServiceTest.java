@@ -92,6 +92,7 @@ public class LectureServiceTest extends AbstractTest{
         Question q = new Question();
         q.setLectureId(1l);
         q.setAnswerIndex(0);
+        q.setIndex(0);
         q.setQuestionText("What is your name ?");
         questionList.add(q);
 
