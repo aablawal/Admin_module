@@ -36,7 +36,7 @@ public class LecturesController {
     @GetMapping("/v1/lectures/find_by_course_content")
     public ResponseEntity<APIResponse<List<Lecture>>> findAllByCourseContentId(@RequestParam Long courseContentId){
 
-        List<Lecture> lectures = lectureService.findAllByCourseContentId(courseContentId, Sort.by("index"));
+        List<Lecture> lectures = lectureService.findAllByCourseContentId(courseContentId, Sort.by("indexNo"));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,lectures));
