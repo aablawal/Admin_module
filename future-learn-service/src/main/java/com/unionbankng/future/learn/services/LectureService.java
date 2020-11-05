@@ -98,7 +98,7 @@ public class LectureService {
         lecture.setDuration(request.getDuration());
         lecture.setOutputAssetName(response.getAssetName());
         lecture.setStreamingLocatorName(response.getLocatorName());
-        lecture.setIndex(request.getIndex());
+        lecture.setIndexNo(request.getIndex());
         lecture.setTitle(request.getTitle());
         lecture.setType(request.getType());
 
@@ -115,7 +115,7 @@ public class LectureService {
         lecture.setCourseId(request.getCourseId());
         lecture.setCreatorUUID(request.getCreatorUUID());
         lecture.setDuration(request.getDuration());
-        lecture.setIndex(request.getIndex());
+        lecture.setIndexNo(request.getIndex());
         lecture.setTitle(request.getTitle());
         lecture.setType(request.getType());
 

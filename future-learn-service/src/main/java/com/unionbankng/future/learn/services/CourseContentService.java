@@ -37,7 +37,7 @@ public class CourseContentService {
         courseContent.setCourseContentText(request.getCourseContentText());
         courseContent.setCourseId(request.getCourseId());
         courseContent.setCreatorUUID(request.getCreatorUUID());
-        courseContent.setIndex(request.getIndex());
+        courseContent.setIndexNo(request.getIndex());
 
         return save(courseContent);
     }
