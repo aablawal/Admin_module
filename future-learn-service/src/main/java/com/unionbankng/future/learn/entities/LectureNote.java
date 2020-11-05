@@ -29,7 +29,8 @@ public class LectureNote implements Serializable {
     private String userUUID;
     @Column(nullable = false)
     private Long courseId;
-    private Double duration;
+    @Column(length = 10)
+    private String duration;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

@@ -10,6 +10,7 @@ import com.unionbankng.future.learn.pojo.CreateLectureRequest;
 import com.unionbankng.future.learn.services.FutureStreamingService;
 import com.unionbankng.future.learn.services.LectureService;
 import com.unionbankng.future.learn.services.QuestionOptionService;
+import com.unionbankng.future.learn.services.QuestionService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,92 +31,31 @@ public class QuestionOptionServiceTest extends AbstractTest{
     @Autowired
     QuestionOptionService questionOptionService;
 
+    @Autowired
+    QuestionService questionService;
+
 
     @Test
-    public void createNewQuizLectureNoQuestionsTest() {
+    public void addOptionsToQuestionTest() {
 
-        CreateLectureRequest request = new CreateLectureRequest();
-        request.setCourseContentId(1l);
-        request.setCourseId(1l);
-        request.setIndex(2);
-        request.setCreatorUUID("1233344455555-87666665-ui8886677666");
-        request.setDuration("30:00");
-        request.setType(LectureType.QUIZ);
-        request.setTitle("Test");
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            lectureService.createNewLecture(null,request);
-        });
-
-        assertEquals(400,exception.getStatus().value());
-
-
-    }
-
-    @Test
-    public void createNewQuizLectureQuestionWithoutOptionsTest() {
-
-        List<Question> questionList = new ArrayList<>();
         Question q = new Question();
-        q.setLectureId(1l);
-        q.setAnswerIndex(0);
-        q.setQuestionText("What is your name ?");
-        questionList.add(q);
-
-
-        CreateLectureRequest request = new CreateLectureRequest();
-        request.setCourseContentId(1l);
-        request.setQuestionList(questionList);
-        request.setCourseId(1l);
-        request.setIndex(2);
-        request.setCreatorUUID("1233344455555-87666665-ui8886677666");
-        request.setType(LectureType.QUIZ);
-        request.setTitle("Test");
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            lectureService.createNewLecture(null,request);
-        });
-
-        assertEquals(400,exception.getStatus().value());
-
-
-    }
-
-    @Test
-    public void createNewQuizLectureSuccessTest() throws IOException {
-
-        List<Question> questionList = new ArrayList<>();
-        Question q = new Question();
-        q.setLectureId(1l);
+        q.setLectureId(2l);
         q.setIndex(0);
         q.setAnswerIndex(0);
         q.setQuestionText("What is your name ?");
 
-        for(int i = 0; i < 3; i++){
-            QuestionOption questionOption = new QuestionOption();
-            questionOption.setIndex(i);
-            questionOption.setOptionText("sidekiq"+ (i == 0 ? "":Integer.toString(i)));
-            q.getOptions().add(questionOption);
-        }
-        questionList.add(q);
+        q = questionService.save(q);
 
+       QuestionOption questionOption = new QuestionOption();
+       questionOption.setOptionText("John");
+       questionOption.setIndex(0);
 
-        CreateLectureRequest request = new CreateLectureRequest();
-        request.setCourseContentId(1l);
-        request.setQuestionList(questionList);
-        request.setCourseId(1l);
-        request.setIndex(2);
-        request.setCreatorUUID("1233344455555-87666665-ui8886677666");
-        request.setType(LectureType.QUIZ);
-        request.setTitle("Test");
+       q = questionOptionService.addToQuestion(q.getId(),questionOption);
 
-         Lecture lecture =  lectureService.createNewLecture(null,request);
-
-
-        assertEquals(1,lecture.getQuestions().size());
-        assertEquals(3,lecture.getQuestions().get(0).getOptions().size());
+        assertEquals(1,q.getOptions().size());
 
 
     }
+
 
 }

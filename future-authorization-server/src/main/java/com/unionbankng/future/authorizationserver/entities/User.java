@@ -42,7 +42,7 @@ public class User implements Serializable {
     private String password;
     @Column(length=5)
     private String dialingCode;
-    @Column(length=32)
+    @Column(length=32, unique = true)
     private String phoneNumber;
     @Column(length = 12)
     private String accountNumber;

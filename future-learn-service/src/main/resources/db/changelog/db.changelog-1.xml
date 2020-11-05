@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet author="chokeme (generated)" id="1604561468321-1">
+    <changeSet author="chokeme (generated)" id="1604570639669-1">
         <createTable tableName="announcement">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="announcementPK"/>
@@ -14,7 +14,7 @@
             <column name="updated_at" type="datetime2"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-2">
+    <changeSet author="chokeme (generated)" id="1604570639669-2">
         <createTable tableName="course">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="coursePK"/>
@@ -40,7 +40,7 @@
             <column name="updated_at" type="datetime2"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-3">
+    <changeSet author="chokeme (generated)" id="1604570639669-3">
         <createTable tableName="course_content">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="course_contentPK"/>
@@ -59,7 +59,7 @@
             <column name="updated_at" type="datetime2"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-4">
+    <changeSet author="chokeme (generated)" id="1604570639669-4">
         <createTable tableName="course_instructors">
             <column name="course_id" type="bigint">
                 <constraints nullable="false"/>
@@ -69,7 +69,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-5">
+    <changeSet author="chokeme (generated)" id="1604570639669-5">
         <createTable tableName="instructor">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="instructorPK"/>
@@ -83,7 +83,7 @@
             <column name="updated_at" type="datetime2"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-6">
+    <changeSet author="chokeme (generated)" id="1604570639669-6">
         <createTable tableName="lecture">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="lecturePK"/>
@@ -109,7 +109,7 @@
             <column name="updated_at" type="datetime2"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-7">
+    <changeSet author="chokeme (generated)" id="1604570639669-7">
         <createTable tableName="lecture_note">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="lecture_notePK"/>
@@ -118,7 +118,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="created_at" type="datetime2"/>
-            <column name="duration" type="float(53)"/>
+            <column name="duration" type="varchar(10)"/>
             <column name="lecture_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
@@ -131,7 +131,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-8">
+    <changeSet author="chokeme (generated)" id="1604570639669-8">
         <createTable tableName="lecture_questions">
             <column name="lecture_id" type="bigint">
                 <constraints nullable="false"/>
@@ -141,7 +141,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-9">
+    <changeSet author="chokeme (generated)" id="1604570639669-9">
         <createTable tableName="question">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="questionPK"/>
@@ -160,7 +160,7 @@
             <column name="updated_at" type="datetime2"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-10">
+    <changeSet author="chokeme (generated)" id="1604570639669-10">
         <createTable tableName="question_option">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="question_optionPK"/>
@@ -173,7 +173,7 @@
             <column name="updated_at" type="datetime2"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-11">
+    <changeSet author="chokeme (generated)" id="1604570639669-11">
         <createTable tableName="question_options">
             <column name="question_id" type="bigint">
                 <constraints nullable="false"/>
@@ -183,7 +183,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-12">
+    <changeSet author="chokeme (generated)" id="1604570639669-12">
         <createTable tableName="user_course">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="user_coursePK"/>
@@ -194,43 +194,43 @@
             <column name="useruuid" type="varchar(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-13">
+    <changeSet author="chokeme (generated)" id="1604570639669-13">
         <addUniqueConstraint columnNames="instructoruuid" constraintName="UC_INSTRUCTORINSTRUCTORUUID_COL" tableName="instructor"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-14">
+    <changeSet author="chokeme (generated)" id="1604570639669-14">
         <addUniqueConstraint columnNames="index, lecture_id" constraintName="UK7j1obecijwij61ng90kkwhu5g" tableName="question"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-15">
+    <changeSet author="chokeme (generated)" id="1604570639669-15">
         <addUniqueConstraint columnNames="options_id" constraintName="UK_pb9aj69m72t1y7x3ovlprhw5g" tableName="question_options"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-16">
+    <changeSet author="chokeme (generated)" id="1604570639669-16">
         <addUniqueConstraint columnNames="questions_id" constraintName="UK_sggp2ogu4lpffp9mdg60rbf3g" tableName="lecture_questions"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-17">
+    <changeSet author="chokeme (generated)" id="1604570639669-17">
         <addUniqueConstraint columnNames="index, course_id" constraintName="UKkuu3139he2rxx64s668d7pgaq" tableName="course_content"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-18">
+    <changeSet author="chokeme (generated)" id="1604570639669-18">
         <addUniqueConstraint columnNames="index, course_content_id" constraintName="UKlp5row3fdj37x5ep6gox9pmfg" tableName="lecture"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-19">
+    <changeSet author="chokeme (generated)" id="1604570639669-19">
         <addUniqueConstraint columnNames="useruuid, course_id" constraintName="UKmqrk8tmxg9rrfj8ig48mue2q5" tableName="user_course"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-20">
+    <changeSet author="chokeme (generated)" id="1604570639669-20">
         <addForeignKeyConstraint baseColumnNames="instructors_id" baseTableName="course_instructors" constraintName="FK3depx2bbanwlhkkg6vrxqqdtx" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="instructor" validate="true"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-21">
+    <changeSet author="chokeme (generated)" id="1604570639669-21">
         <addForeignKeyConstraint baseColumnNames="options_id" baseTableName="question_options" constraintName="FK8tcq8euuoe1jwuiwihivqnf2k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="question_option" validate="true"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-22">
+    <changeSet author="chokeme (generated)" id="1604570639669-22">
         <addForeignKeyConstraint baseColumnNames="questions_id" baseTableName="lecture_questions" constraintName="FKajb348ubugi2wnawkohtcin7v" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="question" validate="true"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-23">
+    <changeSet author="chokeme (generated)" id="1604570639669-23">
         <addForeignKeyConstraint baseColumnNames="lecture_id" baseTableName="lecture_questions" constraintName="FKhup9wq0lninqldhh81kf48txr" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="lecture" validate="true"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-24">
+    <changeSet author="chokeme (generated)" id="1604570639669-24">
         <addForeignKeyConstraint baseColumnNames="question_id" baseTableName="question_options" constraintName="FKjk4v42xhyfv4ca1yyhorsg5tv" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="question" validate="true"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1604561468321-25">
+    <changeSet author="chokeme (generated)" id="1604570639669-25">
         <addForeignKeyConstraint baseColumnNames="course_id" baseTableName="course_instructors" constraintName="FKr71flmbykqdxlnkdhdcx2tr4k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="course" validate="true"/>
     </changeSet>
 </databaseChangeLog>

@@ -37,8 +37,6 @@ public class LectureServiceTest extends AbstractTest{
     @MockBean
     FutureStreamingService futureStreamingService;
 
-    @Autowired
-    private ObjectMapper mapper;
 
     @Test
     public void createNewVideoLectureTest() throws IOException {

@@ -41,7 +41,7 @@ public class Course implements Serializable {
     private String courseImg;
     @Column(columnDefinition = "boolean default false")
     private Boolean isPublished;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     private List<Instructor> instructors = new ArrayList<>();
     private String estimatedTimeToComplete;
     @Column(nullable = false)

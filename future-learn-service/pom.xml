@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unionbankng.future</groupId>
-	<artifactId>learn</artifactId>
+	<artifactId>future-learn-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>learn-service</name>
 	<description>The learn service </description>

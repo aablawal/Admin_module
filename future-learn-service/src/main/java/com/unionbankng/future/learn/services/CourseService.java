@@ -83,7 +83,7 @@ public class CourseService {
             Instructor instructor = instructorRepository.findByInstructorUUID(i.getInstructorUUID()).orElse(new Instructor());
             instructor.setNumberOfCourses(instructor.getNumberOfCourses() == null ? 0: instructor.getNumberOfCourses() + 1);
             instructor.setInstructorUUID(i.getInstructorUUID());
-            instructors.add(instructor);
+            instructors.add(instructorRepository.save(instructor));
         }
 
         course.setCourseTitle(request.getCourseTitle());

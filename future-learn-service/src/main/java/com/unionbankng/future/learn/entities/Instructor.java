@@ -25,9 +25,9 @@ public class Instructor implements Serializable {
     @Column(nullable = false, length = 40,unique = true)
     private String instructorUUID;
     @Column(columnDefinition = "integer default 0")
-    private Integer numberOfLearners;
+    private Integer numberOfLearners = 0;
     @Column(columnDefinition = "integer default 0")
-    private Integer numberOfCourses;
+    private Integer numberOfCourses = 0;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
