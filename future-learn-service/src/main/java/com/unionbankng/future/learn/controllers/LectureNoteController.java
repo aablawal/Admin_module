@@ -2,6 +2,7 @@ package com.unionbankng.future.learn.controllers;
 
 
 import com.unionbankng.future.learn.entities.Announcement;
+import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.entities.LectureNote;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.CreateAnnouncementRequest;
@@ -26,7 +27,7 @@ public class LectureNoteController {
 
 
     @GetMapping("/v1/lecture_note/get_by_course_and_userUUID")
-    public ResponseEntity<APIResponse<Page<LectureNote>>> getCourseAnnouncements(@RequestParam Long courseId,
+    public ResponseEntity<APIResponse<Page<LectureNote>>> findAllByCourseIdAndUserUUID(@RequestParam Long courseId,
                                                                                   @RequestParam String userUUID){
 
         List<LectureNote> lectureNotes = lectureNoteService.findAllByCourseIdAndUserUUID(courseId, userUUID);
@@ -35,19 +36,37 @@ public class LectureNoteController {
                 new APIResponse("Request successful",true,lectureNotes));
     }
 
-    @PostMapping(value = "/v1/lecture_note/create_or_update")
-    public ResponseEntity<APIResponse<Announcement>> createOrUpdateAnnouncement(@RequestBody CreateAnnouncementRequest request) {
+    @GetMapping(value = "/v1/lecture_note/get_by_lecture_and_userUUID")
+    public ResponseEntity<APIResponse<List<LectureNote>>> findAllByLectureIdAndUserUUID(@RequestParam Long lectureId,
+                                                                                     @RequestParam String userUUID) {
 
-        Announcement announcement = announcementService.createOrUpdateAnnouncement(request);
+        List<LectureNote> lectureNotes = lectureNoteService.findAllByLectureIdAndUserUUID(lectureId,userUUID);
 
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,announcement));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,lectureNotes));
     }
 
-    @DeleteMapping(value = "/v1/announcements/delete/{announcementId}")
-    public ResponseEntity<APIResponse<String>> createOrUpdateAnnouncement(@PathVariable Long announcementId) {
+    @DeleteMapping(value = "/v1/lecture_note/delete/{lectureNoteId}")
+    public ResponseEntity<APIResponse<String>> deleteNote(@PathVariable Long lectureNoteId) {
 
-        announcementService.deleteById(announcementId);
+        lectureNoteService.deleteById(lectureNoteId);
 
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,"Announcement deleted successful"));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,"Note deleted successful"));
+    }
+
+    @PostMapping(value = "/v1/lecture_note")
+    public ResponseEntity<APIResponse<LectureNote>> createNote(@RequestBody LectureNote request) {
+
+        LectureNote lectureNote = lectureNoteService.save(request);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,lectureNote));
+    }
+
+
+    @PutMapping(value = "/v1/lecture_note")
+    public ResponseEntity<APIResponse<LectureNote>> updateNote(@RequestBody LectureNote request) {
+
+        LectureNote lectureNote = lectureNoteService.save(request);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,lectureNote));
     }
 }

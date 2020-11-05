@@ -14,10 +14,6 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(
-        uniqueConstraints=
-        @UniqueConstraint(columnNames={"index", "questionId"})
-)
 public class QuestionOption implements Serializable {
 
     private static final long serialVersionUID = 1L;

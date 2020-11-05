@@ -1,11 +1,8 @@
 package com.unionbankng.future.learn.services;
 
 import com.unionbankng.future.learn.entities.Course;
-import com.unionbankng.future.learn.entities.Instructor;
-import com.unionbankng.future.learn.entities.Question;
 import com.unionbankng.future.learn.entities.UserCourse;
 import com.unionbankng.future.learn.pojo.CourseEnrollmentRequest;
-import com.unionbankng.future.learn.repositories.CourseRepository;
 import com.unionbankng.future.learn.repositories.UserCourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +36,7 @@ public class UserCourseService {
     }
 
     public Boolean existByUserUUIDAndCourseId(String userUUID, Long courseId){
-        return userCourseRepository.existByUserUUIDAndCourseId(userUUID,courseId);
+        return userCourseRepository.existsByUserUUIDAndCourseId(userUUID,courseId);
     }
 
     public Long countAllByCourseId(Long courseId){
@@ -81,7 +77,7 @@ public class UserCourseService {
 
     public List<Course> getMyCourses(String userUUID){
 
-        if(userCourseRepository.existByUserUUID(userUUID))
+        if(userCourseRepository.existsByUserUUID(userUUID))
             return new ArrayList<>();
 
         List<Long> userCoursesIds = findAllByUserUUID(userUUID).stream().map(u -> u.getCourseId() ).collect(Collectors.toList());

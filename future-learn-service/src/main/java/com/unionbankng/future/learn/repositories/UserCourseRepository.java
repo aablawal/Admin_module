@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface UserCourseRepository extends JpaRepository<UserCourse,Long> {
 
-    Boolean existByUserUUIDAndCourseId(String userUUID,Long courseId);
-    Boolean existByUserUUID(String userUUID);
+    Boolean existsByUserUUIDAndCourseId(String userUUID, Long courseId);
+    Boolean existsByUserUUID(String userUUID);
     List<UserCourse> findAllByUserUUID(String userUUID);
     Long countAllByUserUUID(String userUUID);
     Page<UserCourse> findAllByCourseId(Long courseId, Pageable pageable);

@@ -107,7 +107,7 @@ public class LectureService {
 
     private Lecture createQuizLecture(CreateLectureRequest request) throws IOException {
 
-        if(request.getQuestionList() == null)
+        if(request.getQuestionList().isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Questions can't be empty");
 
         Lecture lecture = new Lecture();
@@ -121,8 +121,15 @@ public class LectureService {
 
         lecture = save(lecture);
         //create quiz;
-        for (Question q: request.getQuestionList())
+        for (Question q: request.getQuestionList()) {
+            if(q.getAnswerIndex() == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An answer must be selected");
+
+            if(q.getOptions().isEmpty())
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "All questions must have options");
+
             q.setLectureId(lecture.getId());
+        }
 
         lecture.setQuestions(request.getQuestionList());
         return save(lecture);

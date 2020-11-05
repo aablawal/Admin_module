@@ -51,7 +51,7 @@ public class LecturesController {
                 new APIResponse("Request successful",true,lectures));
     }
 
-    @GetMapping("/v1/lectures/find_by_course_id")
+    @GetMapping("/v1/lectures/find_by_creatorUUID")
     public ResponseEntity<APIResponse<Page<Lecture>>> findAllByCreatorUUID(@RequestParam String creatorUUID, @RequestParam int page
     ,@RequestParam int size){
 

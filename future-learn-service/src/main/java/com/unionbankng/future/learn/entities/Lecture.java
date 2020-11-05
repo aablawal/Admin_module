@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,14 +31,14 @@ public class Lecture implements Serializable {
     private String title;
     @Enumerated
     private LectureType type;
-    @Column(columnDefinition = "double default 0.00")
-    private Double duration;
+    @Column(columnDefinition = "varchar(10) default '0:00'",length = 10)
+    private String duration;
     private String streamingLocatorName;
     private String outputAssetName;
     @Column(nullable = false)
     private Integer index;
-    @OneToMany
-    private List<Question> questions;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Question> questions = new ArrayList<>();
     @Column(updatable = false,nullable = false)
     private String creatorUUID;
     @Column(nullable = false)

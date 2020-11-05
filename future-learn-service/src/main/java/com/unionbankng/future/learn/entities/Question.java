@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class Question implements Serializable {
     @Column(nullable = false)
     private Long lectureId;
     @OneToMany(cascade = CascadeType.ALL)
-    private List<QuestionOption> options;
+    private List<QuestionOption> options = new ArrayList<>();
     @Column(nullable = false)
     private Integer answerIndex;
     @Column(updatable = false)
