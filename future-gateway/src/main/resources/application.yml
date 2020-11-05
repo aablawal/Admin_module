@@ -3,6 +3,10 @@ spring:
     active: ${FUTURE_ENV}
   application:
     name: future-gateway
+  http:
+    multipart:
+      max-file-size: 100Mb
+      max-request-size: 10Mb
 server:
   port: 8080
 eureka:
