@@ -24,7 +24,7 @@ public class QuestionOption implements Serializable {
     @Column(columnDefinition="TEXT")
     private String optionText;
     @Column(nullable = false)
-    private Integer index;
+    private Integer indexNo;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

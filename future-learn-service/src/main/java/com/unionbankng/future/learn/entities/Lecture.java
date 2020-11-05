@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(
         uniqueConstraints=
-        @UniqueConstraint(columnNames={"index", "courseContentId"})
+        @UniqueConstraint(columnNames={"indexNo", "courseContentId"})
 )
 public class Lecture implements Serializable {
 
@@ -36,7 +36,7 @@ public class Lecture implements Serializable {
     private String streamingLocatorName;
     private String outputAssetName;
     @Column(nullable = false)
-    private Integer index;
+    private Integer indexNo;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
     @Column(updatable = false,nullable = false)

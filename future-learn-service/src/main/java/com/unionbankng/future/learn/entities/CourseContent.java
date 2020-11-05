@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(
         uniqueConstraints=
-        @UniqueConstraint(columnNames={"index", "courseId"})
+        @UniqueConstraint(columnNames={"indexNo", "courseId"})
 )
 public class CourseContent implements Serializable {
 
@@ -28,7 +28,7 @@ public class CourseContent implements Serializable {
     private Long id;
     private String courseContentText;
     @Column(nullable = false)
-    private Integer index;
+    private Integer indexNo;
     @Column(nullable = false)
     private Long courseId;
     @Column(updatable = false,nullable = false)

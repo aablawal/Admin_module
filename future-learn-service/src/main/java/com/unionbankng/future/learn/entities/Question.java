@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(
         uniqueConstraints=
-        @UniqueConstraint(columnNames={"index", "lectureId"})
+        @UniqueConstraint(columnNames={"indexNo", "lectureId"})
 )
 public class Question implements Serializable {
 
@@ -30,7 +30,7 @@ public class Question implements Serializable {
     @Column(columnDefinition="TEXT")
     private String questionText;
     @Column(nullable = false)
-    private Integer index;
+    private Integer indexNo;
     @Column(nullable = false)
     private Long lectureId;
     @OneToMany(cascade = CascadeType.ALL)
