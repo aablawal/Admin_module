@@ -37,6 +37,7 @@ com/unionbankng/future/futureutilityservice/grpcserver/StreamLinksResponse.class
 com/unionbankng/future/futureutilityservice/grpcserver/AzureMediaServiceRequestOrBuilder.class
 com/unionbankng/future/futureutilityservice/grpcserver/AzureMediaServiceRequest$Builder.class
 com/unionbankng/future/futureutilityservice/grpcserver/StreamLinkRequest$1.class
+com/unionbankng/App.class
 com/unionbankng/future/futureutilityservice/grpcserver/BlobStorageServiceGrpc$3.class
 com/unionbankng/future/futureutilityservice/grpcserver/BlobStorageServiceGrpc$BlobStorageServiceStub.class
 com/unionbankng/future/futureutilityservice/grpcserver/BlobStorageServiceGrpc$MethodHandlers.class

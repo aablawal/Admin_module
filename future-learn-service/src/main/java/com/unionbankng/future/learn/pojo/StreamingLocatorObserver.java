@@ -1,9 +1,8 @@
 package com.unionbankng.future.learn.pojo;
 
 import com.unionbankng.future.futureutilityservice.grpcserver.StreamingLocatorResponse;
-import io.grpc.stub.StreamObserver;
 
-public class StreamingLocatorObserver implements StreamObserver<StreamingLocatorResponse> {
+public class StreamingLocatorObserver implements io.grpc.stub.StreamObserver<com.unionbankng.future.futureutilityservice.grpcserver.StreamingLocatorResponse> {
 
 
     @Override
