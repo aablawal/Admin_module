@@ -21,7 +21,6 @@ public class FutureStreamingService {
     @GrpcClient("utilityService")
     private AzureMediaStreamingServiceGrpc.AzureMediaStreamingServiceStub azureMediaStreamingServiceStub;
 
-
     public StreamingLocatorResponse uploadAndGetStreamingLocator(MultipartFile file) throws IOException {
 
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
