@@ -53,7 +53,7 @@ public class UsersController {
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         UserByTokenResponse userByTokenResponse = new UserByTokenResponse();
-        BeanUtils.copyProperties(userByTokenResponse, user);
+        BeanUtils.copyProperties(user, userByTokenResponse);
 
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,userByTokenResponse));
