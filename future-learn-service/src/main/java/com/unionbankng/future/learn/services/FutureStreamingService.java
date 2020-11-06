@@ -2,6 +2,7 @@ package com.unionbankng.future.learn.services;
 
 import com.google.protobuf.ByteString;
 import com.unionbankng.future.futureutilityservice.grpcserver.*;
+import com.unionbankng.future.learn.pojo.StreamingLocatorObserver;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -29,26 +30,7 @@ public class FutureStreamingService {
 
         final StreamingLocatorResponse[] streamingResponse = {null};
         // request observer
-        io.grpc.stub.StreamObserver<com.unionbankng.future.futureutilityservice.grpcserver.AzureMediaServiceRequest> streamObserver = this.azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new io.grpc.stub.StreamObserver<com.unionbankng.future.futureutilityservice.grpcserver.StreamingLocatorResponse>() {
-            @Override
-            public void onNext(StreamingLocatorResponse streamingLocatorResponse) {
-                System.out.println(
-                        "File upload status :: " + streamingLocatorResponse);
-                if (streamingLocatorResponse != null) {
-                    streamingResponse[0] = streamingLocatorResponse;
-                }
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-
-            }
-
-            @Override
-            public void onCompleted() {
-
-            }
-        });
+        io.grpc.stub.StreamObserver<AzureMediaServiceRequest> streamObserver = this.azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new StreamingLocatorObserver());
 
 
         InputStream inputStream = file.getInputStream();
