@@ -35,6 +35,7 @@ public class FutureStreamingService {
 
             @Override
             public void onNext(StreamingLocatorResponse streamingLocatorResponse) {
+                System.out.println("response is :: "+ streamingLocatorResponse);
                 streamingResponse[0] = streamingLocatorResponse;
             }
 
