@@ -29,14 +29,14 @@ public class FutureStreamingService {
 
         final StreamingLocatorResponse[] streamingResponse = {null};
         // request observer
-        StreamObserver<AzureMediaServiceRequest> streamObserver = this.azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new StreamObserver<>() {
+        StreamObserver<AzureMediaServiceRequest> streamObserver = this.azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new StreamObserver<StreamingLocatorResponse>() {
             @Override
             public void onNext(StreamingLocatorResponse streamingLocatorResponse) {
-
                 System.out.println(
                         "File upload status :: " + streamingLocatorResponse);
-                if (streamingLocatorResponse != null)
+                if (streamingLocatorResponse != null) {
                     streamingResponse[0] = streamingLocatorResponse;
+                }
             }
 
             @Override
@@ -49,6 +49,7 @@ public class FutureStreamingService {
 
             }
         });
+
 
         InputStream inputStream = file.getInputStream();
         byte[] bytes = new byte[4096];
