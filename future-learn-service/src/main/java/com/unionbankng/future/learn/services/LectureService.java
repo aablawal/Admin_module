@@ -86,7 +86,12 @@ public class LectureService {
         if (file == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File cannot be empty");
 
-        StreamingLocatorResponse response = futureStreamingService.uploadAndGetStreamingLocator(file);
+        StreamingLocatorResponse response = null;
+        try {
+            response = futureStreamingService.uploadAndGetStreamingLocator(file);
+        } catch (InterruptedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
+        }
 
         if(response == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
