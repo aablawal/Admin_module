@@ -88,6 +88,9 @@ public class LectureService {
 
         StreamingLocatorResponse response = futureStreamingService.uploadAndGetStreamingLocator(file);
 
+        if(response == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
+
         if(!response.getSuccess())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
 
