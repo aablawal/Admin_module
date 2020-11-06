@@ -20,6 +20,7 @@ public class SwaggerRegister implements SwaggerResourcesProvider {
 		List<SwaggerResource> resources = new ArrayList<>();
 		resources.add(swaggerResource("authorization-server", "/authserv/v2/api-docs", "0.0.1"));
 		resources.add(swaggerResource("job-service", "/jobserv/v2/api-docs", "0.0.1"));
+		resources.add(swaggerResource("learn-service", "/learnserv/v2/api-docs", "0.0.1"));
 
 		return resources;
 	}
