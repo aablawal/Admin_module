@@ -30,7 +30,7 @@ public class FutureStreamingService {
 
         final StreamingLocatorResponse[] streamingResponse = {null};
         // request observer
-        io.grpc.stub.StreamObserver<AzureMediaServiceRequest> streamObserver = this.azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new StreamingLocatorObserver());
+        io.grpc.stub.StreamObserver<AzureMediaServiceRequest> streamObserver = azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new StreamingLocatorObserver());
 
         InputStream inputStream = file.getInputStream();
         byte[] bytes = new byte[4096];
