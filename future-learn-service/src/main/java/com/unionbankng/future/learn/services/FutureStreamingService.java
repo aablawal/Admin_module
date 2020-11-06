@@ -29,7 +29,7 @@ public class FutureStreamingService {
 
         final StreamingLocatorResponse[] streamingResponse = {null};
         // request observer
-        StreamObserver<AzureMediaServiceRequest> streamObserver = this.azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new StreamObserver<StreamingLocatorResponse>() {
+        io.grpc.stub.StreamObserver<com.unionbankng.future.futureutilityservice.grpcserver.AzureMediaServiceRequest> streamObserver = this.azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new io.grpc.stub.StreamObserver<com.unionbankng.future.futureutilityservice.grpcserver.StreamingLocatorResponse>() {
             @Override
             public void onNext(StreamingLocatorResponse streamingLocatorResponse) {
                 System.out.println(
