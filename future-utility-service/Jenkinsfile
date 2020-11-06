@@ -38,6 +38,17 @@ pipeline {
                 }
     }
     }
+
+      stage('Test') {
+                steps {
+                    echo 'Testing..'
+                    withMaven( maven: 'maven-3.6.3' ) {
+                    		sh 'cd future-utility-service && && mvn clean install -U && mvn test'
+                    }
+
+                }
+            }
+
         stage('Build') {
 
             steps {
@@ -54,15 +65,7 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-                withMaven( maven: 'maven-3.6.3' ) {
-                		sh 'cd future-utility-service && mvn test'
-                }
 
-            }
-        }
         
         stage('Deploy') {
             steps {
