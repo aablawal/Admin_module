@@ -75,7 +75,7 @@ public class AzureMediaServiceService{
             System.out.println("Job elapsed time: " + elapsed + " second(s)."+job.state());
 
             if(job.state() != JobState.FINISHED)
-                return StreamingLocatorResponse.builder().status(false).build();
+                return StreamingLocatorResponse.newBuilder().setSuccess(false).build();
 
                 System.out.println("Job finished.");
                 System.out.println();
@@ -85,11 +85,11 @@ public class AzureMediaServiceService{
                 StreamingLocator locator = getStreamingLocator(manager, resourceGroup, accountName,
                         outputAsset.name(), locatorName);
 
-                return StreamingLocatorResponse.builder().outputAssetName(outputAsset.name()).locatorName(locator.name()).status(true).build();
+                return StreamingLocatorResponse.newBuilder().setAssetName(outputAsset.name()).setLocatorName(locator.name()).setSuccess(true).build();
 
 
         } catch (Exception e) {
-            return StreamingLocatorResponse.builder().status(false).build();
+            return StreamingLocatorResponse.newBuilder().setSuccess(false).build();
         }finally {
             cleanup(manager,resourceGroup,accountName,adaptiveEncodeTransform.name(),jobName,inputAssetName);
         }
