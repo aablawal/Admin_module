@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class FutureStreamingService {
@@ -29,7 +30,8 @@ public class FutureStreamingService {
 
         final StreamingLocatorResponse[] streamingResponse = {null};
         // request observer
-        io.grpc.stub.StreamObserver<AzureMediaServiceRequest> streamObserver = azureMediaStreamingServiceStub.uploadAndGetStreamingLocator(new StreamObserver<StreamingLocatorResponse>() {
+        io.grpc.stub.StreamObserver<AzureMediaServiceRequest> streamObserver = azureMediaStreamingServiceStub.
+                withDeadlineAfter(120000, TimeUnit.MILLISECONDS).uploadAndGetStreamingLocator(new StreamObserver<>() {
 
             @Override
             public void onNext(StreamingLocatorResponse streamingLocatorResponse) {
