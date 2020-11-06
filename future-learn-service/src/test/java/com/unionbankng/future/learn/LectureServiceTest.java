@@ -39,7 +39,7 @@ public class LectureServiceTest extends AbstractTest{
 
 
     @Test
-    public void createNewVideoLectureTest() throws IOException {
+    public void createNewVideoLectureTest() throws IOException, InterruptedException {
 
         CreateLectureRequest request = new CreateLectureRequest();
         request.setCourseContentId(1l);
