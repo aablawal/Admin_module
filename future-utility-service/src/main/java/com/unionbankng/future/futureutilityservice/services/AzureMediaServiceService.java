@@ -36,7 +36,7 @@ public class AzureMediaServiceService{
     private final BlobServiceClient blobServiceClient;
 
 
-    public StreamingLocatorResponse uploadAndGetStreamingLocator(AzureMediaServiceRequest request) {
+    public StreamingLocatorResponse uploadAndGetStreamingLocator(byte[] file, String fileName) {
 
         // Creating a unique suffix so that we don't have name collisions if you run the sample
         // multiple times without cleaning up.
@@ -51,7 +51,7 @@ public class AzureMediaServiceService{
 
             // Create a new input Asset and upload the specified local video file into it.
             Asset inputAsset = createInputAsset(manager, resourceGroup, accountName, inputAssetName,
-                    request.getFileName(),request.getFileByte().toByteArray());
+                   fileName,file);
 
             // Output from the encoding Job must be written to an Asset, so let's create one. Note that we
             // are using a unique asset name, there should not be a name collision.

@@ -32,7 +32,7 @@ message DeleteOutputAssetReponse {
 
 
 service AzureMediaStreamingService {
-    rpc uploadAndGetStreamingLocator(AzureMediaServiceRequest) returns (StreamingLocatorResponse);
+    rpc uploadAndGetStreamingLocator(stream AzureMediaServiceRequest) returns (StreamingLocatorResponse);
     rpc getStreamingUrlsFromLocator(StreamLinkRequest) returns (StreamLinksResponse);
     rpc deleteOutputAsset(DeleteOutputAssetRequest) returns (DeleteOutputAssetReponse);
 }

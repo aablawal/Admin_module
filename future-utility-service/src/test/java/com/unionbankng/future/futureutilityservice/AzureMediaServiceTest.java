@@ -25,10 +25,7 @@ public class AzureMediaServiceTest {
     @Test
     public void uploadAndGetStreamingLocatorTest() throws IOException {
         File file = new File("src/test/resources/index.mp4");
-        AzureMediaServiceRequest azureMediaServiceRequest = AzureMediaServiceRequest.newBuilder()
-                .setFileName("index.mp4").setFileByte(ByteString.copyFrom(Files.readAllBytes(file.toPath()))).build();
-
-        StreamingLocatorResponse response = azureMediaServiceService.uploadAndGetStreamingLocator(azureMediaServiceRequest);
+        StreamingLocatorResponse response = azureMediaServiceService.uploadAndGetStreamingLocator(Files.readAllBytes(file.toPath()),"index.mp4");
 
         String streamingLocatorName = response.getLocatorName();
 
