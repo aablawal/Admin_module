@@ -14,7 +14,6 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 @RequiredArgsConstructor
 public class AzureMediaStreamingService extends AzureMediaStreamingServiceGrpc.AzureMediaStreamingServiceImplBase{
 
-
     private final AzureMediaServiceService azureMediaServiceService;
 
     /**
