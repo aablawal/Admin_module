@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class FutureStreamingService {
@@ -27,7 +28,7 @@ public class FutureStreamingService {
         AzureMediaServiceRequest azureMediaServiceRequest = AzureMediaServiceRequest.newBuilder()
                 .setFileByte(ByteString.copyFrom(file.getBytes())).setFileName(fileName).build();
 
-        return azureMediaStreamingServiceBlockingStub.uploadAndGetStreamingLocator(azureMediaServiceRequest);
+        return azureMediaStreamingServiceBlockingStub.withDeadlineAfter(120000, TimeUnit.MILLISECONDS).uploadAndGetStreamingLocator(azureMediaServiceRequest);
 
 
     }
