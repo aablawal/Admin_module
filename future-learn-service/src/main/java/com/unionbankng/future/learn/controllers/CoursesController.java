@@ -11,11 +11,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,6 +76,13 @@ public class CoursesController {
         Course course = courseService.updateCourseImg(image,courseId);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,course));
+    }
+
+    @GetMapping("/user/info")
+    public Object getUserInfo(OAuth2Authentication authentication) {
+        Map<String, String> map = new Hashtable<String, String>();
+        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
+        return details.getDecodedDetails();
     }
 
 

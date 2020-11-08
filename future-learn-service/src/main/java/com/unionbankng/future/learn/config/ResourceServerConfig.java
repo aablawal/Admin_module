@@ -1,16 +1,28 @@
 package com.unionbankng.future.learn.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
+import java.util.Map;
 
 @EnableResourceServer
 @Configuration
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
+	@Value("${sidekiq.jwt.signing_key}")
+	private String jwtSigningKey;
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
@@ -19,11 +31,42 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 	}
 
+
+	@Override
+	public void configure(ResourceServerSecurityConfigurer config) {
+		config.tokenServices( createTokenServices() );
+	}
+
+	@Primary
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	public DefaultTokenServices createTokenServices()  {
+		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+		defaultTokenServices.setTokenStore( createTokenStore() );
+		return defaultTokenServices;
+	}
 
-		return new BCryptPasswordEncoder();
+	@Bean
+	public TokenStore createTokenStore(){
+		return new JwtTokenStore( createJwtAccessTokenConverter() );
+	}
 
+	@Bean
+	public JwtAccessTokenConverter createJwtAccessTokenConverter(){
+		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+		converter.setAccessTokenConverter( new CustomAccessTokenConverter() );
+		converter.setSigningKey(jwtSigningKey);
+		return converter;
+	}
+
+	class CustomAccessTokenConverter extends DefaultAccessTokenConverter {
+
+		@Override
+		public OAuth2Authentication extractAuthentication(Map<String, ?> claims) {
+			OAuth2Authentication authentication
+					= super.extractAuthentication(claims);
+			authentication.setDetails(claims);
+			return authentication;
+		}
 	}
 
 }

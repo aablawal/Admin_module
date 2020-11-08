@@ -6,9 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Hashtable;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,4 +30,6 @@ public class LogoutController {
         return ResponseEntity.ok().body(new APIResponse("Logout successful",true,null));
 
     }
+
+
 }
