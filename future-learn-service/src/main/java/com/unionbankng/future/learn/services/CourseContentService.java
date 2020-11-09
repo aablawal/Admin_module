@@ -69,4 +69,10 @@ public class CourseContentService {
         return save(courseContent);
     }
 
+    public void deleteById(Long contentId){
+
+        courseContentRepository.deleteById(contentId);
+
+    }
+
 }

@@ -65,5 +65,14 @@ public class CourseContentController {
                 new APIResponse("Request successful",true,courseContent));
     }
 
+    @DeleteMapping("/v1/course_content/${courseContentId}")
+    public ResponseEntity<APIResponse<String>> creatContent(@PathVariable Long courseContentId){
+
+        courseContentService.deleteById(courseContentId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,"Content deleted successfully"));
+    }
+
 
 }
