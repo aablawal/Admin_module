@@ -13,7 +13,7 @@ public class JWTUserDetailsExtractor {
         OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
         Map<String,String> detailsMap = (Map<String, String>) details.getDecodedDetails();
 
-        return JwtUserDetail.builder().userEmail(detailsMap.get("userEmail")).userImg(detailsMap.get("userImg"))
+        return JwtUserDetail.builder().userUUID(detailsMap.get("userId")).userEmail(detailsMap.get("userEmail")).userImg(detailsMap.get("userImg"))
                 .userFullName(detailsMap.get("userFullName")).userUUID(detailsMap.get("userUUID")).build();
 
 
