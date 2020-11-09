@@ -57,4 +57,16 @@ public class CourseContentService {
         return save(courseContent);
     }
 
+    public CourseContent updateCourseContent(CourseContent request){
+
+        CourseContent courseContent = new CourseContent();
+        courseContent.setId(request.getId());
+        courseContent.setCourseContentText(request.getCourseContentText());
+        courseContent.setCourseId(request.getCourseId());
+        courseContent.setIndexNo(request.getIndexNo());
+        courseContent.setCreatorUUID(request.getCreatorUUID());
+
+        return save(courseContent);
+    }
+
 }

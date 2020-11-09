@@ -56,5 +56,14 @@ public class CourseContentController {
                 new APIResponse("Request successful",true,courseContent));
     }
 
+    @PostMapping("/v1/course_content/update_content")
+    public ResponseEntity<APIResponse<CourseContent>> creatContent(@RequestBody CourseContent request){
+
+        CourseContent courseContent = courseContentService.updateCourseContent(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,courseContent));
+    }
+
 
 }
