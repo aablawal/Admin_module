@@ -5,6 +5,7 @@ import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class JobService {
                 if (nda_file_names != null)
                     job.nda_files = nda_file_names;
                 if (supporting_file_names != null)
-                  job.supporting_files = supporting_file_names;
+                    job.supporting_files = supporting_file_names;
 
                 return savedJob;
 
@@ -53,13 +54,13 @@ public class JobService {
         return repository.findById(id);
     }
     public Optional<List<Job>> findJobsByOwnerId(Long id) {
-        return repository.findByOid(id);
+        return repository.findByOid(id,Sort.by("id").descending());
     }
     public  Optional<List<Job>> findJobsByStatus(JobStatus status) {
-        return repository.findByStatus(status);
+        return repository.findByStatus(status, Sort.by("id").descending());
     }
     public  Optional<List<Job>> findJobByType(JobType type) {
-        return repository.findByType(type);
+        return repository.findByType(type, Sort.by("id").descending());
     }
     public void  deleteJobById(Long id) {
         repository.deleteById(id);
