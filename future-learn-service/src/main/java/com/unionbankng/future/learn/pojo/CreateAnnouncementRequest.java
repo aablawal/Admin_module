@@ -8,11 +8,8 @@ import javax.validation.constraints.NotNull;
 public class CreateAnnouncementRequest {
 
     private Long id;
-
     @NotNull
     private String announcementText;
-    @NotNull
-    private String posterUUID;
     @NotNull
     private Long courseId;
 }

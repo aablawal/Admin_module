@@ -4,6 +4,5 @@ import lombok.Data;
 
 @Data
 public class CourseEnrollmentRequest {
-    private String userUUID;
     private Long courseEnrollingForId;
 }

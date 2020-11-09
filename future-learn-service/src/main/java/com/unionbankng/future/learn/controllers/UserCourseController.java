@@ -13,8 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -29,18 +31,19 @@ public class UserCourseController {
 
 
     @GetMapping("/v1/user_course/get_my_courses")
-    public ResponseEntity<APIResponse<List<Course>>> getMyCourses(@RequestParam String userUUID){
+    public ResponseEntity<APIResponse<List<Course>>> getMyCourses(@ApiIgnore OAuth2Authentication authentication){
 
-        List<Course> courses = userCourseService.getMyCourses(userUUID);
+        List<Course> courses = userCourseService.getMyCourses(authentication);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
     }
 
     @PostMapping(value = "/v1/user_course/enroll")
-    public ResponseEntity<APIResponse<UserCourse>> enrollForCourse(@RequestBody CourseEnrollmentRequest request) throws IOException {
+    public ResponseEntity<APIResponse<UserCourse>> enrollForCourse(@RequestBody CourseEnrollmentRequest request
+            ,@ApiIgnore OAuth2Authentication authentication) {
 
-        UserCourse userCourse = userCourseService.enrollForCourse(request);
+        UserCourse userCourse = userCourseService.enrollForCourse(request,authentication);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,userCourse));
     }

@@ -1,20 +1,16 @@
 package com.unionbankng.future.learn.controllers;
 
 
-import com.unionbankng.future.learn.entities.Announcement;
-import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.entities.LectureNote;
 import com.unionbankng.future.learn.pojo.APIResponse;
-import com.unionbankng.future.learn.pojo.CreateAnnouncementRequest;
-import com.unionbankng.future.learn.services.AnnouncementService;
 import com.unionbankng.future.learn.services.LectureNoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -26,11 +22,11 @@ public class LectureNoteController {
     private final LectureNoteService lectureNoteService;
 
 
-    @GetMapping("/v1/lecture_note/get_by_course_and_userUUID")
+    @GetMapping("/v1/lecture_note/get_by_course_and_iam")
     public ResponseEntity<APIResponse<Page<LectureNote>>> findAllByCourseIdAndUserUUID(@RequestParam Long courseId,
-                                                                                  @RequestParam String userUUID){
+                                                                                       @ApiIgnore OAuth2Authentication authentication){
 
-        List<LectureNote> lectureNotes = lectureNoteService.findAllByCourseIdAndUserUUID(courseId, userUUID);
+        List<LectureNote> lectureNotes = lectureNoteService.findAllByCourseIdAndIam(courseId, authentication);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,lectureNotes));
@@ -38,9 +34,9 @@ public class LectureNoteController {
 
     @GetMapping(value = "/v1/lecture_note/get_by_lecture_and_userUUID")
     public ResponseEntity<APIResponse<List<LectureNote>>> findAllByLectureIdAndUserUUID(@RequestParam Long lectureId,
-                                                                                     @RequestParam String userUUID) {
+                                                                                        @ApiIgnore OAuth2Authentication authentication) {
 
-        List<LectureNote> lectureNotes = lectureNoteService.findAllByLectureIdAndUserUUID(lectureId,userUUID);
+        List<LectureNote> lectureNotes = lectureNoteService.findAllByLectureIdAndIam(lectureId,authentication);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,lectureNotes));
     }

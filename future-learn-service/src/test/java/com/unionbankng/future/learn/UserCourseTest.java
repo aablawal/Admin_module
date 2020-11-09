@@ -36,19 +36,18 @@ public class UserCourseTest extends AbstractTest{
         instructors.add(instructor);
 
         CreateCourseRequest createCourseRequest = CreateCourseRequest.builder()
-                .courseTitle("Test course").creatorUUID("123456").description("A very long text").estimatedTimeToComplete("60 hours")
+                .courseTitle("Test course").description("A very long text").estimatedTimeToComplete("60 hours")
                 .isPaid(false).isPublished(false).requirements("Preferably html").shortDesc("short desc").price(BigDecimal.TEN)
                 .outcomes("Outcomes text").instructors(instructors).build();
 
-        Course course = courseService.createCourse(createCourseRequest);
+        Course course = courseService.createCourse(createCourseRequest,"123456");
 
 
         CourseEnrollmentRequest courseEnrollmentRequest = new CourseEnrollmentRequest();
         courseEnrollmentRequest.setCourseEnrollingForId(course.getId());
-        courseEnrollmentRequest.setUserUUID("122233389997");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userCourseService.enrollForCourse(courseEnrollmentRequest);
+            userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997");
         });
 
         assertEquals(400,exception.getStatus().value());
@@ -62,10 +61,9 @@ public class UserCourseTest extends AbstractTest{
 
         CourseEnrollmentRequest courseEnrollmentRequest = new CourseEnrollmentRequest();
         courseEnrollmentRequest.setCourseEnrollingForId(100l);
-        courseEnrollmentRequest.setUserUUID("122233389997");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userCourseService.enrollForCourse(courseEnrollmentRequest);
+            userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997");
         });
 
         assertEquals(404,exception.getStatus().value());
@@ -82,18 +80,16 @@ public class UserCourseTest extends AbstractTest{
         instructors.add(instructor);
 
         CreateCourseRequest createCourseRequest = CreateCourseRequest.builder()
-                .courseTitle("Test course").creatorUUID("123456").description("A very long text").estimatedTimeToComplete("60 hours")
+                .courseTitle("Test course").description("A very long text").estimatedTimeToComplete("60 hours")
                 .isPaid(false).isPublished(true).requirements("Preferably html").shortDesc("short desc").price(BigDecimal.TEN)
                 .outcomes("Outcomes text").instructors(instructors).build();
 
-        Course course = courseService.createCourse(createCourseRequest);
+        Course course = courseService.createCourse(createCourseRequest,"123456");
 
 
         CourseEnrollmentRequest courseEnrollmentRequest = new CourseEnrollmentRequest();
         courseEnrollmentRequest.setCourseEnrollingForId(course.getId());
-        courseEnrollmentRequest.setUserUUID("122233389997");
-
-        UserCourse userCourse = userCourseService.enrollForCourse(courseEnrollmentRequest);
+        UserCourse userCourse = userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997");
 
 
         assertEquals("122233389997",userCourse.getUserUUID());
@@ -110,18 +106,17 @@ public class UserCourseTest extends AbstractTest{
         instructors.add(instructor);
 
         CreateCourseRequest createCourseRequest = CreateCourseRequest.builder()
-                .courseTitle("Test course").creatorUUID("123456").description("A very long text").estimatedTimeToComplete("60 hours")
+                .courseTitle("Test course").description("A very long text").estimatedTimeToComplete("60 hours")
                 .isPaid(false).isPublished(true).requirements("Preferably html").shortDesc("short desc").price(BigDecimal.TEN)
                 .outcomes("Outcomes text").instructors(instructors).build();
 
-        Course course = courseService.createCourse(createCourseRequest);
+        Course course = courseService.createCourse(createCourseRequest,"123456");
 
 
         CourseEnrollmentRequest courseEnrollmentRequest = new CourseEnrollmentRequest();
         courseEnrollmentRequest.setCourseEnrollingForId(course.getId());
-        courseEnrollmentRequest.setUserUUID("122233389997-883u33");
 
-        userCourseService.enrollForCourse(courseEnrollmentRequest);
+        userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997-883u33");
 
         List<Course> courses = userCourseService.getMyCourses("122233389997-883u33");
 

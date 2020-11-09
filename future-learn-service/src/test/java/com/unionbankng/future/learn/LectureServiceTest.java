@@ -45,7 +45,6 @@ public class LectureServiceTest extends AbstractTest{
         request.setCourseContentId(1l);
         request.setCourseId(1l);
         request.setIndex(1);
-        request.setCreatorUUID("1233344455555-87666665-ui8886677666");
         request.setDuration("30:00");
         request.setType(LectureType.VIDEO);
         request.setTitle("Test");
@@ -57,7 +56,7 @@ public class LectureServiceTest extends AbstractTest{
         Mockito.when(futureStreamingService.uploadAndGetStreamingLocator(firstFile)).thenReturn(streamingLocatorResponse);
 
 
-        Lecture lecture = lectureService.createNewLecture(firstFile,request);
+        Lecture lecture = lectureService.createNewLecture(firstFile,request,"1233344455555-87666665-ui8886677666");
 
         Assert.assertEquals("testLocator",lecture.getStreamingLocatorName());
         Assert.assertEquals("assetName",lecture.getOutputAssetName());
@@ -71,13 +70,12 @@ public class LectureServiceTest extends AbstractTest{
         request.setCourseContentId(1l);
         request.setCourseId(1l);
         request.setIndex(2);
-        request.setCreatorUUID("1233344455555-87666665-ui8886677666");
         request.setDuration("30:00");
         request.setType(LectureType.QUIZ);
         request.setTitle("Test");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            lectureService.createNewLecture(null,request);
+            lectureService.createNewLecture(null,request,"1233344455555-87666665-ui8886677666");
         });
 
         assertEquals(400,exception.getStatus().value());
@@ -102,12 +100,11 @@ public class LectureServiceTest extends AbstractTest{
         request.setQuestionList(questionList);
         request.setCourseId(1l);
         request.setIndex(3);
-        request.setCreatorUUID("1233344455555-87666665-ui8886677666");
         request.setType(LectureType.QUIZ);
         request.setTitle("Test");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            lectureService.createNewLecture(null,request);
+            lectureService.createNewLecture(null,request,"1233344455555-87666665-ui8886677666");
         });
 
         assertEquals(400,exception.getStatus().value());
@@ -139,11 +136,10 @@ public class LectureServiceTest extends AbstractTest{
         request.setQuestionList(questionList);
         request.setCourseId(1l);
         request.setIndex(2);
-        request.setCreatorUUID("1233344455555-87666665-ui8886677666");
         request.setType(LectureType.QUIZ);
         request.setTitle("Test");
 
-         Lecture lecture =  lectureService.createNewLecture(null,request);
+         Lecture lecture =  lectureService.createNewLecture(null,request,"1233344455555-87666665-ui8886677666");
 
 
         assertEquals(1,lecture.getQuestions().size());

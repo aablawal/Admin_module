@@ -19,9 +19,8 @@ public class CourseContentServiceTest extends AbstractTest{
         courseContentRequest.setCourseContentText("Section 1");
         courseContentRequest.setCourseId(1l);
         courseContentRequest.setIndex(1);
-        courseContentRequest.setCreatorUUID("12333333333");
 
-        CourseContent courseContent = courseContentService.createNewContent(courseContentRequest);
+        CourseContent courseContent = courseContentService.createNewContent(courseContentRequest,"12333333333");
 
         Assert.assertEquals(Integer.valueOf(1),courseContent.getIndexNo());
 

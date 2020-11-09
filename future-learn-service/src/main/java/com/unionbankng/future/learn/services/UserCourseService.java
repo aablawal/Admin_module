@@ -3,11 +3,14 @@ package com.unionbankng.future.learn.services;
 import com.unionbankng.future.learn.entities.Course;
 import com.unionbankng.future.learn.entities.UserCourse;
 import com.unionbankng.future.learn.pojo.CourseEnrollmentRequest;
+import com.unionbankng.future.learn.pojo.JwtUserDetail;
 import com.unionbankng.future.learn.repositories.UserCourseRepository;
+import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -48,10 +51,18 @@ public class UserCourseService {
         return userCourseRepository.countAllByUserUUID(userUUID);
     }
 
-    @Transactional
-    public UserCourse enrollForCourse(CourseEnrollmentRequest courseEnrollmentRequest){
+    public UserCourse enrollForCourse(CourseEnrollmentRequest courseEnrollmentRequest,OAuth2Authentication authentication){
 
-        if(existByUserUUIDAndCourseId(courseEnrollmentRequest.getUserUUID(),courseEnrollmentRequest.getCourseEnrollingForId()))
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
+        return enrollForCourse(courseEnrollmentRequest,jwtUserDetail.getUserUUID());
+
+    }
+
+    @Transactional
+    public UserCourse enrollForCourse(CourseEnrollmentRequest courseEnrollmentRequest,String userUUID){
+
+        if(existByUserUUIDAndCourseId(userUUID,courseEnrollmentRequest.getCourseEnrollingForId()))
             throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are already enrolled for this course");
 
         Course course = courseService.findById(courseEnrollmentRequest.getCourseEnrollingForId()).orElseThrow(
@@ -71,18 +82,27 @@ public class UserCourseService {
 
         UserCourse userCourse = new UserCourse();
         userCourse.setCourseId(courseEnrollmentRequest.getCourseEnrollingForId());
-        userCourse.setUserUUID(courseEnrollmentRequest.getUserUUID());
+        userCourse.setUserUUID(userUUID);
 
         return save(userCourse);
 
     }
 
-    public List<Course> getMyCourses(String userUUID){
+    public List<Course> getMyCourses(OAuth2Authentication authentication){
 
-        if(!userCourseRepository.existsByUserUUID(userUUID))
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
+        return getMyCourses(jwtUserDetail.getUserUUID());
+
+    }
+
+    public List<Course> getMyCourses(String myUUID){
+
+
+        if(!userCourseRepository.existsByUserUUID(myUUID))
             return new ArrayList<>();
 
-        List<Long> userCoursesIds = findAllByUserUUID(userUUID).stream().map(u -> u.getCourseId() ).collect(Collectors.toList());
+        List<Long> userCoursesIds = findAllByUserUUID(myUUID).stream().map(u -> u.getCourseId() ).collect(Collectors.toList());
 
         return courseService.findAllByIdIn(userCoursesIds);
 

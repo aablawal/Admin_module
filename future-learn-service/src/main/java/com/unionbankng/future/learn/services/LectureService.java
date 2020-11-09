@@ -8,13 +8,16 @@ import com.unionbankng.future.learn.entities.Question;
 import com.unionbankng.future.learn.enums.LectureType;
 import com.unionbankng.future.learn.pojo.CourseContentRequest;
 import com.unionbankng.future.learn.pojo.CreateLectureRequest;
+import com.unionbankng.future.learn.pojo.JwtUserDetail;
 import com.unionbankng.future.learn.repositories.CourseContentRepository;
 import com.unionbankng.future.learn.repositories.LectureRepository;
+import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -50,18 +53,30 @@ public class LectureService {
         return lectureRepository.findAllByCourseId(courseId);
     }
 
+    public Page<Lecture> findAllWhereIamCreator(OAuth2Authentication authentication, Pageable pageable){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        return findAllByCreatorUUID(jwtUserDetail.getUserUUID(),pageable);
+    }
+
     public Page<Lecture> findAllByCreatorUUID(String creatorUUID,Pageable pageable){
         return lectureRepository.findAllByCreatorUUID(creatorUUID,pageable);
     }
 
+    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,OAuth2Authentication authentication) throws IOException {
 
-    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request) throws IOException {
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
+        return createNewLecture(file,request,jwtUserDetail.getUserUUID());
+
+    }
+
+    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,String creatorUUID) throws IOException {
 
         if(request.getType().equals(LectureType.VIDEO)) {
-            return createVideoLecture(file, request);
+            return createVideoLecture(file, request,creatorUUID);
         }else{
 
-            return createQuizLecture(request);
+            return createQuizLecture(request,creatorUUID);
 
         }
 
@@ -81,7 +96,7 @@ public class LectureService {
        return response.getSuccess() ? response.getCommaSeperatedStreamingLinks() : null;
     }
 
-    private Lecture createVideoLecture(MultipartFile file, CreateLectureRequest request) throws IOException {
+    private Lecture createVideoLecture(MultipartFile file, CreateLectureRequest request, String creatorUUID) throws IOException {
 
         if (file == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File cannot be empty");
@@ -102,7 +117,7 @@ public class LectureService {
         Lecture lecture = new Lecture();
         lecture.setCourseContentId(request.getCourseContentId());
         lecture.setCourseId(request.getCourseId());
-        lecture.setCreatorUUID(request.getCreatorUUID());
+        lecture.setCreatorUUID(creatorUUID);
         lecture.setDuration(request.getDuration());
         lecture.setOutputAssetName(response.getAssetName());
         lecture.setStreamingLocatorName(response.getLocatorName());
@@ -113,7 +128,7 @@ public class LectureService {
         return save(lecture);
     }
 
-    private Lecture createQuizLecture(CreateLectureRequest request) throws IOException {
+    private Lecture createQuizLecture(CreateLectureRequest request,String creatorUUID) {
 
         if(request.getQuestionList().isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Questions can't be empty");
@@ -121,7 +136,7 @@ public class LectureService {
         Lecture lecture = new Lecture();
         lecture.setCourseContentId(request.getCourseContentId());
         lecture.setCourseId(request.getCourseId());
-        lecture.setCreatorUUID(request.getCreatorUUID());
+        lecture.setCreatorUUID(creatorUUID);
         lecture.setDuration(request.getDuration());
         lecture.setIndexNo(request.getIndex());
         lecture.setTitle(request.getTitle());

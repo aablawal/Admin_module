@@ -30,12 +30,11 @@ public class AnnouncementServiceTest extends AbstractTest{
     public void createAnnouncementCourseNotFoundTest() {
 
         CreateAnnouncementRequest createAnnouncementRequest = new CreateAnnouncementRequest();
-        createAnnouncementRequest.setPosterUUID("123333-7888888-89999");
         createAnnouncementRequest.setCourseId(10l);
         createAnnouncementRequest.setAnnouncementText("Very long announcement text; preferably html");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            announcementService.createOrUpdateAnnouncement(createAnnouncementRequest);
+            announcementService.createOrUpdateAnnouncement(createAnnouncementRequest,"123333-7888888-89999");
         });
 
         assertEquals(404,exception.getStatus().value());
@@ -53,19 +52,18 @@ public class AnnouncementServiceTest extends AbstractTest{
         instructors.add(instructor);
 
         CreateCourseRequest createCourseRequest = CreateCourseRequest.builder()
-                .courseTitle("Test course").creatorUUID("123456").description("A very long text").estimatedTimeToComplete("60 hours")
+                .courseTitle("Test course").description("A very long text").estimatedTimeToComplete("60 hours")
                 .isPaid(false).isPublished(false).requirements("Preferably html").shortDesc("short desc").price(BigDecimal.TEN)
                 .outcomes("Outcomes text").instructors(instructors).build();
 
-        Course course = courseService.createCourse(createCourseRequest);
+        Course course = courseService.createCourse(createCourseRequest,"123456");
 
         CreateAnnouncementRequest createAnnouncementRequest = new CreateAnnouncementRequest();
-        createAnnouncementRequest.setPosterUUID("123333-7888888-89999");
         createAnnouncementRequest.setCourseId(course.getId());
         createAnnouncementRequest.setAnnouncementText("Very long announcement text; preferably html");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            announcementService.createOrUpdateAnnouncement(createAnnouncementRequest);
+            announcementService.createOrUpdateAnnouncement(createAnnouncementRequest,"123333-7888888-89999");
         });
 
         assertEquals(400,exception.getStatus().value());
@@ -83,18 +81,17 @@ public class AnnouncementServiceTest extends AbstractTest{
         instructors.add(instructor);
 
         CreateCourseRequest createCourseRequest = CreateCourseRequest.builder()
-                .courseTitle("Test course").creatorUUID("123456").description("A very long text").estimatedTimeToComplete("60 hours")
+                .courseTitle("Test course").description("A very long text").estimatedTimeToComplete("60 hours")
                 .isPaid(false).isPublished(Boolean.TRUE).requirements("Preferably html").shortDesc("short desc").price(BigDecimal.TEN)
                 .outcomes("Outcomes text").instructors(instructors).build();
 
-        Course course = courseService.createCourse(createCourseRequest);
+        Course course = courseService.createCourse(createCourseRequest,"123456");
 
         CreateAnnouncementRequest createAnnouncementRequest = new CreateAnnouncementRequest();
-        createAnnouncementRequest.setPosterUUID("123333-7888888-89999");
         createAnnouncementRequest.setCourseId(course.getId());
         createAnnouncementRequest.setAnnouncementText("Very long announcement text; preferably html");
 
-        Announcement announcement = announcementService.createOrUpdateAnnouncement(createAnnouncementRequest);
+        Announcement announcement = announcementService.createOrUpdateAnnouncement(createAnnouncementRequest,"123333-7888888-89999");
 
 
         assertEquals("123333-7888888-89999",announcement.getPosterUUID());

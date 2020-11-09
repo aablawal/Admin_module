@@ -28,11 +28,11 @@ public class CourseServiceTest extends AbstractTest{
         instructors.add(instructor);
 
         CreateCourseRequest createCourseRequest = CreateCourseRequest.builder()
-                .courseTitle("Test course").creatorUUID("123456").description("A very long text").estimatedTimeToComplete("60 hours")
+                .courseTitle("Test course").description("A very long text").estimatedTimeToComplete("60 hours")
                 .isPaid(false).isPublished(false).requirements("Preferably html").shortDesc("short desc").price(BigDecimal.TEN)
                 .outcomes("Outcomes text").instructors(instructors).build();
 
-        Course course = courseService.createCourse(createCourseRequest);
+        Course course = courseService.createCourse(createCourseRequest,"123456");
 
         Assert.assertEquals(1,course.getInstructors().size());
         Assert.assertEquals(BigDecimal.TEN,course.getPrice());
@@ -48,11 +48,11 @@ public class CourseServiceTest extends AbstractTest{
         instructors.add(instructor);
 
         CreateCourseRequest createCourseRequest = CreateCourseRequest.builder()
-                .courseTitle("Test course").creatorUUID("123456").description("A very long text").estimatedTimeToComplete("60 hours")
+                .courseTitle("Test course").description("A very long text").estimatedTimeToComplete("60 hours")
                 .isPaid(false).isPublished(false).requirements("Preferably html").shortDesc("short desc").price(BigDecimal.TEN)
                 .outcomes("Outcomes text").instructors(instructors).build();
 
-        courseService.createCourse(createCourseRequest);
+        courseService.createCourse(createCourseRequest,"123456");
 
         Page<Course> coursePage = courseService.findAllByInstructorsIn("1234564", PageRequest.of(0,10));
 

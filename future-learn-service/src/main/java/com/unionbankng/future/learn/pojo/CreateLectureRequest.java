@@ -19,7 +19,6 @@ public class CreateLectureRequest {
     @NotNull
     private Integer index;
     private List<Question> questionList = new ArrayList<>();
-    private String creatorUUID;
     private Long courseContentId;
     private Long courseId;
 }

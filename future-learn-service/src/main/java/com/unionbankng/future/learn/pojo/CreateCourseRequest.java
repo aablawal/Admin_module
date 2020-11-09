@@ -20,5 +20,4 @@ public class CreateCourseRequest {
     private Boolean isPublished;
     private List<Instructor> instructors;
     private String estimatedTimeToComplete;
-    private String creatorUUID;
 }
