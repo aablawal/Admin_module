@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="ACER NITRO 5 (generated)" id="1604504873532-1">
+        <createTable tableName="jobs">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="jobsPK"/>
+            </column>
+            <column name="assessment" type="varchar(255)"/>
+            <column name="budget" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="categories" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="date"/>
+            <column name="description" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration" type="varchar(255)"/>
+            <column name="goal" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="date"/>
+            <column name="nda_files" type="varchar (max)"/>
+            <column name="oid" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_terms" type="varchar(255)"/>
+            <column name="publish_date" type="date"/>
+            <column name="qualification" type="varchar(255)"/>
+            <column name="sample_product" type="varchar(255)"/>
+            <column name="skills_required" type="varchar(255)"/>
+            <column name="status" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supporting_files" type="varchar(255)"/>
+            <column name="team" type="varchar(255)"/>
+            <column name="timeline" type="varchar(255)"/>
+            <column name="title" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1604563326165-1">
+        <addColumn tableName="jobs">
+            <column name="interview" type="bit"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

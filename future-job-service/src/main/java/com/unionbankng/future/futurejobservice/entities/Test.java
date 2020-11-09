@@ -1,29 +1,17 @@
-
 package com.unionbankng.future.futurejobservice.entities;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
-import lombok.*;
 
-import java.util.Date;
-
-
-@Data
 @Entity
 @Getter
 @Setter
-public class Test {
+public class Test{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String data;
-    private String remark;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
-
-    @PrePersist
-    private void setCreatedAt() {
-        this.createdAt = new Date();
-    }
+    public Long id;
+    public String name;
 
 }
-
