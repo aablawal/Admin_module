@@ -11,10 +11,10 @@ public class JWTUserDetailsExtractor {
     public static JwtUserDetail getUserDetailsFromAuthentication(OAuth2Authentication authentication){
 
         OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
-        Map<String,String> detailsMap = (Map<String, String>) details.getDecodedDetails();
+        Map<String,Object> detailsMap = (Map<String, Object>) details.getDecodedDetails();
 
-        return JwtUserDetail.builder().userUUID(detailsMap.get("userId")).userEmail(detailsMap.get("userEmail")).userImg(detailsMap.get("userImg"))
-                .userFullName(detailsMap.get("userFullName")).userUUID(detailsMap.get("userUUID")).build();
+        return JwtUserDetail.builder().userId((Long)detailsMap.get("userId")).userEmail(detailsMap.get("userEmail").toString()).userImg(detailsMap.get("userImg").toString())
+                .userFullName(detailsMap.get("userFullName").toString()).userUUID(detailsMap.get("userUUID").toString()).build();
 
 
     }
