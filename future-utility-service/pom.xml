@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.3.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.unionbankng.future</groupId>
+	<artifactId>future-utility-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>future-utility-service</name>
+	<description>Utility Service for project future handles everything that does not have an ideal service ranging from document upload etc</description>
+
+	<properties>
+		<java.version>14</java.version>
+		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
+	</properties>
+
+	<dependencies>
+		<!-- Spring cloud-->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<!--JPA-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<!--test-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!--GRPC-->
+		<dependency>
+			<groupId>net.devh</groupId>
+			<artifactId>grpc-server-spring-boot-starter</artifactId>
+			<version>2.10.1.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-testing</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.unionbankng</groupId>
+			<artifactId>future-utilityservice-interface</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<!--Code Optimization-->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!--Streaming -->
+		<dependency>
+			<groupId>com.microsoft.azure.mediaservices.v2018_07_01</groupId>
+			<artifactId>azure-mgmt-media</artifactId>
+			<version>1.0.0-beta-6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.rest</groupId>
+			<artifactId>client-runtime</artifactId>
+			<version>1.7.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>azure-client-authentication</artifactId>
+			<version>1.7.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.rest</groupId>
+			<artifactId>client-runtime</artifactId>
+			<version>1.7.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-storage-blob</artifactId>
+			<version>12.4.0</version>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>jib-maven-plugin</artifactId>
+				<groupId>com.google.cloud.tools</groupId>
+				<version>${jib-maven-plugin.version}</version>
+				<configuration>
+					<from>
+						<image>adoptopenjdk/openjdk14:alpine-jre-nightly</image>
+					</from>
+					<to>
+						<auth>
+							<!--suppress UnresolvedMavenProperty -->
+							<username>${ACR_USERNAME}</username>
+							<!--suppress UnresolvedMavenProperty -->
+							<password>${ACR_PASSWORD}</password>
+						</auth>
+						<!--suppress UnresolvedMavenProperty -->
+						<image>${ACR_SERVER}/${project.artifactId}</image>
+					</to>
+					<container>
+						<environment>
+							<!--suppress UnresolvedMavenProperty -->
+							<FUTURE_ENV>${FUTURE_ENV}</FUTURE_ENV>
+						</environment>
+					</container>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>maven-group</id>
+			<url>http://168.63.73.171:8081/nexus/content/groups/maven-group/</url>
+		</repository>
+	</repositories>
+</project>

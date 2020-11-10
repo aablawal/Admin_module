@@ -1,0 +1,84 @@
+spring:
+  profiles:
+    active: ${FUTURE_ENV}
+  application:
+    name: future-gateway
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+server:
+  port: 8080
+eureka:
+  client:
+    register-with-eureka: true
+
+zuul:
+  host:
+    connect-timeout-millis: 120000
+    socket-timeout-millis: 120000
+ribbon:
+  ReadTimeout: 120000
+
+---
+
+spring:
+  profiles: development
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8081/eureka}
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    authorization-server:
+      path: /authserv/**
+      service-id: authorization-server
+    job-service:
+      path: /jobserv/**
+      service-id: job-service
+    learn-service:
+      path: /learnserv/**
+      service-id: learn-service
+
+
+---
+spring:
+  profiles: staging
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    authorization-server:
+      path: /authserv/**
+      url: http://future-auth-server
+    job-service:
+      path: /jobserv/**
+      url: http://future-job-service
+    learn-service:
+      path: /learnserv/**
+      url: http://future-learn-service
+
+---
+spring:
+  profiles: production
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    authorization-server:
+      path: /authserv/**
+      url: http://future-auth-server
+    job-service:
+      path: /jobserv/**
+      url: http://future-job-service
+    learn-service:
+      path: /learnserv/**
+      url: http://future-learn-service
+

@@ -1,0 +1,35 @@
+spring:
+  profiles:
+    active: ${FUTURE_ENV}
+  application:
+    name: future-messaging-service
+server:
+  port: 8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+---
+spring:
+  profiles: development
+  cloud:
+    config:
+      uri: http://localhost:8082
+      label: develop
+---
+spring:
+  profiles: staging
+  cloud:
+    config:
+      uri: http://future-config-server
+      label: staging
+---
+
+spring:
+  profiles: production
+  cloud:
+    config:
+      uri: http://future-config-server
+      label: master

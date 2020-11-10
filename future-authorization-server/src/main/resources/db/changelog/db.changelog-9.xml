@@ -1,0 +1,37 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1601639457089-1">
+        <createTable tableName="profile_skill">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="profile_skillPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="profile_id" type="bigint"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="skill_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601639457089-2">
+        <createTable tableName="user_interest">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_interestPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="user_id" type="bigint"/>
+            <column name="skill_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601639457089-3">
+        <addForeignKeyConstraint baseColumnNames="skill_id" baseTableName="user_interest" constraintName="FKpqogkhyr5du0swinnts53yope" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="tag" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601639457089-4">
+        <addForeignKeyConstraint baseColumnNames="skill_id" baseTableName="profile_skill" constraintName="FKtbbu3kr67ct81tll6rpqr36i1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="tag" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601639457089-5">
+        <dropForeignKeyConstraint baseTableName="user_skill" constraintName="FKl491362ml4r53a9785tjiwwgo"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1601639457089-6">
+        <dropTable tableName="user_skill"/>
+    </changeSet>
+</databaseChangeLog>
