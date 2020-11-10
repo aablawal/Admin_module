@@ -21,4 +21,5 @@ public class OauthAccessToken {
     @Column(columnDefinition="TEXT")
     private String refreshToken;
 
+
 }

@@ -26,12 +26,11 @@ public class JobService {
             Job job = new ObjectMapper().readValue(jobData, Job.class);
             job.setStatus(JobStatus.AC);
 
-               Job savedJob=repository.save(job);
                 //save files if not null
                 if (nda_files!=null)
-                    nda_file_names = this.fileStoreService.storeFiles(nda_files, savedJob.id);
+                    nda_file_names = this.fileStoreService.storeFiles(nda_files, job.oid);
                 if (supporting_files!=null)
-                    supporting_file_names = this.fileStoreService.storeFiles(supporting_files, savedJob.id);
+                    supporting_file_names = this.fileStoreService.storeFiles(supporting_files, job.oid);
 
                 //cross verify if attached files processed
                 if (nda_file_names != null)
@@ -39,7 +38,8 @@ public class JobService {
                 if (supporting_file_names != null)
                     job.supporting_files = supporting_file_names;
 
-                return savedJob;
+            Job savedJob=repository.save(job);
+            return savedJob;
 
         }catch ( Exception e){
             e.printStackTrace();

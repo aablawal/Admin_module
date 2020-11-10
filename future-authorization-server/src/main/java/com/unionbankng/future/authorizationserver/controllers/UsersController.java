@@ -19,6 +19,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,6 +45,12 @@ public class UsersController {
         User user = userService.findById(userId).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
+    }
+
+    @GetMapping("/v1/users/role/{role}")
+    public ResponseEntity<APIResponse<List<User>>> getUsersByRole(@PathVariable String role) {
+        //function will be added here
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,null));
     }
 
     @GetMapping("/v1/users/get_details_with_token")
