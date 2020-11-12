@@ -49,7 +49,7 @@ public class LectureServiceTest extends AbstractTest{
         request.setType(LectureType.VIDEO);
         request.setTitle("Test");
 
-        MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "Hello world".getBytes());
+        MockMultipartFile firstFile = new MockMultipartFile("file", "filename.mp4", "video/mp4", "Hello world".getBytes());
 
         StreamingLocatorResponse streamingLocatorResponse = StreamingLocatorResponse.newBuilder()
                 .setLocatorName("testLocator").setAssetName("assetName").setSuccess(true).build();

@@ -1,0 +1,84 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1605186321765-3">
+        <createTable tableName="course_question">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="course_questionPK"/>
+            </column>
+            <column name="course_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="creator_name" type="varchar(255)"/>
+            <column name="creatoruuid" type="varchar(255)"/>
+            <column name="description" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lecture_id" type="bigint"/>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-4">
+        <createTable tableName="course_question_comment">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="course_question_commentPK"/>
+            </column>
+            <column name="course_question_id" type="bigint"/>
+            <column name="created_at" type="datetime2"/>
+            <column name="creator_name" type="varchar(255)"/>
+            <column name="creatoruuid" type="varchar(255)"/>
+            <column name="reply" type="varchar(255)"/>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-5">
+        <createTable tableName="user_course_progress">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_course_progressPK"/>
+            </column>
+            <column name="course_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="current_lecture_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="progress_percentage" type="float(53)"/>
+            <column name="updated_at" type="datetime2"/>
+            <column name="useruuid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-6">
+        <createTable tableName="user_course_progress_lectures_taken">
+            <column name="user_course_progress_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lectures_taken_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-7">
+        <addUniqueConstraint columnNames="lectures_taken_id" constraintName="UK_1ohbx6s9r2mhipwbre24mf3uf" tableName="user_course_progress_lectures_taken"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-8">
+        <addUniqueConstraint columnNames="course_id, useruuid" constraintName="UKt30o3n5u5y6b37l4vsynqb3vp" tableName="user_course_progress"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-9">
+        <addForeignKeyConstraint baseColumnNames="user_course_progress_id" baseTableName="user_course_progress_lectures_taken" constraintName="FKhc6bqnyvug6yfbo1jr7iin3lj" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user_course_progress" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-10">
+        <addForeignKeyConstraint baseColumnNames="lectures_taken_id" baseTableName="user_course_progress_lectures_taken" constraintName="FKosalty983yuw3d3mm1s4j630q" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="lecture" validate="true"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-1">
+        <addDefaultValue columnDataType="boolean" columnName="is_paid" defaultValueBoolean="false" tableName="course"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1605186321765-2">
+        <addDefaultValue columnDataType="boolean" columnName="is_published" defaultValueBoolean="false" tableName="course"/>
+    </changeSet>
+</databaseChangeLog>

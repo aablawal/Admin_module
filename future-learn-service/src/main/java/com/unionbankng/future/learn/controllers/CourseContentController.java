@@ -47,7 +47,7 @@ public class CourseContentController {
 
 
     @PostMapping("/v1/course_content/create_content")
-    public ResponseEntity<APIResponse<CourseContent>> creatContent(@RequestBody CourseContentRequest request,
+    public ResponseEntity<APIResponse<CourseContent>> createContent(@RequestBody CourseContentRequest request,
                                                                    @ApiIgnore OAuth2Authentication authentication){
 
         CourseContent courseContent = courseContentService.createNewContent(request,authentication);
@@ -57,7 +57,7 @@ public class CourseContentController {
     }
 
     @PostMapping("/v1/course_content/update_content")
-    public ResponseEntity<APIResponse<CourseContent>> creatContent(@RequestBody CourseContent request){
+    public ResponseEntity<APIResponse<CourseContent>> updateContent(@RequestBody CourseContent request){
 
         CourseContent courseContent = courseContentService.updateCourseContent(request);
 
@@ -65,8 +65,8 @@ public class CourseContentController {
                 new APIResponse("Request successful",true,courseContent));
     }
 
-    @DeleteMapping("/v1/course_content/${courseContentId}")
-    public ResponseEntity<APIResponse<String>> creatContent(@PathVariable Long courseContentId){
+    @DeleteMapping("/v1/course_content/{courseContentId}")
+    public ResponseEntity<APIResponse<String>> deleteCourseContent(@PathVariable Long courseContentId){
 
         courseContentService.deleteById(courseContentId);
 

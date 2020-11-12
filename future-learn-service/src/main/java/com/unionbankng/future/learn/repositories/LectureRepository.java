@@ -14,5 +14,6 @@ public interface LectureRepository extends JpaRepository<Lecture,Long> {
 
     List<Lecture> findAllByCourseContentId(Long courseContentId, Sort sort);
     List<Lecture> findAllByCourseId(Long courseId);
+    Long countAllByCourseId(Long courseId);
     Page<Lecture> findAllByCreatorUUID(String creatorUUID, Pageable pageable);
 }
