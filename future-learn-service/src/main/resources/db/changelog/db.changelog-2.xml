@@ -75,10 +75,4 @@
     <changeSet author="chokeme (generated)" id="1605186321765-10">
         <addForeignKeyConstraint baseColumnNames="lectures_taken_id" baseTableName="user_course_progress_lectures_taken" constraintName="FKosalty983yuw3d3mm1s4j630q" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="lecture" validate="true"/>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1605186321765-1">
-        <addDefaultValue columnDataType="boolean" columnName="is_paid" defaultValueBoolean="false" tableName="course"/>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1605186321765-2">
-        <addDefaultValue columnDataType="boolean" columnName="is_published" defaultValueBoolean="false" tableName="course"/>
-    </changeSet>
 </databaseChangeLog>
