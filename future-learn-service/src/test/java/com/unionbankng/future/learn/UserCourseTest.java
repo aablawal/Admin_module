@@ -4,8 +4,6 @@ import com.unionbankng.future.learn.entities.*;
 import com.unionbankng.future.learn.pojo.CourseEnrollmentRequest;
 import com.unionbankng.future.learn.pojo.CreateCourseRequest;
 import com.unionbankng.future.learn.services.CourseService;
-import com.unionbankng.future.learn.services.QuestionOptionService;
-import com.unionbankng.future.learn.services.QuestionService;
 import com.unionbankng.future.learn.services.UserCourseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +45,7 @@ public class UserCourseTest extends AbstractTest{
         courseEnrollmentRequest.setCourseEnrollingForId(course.getId());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997");
+            userCourseService.enrollForFreeCourse(courseEnrollmentRequest,"122233389997");
         });
 
         assertEquals(400,exception.getStatus().value());
@@ -63,7 +61,7 @@ public class UserCourseTest extends AbstractTest{
         courseEnrollmentRequest.setCourseEnrollingForId(100l);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997");
+            userCourseService.enrollForFreeCourse(courseEnrollmentRequest,"122233389997");
         });
 
         assertEquals(404,exception.getStatus().value());
@@ -89,7 +87,7 @@ public class UserCourseTest extends AbstractTest{
 
         CourseEnrollmentRequest courseEnrollmentRequest = new CourseEnrollmentRequest();
         courseEnrollmentRequest.setCourseEnrollingForId(course.getId());
-        UserCourse userCourse = userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997");
+        UserCourse userCourse = userCourseService.enrollForFreeCourse(courseEnrollmentRequest,"122233389997");
 
 
         assertEquals("122233389997",userCourse.getUserUUID());
@@ -116,7 +114,7 @@ public class UserCourseTest extends AbstractTest{
         CourseEnrollmentRequest courseEnrollmentRequest = new CourseEnrollmentRequest();
         courseEnrollmentRequest.setCourseEnrollingForId(course.getId());
 
-        userCourseService.enrollForCourse(courseEnrollmentRequest,"122233389997-883u33");
+        userCourseService.enrollForFreeCourse(courseEnrollmentRequest,"122233389997-883u33");
 
         List<Course> courses = userCourseService.getMyCourses("122233389997-883u33");
 

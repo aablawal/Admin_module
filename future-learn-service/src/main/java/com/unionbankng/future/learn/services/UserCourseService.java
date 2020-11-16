@@ -2,6 +2,8 @@ package com.unionbankng.future.learn.services;
 
 import com.unionbankng.future.learn.entities.Course;
 import com.unionbankng.future.learn.entities.UserCourse;
+import com.unionbankng.future.learn.grpcserver.CoursePaymentResponse;
+import com.unionbankng.future.learn.grpcserver.Status;
 import com.unionbankng.future.learn.pojo.CourseEnrollmentRequest;
 import com.unionbankng.future.learn.pojo.JwtUserDetail;
 import com.unionbankng.future.learn.repositories.UserCourseRepository;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,16 +54,16 @@ public class UserCourseService {
         return userCourseRepository.countAllByUserUUID(userUUID);
     }
 
-    public UserCourse enrollForCourse(CourseEnrollmentRequest courseEnrollmentRequest,OAuth2Authentication authentication){
+    public UserCourse enrollForFreeCourse(CourseEnrollmentRequest courseEnrollmentRequest, OAuth2Authentication authentication){
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
-        return enrollForCourse(courseEnrollmentRequest,jwtUserDetail.getUserUUID());
+        return enrollForFreeCourse(courseEnrollmentRequest,jwtUserDetail.getUserUUID());
 
     }
 
     @Transactional
-    public UserCourse enrollForCourse(CourseEnrollmentRequest courseEnrollmentRequest,String userUUID){
+    public UserCourse enrollForFreeCourse(CourseEnrollmentRequest courseEnrollmentRequest, String userUUID){
 
         if(existByUserUUIDAndCourseId(userUUID,courseEnrollmentRequest.getCourseEnrollingForId()))
             throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are already enrolled for this course");
@@ -73,7 +76,7 @@ public class UserCourseService {
             throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "Course not published");
 
         if(course.getIsPaid())
-            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment not implemented at the moment");
+            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "Course is paid, please make payment");
 
         // increase course instructor learner count
         course.getInstructors().forEach(i ->
@@ -87,6 +90,42 @@ public class UserCourseService {
         return save(userCourse);
 
     }
+
+    @Transactional
+    public CoursePaymentResponse enrollForPaidCourse(com.unionbankng.future.learn.grpcserver.CoursePaymentRequest request){
+
+        CoursePaymentResponse response = CoursePaymentResponse.newBuilder().setSuccess(true).setStatus(Status.FAILED).build();
+
+        if(existByUserUUIDAndCourseId(request.getUserUUID(),Integer.toUnsignedLong(request.getCourseId())))
+            return response.toBuilder().setStatus(Status.DUPLICATE).build();
+
+        Course course = courseService.findById(Integer.toUnsignedLong(request.getCourseId())).orElse(null
+        );
+
+        if(course == null)
+            return response.toBuilder().setSuccess(true).setStatus(Status.NOT_FOUND).build();
+
+        if(course.getPrice().compareTo(BigDecimal.valueOf(request.getAmountPaid())) < 0)
+            return response.toBuilder().setStatus(Status.INSUFFICIENT_FUNDS).build();
+
+        // increase course instructor learner count
+        course.getInstructors().forEach(i ->
+                i.setNumberOfLearners(i.getNumberOfLearners() + 1));
+        instructorService.saveAll(course.getInstructors());
+
+        UserCourse userCourse = new UserCourse();
+        userCourse.setCourseId(Integer.toUnsignedLong(request.getCourseId()));
+        userCourse.setUserUUID(request.getUserUUID());
+
+
+        //send email
+
+        save(userCourse);
+
+        return response.toBuilder().setStatus(Status.SUCCESS).build();
+
+    }
+
 
     public List<Course> getMyCourses(OAuth2Authentication authentication){
 

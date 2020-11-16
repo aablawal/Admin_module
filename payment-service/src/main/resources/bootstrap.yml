@@ -1,0 +1,46 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: ${FUTURE_ENV}
+  application:
+    name: payment-service
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+server:
+  port: 8088
+  error:
+    include-message: always
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+---
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8082
+      label: develop
+  config:
+    activate:
+      on-profile: development
+---
+spring:
+  cloud:
+    config:
+      uri: http://future-config-server
+      label: staging
+  config:
+    activate:
+      on-profile: staging
+---
+
+spring:
+  cloud:
+    config:
+      uri: http://future-config-server
+      label: master
+  config:
+    activate:
+      on-profile: production
