@@ -43,6 +43,10 @@ zuul:
     payment-service:
       path: /paymentserv/**
       service-id: payment-service
+    bank-service:
+      path: /bankserv/**
+      service-id: bank-service
+
 
 
 ---
@@ -67,6 +71,9 @@ zuul:
     payment-service:
       path: /paymentserv/**
       url: http://future-payment-service
+    bank-service:
+      path: /bankserv/**
+      url: http://future-bank-service
 
 ---
 spring:
@@ -90,4 +97,7 @@ zuul:
     payment-service:
       path: /paymentserv/**
       url: http://future-payment-service
+    bank-service:
+      path: /bankserv/**
+      url: http://future-bank-service
 

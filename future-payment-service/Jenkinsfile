@@ -38,12 +38,11 @@ pipeline {
                 }
     }
     }
-
       stage('Test') {
                 steps {
                     echo 'Testing..'
                     withMaven( maven: 'maven-3.6.3' ) {
-                    		sh 'cd future-utility-service && mvn clean install -U && mvn test'
+                    		sh 'cd future-payment-service && mvn test'
                     }
 
                 }
@@ -74,13 +73,13 @@ pipeline {
                   if (GLOBAL_ENVIRONMENT == 'staging') {
                     
                     sh "kubectl config use-context marcus-developement-cluster"
-					sh "kubectl set image deployment/future-utility-service future-utility-service=${ACR_LOGINSERVER}/future-utility-service --namespace project-future"
-					sh "kubectl rollout restart deployment/future-utility-service --namespace project-future"
+					sh "kubectl set image deployment/future-payment-service future-payment-service=${ACR_LOGINSERVER}/future-payment-service --namespace project-future"
+					sh "kubectl rollout restart deployment/future-payment-service --namespace project-future"
 					
                   } else {
                     sh "kubectl config use-context MarcusProdAKSClust"
-                    sh "kubectl set image deployment/future-utility-service future-utility-service=${ACR_LOGINSERVER}/future-utility-service --namespace project-future"
-                    sh "kubectl rollout restart deployment/future-utility-service --namespace project-future"
+                    sh "kubectl set image deployment/future-payment-service future-payment-service=${ACR_LOGINSERVER}/future-payment-service --namespace project-future"
+                    sh "kubectl rollout restart deployment/future-payment-service --namespace project-future"
                   }
                 }
             
@@ -98,7 +97,7 @@ def build(ENVIRONMENT) {
     
     	 withMaven( maven: 'maven-3.6.3' ) {
     	 	withEnv(["FUTURE_ENV=staging","ACR_SERVER=${ACR_LOGINSERVER}"]){
-				sh 'cd future-utility-service && mvn clean compile jib:build'
+				sh 'cd future-payment-service && mvn clean compile jib:build'
 			}
 
     	 } 
@@ -110,7 +109,7 @@ def build(ENVIRONMENT) {
      
      	withMaven( maven: 'maven-3.6.3' ) {
      		withEnv(["FUTURE_ENV=production","ACR_SERVER=${ACR_LOGINSERVER}"]){
-     			sh 'cd future-utility-service && mvn clean compile jib:build'
+     			sh 'cd future-payment-service && mvn clean compile jib:build'
      		}
 
     	 } 

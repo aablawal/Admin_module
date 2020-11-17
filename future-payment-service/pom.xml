@@ -9,18 +9,33 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unionbankng.future</groupId>
-	<artifactId>future-bank-service</artifactId>
+	<artifactId>future-payment-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>future-bank-service</name>
-	<description>Bank service for project future that handles all bank related task e.g account creature, funding and cards</description>
+	<name>future-payment-service</name>
+	<description>Payment service for project future</description>
 
 	<properties>
 		<java.version>14</java.version>
+		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
 		<spring-cloud.version>Hoxton.SR7</spring-cloud.version>
-		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 	</properties>
 
 	<dependencies>
+
+		<!--Database-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
 		<!-- Spring cloud-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -33,26 +48,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-oauth2</artifactId>
-		</dependency>
-		<!--Database-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<!--Code Optimization-->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<!--Test-->
 		<dependency>
@@ -70,43 +65,18 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!--Api optimization-->
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-inline -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-inline</artifactId>
+			<version>3.6.0</version>
+			<scope>test</scope>
 		</dependency>
-		<!-- Documentations -->
+		<!--Code Optimization-->
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<!--Caching -->
-		<dependency>
-			<groupId>com.google.code.simple-spring-memcached</groupId>
-			<artifactId>xmemcached-provider</artifactId>
-			<version>4.1.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.googlecode.xmemcached</groupId>
-			<artifactId>xmemcached</artifactId>
-			<version>2.4.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.simple-spring-memcached</groupId>
-			<artifactId>spring-cache</artifactId>
-			<version>4.1.3</version>
-		</dependency>
-		<!--Azure-->
-		<dependency>
-			<groupId>com.microsoft.azure</groupId>
-			<artifactId>azure-servicebus-jms-spring-boot-starter</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<!--Api optimization-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<!--http client-->
 		<dependency>
@@ -114,13 +84,27 @@
 			<artifactId>retrofit</artifactId>
 			<version>2.9.0</version>
 		</dependency>
+		<!--GRPC-->
 		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>converter-gson</artifactId>
-			<version>2.9.0</version>
+			<groupId>com.unionbankng</groupId>
+			<artifactId>future-learn-service-interface</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
-
-
+		<dependency>
+			<groupId>net.devh</groupId>
+			<artifactId>grpc-client-spring-boot-starter</artifactId>
+			<version>2.7.0.RELEASE</version>
+		</dependency>
+		<!-- Documentations -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -135,16 +119,17 @@
 		</dependencies>
 	</dependencyManagement>
 
+
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.liquibase</groupId>
-				<artifactId>liquibase-maven-plugin</artifactId>
-				<version>4.0.0</version>
-				<configuration>
-					<propertyFile>
-						src/main/resources/liquibase.properties</propertyFile>
-				</configuration>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-maven-plugin</artifactId>
+			<version>4.0.0</version>
+			<configuration>
+				<propertyFile>
+					src/main/resources/liquibase.properties</propertyFile>
+			</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>org.liquibase.ext</groupId>
@@ -170,7 +155,6 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-
 			<plugin>
 				<artifactId>jib-maven-plugin</artifactId>
 				<groupId>com.google.cloud.tools</groupId>
@@ -205,10 +189,10 @@
 	</build>
 
 	<repositories>
-		<repository>
-			<id>maven-group</id>
-			<url>http://168.63.73.171:8081/nexus/content/groups/maven-group/</url>
-		</repository>
+			<repository>
+				<id>maven-group</id>
+				<url>http://168.63.73.171:8081/nexus/content/groups/maven-group/</url>
+			</repository>
 	</repositories>
 
 </project>
