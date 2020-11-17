@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet author="ACER NITRO 5 (generated)" id="1604504873532-1">
+    <changeSet author="ACER NITRO 5 (generated)" id="1605527494400-2">
         <createTable tableName="jobs">
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="jobsPK"/>
@@ -18,6 +18,9 @@
             </column>
             <column name="duration" type="varchar(255)"/>
             <column name="goal" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="interview" type="bit">
                 <constraints nullable="false"/>
             </column>
             <column name="last_modified_date" type="date"/>
@@ -43,10 +46,5 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-    </changeSet>
-    <changeSet author="ACER NITRO 5 (generated)" id="1604563326165-1">
-        <addColumn tableName="jobs">
-            <column name="interview" type="bit"/>
-        </addColumn>
     </changeSet>
 </databaseChangeLog>

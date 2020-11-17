@@ -13,7 +13,9 @@ public class JWTUserDetailsExtractor {
         OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
         Map<String,Object> detailsMap = (Map<String, Object>) details.getDecodedDetails();
 
-        return JwtUserDetail.builder().userId((Long)detailsMap.get("userId")).userEmail(detailsMap.get("userEmail").toString()).userImg(detailsMap.get("userImg").toString())
+        String userImg = detailsMap.get("userImg") == null ? null : detailsMap.get("userImg").toString();
+
+        return JwtUserDetail.builder().userId(((Integer)detailsMap.get("userId")).longValue()).userEmail(detailsMap.get("userEmail").toString()).userImg(userImg)
                 .userFullName(detailsMap.get("userFullName").toString()).userUUID(detailsMap.get("userUUID").toString()).build();
 
 

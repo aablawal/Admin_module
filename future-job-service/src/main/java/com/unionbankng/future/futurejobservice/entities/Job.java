@@ -31,7 +31,7 @@ public class Job implements Serializable {
     @NotNull
     @Column(columnDefinition ="TEXT", nullable=false)
     public String description;
-    public String supporting_files;
+    public String supportingFiles;
     @NotNull
     @Column(nullable=false)
     @Enumerated(EnumType.STRING)
@@ -45,22 +45,22 @@ public class Job implements Serializable {
     public Long budget;
     public String team;
     public String qualification;
-    public String skills_required;
+    public String skillsRequired;
     public String assessment;
-    public String sample_product;
+    public String sampleProduct;
     public boolean interview;
     public String timeline;
-    public String payment_terms;
+    public String paymentTerms;
     @Column(name="nda_files", columnDefinition="TEXT")
-    public String nda_files;
+    public String ndaFiles;
     @NotNull
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     public JobStatus status;
     @Temporal(TemporalType.DATE)
-    public Date publish_date;
+    public Date publishDate;
     @Temporal(TemporalType.DATE)
-    public Date last_modified_date;
+    public Date lastModifiedDate;
     @Temporal(TemporalType.DATE)
     public Date createdAt;
 
@@ -70,7 +70,7 @@ public class Job implements Serializable {
         this.title=job.title;
         this.goal=job.goal;
         this.description=job.description;
-        this.supporting_files=job.supporting_files;
+        this.supportingFiles=job.supportingFiles;
         this.type=job.type;
         this.interview=job.interview;
         this.categories=job.categories;
@@ -78,15 +78,15 @@ public class Job implements Serializable {
         this.budget=job.budget;
         this.team=job.team;
         this.qualification=job.qualification;
-        this.skills_required=job.skills_required;
+        this.skillsRequired=job.skillsRequired;
         this.assessment=job.assessment;
-        this.sample_product=job.sample_product;
+        this.sampleProduct=job.sampleProduct;
         this.timeline=job.timeline;
-        this.payment_terms=job.payment_terms;
-        this.nda_files=job.nda_files;
+        this.paymentTerms=job.paymentTerms;
+        this.ndaFiles=job.ndaFiles;
         this.status=job.status;
-        this.publish_date=job.publish_date;
-        this.last_modified_date=job.last_modified_date;
+        this.publishDate=job.publishDate;
+        this.lastModifiedDate=job.lastModifiedDate;
         this.createdAt=job.createdAt;
     }
 
@@ -97,7 +97,7 @@ public class Job implements Serializable {
 
     @PreUpdate
     private void lastModifiedDate() {
-        last_modified_date = new Date();
+        lastModifiedDate = new Date();
     }
 
     @Override

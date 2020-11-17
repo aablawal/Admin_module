@@ -12,6 +12,7 @@ import com.unionbankng.future.learn.pojo.JwtUserDetail;
 import com.unionbankng.future.learn.repositories.CourseContentRepository;
 import com.unionbankng.future.learn.repositories.LectureRepository;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
+import liquibase.util.file.FilenameUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ public class LectureService {
     private final LectureRepository lectureRepository;
     private final FutureStreamingService futureStreamingService;
 
+    private String[] allowedVideoExtensions = new String[]{"mp4","3gp","mkv","avi"};
 
     public Lecture save(Lecture lecture){
         return lectureRepository.save(lecture);
@@ -100,6 +103,13 @@ public class LectureService {
 
         if (file == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File cannot be empty");
+
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        // Convert String Array to List
+        List<String> extensionList = Arrays.asList(allowedVideoExtensions);
+
+        if (!extensionList.contains(extension))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File format not allowed");
 
         StreamingLocatorResponse response = null;
         try {

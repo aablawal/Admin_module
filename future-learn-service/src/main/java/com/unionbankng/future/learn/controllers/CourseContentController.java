@@ -47,13 +47,31 @@ public class CourseContentController {
 
 
     @PostMapping("/v1/course_content/create_content")
-    public ResponseEntity<APIResponse<CourseContent>> creatContent(@RequestBody CourseContentRequest request,
+    public ResponseEntity<APIResponse<CourseContent>> createContent(@RequestBody CourseContentRequest request,
                                                                    @ApiIgnore OAuth2Authentication authentication){
 
         CourseContent courseContent = courseContentService.createNewContent(request,authentication);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courseContent));
+    }
+
+    @PostMapping("/v1/course_content/update_content")
+    public ResponseEntity<APIResponse<CourseContent>> updateContent(@RequestBody CourseContent request){
+
+        CourseContent courseContent = courseContentService.updateCourseContent(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,courseContent));
+    }
+
+    @DeleteMapping("/v1/course_content/{courseContentId}")
+    public ResponseEntity<APIResponse<String>> deleteCourseContent(@PathVariable Long courseContentId){
+
+        courseContentService.deleteById(courseContentId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,"Content deleted successfully"));
     }
 
 
