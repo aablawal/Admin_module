@@ -5,5 +5,5 @@ public enum JobStatus {
     PA,
     IA,
     WP,
-    CO,
+    CO
 }

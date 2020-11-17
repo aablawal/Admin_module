@@ -47,12 +47,6 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
-    @GetMapping("/v1/users/role/{role}")
-    public ResponseEntity<APIResponse<List<User>>> getUsersByRole(@PathVariable String role) {
-        //function will be added here
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,null));
-    }
-
     @GetMapping("/v1/users/get_details_with_token")
     public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore OAuth2Authentication auth) {
 
