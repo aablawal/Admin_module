@@ -78,7 +78,7 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-utility-service --namespace project-future"
 					
                   } else {
-                    sh "kubectl config use-context MarcusProdAKSCluster"
+                    sh "kubectl config use-context MarcusProdAKSClust"
                     sh "kubectl set image deployment/future-utility-service future-utility-service=${ACR_LOGINSERVER}/future-utility-service --namespace project-future"
                     sh "kubectl rollout restart deployment/future-utility-service --namespace project-future"
                   }

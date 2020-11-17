@@ -40,6 +40,13 @@ zuul:
     learn-service:
       path: /learnserv/**
       service-id: learn-service
+    payment-service:
+      path: /paymentserv/**
+      service-id: payment-service
+    bank-service:
+      path: /bankserv/**
+      service-id: bank-service
+
 
 
 ---
@@ -61,6 +68,12 @@ zuul:
     learn-service:
       path: /learnserv/**
       url: http://future-learn-service
+    payment-service:
+      path: /paymentserv/**
+      url: http://future-payment-service
+    bank-service:
+      path: /bankserv/**
+      url: http://future-bank-service
 
 ---
 spring:
@@ -81,4 +94,10 @@ zuul:
     learn-service:
       path: /learnserv/**
       url: http://future-learn-service
+    payment-service:
+      path: /paymentserv/**
+      url: http://future-payment-service
+    bank-service:
+      path: /bankserv/**
+      url: http://future-bank-service
 

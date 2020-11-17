@@ -1,0 +1,29 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.unionbankng.future.learn.grpcserver;
+
+message CoursePaymentRequest {
+    string userUUID = 1;
+    int32 courseId = 2;
+    string paymentReference = 3;
+    double amountPaid = 4;
+    string email = 5;
+    string userFullName = 6;
+}
+
+message CoursePaymentResponse {
+  bool success = 1;
+  Status status = 2;
+}
+
+enum Status {
+    FAILED = 0;
+    SUCCESS = 1;
+    DUPLICATE = 2;
+    NOT_FOUND=3;
+    INSUFFICIENT_FUNDS = 4;
+}
+
+service CoursePaymentService {
+    rpc payForCourse(CoursePaymentRequest) returns (CoursePaymentResponse);
+}

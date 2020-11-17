@@ -221,6 +221,7 @@
   <modules>
       
     <module>future-utilityservice-interface</module>
+    <module>future-learn-service-interface</module>
       
   </modules>
 

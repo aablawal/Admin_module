@@ -67,7 +67,7 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-eureka-server --namespace project-future"
 					
                   } else {
-                    sh "kubectl config use-context MarcusProdAKSCluster"
+                    sh "kubectl config use-context MarcusProdAKSClust"
                     sh "kubectl set image deployment/future-eureka-server future-eureka-server=${ACR_LOGINSERVER}/future-eureka-server --namespace project-future"
 					sh "kubectl rollout restart deployment/future-eureka-server --namespace project-future"
                   }
