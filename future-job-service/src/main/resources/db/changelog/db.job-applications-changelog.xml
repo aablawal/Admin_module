@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="ACER NITRO 5 (generated)" id="1605527494400-1">
+        <createTable tableName="applications">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="applicationsPK"/>
+            </column>
+            <column name="about" type="varchar (max)"/>
+            <column name="account_name" type="varchar(255)"/>
+            <column name="account_number" type="varchar(255)"/>
+            <column name="bid_amount" type="bigint"/>
+            <column name="comment" type="varchar (max)"/>
+            <column name="created_at" type="date"/>
+            <column name="employer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="date"/>
+            <column name="milestones" type="varchar (max)"/>
+            <column name="payment_terms" type="varchar (max)"/>
+            <column name="prepared_currency" type="varchar(255)"/>
+            <column name="previous_work_links" type="varchar (max)"/>
+            <column name="social_media_links" type="varchar (max)"/>
+            <column name="status" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supporting_files" type="varchar(255)"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="work_method" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
