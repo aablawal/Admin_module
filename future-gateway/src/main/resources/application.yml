@@ -29,7 +29,7 @@ eureka:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8081/eureka}
 zuul:
-  sensitiveHeaders: Cookie,Set-Cookie
+  sensitiveHeaders:
   routes:
     authorization-server:
       path: /authserv/**
@@ -57,7 +57,7 @@ eureka:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
 zuul:
-  sensitiveHeaders: Cookie,Set-Cookie
+  sensitiveHeaders:
   routes:
     authorization-server:
       path: /authserv/**
@@ -83,7 +83,7 @@ eureka:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
 zuul:
-  sensitiveHeaders: Cookie,Set-Cookie
+  sensitiveHeaders:
   routes:
     authorization-server:
       path: /authserv/**
