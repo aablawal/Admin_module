@@ -4,8 +4,10 @@ import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
+import com.unionbankng.future.futurejobservice.services.DatabaseService;
 import com.unionbankng.future.futurejobservice.services.EscrowService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
+import com.unionbankng.future.futurejobservice.services.UserService;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +16,6 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -27,6 +28,8 @@ public class JobProposalController {
 
     private final JobProposalService service;
     private final EscrowService escrowService;
+    private final UserService userService;
+    private final DatabaseService databaseService;
     private Object data;
 
     @ModelAttribute
@@ -74,10 +77,10 @@ public class JobProposalController {
                 new APIResponse("success",true, service.updateProposalStatus(id,status, model)));
     }
 
-    @GetMapping("/v1/escrow/test/get")
-    public ResponseEntity<APIResponse> getTransactions(@RequestParam String status){
-        return ResponseEntity.ok().body(
-                new APIResponse("success",true,escrowService.getTransactions(status)));
+    @GetMapping("/v1/jwt/test")
+    public ResponseEntity<APIResponse> test(OAuth2Authentication authentication){
+     return ResponseEntity.ok().body(
+                new APIResponse("success",true, databaseService.connect()));
     }
 
 }

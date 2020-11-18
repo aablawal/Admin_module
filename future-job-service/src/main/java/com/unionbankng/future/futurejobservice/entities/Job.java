@@ -65,7 +65,7 @@ public class Job implements Serializable {
     public Date createdAt;
 
     public Job(Job job){
-         this.id=job.id;
+        this.id=job.id;
         this.oid=job.oid;
         this.title=job.title;
         this.goal=job.goal;

@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.services;
+import com.unionbankng.future.futurejobservice.entities.EscrowRequest;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,7 @@ public class EscrowService {
     private String token;
 
     @Value("${sidekiq.escrow.baseUrl}")
-    private String baseURL="";
+    private String baseURL;
 
 
     @Autowired
@@ -39,5 +40,14 @@ public class EscrowService {
    public  String getTransactions(String status){
        HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
        return rest.exchange(baseURL+"/Transaction/AppTranx?appid="+appId+"&action="+status, HttpMethod.GET, entity, String.class).getBody();
+   }
+
+   public EscrowRequest createTransaction(EscrowRequest request){
+       HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+       int peppfess=(int)2.5/100*request.getAmount() +0;
+       request.setAppId(appId);
+       request.setPeppfees(peppfess);
+
+       return  request;
    }
 }
