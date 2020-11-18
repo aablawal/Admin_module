@@ -21,7 +21,7 @@ public class EscrowService {
     private String token;
 
     @Value("${sidekiq.escrow.baseUrl}")
-    private String baseURL;
+    private String baseURL="";
 
 
     @Autowired
