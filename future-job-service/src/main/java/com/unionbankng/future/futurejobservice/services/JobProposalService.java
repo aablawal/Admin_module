@@ -26,6 +26,12 @@ public class JobProposalService {
     private  final JobProposalRepository repository;
     private  final FileStoreService fileStoreService;
 
+    public JobProposal updateProposalStatus(Long id, String newStatus, Model model){
+        Model data =this.findProposalById(id,model);
+        JobProposal proposal= (JobProposal) data.getAttribute("proposal");
+        proposal.setStatus(JobProposalStatus.valueOf(newStatus.toUpperCase()));
+        return repository.save(proposal);
+    }
     public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files){
         try {
             String supporting_file_names = null;

@@ -1,22 +1,20 @@
 package com.unionbankng.future.futurejobservice.controllers;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
+import com.unionbankng.future.futurejobservice.services.EscrowService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
-import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -28,6 +26,8 @@ import java.util.*;
 public class JobProposalController {
 
     private final JobProposalService service;
+    private final EscrowService escrowService;
+    private Object data;
 
     @ModelAttribute
     public void serResponseHeader(HttpServletResponse response){
@@ -68,17 +68,17 @@ public class JobProposalController {
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.getProposalsCount(jid)));
     }
-    @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse> getTest(  @ApiIgnore OAuth2Authentication authentication){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-
+    @PutMapping("/v1/job/proposal/status")
+    public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status, Model model){
         return ResponseEntity.ok().body(
-                new APIResponse("success",true,jwtUserDetail));
-
+                new APIResponse("success",true, service.updateProposalStatus(id,status, model)));
     }
 
-
-
+    @GetMapping("/v1/escrow/test/get")
+    public ResponseEntity<APIResponse> getTransactions(@RequestParam String status){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,escrowService.getTransactions(status)));
+    }
 
 }
 
