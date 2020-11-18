@@ -41,7 +41,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	               .authorities ("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
 	               .scopes ("read", "write")
 	               .autoApprove (true)     
-	               .secret (passwordEncoder. encode ("password"));
+	               .secret (passwordEncoder. encode ("password")).and().withClient ("discord-client")
+			   .authorizedGrantTypes ("password", "authorization_code", "refresh_token", "implicit")
+			   .authorities ("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
+			   .scopes ("read", "write")
+			   .autoApprove (true)
+			   .secret (passwordEncoder. encode ("password")).redirectUris("https://discourse.sidekik.ng/auth/oauth2_basic/callback");
 	   }
 	   
 	    @Override
