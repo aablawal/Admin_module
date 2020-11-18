@@ -3,12 +3,8 @@ import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
-import com.unionbankng.future.futurejobservice.services.JobProposalService;
-import com.unionbankng.future.futurejobservice.services.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import java.util.ArrayList;
@@ -31,12 +27,8 @@ public class AppService {
     }
 
     public Model getJob(Job job, Model model){
-        ArrayList<Map<String,Object>> baseList=new ArrayList<>();
-        Map<String,Object> data=new HashMap<>();
-        data.put("job",job);
-        data.put("proposals", jobProposalRepository.getCountByJobId(job.id));
-        baseList.add(data);
-        model.addAttribute("data",baseList);
+        model.addAttribute("job",job);
+        model.addAttribute("proposals", jobProposalRepository.getCountByJobId(job.id));
         return  model;
     }
     public  Model getJobCollection(Page<Job> page,Model model){
@@ -51,12 +43,8 @@ public class AppService {
     }
 
     public Model getProposal(JobProposal proposal, Model model){
-        ArrayList<Map<String,Object>> baseList=new ArrayList<>();
-        Map<String,Object> data=new HashMap<>();
-        data.put("job",jobRepository.findById(proposal.jobId));
-        data.put("proposal", proposal);
-        baseList.add(data);
-        model.addAttribute("data",baseList);
+        model.addAttribute("job",jobRepository.findById(proposal.jobId));
+        model.addAttribute("proposal",proposal);
         return  model;
     }
     public  Model getProposalCollection(Page<JobProposal> page, Model model){
