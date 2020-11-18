@@ -76,6 +76,7 @@ zuul:
     bank-service:
       path: /bankserv/**
       url: http://future-bank-service
+  strip-prefix: false
 
 ---
 spring:
