@@ -9,6 +9,8 @@ spring:
       max-request-size: 100MB
 server:
   port: 8080
+  tomcat:
+    redirect-context-root: false
 eureka:
   client:
     register-with-eureka: true
