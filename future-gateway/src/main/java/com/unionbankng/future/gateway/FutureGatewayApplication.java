@@ -17,8 +17,5 @@ public class FutureGatewayApplication {
 		SpringApplication.run(FutureGatewayApplication.class, args);
 	}
 
-	@Bean
-	public LocationRewriteFilter locationRewriteFilter() {
-		return new LocationRewriteFilter();
-	}
+
 }
