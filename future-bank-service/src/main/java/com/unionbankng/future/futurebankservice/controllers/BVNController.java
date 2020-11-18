@@ -23,7 +23,7 @@ public class BVNController {
 
     private final BvnValidationService bvnValidationService;
 
-    @PostMapping("/v1/bvn/get_bvn_details}")
+    @PostMapping("/v1/bvn/get_bvn_details")
     public ResponseEntity<APIResponse<ValidateBvnResponse>> getCustomerBVNDetails(@RequestParam String bvn) throws IOException {
 
         return bvnValidationService.getCustomerBVNDetails(bvn);
@@ -31,7 +31,7 @@ public class BVNController {
 
     }
 
-    @PostMapping("/v1/bvn/verify_bvn}")
+    @PostMapping("/v1/bvn/verify_bvn")
     public ResponseEntity<APIResponse<SidekiqBVNValidationResponse>> verifyCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
 
        return bvnValidationService.verifyCustomerBVN(bvn,dob);
