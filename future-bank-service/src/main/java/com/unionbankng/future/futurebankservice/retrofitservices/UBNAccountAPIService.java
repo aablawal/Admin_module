@@ -1,8 +1,6 @@
 package com.unionbankng.future.futurebankservice.retrofitservices;
 
-import com.unionbankng.future.futurebankservice.pojos.UBNAuthServerTokenResponse;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnRequest;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnResponse;
+import com.unionbankng.future.futurebankservice.pojos.*;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -21,4 +19,13 @@ public interface UBNAccountAPIService {
 
     @POST("BVNValidationService2/verifyBVN")
     Call<ValidateBvnResponse> validateBVN(@Query("access_token") String accessToken, @Body ValidateBvnRequest request);
+
+    @POST("ubnmiserv/secured/openaccount")
+    Call<UBNCreateAccountResponse> openAccount(@Query("access_token") String accessToken, @Body UBNCreateAccountNewCustomerRequest request);
+
+    @POST("ubnmiserv/secured/addaccounttocustomer")
+    Call<UBNCreateAccountResponse> openAccountExistingCustomer(@Query("access_token") String accessToken, @Body UBNOpenAccountExistingCustomerRequest request);
+
+
+
 }
