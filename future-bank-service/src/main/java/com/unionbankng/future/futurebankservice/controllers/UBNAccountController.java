@@ -23,10 +23,14 @@ public class UBNAccountController {
     @PostMapping("/v1/ubn_account/create_account_for_customer")
     public ResponseEntity<APIResponse<UBNCreateAccountResponse>> openAccountForCustomer(@RequestBody UBNCreateAccountNewCustomerRequest request) throws IOException {
 
+        //determine existing or non existing customer
         Response<UBNCreateAccountResponse> responseResponse = ubnAccountAPIServiceHandler.openAccountForNewCustomer(request);
 
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        //update customer details with account number
+
 
         return ResponseEntity.ok().body(new APIResponse<>("Account creation successful", true, responseResponse.body()));
 
