@@ -3,6 +3,7 @@ package com.unionbankng.future.futurebankservice.retrofitservices;
 import com.unionbankng.future.futurebankservice.pojos.*;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -25,6 +26,13 @@ public interface UBNAccountAPIService {
 
     @POST("ubnmiserv/secured/addaccounttocustomer")
     Call<UBNCreateAccountResponse> openAccountExistingCustomer(@Query("access_token") String accessToken, @Body UBNOpenAccountExistingCustomerRequest request);
+
+    @GET("account/id-card/type")
+    Call<AccountIdTypesResponse> getSupportedIdCardTypes();
+
+    @POST("ubnmiserv/secured/fundstransfer")
+    Call<UBNFundTransferResponse> fundsTransferUBN(@Query("access_token") String accessToken, @Body UBNFundTransferRequest request);
+
 
 
 

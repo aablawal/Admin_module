@@ -109,4 +109,19 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
+    public Response<UBNFundTransferResponse> transferFundsUBN(UBNFundTransferRequest request) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        return ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
+
+    }
+
 }
