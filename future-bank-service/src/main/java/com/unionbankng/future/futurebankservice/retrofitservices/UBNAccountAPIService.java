@@ -2,10 +2,7 @@ package com.unionbankng.future.futurebankservice.retrofitservices;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 public interface UBNAccountAPIService {
 
@@ -28,7 +25,7 @@ public interface UBNAccountAPIService {
     Call<UBNCreateAccountResponse> openAccountExistingCustomer(@Query("access_token") String accessToken, @Body UBNOpenAccountExistingCustomerRequest request);
 
     @GET("account/id-card/type")
-    Call<AccountIdTypesResponse> getSupportedIdCardTypes();
+    Call<AccountIdTypesResponse> getSupportedIdCardTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
     @POST("ubnmiserv/secured/fundstransfer")
     Call<UBNFundTransferResponse> fundsTransferUBN(@Query("access_token") String accessToken, @Body UBNFundTransferRequest request);
