@@ -5,52 +5,48 @@ import lombok.Data;
 @Data
 public class UBNCreateAccountNewCustomerRequest {
 
-	private String title;
-	private String firstName;
-	private String middleName;
-	private String lastName;
-	private String dateOfBirth;
+	private String accountBranchCode;
+	private String accountTier;
 	private String address;
 	private String address2;
 	private String address3;
 	private String address4;
-	private String state;
-	private String nationality; //NG
+	private String annualIncome;
+	private String bvn;
+	private String ccyCode;
+	private String city;
+	private String country;
+	private String countryOfResident;
+	private String cusIdCardNo;
+	private String customerBranchCode;
+	private String email;
+	private String firstName;
+	private String gender;
+	private Long id;
+	private String idType;
+	private String initialAmount;
+	private String language;
+	private String lastName;
+	private String maritaStatus;
+	private String middleName;
 	private String motherMaidenName;
+	private String nationality;
+	private String nextOfKinName;
+	private String nextOfKinPhoneNumber;
+	private boolean pnd;
+	private String productCode;
+	private String profession;
+	private String relationship;
+	private boolean smsAlert;
+	private boolean staff;
+	private String state;
 	private String telephone;
 	private String telephone2;
-	private String profession;
-	private String maritaStatus; //MARRIED
-	private String gender;//F
-	private String email;
-	private String custIdCardNo;//yu78665w
-	private String issueDate; //21-jan-2000"
-	private String expiryDate; //28-dec-2023,
-	private String nextOfKin; // name ahmed anslem
-	private String relatioship; //BROTHER,
-	private String customerBranchCode; //682,
-	private String uniqueID; //CHUKSMOHAMMED126,
-	private String customerCategory; //IND_IND
-	private String customerType; //I,
-	private String language; // ENG,
-	private String city;
-	private String countryOfResident; //NG,
+	private String title;
 	private String zipCode;
-	private boolean staff = false;
-	private String country; //NG,
-	private String nextOfKinMobileNumber;
-	private boolean smsAlert = false;
-	private String rmCode; //5429540,
-	private String initiatorID; //WEBSVCS
-	private String verifierID; //WEBSVCS
-	private String misCode;
-	private String misClass;
-	private String introducerTag; //4626183;
-	private String accountBranchCode; //682;
-	private String ccyCode;
-	private String productCode;
-	private boolean pnd = false;
-	private String externalReference;
+	private String customerSeg;
+	private String customerType;
+	private String introducerTag;
 
 	
 }

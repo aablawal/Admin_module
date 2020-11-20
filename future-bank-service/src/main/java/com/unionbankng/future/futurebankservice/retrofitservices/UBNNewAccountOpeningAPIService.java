@@ -1,6 +1,7 @@
 package com.unionbankng.future.futurebankservice.retrofitservices;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -27,6 +28,69 @@ public interface UBNNewAccountOpeningAPIService {
     @GET("account-opening/message/country")
     Call<UBNStateByCountryResponse> getStatesByCountryForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
                                                           @Query("countryCode") String countryCode);
+
+    @GET("account-opening/message/country")
+    Call<UBNCitiesResponse> getCitiesByCountryAndStateForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                                 @Query("countryCode") String countryCode, @Query("stateCode") String stateCode);
+
+    @GET("account-opening/message/branches")
+    Call<UBNBranchesResponse> getUBNBranches(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
+
+    @GET("account-opening/message/gender")
+    Call<AccountProductTypeResponse> getUBNGenders(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
+
+    @GET("account-opening/message/gender")
+    Call<AccountProductTypeResponse> getMaritalStatus(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
+
+    @GET("account-opening/account/customer/type")
+    Call<UBNCustomerTypeRequest> getCustomerTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
+
+    @GET("account-opening/account/type")
+    Call<UBNAccountTypeResponse> getUBNAccountTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
+
+
+    @GET("account-opening/message/all/segment")
+    Call<UBNCustomerSegmentResponse> getCustomersSegment(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
+
+
+    @POST("account-opening/account/initiate/account")
+    Call<UBNCreateAccountNewCustomerResponse> createUBNNewCustomerAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                      @Body UBNCreateAccountNewCustomerRequest request);
+
+
+    @GET("account-opening/document/type")
+    Call<AccountProductTypeResponse> getDocumentTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                   @Query("productCode") String productCode);
+
+    @Multipart
+    @POST("account-opening/document/upload")
+    Call<UBNGenericResponse> uploadDocumentForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                      @Query("recordId") Long recordId,@Query("type") String type,@Part("file") RequestBody file);
+
+    @POST("account-opening/document/submit")
+    Call<UBNGenericResponse> submitDocumentsForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                      @Query("bvn") String bvn,@Query("recordId") Long recordId);
+
+    @POST("account-opening/account/payment")
+    Call<UBNAccountPaymentResponse> accountPaymentUBN1(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                     @Query("customerId") Long customerId, @Query("isReactivate") Boolean isReactivate,
+                                                     @Body UBNAccountPaymentRequest request);
+
+    @POST("account-opening/account/pay")
+    Call<UBNAccountPaymentResponse> accountPaymentUBN2(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                       @Query("customerId") Long customerId, @Query("oldAccNumber") String oldAccNumber,
+                                                       @Body UBNAccountPaymentRequest request);
+
+    @POST("account-opening/account/confirm/payment")
+    Call<UBNGenericResponse> confirmUBNPaymentStatus(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                       @Query("customerId") Long customerId);
+
+    @POST("account-opening/account/add/account")
+    Call<UBNCompleteAccountPaymentResponse> completeUBNAccountCreation(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                     @Body CompleteUBNAccountCreationRequest request);
+
+
+
 
 
 

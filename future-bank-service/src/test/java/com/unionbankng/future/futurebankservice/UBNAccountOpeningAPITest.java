@@ -82,6 +82,103 @@ public class UBNAccountOpeningAPITest extends AbstractTest {
     }
 
 
+    @Test
+    public void getCitiesByCountryAndStateForAccountTest() throws IOException {
+
+
+        Response<UBNCitiesResponse> response = ubnNewAccountOpeningAPIServiceHandler.getCitiesByCountryAndStateForAccount("NG","OYO");
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+    @Test
+    public void getUBNBranchesTest() throws IOException {
+
+
+        Response<UBNBranchesResponse> response = ubnNewAccountOpeningAPIServiceHandler.getUBNBranches();
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+    @Test
+    public void getUBNGenders() throws IOException {
+
+
+        Response<AccountProductTypeResponse> response = ubnNewAccountOpeningAPIServiceHandler.getUBNGenders();
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+    @Test
+    public void getMaritalStatus() throws IOException {
+
+
+        Response<AccountProductTypeResponse> response = ubnNewAccountOpeningAPIServiceHandler.getMaritalStatus();
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+    @Test
+    public void getCustomerTypesTest() throws IOException {
+
+
+        Response<UBNCustomerTypeRequest> response = ubnNewAccountOpeningAPIServiceHandler.getCustomerTypes();
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+    @Test
+    public void getCustomersSegmentTest() throws IOException {
+
+
+        Response<UBNCustomerSegmentResponse> response = ubnNewAccountOpeningAPIServiceHandler.getCustomersSegment();
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+    @Test
+    public void getDocumentTypesTest() throws IOException {
+
+
+        Response<AccountProductTypeResponse> response = ubnNewAccountOpeningAPIServiceHandler.getDocumentTypes("SA_008");
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+
+
+
+
+
+
 
 
 
