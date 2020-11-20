@@ -3,6 +3,7 @@ package com.unionbankng.future.futurebankservice.controllers;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.UBNNewAccountOpeningAPIServiceHandler;
+import liquibase.pro.packaged.B;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -268,6 +269,78 @@ public class UBNAccountOpeningController {
 
         //determine existing or non existing customer
         Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.submitDocumentsForAccount(recordId,bvn);
+
+        if(!responseResponse.isSuccessful())
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        //update customer details with account number
+
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+
+    }
+
+    @PostMapping("/v1/ubn_account_opening/initiate_payment")
+    public ResponseEntity<APIResponse<UBNAccountPaymentResponse>> accountPaymentUBN1(
+            @RequestParam Long customerId, @RequestParam Boolean isReactivated,@RequestBody UBNAccountPaymentRequest request
+    ) throws IOException {
+
+        //determine existing or non existing customer
+        Response<UBNAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.accountPaymentUBN1(customerId,isReactivated,request);
+
+        if(!responseResponse.isSuccessful())
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        //update customer details with account number
+
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+
+    }
+
+    @PostMapping("/v1/ubn_account_opening/initiate_payment_second_leg")
+    public ResponseEntity<APIResponse<UBNAccountPaymentResponse>> accountPaymentUBN1(
+            @RequestParam Long customerId, @RequestParam String oldAccount,@RequestBody UBNAccountPaymentRequest request
+    ) throws IOException {
+
+        //determine existing or non existing customer
+        Response<UBNAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.accountPaymentUBN2(customerId,oldAccount,request);
+
+        if(!responseResponse.isSuccessful())
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        //update customer details with account number
+
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+
+    }
+
+    @GetMapping("/v1/ubn_account_opening/confirm_payment_status")
+    public ResponseEntity<APIResponse<UBNGenericResponse>> confirmUBNPaymentStatus(
+            @RequestParam Long customerId
+    ) throws IOException {
+
+        //determine existing or non existing customer
+        Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.confirmUBNPaymentStatus(customerId);
+
+        if(!responseResponse.isSuccessful())
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        //update customer details with account number
+
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+
+    }
+
+    @PostMapping("/v1/ubn_account_opening/complete_account_opening")
+    public ResponseEntity<APIResponse<UBNCompleteAccountPaymentResponse>> completeUBNAccountCreation(
+            @RequestBody CompleteUBNAccountCreationRequest request
+    ) throws IOException {
+
+        //determine existing or non existing customer
+        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(request);
 
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
