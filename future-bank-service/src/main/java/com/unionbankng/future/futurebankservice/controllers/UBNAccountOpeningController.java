@@ -222,7 +222,7 @@ public class UBNAccountOpeningController {
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
-        //update customer details with account number
+        //save customer account with status document upload
 
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
@@ -255,7 +255,7 @@ public class UBNAccountOpeningController {
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
-        //update customer details with account number
+        //update customer account with status upload complete
 
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
@@ -273,7 +273,7 @@ public class UBNAccountOpeningController {
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
-        //update customer details with account number
+        //update customer account with status upload complete
 
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));

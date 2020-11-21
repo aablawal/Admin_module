@@ -6,16 +6,14 @@ import com.unionbankng.future.futurebankservice.pojos.ValidateBvnRequest;
 import com.unionbankng.future.futurebankservice.pojos.ValidateBvnResponse;
 import com.unionbankng.future.futurebankservice.services.BvnValidationService;
 import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 import retrofit2.Response;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BVNTest extends AbstractTest {
 

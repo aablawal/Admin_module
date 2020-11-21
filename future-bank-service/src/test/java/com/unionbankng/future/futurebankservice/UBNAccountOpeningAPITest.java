@@ -2,7 +2,7 @@ package com.unionbankng.future.futurebankservice;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.UBNNewAccountOpeningAPIServiceHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import retrofit2.Response;
 
