@@ -222,7 +222,8 @@
       
     <module>future-utilityservice-interface</module>
     <module>future-learn-service-interface</module>
-      
+    <module>future-bank-service-interface</module>
+
   </modules>
 
   <distributionManagement>
