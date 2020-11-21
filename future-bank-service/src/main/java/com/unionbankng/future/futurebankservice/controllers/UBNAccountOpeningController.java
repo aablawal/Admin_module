@@ -1,14 +1,21 @@
 package com.unionbankng.future.futurebankservice.controllers;
 
 
+import com.unionbankng.future.futurebankservice.entities.CustomerBankAccount;
+import com.unionbankng.future.futurebankservice.enums.AccountStatus;
 import com.unionbankng.future.futurebankservice.pojos.*;
+import com.unionbankng.future.futurebankservice.services.CustomerBankAccountService;
 import com.unionbankng.future.futurebankservice.services.UBNNewAccountOpeningAPIServiceHandler;
-import liquibase.pro.packaged.B;
+import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 
@@ -17,7 +24,10 @@ import java.io.IOException;
 @RequestMapping(path = "api")
 public class UBNAccountOpeningController {
 
+    Logger logger = LoggerFactory.getLogger(UBNAccountOpeningController.class);
+
     private final UBNNewAccountOpeningAPIServiceHandler ubnNewAccountOpeningAPIServiceHandler;
+    private final CustomerBankAccountService customerBankAccountService;
 
     @GetMapping("/v1/ubn_account_opening/get_supported_id_types")
     public ResponseEntity<APIResponse<AccountIdTypesResponse>> getSupportedIdTypesForAccount() throws IOException {
@@ -222,10 +232,8 @@ public class UBNAccountOpeningController {
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
-        //save customer account with status document upload
 
-
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true,responseResponse.body()));
 
     }
 
@@ -336,17 +344,28 @@ public class UBNAccountOpeningController {
 
     @PostMapping("/v1/ubn_account_opening/complete_account_opening")
     public ResponseEntity<APIResponse<UBNCompleteAccountPaymentResponse>> completeUBNAccountCreation(
-            @RequestBody CompleteUBNAccountCreationRequest request
+            @RequestBody CompleteUBNAccountCreationRequest request, @ApiIgnore OAuth2Authentication authentication
     ) throws IOException {
 
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         //determine existing or non existing customer
         Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(request);
 
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
+        UBNCompleteAccountPaymentResponse response = responseResponse.body();
         //update customer details with account number
+        String accNumber = response.getData().split(":")[1].strip().replace("\"","");
+        logger.info("Account Number is :{}",accNumber);
 
+        CustomerBankAccount customerBankAccount = new CustomerBankAccount();
+        customerBankAccount.setAccountNumber(accNumber);
+        customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
+        customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
+        customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
+
+        customerBankAccountService.save(customerBankAccount);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
 

@@ -26,6 +26,7 @@ public class UBNAccountOpeningAPITest extends AbstractTest {
         assertEquals("00",response.body().getStatusCode());
 
 
+
     }
 
     @Test
