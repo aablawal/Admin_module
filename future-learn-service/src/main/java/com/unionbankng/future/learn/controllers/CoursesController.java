@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Nullable;
@@ -44,6 +45,15 @@ public class CoursesController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
+    }
+
+    @GetMapping("/v1/courses/{courseId}")
+    public ResponseEntity<APIResponse<Course>> findById(@PathVariable Long courseId){
+
+        Course course = courseService.findById(courseId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course Not Found"));
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,course));
     }
 
     @GetMapping("/v1/courses")
