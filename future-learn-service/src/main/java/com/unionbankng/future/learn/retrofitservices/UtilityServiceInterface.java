@@ -13,7 +13,7 @@ public interface UtilityServiceInterface {
 
     @Multipart
     @POST("api/v1/video_stream/upload")
-    Call<APIResponse<StreamingLocatorResponse>> upload(@Header("Authorization") String token, @Part() MultipartBody.Part file);
+    Call<APIResponse<StreamingLocatorResponse>> upload(@Part("file") RequestBody file);
 
 
 }

@@ -50,20 +50,15 @@ public class UtilityServiceInterfaceService {
 
         System.out.println(file.getContentType()+" ====================");
         RequestBody requestFile =
-                RequestBody.create(
-                        MediaType.parse("multipart/form-data"),
+                RequestBody.create(null,
                         file.getBytes()
                 );
 
 
-        // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body =
-                MultipartBody.Part.createFormData("file",null, requestFile);
-
 
         String authorization = String.format("Bearer %s",token);
         return utilityServiceInterface.upload(
-                authorization,body).execute();
+                requestFile).execute();
 
     }
 }
