@@ -22,26 +22,10 @@ public class FileStorageService {
 
 
     public String storeFile(MultipartFile file, Long userId,BlobType blobType) throws IOException {
-
-        logger.info("Name is :{}",file.getOriginalFilename());
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
         String fileName = userId + "_" + UUID.randomUUID().toString() + fileExtension;
-
-        StorageUploadRequest storageUploadRequest = StorageUploadRequest.newBuilder().setFileName(fileName)
-                .setBlobType(blobType).setFileByte(ByteString.copyFrom(file.getBytes())).build();
-
-        StorageUploadResponse response = blobStorageServiceBlockingStub.upload(storageUploadRequest);
-
-        return response.getUrl();
-
-    }
-
-    public String storeFile(MultipartFile file, Long userId,BlobType blobType,String ext) throws IOException {
-
-
-        String fileName = userId + "_" + UUID.randomUUID().toString() + ext;
 
         StorageUploadRequest storageUploadRequest = StorageUploadRequest.newBuilder().setFileName(fileName)
                 .setBlobType(blobType).setFileByte(ByteString.copyFrom(file.getBytes())).build();

@@ -50,7 +50,7 @@ public class UtilityServiceInterfaceService {
         System.out.println(file.getContentType()+" ====================");
         RequestBody requestFile =
                 RequestBody.create(
-                        MediaType.get(file.getContentType()),
+                        MediaType.parse("multipart/form-data"),
                         file.getBytes()
                 );
 
