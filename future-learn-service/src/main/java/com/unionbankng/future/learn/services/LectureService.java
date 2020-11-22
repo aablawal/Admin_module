@@ -1,15 +1,10 @@
 package com.unionbankng.future.learn.services;
 
 import com.unionbankng.future.futureutilityservice.grpcserver.StreamLinksResponse;
-import com.unionbankng.future.futureutilityservice.grpcserver.StreamingLocatorResponse;
-import com.unionbankng.future.learn.entities.CourseContent;
 import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.entities.Question;
 import com.unionbankng.future.learn.enums.LectureType;
-import com.unionbankng.future.learn.pojo.CourseContentRequest;
-import com.unionbankng.future.learn.pojo.CreateLectureRequest;
-import com.unionbankng.future.learn.pojo.JwtUserDetail;
-import com.unionbankng.future.learn.repositories.CourseContentRepository;
+import com.unionbankng.future.learn.pojo.*;
 import com.unionbankng.future.learn.repositories.LectureRepository;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import liquibase.util.file.FilenameUtils;
@@ -19,16 +14,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import retrofit2.Response;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +31,7 @@ public class LectureService {
 
     private final LectureRepository lectureRepository;
     private final FutureStreamingService futureStreamingService;
+    private  final UtilityServiceInterfaceService utilityServiceInterfaceService;
 
     private String[] allowedVideoExtensions = new String[]{"mp4","3gp","mkv","avi"};
 
@@ -68,22 +64,18 @@ public class LectureService {
     public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,OAuth2Authentication authentication) throws IOException {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-
-        return createNewLecture(file,request,jwtUserDetail.getUserUUID());
-
-    }
-
-    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,String creatorUUID) throws IOException {
+        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
 
         if(request.getType().equals(LectureType.VIDEO)) {
-            return createVideoLecture(file, request,creatorUUID);
+            return createVideoLecture(file, request,jwtUserDetail.getUserUUID(),details.getTokenValue());
         }else{
 
-            return createQuizLecture(request,creatorUUID);
+            return createQuizLecture(request,jwtUserDetail.getUserUUID());
 
         }
 
     }
+
 
     public String generateStreamingLinks(Long lectureId){
 
@@ -99,7 +91,7 @@ public class LectureService {
        return response.getSuccess() ? response.getCommaSeperatedStreamingLinks() : null;
     }
 
-    private Lecture createVideoLecture(MultipartFile file, CreateLectureRequest request, String creatorUUID) throws IOException {
+    public Lecture createVideoLecture(MultipartFile file, CreateLectureRequest request, String creatorUUID,String token) throws IOException {
 
         if (file == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File cannot be empty");
@@ -111,17 +103,16 @@ public class LectureService {
         if (!extensionList.contains(extension))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File format not allowed");
 
-        StreamingLocatorResponse response = null;
-        try {
-            response = futureStreamingService.uploadAndGetStreamingLocator(file);
-        } catch (InterruptedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
-        }
 
-        if(response == null)
+        Response<APIResponse<StreamingLocatorResponse>> responseResponse = utilityServiceInterfaceService.uploadVideoStream(token,file);
+
+        if(!responseResponse.isSuccessful())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
 
-        if(!response.getSuccess())
+        if(!responseResponse.body().isSuccess())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
+
+        if(!responseResponse.body().getPayload().getSuccess())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
 
         Lecture lecture = new Lecture();
@@ -129,8 +120,8 @@ public class LectureService {
         lecture.setCourseId(request.getCourseId());
         lecture.setCreatorUUID(creatorUUID);
         lecture.setDuration(request.getDuration());
-        lecture.setOutputAssetName(response.getAssetName());
-        lecture.setStreamingLocatorName(response.getLocatorName());
+        lecture.setOutputAssetName(responseResponse.body().getPayload().getAssetName());
+        lecture.setStreamingLocatorName(responseResponse.body().getPayload().getLocatorName());
         lecture.setIndexNo(request.getIndex());
         lecture.setTitle(request.getTitle());
         lecture.setType(request.getType());
@@ -138,7 +129,7 @@ public class LectureService {
         return save(lecture);
     }
 
-    private Lecture createQuizLecture(CreateLectureRequest request,String creatorUUID) {
+    public Lecture createQuizLecture(CreateLectureRequest request,String creatorUUID) {
 
         if(request.getQuestionList().isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Questions can't be empty");

@@ -2,10 +2,6 @@ syntax = "proto3";
 option java_multiple_files = true;
 package com.unionbankng.future.futureutilityservice.grpcserver;
 
-message AzureMediaServiceRequest {
-    string fileName = 1;
-    bytes fileByte = 2;
-}
 
 message StreamLinkRequest {
   string locatorName = 1;
@@ -13,12 +9,6 @@ message StreamLinkRequest {
 
 message DeleteOutputAssetRequest {
   string assetName = 1;
-}
-
-message StreamingLocatorResponse {
-  string locatorName = 1;
-  string assetName = 2;
-  bool success = 3;
 }
 
 message StreamLinksResponse {
@@ -32,7 +22,6 @@ message DeleteOutputAssetReponse {
 
 
 service AzureMediaStreamingService {
-    rpc uploadAndGetStreamingLocator(stream AzureMediaServiceRequest) returns (StreamingLocatorResponse);
     rpc getStreamingUrlsFromLocator(StreamLinkRequest) returns (StreamLinksResponse);
     rpc deleteOutputAsset(DeleteOutputAssetRequest) returns (DeleteOutputAssetReponse);
 }

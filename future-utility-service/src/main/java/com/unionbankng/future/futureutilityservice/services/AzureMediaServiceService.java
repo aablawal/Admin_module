@@ -6,6 +6,7 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.microsoft.azure.management.mediaservices.v2018_07_01.*;
 import com.microsoft.azure.management.mediaservices.v2018_07_01.implementation.MediaManager;
 import com.unionbankng.future.futureutilityservice.grpcserver.*;
+import com.unionbankng.future.futureutilityservice.pojos.StreamingLocatorResponse;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,7 +76,7 @@ public class AzureMediaServiceService{
             System.out.println("Job elapsed time: " + elapsed + " second(s)."+job.state());
 
             if(job.state() != JobState.FINISHED)
-                return StreamingLocatorResponse.newBuilder().setSuccess(false).build();
+                return StreamingLocatorResponse.builder().success(false).build();
 
                 System.out.println("Job finished.");
                 System.out.println();
@@ -85,11 +86,11 @@ public class AzureMediaServiceService{
                 StreamingLocator locator = getStreamingLocator(manager, resourceGroup, accountName,
                         outputAsset.name(), locatorName);
 
-                return StreamingLocatorResponse.newBuilder().setAssetName(outputAsset.name()).setLocatorName(locator.name()).setSuccess(true).build();
+                return StreamingLocatorResponse.builder().assetName(outputAsset.name()).locatorName(locator.name()).success(true).build();
 
 
         } catch (Exception e) {
-            return StreamingLocatorResponse.newBuilder().setSuccess(false).build();
+            return StreamingLocatorResponse.builder().success(false).build();
         }finally {
             cleanup(manager,resourceGroup,accountName,adaptiveEncodeTransform.name(),jobName,inputAssetName);
         }

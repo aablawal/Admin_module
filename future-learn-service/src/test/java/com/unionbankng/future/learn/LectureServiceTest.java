@@ -1,26 +1,22 @@
 package com.unionbankng.future.learn;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.futureutilityservice.grpcserver.StreamingLocatorResponse;
-import com.unionbankng.future.learn.entities.CourseContent;
 import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.entities.Question;
 import com.unionbankng.future.learn.entities.QuestionOption;
 import com.unionbankng.future.learn.enums.LectureType;
-import com.unionbankng.future.learn.pojo.CourseContentRequest;
+import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.CreateLectureRequest;
-import com.unionbankng.future.learn.services.CourseContentService;
-import com.unionbankng.future.learn.services.FutureStreamingService;
+import com.unionbankng.future.learn.pojo.StreamingLocatorResponse;
 import com.unionbankng.future.learn.services.LectureService;
+import com.unionbankng.future.learn.services.UtilityServiceInterfaceService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +24,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 public class LectureServiceTest extends AbstractTest{
 
@@ -35,11 +33,11 @@ public class LectureServiceTest extends AbstractTest{
     LectureService lectureService;
 
     @MockBean
-    FutureStreamingService futureStreamingService;
+    UtilityServiceInterfaceService utilityServiceInterfaceService;
 
 
     @Test
-    public void createNewVideoLectureTest() throws IOException, InterruptedException {
+    public void createNewVideoLectureTest() throws IOException {
 
         CreateLectureRequest request = new CreateLectureRequest();
         request.setCourseContentId(1l);
@@ -51,12 +49,16 @@ public class LectureServiceTest extends AbstractTest{
 
         MockMultipartFile firstFile = new MockMultipartFile("file", "filename.mp4", "video/mp4", "Hello world".getBytes());
 
-        StreamingLocatorResponse streamingLocatorResponse = StreamingLocatorResponse.newBuilder()
-                .setLocatorName("testLocator").setAssetName("assetName").setSuccess(true).build();
-        Mockito.when(futureStreamingService.uploadAndGetStreamingLocator(firstFile)).thenReturn(streamingLocatorResponse);
+        StreamingLocatorResponse streamingLocatorResponse = StreamingLocatorResponse.builder().assetName("assetName").locatorName("testLocator")
+                .success(true).build();
+
+        APIResponse<StreamingLocatorResponse> response = new APIResponse<>("Request Successful",true,streamingLocatorResponse);
+
+        Response<APIResponse<StreamingLocatorResponse>> aResponse = Response.success(response);
+        Mockito.when(utilityServiceInterfaceService.uploadVideoStream(any(String.class),eq(firstFile))).thenReturn(aResponse);
 
 
-        Lecture lecture = lectureService.createNewLecture(firstFile,request,"1233344455555-87666665-ui8886677666");
+        Lecture lecture = lectureService.createVideoLecture(firstFile,request,"1233344455555-87666665-ui8886677666","1222222333");
 
         Assert.assertEquals("testLocator",lecture.getStreamingLocatorName());
         Assert.assertEquals("assetName",lecture.getOutputAssetName());
@@ -75,7 +77,7 @@ public class LectureServiceTest extends AbstractTest{
         request.setTitle("Test");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            lectureService.createNewLecture(null,request,"1233344455555-87666665-ui8886677666");
+            lectureService.createQuizLecture(request,"1233344455555-87666665-ui8886677666");
         });
 
         assertEquals(400,exception.getStatus().value());
@@ -104,7 +106,7 @@ public class LectureServiceTest extends AbstractTest{
         request.setTitle("Test");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            lectureService.createNewLecture(null,request,"1233344455555-87666665-ui8886677666");
+            lectureService.createQuizLecture(request,"1233344455555-87666665-ui8886677666");
         });
 
         assertEquals(400,exception.getStatus().value());
@@ -139,7 +141,7 @@ public class LectureServiceTest extends AbstractTest{
         request.setType(LectureType.QUIZ);
         request.setTitle("Test");
 
-         Lecture lecture =  lectureService.createNewLecture(null,request,"1233344455555-87666665-ui8886677666");
+         Lecture lecture =  lectureService.createQuizLecture(request,"1233344455555-87666665-ui8886677666");
 
 
         assertEquals(1,lecture.getQuestions().size());
