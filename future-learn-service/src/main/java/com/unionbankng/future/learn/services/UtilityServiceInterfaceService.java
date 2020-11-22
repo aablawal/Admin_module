@@ -47,9 +47,10 @@ public class UtilityServiceInterfaceService {
 
     public Response<APIResponse<StreamingLocatorResponse>> uploadVideoStream(String token, MultipartFile file) throws IOException {
 
+        System.out.println(file.getContentType()+" ====================");
         RequestBody requestFile =
                 RequestBody.create(
-                        MediaType.get(file.getContentType()),
+                        MediaType.get("multipart/form-data"),
                         file.getBytes()
                 );
 
