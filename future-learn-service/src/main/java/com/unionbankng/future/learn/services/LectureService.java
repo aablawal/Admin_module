@@ -103,9 +103,12 @@ public class LectureService {
         if (!extensionList.contains(extension))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File format not allowed");
 
+        Long startTime = System.currentTimeMillis();
 
         Response<APIResponse<StreamingLocatorResponse>> responseResponse = utilityServiceInterfaceService.uploadVideoStream(token,file);
 
+        Long endTime = System.currentTimeMillis() - startTime;
+        System.out.println("=================== "+endTime);
         if(!responseResponse.isSuccessful())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload failed");
 
