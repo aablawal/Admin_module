@@ -76,6 +76,7 @@ public class CoursesController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,course));
     }
 
+
     @PostMapping("/v1/courses/publish/{courseId}")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@PathVariable Long courseId,
                                                                @ApiIgnore OAuth2Authentication authentication){

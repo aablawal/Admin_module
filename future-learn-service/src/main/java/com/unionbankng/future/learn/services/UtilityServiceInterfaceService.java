@@ -5,6 +5,7 @@ import com.unionbankng.future.learn.pojo.StreamingLocatorResponse;
 import com.unionbankng.future.learn.retrofitservices.UtilityServiceInterface;
 import lombok.RequiredArgsConstructor;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,9 +55,15 @@ public class UtilityServiceInterfaceService {
                         file.getBytes()
                 );
 
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("uploaded", "uploaded", requestFile);
+
+
         String authorization = String.format("Bearer %s",token);
         return utilityServiceInterface.upload(
-                authorization,requestFile).execute();
+                authorization,body).execute();
 
     }
 }
