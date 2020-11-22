@@ -11,6 +11,7 @@ public interface UtilityServiceInterface {
 
 
     @Multipart
+    @FormUrlEncoded
     @POST("api/v1/video_stream/upload")
     Call<APIResponse<StreamingLocatorResponse>> upload(@Header("Authorization") String token, @Part("file") RequestBody file);
 
