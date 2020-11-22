@@ -5,6 +5,7 @@ import com.unionbankng.future.learn.pojo.StreamingLocatorResponse;
 import com.unionbankng.future.learn.retrofitservices.UtilityServiceInterface;
 import lombok.RequiredArgsConstructor;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,12 @@ public class UtilityServiceInterfaceService {
     @PostConstruct
     public void init() {
 
-        Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+        OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+                .connectTimeout(60, TimeUnit.MINUTES)
+                .readTimeout(60, TimeUnit.MINUTES)
+                .writeTimeout(60, TimeUnit.MINUTES).build();
+
+        Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(utilityServiceBaseURL)
                 .build();
 
