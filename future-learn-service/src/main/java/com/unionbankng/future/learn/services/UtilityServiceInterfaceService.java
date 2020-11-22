@@ -50,15 +50,17 @@ public class UtilityServiceInterfaceService {
 
         System.out.println(file.getContentType()+" ====================");
         RequestBody requestFile =
-                RequestBody.create(null,
+                RequestBody.create(MediaType.get(file.getContentType()),
                         file.getBytes()
                 );
 
+        MultipartBody.Part fileData =
+                MultipartBody.Part.createFormData("file", "fileName.mp4", requestFile);
 
 
         String authorization = String.format("Bearer %s",token);
         return utilityServiceInterface.upload(
-                requestFile).execute();
+                fileData).execute();
 
     }
 }
