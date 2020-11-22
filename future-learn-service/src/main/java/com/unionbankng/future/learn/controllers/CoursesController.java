@@ -58,7 +58,7 @@ public class CoursesController {
     }
 
     @GetMapping("/v1/courses")
-    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByInstructor(@RequestParam int page, @RequestParam int size){
+    public ResponseEntity<APIResponse<Page<Course>>> getAllCourses(@RequestParam int page, @RequestParam int size){
 
         Page<Course> courses = courseService.findAllByIsPublished(true,PageRequest.of(page,size));
 
