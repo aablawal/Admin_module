@@ -58,7 +58,7 @@ public class UtilityServiceInterfaceService {
 
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("uploaded", "uploaded", requestFile);
+                MultipartBody.Part.createFormData("file",null, requestFile);
 
 
         String authorization = String.format("Bearer %s",token);
