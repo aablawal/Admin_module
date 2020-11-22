@@ -22,6 +22,8 @@ public class FileStorageService {
 
 
     public String storeFile(MultipartFile file, Long userId,BlobType blobType) throws IOException {
+
+        logger.info("Name is :{}",file.getName());
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
