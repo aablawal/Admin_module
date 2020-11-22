@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @RestController
@@ -78,7 +79,7 @@ public class CoursesController {
     }
 
     @PostMapping(value = "/v1/courses/{courseId}/upload_course_img",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Course>> uploadCourseImage(@Nullable @RequestPart("image") MultipartFile image,
+    public ResponseEntity<APIResponse<Course>> uploadCourseImage(@NotNull @RequestPart("image") MultipartFile image,
                                                                 @PathVariable Long courseId) throws IOException {
 
         Course course = courseService.updateCourseImg(image,courseId);
