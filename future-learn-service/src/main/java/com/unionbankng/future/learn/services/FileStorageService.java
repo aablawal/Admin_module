@@ -38,6 +38,20 @@ public class FileStorageService {
 
     }
 
+    public String storeFile(MultipartFile file, Long userId,BlobType blobType,String ext) throws IOException {
+
+
+        String fileName = userId + "_" + UUID.randomUUID().toString() + ext;
+
+        StorageUploadRequest storageUploadRequest = StorageUploadRequest.newBuilder().setFileName(fileName)
+                .setBlobType(blobType).setFileByte(ByteString.copyFrom(file.getBytes())).build();
+
+        StorageUploadResponse response = blobStorageServiceBlockingStub.upload(storageUploadRequest);
+
+        return response.getUrl();
+
+    }
+
     public int deleteFileFromStorage(String source,BlobType blobType) {
         String originalFileName = source.substring(source.lastIndexOf("/") + 1);
         logger.info("Delete from Blob storage where blob client : {}",originalFileName);

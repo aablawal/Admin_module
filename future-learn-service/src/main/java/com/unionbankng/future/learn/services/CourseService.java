@@ -78,13 +78,13 @@ public class CourseService {
     }
 
     @CachePut(value = "course", key="#courseId")
-    public Course updateCourseImg(MultipartFile image , @ParameterValueKeyProvider Long courseId) throws IOException {
+    public Course updateCourseImg(MultipartFile image , @ParameterValueKeyProvider Long courseId,String ext) throws IOException {
 
         Course course = courseRepository.findById(courseId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course Not Found"));
         if(course.getCourseImg() != null)
             fileStorageService.deleteFileFromStorage(course.getCourseImg(), BlobType.IMAGE);
 
-        String source = fileStorageService.storeFile(image,courseId,BlobType.IMAGE);
+        String source = fileStorageService.storeFile(image,courseId,BlobType.IMAGE,ext);
         course.setCourseImg(source);
         return courseRepository.save(course);
     }

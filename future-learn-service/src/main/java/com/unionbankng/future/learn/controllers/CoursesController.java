@@ -69,9 +69,9 @@ public class CoursesController {
 
     @PostMapping(value = "/v1/courses/{courseId}/upload_course_img",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<Course>> uploadCourseImage(@Nullable @RequestPart("image") MultipartFile image,
-                                                                @PathVariable Long courseId) throws IOException {
+                                                                @PathVariable Long courseId,@RequestPart("ext") String ext) throws IOException {
 
-        Course course = courseService.updateCourseImg(image,courseId);
+        Course course = courseService.updateCourseImg(image,courseId,ext);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,course));
     }
