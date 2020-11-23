@@ -15,10 +15,4 @@
             <column name="payment_terms" type="TEXT"/>
         </addColumn>
     </changeSet>
-    <changeSet author="chokeme (generated)" id="1606134135461-1">
-        <addDefaultValue columnDataType="boolean" columnName="is_paid" defaultValueBoolean="false" tableName="course"/>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1606134135461-2">
-        <addDefaultValue columnDataType="boolean" columnName="is_published" defaultValueBoolean="false" tableName="course"/>
-    </changeSet>
 </databaseChangeLog>
