@@ -39,7 +39,7 @@ public interface UBNNewAccountOpeningAPIService {
     @GET("account-opening/message/gender")
     Call<AccountProductTypeResponse> getUBNGenders(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
-    @GET("account-opening/message/gender")
+    @GET("account-opening/message/status")
     Call<AccountProductTypeResponse> getMaritalStatus(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
     @GET("account-opening/account/customer/type")
