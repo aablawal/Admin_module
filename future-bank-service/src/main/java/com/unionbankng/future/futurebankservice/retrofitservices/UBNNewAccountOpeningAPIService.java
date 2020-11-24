@@ -1,6 +1,7 @@
 package com.unionbankng.future.futurebankservice.retrofitservices;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;
@@ -65,7 +66,7 @@ public interface UBNNewAccountOpeningAPIService {
     @Multipart
     @POST("account-opening/document/upload")
     Call<UBNGenericResponse> uploadDocumentForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
-                                                      @Query("recordId") Long recordId,@Query("type") String type,@Part("file") RequestBody file);
+                                                      @Query("recordId") Long recordId,@Query("type") String type,@Part() MultipartBody.Part file);
 
     @POST("account-opening/document/submit")
     Call<UBNGenericResponse> submitDocumentsForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,

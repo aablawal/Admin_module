@@ -4,6 +4,7 @@ import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.retrofitservices.UBNNewAccountOpeningAPIService;
 import com.unionbankng.future.futurebankservice.util.UnsafeOkHttpClient;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.slf4j.Logger;
@@ -308,15 +309,19 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         logger.info("access token is : {}",response.getAccess_token());
 
+
         RequestBody requestFile =
-                RequestBody.create(
-                        MediaType.get(file.getContentType()),
+                RequestBody.create(MediaType.get(file.getContentType()),
                         file.getBytes()
                 );
 
+        MultipartBody.Part fileData =
+                MultipartBody.Part.createFormData("file", file.getOriginalFilename(), requestFile);
+
+
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.uploadDocumentForAccount(
-                authorization,"01",recordId,type,requestFile).execute();
+                authorization,"01",recordId,type,fileData).execute();
 
     }
 
