@@ -29,6 +29,8 @@ public class CustomerBankAccount implements Serializable {
     private String userUUID;
     @Enumerated
     private AccountStatus accountStatus;
+    @Column(nullable = false)
+    private String accountName;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

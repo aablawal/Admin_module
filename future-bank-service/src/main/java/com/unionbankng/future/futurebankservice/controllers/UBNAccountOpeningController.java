@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -344,7 +345,7 @@ public class UBNAccountOpeningController {
 
     @PostMapping("/v1/ubn_account_opening/complete_account_opening")
     public ResponseEntity<APIResponse<UBNCompleteAccountPaymentResponse>> completeUBNAccountCreation(
-            @RequestBody CompleteUBNAccountCreationRequest request, @ApiIgnore OAuth2Authentication authentication
+            @RequestBody @Valid  CompleteUBNAccountCreationRequest request, @ApiIgnore OAuth2Authentication authentication
     ) throws IOException {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
@@ -361,6 +362,7 @@ public class UBNAccountOpeningController {
 
         CustomerBankAccount customerBankAccount = new CustomerBankAccount();
         customerBankAccount.setAccountNumber(accNumber);
+        customerBankAccount.setAccountName(request.getAccountName());
         customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
         customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
         customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
