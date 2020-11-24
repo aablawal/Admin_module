@@ -41,7 +41,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	               .authorities ("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
 	               .scopes ("read", "write")
 	               .autoApprove (true)     
-	               .secret (passwordEncoder. encode ("password")).and().withClient ("discourse-client")
+	               .secret (passwordEncoder. encode ("password")).redirectUris("http://localhost:4200").and().withClient ("discourse-client")
 			   .authorizedGrantTypes ("password", "authorization_code", "refresh_token", "implicit")
 			   .authorities ("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
 			   .scopes ("read", "write")
