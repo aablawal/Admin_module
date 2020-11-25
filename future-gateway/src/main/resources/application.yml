@@ -24,38 +24,32 @@ ribbon:
 
 spring:
   profiles: development
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8081/eureka}
+
 zuul:
   sensitiveHeaders:
   routes:
     authorization-server:
       path: /authserv/**
-      service-id: authorization-server
+      url: http://localhost:8082
     job-service:
       path: /jobserv/**
-      service-id: job-service
+      url: http://localhost:8086
     learn-service:
       path: /learnserv/**
-      service-id: learn-service
+      url: http://localhost:8087
     payment-service:
       path: /paymentserv/**
-      service-id: payment-service
+      url: http://localhost:8088
     bank-service:
       path: /bankserv/**
-      service-id: bank-service
+      url: http://localhost:8089
 
 
 
 ---
 spring:
   profiles: staging
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
+
 zuul:
   sensitiveHeaders:
   routes:
@@ -78,10 +72,7 @@ zuul:
 ---
 spring:
   profiles: production
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI:http://future-eureka-server/eureka}
+
 zuul:
   sensitiveHeaders:
   routes:
