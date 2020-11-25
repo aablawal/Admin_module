@@ -25,6 +25,8 @@ public class CustomerBankAccount implements Serializable {
     @Column(nullable = false,unique = true)
     private String accountNumber;
     private Long customerUBNId;
+    private String branchCode;
+    private String accountType;
     @Column(nullable = false)
     private String userUUID;
     @Enumerated

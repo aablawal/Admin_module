@@ -24,6 +24,8 @@ public class CustomerBankAccountTest extends AbstractTest {
         customerBankAccount.setUserUUID("33333-44444-444");
         customerBankAccount.setCustomerUBNId(1l);
         customerBankAccount.setAccountName("Okeme Baba");
+        customerBankAccount.setBranchCode("000");
+        customerBankAccount.setAccountType("SA_01");
         customerBankAccount.setAccountNumber("00222334444");
         customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
 
@@ -41,6 +43,8 @@ public class CustomerBankAccountTest extends AbstractTest {
         customerBankAccount.setUserUUID("33333-44444-444");
         customerBankAccount.setCustomerUBNId(2l);
         customerBankAccount.setAccountName("Okeme Baba");
+        customerBankAccount.setBranchCode("000");
+        customerBankAccount.setAccountType("SA_01");
         customerBankAccount.setAccountNumber("00222334434");
         customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
 
