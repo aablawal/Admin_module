@@ -255,7 +255,7 @@ public class UBNAccountOpeningController {
     }
 
     @PostMapping(value = "/v1/ubn_account_opening/upload_document/{type}/{recordId}",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<UBNGenericResponse>> uploadDocumentForAccount(@PathVariable String type,
+    public ResponseEntity<APIResponse<UBNGenericResponse>> uploadDocumentForAccount(@PathVariable Integer type,
                                                                                             @PathVariable Long recordId, @RequestPart("file") MultipartFile file) throws IOException {
 
         //determine existing or non existing customer

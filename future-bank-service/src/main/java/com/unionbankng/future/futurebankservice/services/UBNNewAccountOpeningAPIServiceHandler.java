@@ -298,7 +298,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     }
 
-    public Response<UBNGenericResponse> uploadDocumentForAccount(Long recordId, String type, MultipartFile file) throws IOException {
+    public Response<UBNGenericResponse> uploadDocumentForAccount(Long recordId, Integer type, MultipartFile file) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 

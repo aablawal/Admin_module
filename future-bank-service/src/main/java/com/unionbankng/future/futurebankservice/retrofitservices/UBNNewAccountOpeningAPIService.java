@@ -66,7 +66,7 @@ public interface UBNNewAccountOpeningAPIService {
     @Multipart
     @POST("account-opening/document/upload")
     Call<UBNGenericResponse> uploadDocumentForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
-                                                      @Query("recordId") Long recordId,@Query("type") String type,@Part() MultipartBody.Part file);
+                                                      @Query("recordId") Long recordId,@Query("type") Integer type,@Part() MultipartBody.Part file);
 
     @POST("account-opening/document/submit")
     Call<UBNGenericResponse> submitDocumentsForAccount(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
