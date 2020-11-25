@@ -254,7 +254,7 @@ public class UBNAccountOpeningController {
 
     }
 
-    @GetMapping(value = "/v1/ubn_account_opening/upload_document",consumes = { "multipart/form-data" })
+    @PostMapping(value = "/v1/ubn_account_opening/upload_document",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<UBNGenericResponse>> uploadDocumentForAccount(@RequestParam String type,
                                                                                             @RequestParam Long  recordId, @RequestPart("file") MultipartFile file) throws IOException {
 
