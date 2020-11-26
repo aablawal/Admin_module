@@ -312,11 +312,11 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         RequestBody requestFile =
                 RequestBody.create(MediaType.get(file.getContentType()),
-                        file.getInputStream().readAllBytes()
+                        file.getBytes()
                 );
 
         MultipartBody.Part fileData =
-                MultipartBody.Part.createFormData("file", file.getOriginalFilename(), requestFile);
+                MultipartBody.Part.createFormData("stream", file.getOriginalFilename(), requestFile);
 
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
