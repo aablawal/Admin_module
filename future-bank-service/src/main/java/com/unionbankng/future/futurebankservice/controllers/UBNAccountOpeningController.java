@@ -1,6 +1,7 @@
 package com.unionbankng.future.futurebankservice.controllers;
 
 
+import com.google.common.base.CharMatcher;
 import com.unionbankng.future.futurebankservice.entities.CustomerBankAccount;
 import com.unionbankng.future.futurebankservice.enums.AccountStatus;
 import com.unionbankng.future.futurebankservice.pojos.*;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
@@ -356,8 +358,8 @@ public class UBNAccountOpeningController {
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
         UBNCompleteAccountPaymentResponse response = responseResponse.body();
-        //update customer details with account number
-        String accNumber = response.getData().split(":")[1].strip().replace("\"","");
+        //extract account number from response data
+        String accNumber = CharMatcher.inRange('0', '9').retainFrom(response.getData());
         logger.info("Account Number is :{}",accNumber);
 
         CustomerBankAccount customerBankAccount = new CustomerBankAccount();
