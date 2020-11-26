@@ -1,6 +1,4 @@
 package com.unionbankng.future.futurejobservice.pojos;
-
-
 import lombok.Builder;
 import lombok.Data;
 

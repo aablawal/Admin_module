@@ -1,48 +1,35 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet author="ACER NITRO 5 (generated)" id="1605865713516-2">
-        <createTable tableName="jobs">
+    <changeSet author="ACER NITRO 5 (generated)" id="1606278019563-2">
+        <createTable tableName="job_milestones">
             <column autoIncrement="true" name="id" type="bigint">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="jobsPK"/>
-            </column>
-            <column name="assessment" type="varchar(255)"/>
-            <column name="budget" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="categories" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="job_milestonesPK"/>
             </column>
             <column name="created_at" type="date"/>
             <column name="description" type="varchar (max)">
                 <constraints nullable="false"/>
             </column>
-            <column name="duration" type="varchar(255)"/>
-            <column name="goal" type="varchar (max)">
+            <column name="employer_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="interview" type="bit">
+            <column name="end_date" type="date"/>
+            <column name="job_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_date" type="date"/>
-            <column name="nda_files" type="varchar (max)"/>
-            <column name="oid" type="bigint">
+            <column name="proposal_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="payment_terms" type="varchar(255)"/>
-            <column name="publish_date" type="date"/>
-            <column name="qualification" type="varchar(255)"/>
-            <column name="sample_product" type="varchar(255)"/>
-            <column name="skills_required" type="varchar(255)"/>
-            <column name="status" type="varchar(3)">
+            <column name="amount" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="supporting_files" type="varchar(255)"/>
-            <column name="team" type="varchar(255)"/>
-            <column name="timeline" type="varchar(255)"/>
+            <column name="start_date" type="date"/>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="title" type="varchar (max)">
                 <constraints nullable="false"/>
             </column>
-            <column name="type" type="varchar(255)">
+            <column name="user_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
         </createTable>

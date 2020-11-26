@@ -4,19 +4,22 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Table(name="escrow_transactions")
+@Table(name="job_contracts")
 @Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EscrowRequest {
+public class JobContract {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     Long Id;
     @NotNull
+    Long proposalId;
+    @NotNull
+    Long jobId;
     int appId;
     @NotNull
     String referenceId;
@@ -25,26 +28,31 @@ public class EscrowRequest {
     @NotNull
     int amount;
     @NotNull
+    int clearedAmount;
+    @NotNull
     String country;
+    String workMethod;
     @NotNull
     String currency;
-    @NotNull
     String customerEmail;
-    @NotNull
     String merchantEmail;
     @NotNull
     String merchantAccountNumber;
+    @NotNull
+    String customerAccountNumber;
+    @NotNull
     String merchantBankCode;
+    @NotNull
+    String customerBankCode;
     @NotNull
     String customerName;
     @NotNull
     String merchantName;
-    @NotNull
     String customerPhone;
-    @NotNull
     String merchantPhone;
     @NotNull
     int peppfees;
+    String transferReferenceId;
     @Temporal(TemporalType.DATE)
     Date startDate;
     @Temporal(TemporalType.DATE)
@@ -53,20 +61,23 @@ public class EscrowRequest {
     Date createdAt;
     @Temporal(TemporalType.DATE)
     Date lastModifiedDate;
-    String transferReferenceId;
 
-    public EscrowRequest(EscrowRequest request) {
-        this.Id =  request.Id;
+    public JobContract(JobContract request) {
+        this.proposalId= request.proposalId;
+        this.jobId=request.jobId;
         this.appId = request.appId;
         this.referenceId =  request.referenceId;
         this.userEmail =  request.userEmail;
         this.amount =  request.amount;
+        this.clearedAmount=request.clearedAmount;
         this.country =  request.country;
         this.currency =  request.currency;
         this.customerEmail =  request.customerEmail;
         this.merchantEmail =  request.merchantEmail;
         this.merchantAccountNumber =  request.merchantAccountNumber;
+        this.customerAccountNumber=request.customerAccountNumber;
         this.merchantBankCode =  request.merchantBankCode;
+        this.customerBankCode=request.customerBankCode;
         this.customerName =  request.customerName;
         this.merchantName =  request.merchantName;
         this.customerPhone =  request.customerPhone;

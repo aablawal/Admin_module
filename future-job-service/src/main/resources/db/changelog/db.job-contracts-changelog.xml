@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="ACER NITRO 5 (generated)" id="1605865713516-1">
+        <createTable tableName="job_contracts">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="job_contractsPK"/>
+            </column>
+            <column name="amount" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cleared_amount" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="work_method" type="varchar(255)"/>
+            <column name="created_at" type="date"/>
+            <column name="currency" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_account_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_bank_code" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_email" type="varchar(255)"/>
+            <column name="customer_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_phone" type="varchar(255)"/>
+            <column name="end_date" type="date"/>
+            <column name="job_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="date"/>
+            <column name="merchant_account_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="merchant_bank_code" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="merchant_email" type="varchar(255)"/>
+            <column name="merchant_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="merchant_phone" type="varchar(255)"/>
+            <column name="peppfees" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proposal_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reference_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="date"/>
+            <column name="transfer_reference_id" type="varchar(255)"/>
+            <column name="user_email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
