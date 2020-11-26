@@ -347,11 +347,12 @@ public class UBNAccountOpeningController {
     }
 
     @PostMapping("/v1/ubn_account_opening/complete_account_opening")
-    public ResponseEntity<APIResponse<UBNCompleteAccountPaymentResponse>> completeUBNAccountCreation(
+    public ResponseEntity<APIResponse<UBNAccountDataResponse>> completeUBNAccountCreation(
             @RequestBody @Valid CompleteUBNAccountCreationRequest request, @ApiIgnore OAuth2Authentication authentication
     ) throws IOException {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
         //create ubn account
         UBNAccountCreationRequest ubnAccountCreationRequest = new  UBNAccountCreationRequest();
         ubnAccountCreationRequest.setCustomerRecordId(request.getCustomerRecordId());
@@ -363,31 +364,33 @@ public class UBNAccountOpeningController {
         Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
                 .completeUBNAccountCreation(ubnAccountCreationRequest);
 
-        if(!responseResponse.isSuccessful())
+        if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
-        UBNCompleteAccountPaymentResponse response = responseResponse.body();
+        Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
+                .getUBNAccountDetails(request.getCustomerRecordId());
 
-        if(!response.getStatusCode().equals("00"))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse<>("An error occurred", false, response));
+        if(!dataResponseResponse.isSuccessful())
+            return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
 
-        logger.info("Response  is :{}",response);
-        //extract account number from response data
-        String accNumber = CharMatcher.inRange('0', '9').retainFrom(response.getData());
-        logger.info("Account Number is :{}",accNumber);
+
+        if(!dataResponseResponse.body().getStatusCode().equals("00"))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse<>("An error occurred", false, dataResponseResponse.body()));
+
+        logger.info("Response  is :{}",dataResponseResponse);
 
         CustomerBankAccount customerBankAccount = new CustomerBankAccount();
-        customerBankAccount.setAccountNumber(accNumber);
-        customerBankAccount.setAccountType(request.getAccountType());
+        customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
+        customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
         customerBankAccount.setBranchCode(request.getBranchCode());
-        customerBankAccount.setAccountName(request.getAccountName());
+        customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
         customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
         customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
         customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
 
         customerBankAccountService.save(customerBankAccount);
 
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
 
     }
 

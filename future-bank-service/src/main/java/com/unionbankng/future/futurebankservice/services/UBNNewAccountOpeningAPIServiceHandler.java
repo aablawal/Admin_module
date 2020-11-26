@@ -415,6 +415,24 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     }
 
+    public Response<UBNAccountDataResponse> getUBNAccountDetails(Long accountId) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+
+        String authorization = String.format("Bearer %s",response.getAccess_token());
+        return ubnAccountAPIService.getUBNAccountDetails(
+                authorization,"01",accountId).execute();
+
+    }
+
 
 
 
