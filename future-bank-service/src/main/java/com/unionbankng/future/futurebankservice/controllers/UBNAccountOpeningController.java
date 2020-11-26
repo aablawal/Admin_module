@@ -11,6 +11,7 @@ import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.util.StringUtils;
@@ -351,13 +352,24 @@ public class UBNAccountOpeningController {
     ) throws IOException {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        //determine existing or non existing customer
-        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(request);
+        //create ubn account
+        UBNAccountCreationRequest ubnAccountCreationRequest = new  UBNAccountCreationRequest();
+        ubnAccountCreationRequest.setCustomerRecordId(request.getCustomerRecordId());
+        ubnAccountCreationRequest.setCustomerType(request.getCustomerType());
+        ubnAccountCreationRequest.setIntroducerTag(request.getIntroducerTag());
+
+        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
+                .completeUBNAccountCreation(ubnAccountCreationRequest);
 
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
         UBNCompleteAccountPaymentResponse response = responseResponse.body();
+
+        if(!response.getStatusCode().equals("00"))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse<>("An error occurred", false, response));
+
+        logger.info("Response  is :{}",response);
         //extract account number from response data
         String accNumber = CharMatcher.inRange('0', '9').retainFrom(response.getData());
         logger.info("Account Number is :{}",accNumber);
