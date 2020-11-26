@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import java.util.Map;
 
@@ -24,8 +25,11 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     public Authentication authenticate(Authentication auth)
             throws AuthenticationException {
 
-        Map<String, String> map = (Map<String,String>)auth.getDetails();
-        String thirdPartyOauthToken = map.get("oauth_token");
+        String thirdPartyOauthToken = "";
+        if (!(auth.getDetails() instanceof WebAuthenticationDetails)) {
+            Map<String, String> map = (Map<String, String>) auth.getDetails();
+            thirdPartyOauthToken = map.get("oauth_token");
+        }
 
         this.logger.info(String.format("token is : %s",thirdPartyOauthToken));
         String username = auth.getPrincipal() == null ? "NONE_PROVIDED" : auth.getName();

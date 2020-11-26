@@ -1,7 +1,7 @@
 package com.unionbankng.future.futureutilityservice;
 
-import com.google.protobuf.ByteString;
 import com.unionbankng.future.futureutilityservice.grpcserver.*;
+import com.unionbankng.future.futureutilityservice.pojos.StreamingLocatorResponse;
 import com.unionbankng.future.futureutilityservice.services.AzureMediaServiceService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

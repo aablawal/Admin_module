@@ -60,6 +60,7 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,userByTokenResponse));
     }
 
+
     @PostMapping(value = "/v1/users/{userId}/update_profile")
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody PersonalInfoUpdateRequest request) throws IOException {
 

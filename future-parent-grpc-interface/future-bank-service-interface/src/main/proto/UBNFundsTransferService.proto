@@ -1,0 +1,46 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.unionbankng.future.futurebankservice.grpc;
+
+message UBNFundsTransferRequest {
+  double amount =1;
+  string creditAccountBankCode = 2;
+  string creditAccountBranchCode = 3;
+  string creditAccountName = 4;
+  string creditAccountNumber = 5;
+  string creditAccountType = 6;
+  string creditNarration = 7;
+  string currency = 8;
+  string debitAccountBranchCode = 9;
+  string debitAccountName = 10;
+  string debitAccountNumber  = 11;
+  string debitAccountType = 12;
+  string debitInstrumentNumber = 13;
+  string debitNarration = 14;
+  string feeEntryMode = 15;
+  string initBranchCode = 16;
+  string paymentReference = 17;
+  string paymentTypeCode = 18;
+  string TEST22 = 19;
+  string valueDate = 20;
+  string channelCode = 21;
+  string beneficiaryBvn = 22;
+  string beneficiaryKycLevel = 23;
+  string senderBvn = 24;
+  string senderKycLevel = 25;
+  string nameEnquirySessionId = 26;
+  string ftSessionId = 27;
+  string transactionLocation = 28;
+}
+
+message UBNFundsTransferResponse {
+  string code = 1;
+  string message = 2;
+  string reference = 3;
+  string sessionId = 4;
+}
+
+
+service UBNFundsTransferService {
+    rpc transferFund(UBNFundsTransferRequest) returns (UBNFundsTransferResponse);
+}

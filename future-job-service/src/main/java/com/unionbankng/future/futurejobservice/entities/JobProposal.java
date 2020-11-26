@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
-@Table(name="applications")
+@Table(name="job_proposals")
 @Entity
 @Getter
 @Setter
@@ -34,6 +34,9 @@ public class JobProposal implements Serializable {
     public String preparedCurrency;
     public String supportingFiles;
     public Long bidAmount;
+    public Long  duration;
+    @Column(length = 50)
+    public String durationType;
     @Column(columnDefinition="TEXT")
     public String previousWorkLinks;
     @Column(columnDefinition="TEXT")
@@ -48,6 +51,10 @@ public class JobProposal implements Serializable {
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     public JobProposalStatus status;
+    @Temporal(TemporalType.DATE)
+    public Date startDate;
+    @Temporal(TemporalType.DATE)
+    public Date endDate;
     @Temporal(TemporalType.DATE)
     public Date lastModifiedDate;
     @Temporal(TemporalType.DATE)
@@ -71,6 +78,8 @@ public class JobProposal implements Serializable {
         this.accountNumber =application.accountNumber;
         this.accountNumber =application.accountNumber;
         this.status =application.status;
+        this.startDate =application.startDate;
+        this.endDate =application.endDate;
         this.lastModifiedDate =application.lastModifiedDate;
         this.createdAt =application.createdAt;
     }

@@ -44,6 +44,10 @@ public class Course implements Serializable {
     @ManyToMany
     private List<Instructor> instructors = new ArrayList<>();
     private String estimatedTimeToComplete;
+    private String accountNumber;
+    private String accountName;
+    @Column(columnDefinition="TEXT")
+    private String paymentTerms;
     @Column(nullable = false)
     private String creatorUUID;
     @Column(updatable = false)

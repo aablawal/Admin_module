@@ -1,13 +1,13 @@
 package com.unionbankng.future.paymentservice.utils;
 
 
-import javax.ws.rs.core.HttpHeaders;
 
 import com.unionbankng.future.paymentservice.pojos.VerifyTransactionResponse;
 import com.unionbankng.future.paymentservice.retrofitservices.PaystackService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;

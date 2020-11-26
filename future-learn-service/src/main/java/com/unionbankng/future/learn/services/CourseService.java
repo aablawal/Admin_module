@@ -104,6 +104,9 @@ public class CourseService {
         Course course = new Course();
         ArrayList<Instructor> instructors = new ArrayList<>();
 
+        if(request.getIsPaid() && (request.getAccountNumber() == null || request.getAccountName() == null))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account number and name can not be empty when the course is paid");
+
         //instructor
         if(request.getInstructors() != null)
         for (Instructor i : request.getInstructors()){

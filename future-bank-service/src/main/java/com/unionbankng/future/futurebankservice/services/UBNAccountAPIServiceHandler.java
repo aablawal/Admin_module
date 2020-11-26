@@ -1,8 +1,6 @@
 package com.unionbankng.future.futurebankservice.services;
 
-import com.unionbankng.future.futurebankservice.pojos.UBNAuthServerTokenResponse;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnRequest;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnResponse;
+import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.retrofitservices.UBNAccountAPIService;
 import com.unionbankng.future.futurebankservice.util.UnsafeOkHttpClient;
 import okhttp3.OkHttpClient;
@@ -78,6 +76,51 @@ public class UBNAccountAPIServiceHandler {
         logger.info("access token is : {}",response.getAccess_token());
 
         return ubnAccountAPIService.validateBVN(response.getAccess_token(),request).execute();
+
+    }
+
+    public Response<UBNCreateAccountResponse> openAccountForNewCustomer(UBNCreateAccountNewCustomerRequest request) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        return ubnAccountAPIService.openAccount(response.getAccess_token(),request).execute();
+
+    }
+
+    public Response<UBNCreateAccountResponse> openAccountForExistingCustomer(UBNOpenAccountExistingCustomerRequest request) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        return ubnAccountAPIService.openAccountExistingCustomer(response.getAccess_token(),request).execute();
+
+    }
+
+    public Response<UBNFundTransferResponse> transferFundsUBN(UBNFundTransferRequest request) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        return ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
 
     }
 

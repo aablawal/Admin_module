@@ -29,6 +29,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
 	   @Value("${sidekiq.jwt.signing_key}")
 	   private String jwtSigningKey;
+	   @Value("${sidekiq.oauth.redirect.url}")
+	   private String sidekiqRedirectURI;
+	   @Value("${discourse.oauth.redirect.uri}")
+	   private String discourseRedirectURI;
 	   private final AuthenticationManager authenticationManager;
 	   private final PasswordEncoder passwordEncoder;
 	   
@@ -41,7 +45,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	               .authorities ("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
 	               .scopes ("read", "write")
 	               .autoApprove (true)     
-	               .secret (passwordEncoder. encode ("password"));
+	               .secret (passwordEncoder. encode ("password")).redirectUris(sidekiqRedirectURI).and().withClient ("discourse-client")
+			   .authorizedGrantTypes ("password", "authorization_code", "refresh_token", "implicit")
+			   .authorities ("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
+			   .scopes ("read", "write")
+			   .autoApprove (true)
+			   .secret (passwordEncoder. encode ("password")).redirectUris(discourseRedirectURI);
 	   }
 	   
 	    @Override

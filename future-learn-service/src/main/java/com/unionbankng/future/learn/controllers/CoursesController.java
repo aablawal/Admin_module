@@ -13,9 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @RestController
@@ -46,8 +48,17 @@ public class CoursesController {
                 new APIResponse("Request successful",true,courses));
     }
 
+    @GetMapping("/v1/courses/{courseId}")
+    public ResponseEntity<APIResponse<Course>> findById(@PathVariable Long courseId){
+
+        Course course = courseService.findById(courseId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course Not Found"));
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,course));
+    }
+
     @GetMapping("/v1/courses")
-    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByInstructor(@RequestParam int page, @RequestParam int size){
+    public ResponseEntity<APIResponse<Page<Course>>> getAllCourses(@RequestParam int page, @RequestParam int size){
 
         Page<Course> courses = courseService.findAllByIsPublished(true,PageRequest.of(page,size));
 
@@ -68,13 +79,14 @@ public class CoursesController {
     }
 
     @PostMapping(value = "/v1/courses/{courseId}/upload_course_img",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Course>> uploadCourseImage(@Nullable @RequestPart("image") MultipartFile image,
+    public ResponseEntity<APIResponse<Course>> uploadCourseImage(@NotNull @RequestPart("image") MultipartFile image,
                                                                 @PathVariable Long courseId) throws IOException {
 
         Course course = courseService.updateCourseImg(image,courseId);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,course));
     }
+
 
     @PostMapping("/v1/courses/publish/{courseId}")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@PathVariable Long courseId,

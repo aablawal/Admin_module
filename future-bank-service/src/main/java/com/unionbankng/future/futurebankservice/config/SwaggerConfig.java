@@ -17,7 +17,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.OAS_30)
           .select()
           .paths(PathSelectors.any())
-          .apis(RequestHandlerSelectors.basePackage("com.unionbankng.future.learn.controllers"))
+          .apis(RequestHandlerSelectors.basePackage("com.unionbankng.future.futurebankservice.controllers"))
           .build().apiInfo(metaData());                                           
     }
     
