@@ -358,6 +358,8 @@ public class UBNAccountOpeningController {
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
         UBNCompleteAccountPaymentResponse response = responseResponse.body();
+
+        logger.info("Response  is :{}",response.getData());
         //extract account number from response data
         String accNumber = CharMatcher.inRange('0', '9').retainFrom(response.getData());
         logger.info("Account Number is :{}",accNumber);
