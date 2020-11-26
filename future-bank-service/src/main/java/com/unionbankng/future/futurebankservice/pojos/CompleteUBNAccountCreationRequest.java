@@ -14,4 +14,8 @@ public class CompleteUBNAccountCreationRequest{
     private String introducerTag;
     @NotNull
     private String accountName;
+    @NotNull
+    private String branchCode;
+    @NotNull
+    private String accountType ;
 }
