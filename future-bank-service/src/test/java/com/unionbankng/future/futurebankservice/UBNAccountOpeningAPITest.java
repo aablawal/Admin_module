@@ -161,22 +161,6 @@ public class UBNAccountOpeningAPITest extends AbstractTest {
 
     }
 
-    @Test
-    public void getDocumentTypesTest() throws IOException {
-
-
-        Response<AccountProductTypeResponse> response = ubnNewAccountOpeningAPIServiceHandler.getDocumentTypes("SA_008");
-
-        System.out.println(response.toString());
-        assertEquals(200,response.code());
-        assertEquals("00",response.body().getStatusCode());
-
-
-    }
-
-
-
-
 
 
 
