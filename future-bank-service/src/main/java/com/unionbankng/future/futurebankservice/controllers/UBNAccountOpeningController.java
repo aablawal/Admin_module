@@ -358,6 +358,8 @@ public class UBNAccountOpeningController {
         ubnAccountCreationRequest.setCustomerType(request.getCustomerType());
         ubnAccountCreationRequest.setIntroducerTag(request.getIntroducerTag());
 
+        logger.info("UBN account create request  is :{}",ubnAccountCreationRequest);
+
         Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
                 .completeUBNAccountCreation(ubnAccountCreationRequest);
 
