@@ -10,7 +10,7 @@ public class CompleteUBNAccountCreationRequest{
     private Long customerRecordId;
     @NotNull
     private String customerType;
-    @NotNull
+
     private String introducerTag;
     @NotNull
     private String accountName;
