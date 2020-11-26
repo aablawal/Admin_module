@@ -88,7 +88,7 @@ public interface UBNNewAccountOpeningAPIService {
 
     @POST("account-opening/account/add/account")
     Call<UBNCompleteAccountPaymentResponse> completeUBNAccountCreation(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
-                                                     @Body CompleteUBNAccountCreationRequest request);
+                                                     @Body UBNAccountCreationRequest request);
 
 
 

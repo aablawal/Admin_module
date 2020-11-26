@@ -352,8 +352,14 @@ public class UBNAccountOpeningController {
     ) throws IOException {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        //determine existing or non existing customer
-        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(request);
+        //create ubn account
+        UBNAccountCreationRequest ubnAccountCreationRequest = new  UBNAccountCreationRequest();
+        ubnAccountCreationRequest.setCustomerRecordId(request.getCustomerRecordId());
+        ubnAccountCreationRequest.setCustomerType(request.getCustomerType());
+        ubnAccountCreationRequest.setIntroducerTag(request.getIntroducerTag());
+
+        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
+                .completeUBNAccountCreation(ubnAccountCreationRequest);
 
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));

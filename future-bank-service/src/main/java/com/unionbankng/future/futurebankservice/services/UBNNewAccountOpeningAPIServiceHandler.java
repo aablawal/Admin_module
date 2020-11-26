@@ -397,7 +397,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     }
 
-    public Response<UBNCompleteAccountPaymentResponse> completeUBNAccountCreation(CompleteUBNAccountCreationRequest request) throws IOException {
+    public Response<UBNCompleteAccountPaymentResponse> completeUBNAccountCreation(UBNAccountCreationRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
