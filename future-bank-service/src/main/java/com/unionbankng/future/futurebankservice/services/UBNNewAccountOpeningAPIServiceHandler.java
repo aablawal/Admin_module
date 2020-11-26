@@ -312,7 +312,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         RequestBody requestFile =
                 RequestBody.create(MediaType.get(file.getContentType()),
-                        file.getBytes()
+                        file.getInputStream().readAllBytes()
                 );
 
         MultipartBody.Part fileData =
