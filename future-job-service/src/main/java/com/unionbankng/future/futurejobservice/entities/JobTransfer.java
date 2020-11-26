@@ -10,6 +10,7 @@ import java.util.Date;
 @Setter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class JobTransfer {
 
     @Id
@@ -49,6 +50,30 @@ public class JobTransfer {
     String paymentReference;
     @Temporal(TemporalType.DATE)
     Date createdAt;
+
+    public JobTransfer(JobTransfer transfer) {
+        this.id = transfer.id;
+        this.proposalId = transfer.proposalId;
+        this.userId =  transfer.userId;
+        this.employerId =  transfer.employerId;
+        this.jobId =  transfer.jobId;
+        this.amount =  transfer.amount;
+        this.creditAccountName =  transfer.creditAccountName;
+        this.creditAccountBankCode =  transfer.creditAccountBankCode;
+        this.creditAccountNumber =  transfer.creditAccountNumber;
+        this.creditNarration =  transfer.creditNarration;
+        this.creditAccountBranchCode =  transfer.creditAccountBranchCode;
+        this.debitAccountBranchCode =  transfer.debitAccountBranchCode;
+        this.creditAccountType =  transfer.creditAccountType;
+        this.currency =  transfer.currency;
+        this.debitAccountName =  transfer.debitAccountName;
+        this.debitAccountNumber =  transfer.debitAccountNumber;
+        this.debitNarration =  transfer.debitNarration;
+        this.debitAccountType =  transfer.debitAccountType;
+        this.initBranchCode =  transfer.initBranchCode;
+        this.paymentReference =  transfer.paymentReference;
+        this.createdAt =  transfer.createdAt;
+    }
 
     @PrePersist
     private void setCreatedAt() {

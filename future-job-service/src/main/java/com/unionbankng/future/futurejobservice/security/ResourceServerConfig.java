@@ -23,7 +23,6 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Map;
 
-@EnableWebSecurity
 @EnableResourceServer
 @Configuration
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
