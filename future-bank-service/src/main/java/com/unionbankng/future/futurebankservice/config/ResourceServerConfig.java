@@ -80,10 +80,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	@Bean
 	public FilterRegistrationBean<CorsFilter> corFilter() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		List<String> allowedOriginPatterns = Arrays.asList("localhost:4200","sidekiq.azurewebsites.net");
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.setAllowCredentials(true);
-		corsConfiguration.setAllowedOrigins(allowedOriginPatterns);
+		corsConfiguration.addAllowedOrigin("*");
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.setMaxAge(3600L);
