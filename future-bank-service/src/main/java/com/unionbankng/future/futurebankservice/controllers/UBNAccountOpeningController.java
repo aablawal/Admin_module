@@ -261,7 +261,8 @@ public class UBNAccountOpeningController {
     public ResponseEntity<APIResponse<UBNGenericResponse>> uploadDocumentForAccount(@PathVariable Integer type,
                                                                                             @PathVariable Long recordId, @RequestPart("file") MultipartFile file) throws IOException {
 
-        logger.info("file size is",file.getSize());
+        logger.info("file size is {}",file.getSize());
+        logger.info("file name is {}",file.getOriginalFilename());
         //determine existing or non existing customer
         Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.uploadDocumentForAccount(recordId,type,file);
 
