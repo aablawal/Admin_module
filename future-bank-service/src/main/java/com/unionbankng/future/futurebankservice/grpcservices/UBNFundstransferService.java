@@ -1,5 +1,4 @@
 package com.unionbankng.future.futurebankservice.grpcservices;
-
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferRequest;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferServiceGrpc;

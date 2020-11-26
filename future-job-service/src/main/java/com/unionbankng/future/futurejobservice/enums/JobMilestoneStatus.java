@@ -1,11 +1,10 @@
 package com.unionbankng.future.futurejobservice.enums;
 
-public enum JobProposalStatus {
+public enum JobMilestoneStatus {
     PE,
     AC,
-    CO,
-    WP,
-    IA,
     RE,
+    CO,
+    IA,
+    PA
 }
-
