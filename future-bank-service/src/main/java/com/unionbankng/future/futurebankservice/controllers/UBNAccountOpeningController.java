@@ -359,7 +359,7 @@ public class UBNAccountOpeningController {
 
         UBNCompleteAccountPaymentResponse response = responseResponse.body();
 
-        logger.info("Response  is :{}",response.getData());
+        logger.info("Response  is :{}",response);
         //extract account number from response data
         String accNumber = CharMatcher.inRange('0', '9').retainFrom(response.getData());
         logger.info("Account Number is :{}",accNumber);
