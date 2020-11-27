@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,10 @@ public class UserService {
     @Cacheable(value = "user", key="#id")
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<List<User>> findUsersBySearch(String question){
+       return  userRepository .findUsersBySearch(question);
     }
 
     @Cacheable(value = "user", key="#uuId")
