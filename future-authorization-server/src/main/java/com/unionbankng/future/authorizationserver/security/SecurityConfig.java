@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().loginPage("/login")
 
                 .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and().oauth2Login().and()
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and().oauth2Login().loginPage("/login").and()
 
                 .httpBasic().disable()
                 .anonymous().disable();

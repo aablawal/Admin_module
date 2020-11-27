@@ -109,6 +109,18 @@ input {
     transition: background-color 0.3s;
 }
 
+a {
+    background-image: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    margin: 0;
+    outline: 0;
+    padding: 0;
+    -webkit-transition: background-color 0.3s;
+    transition: background-color 0.3s;
+}
+
 input[type='submit'] {
     cursor: pointer;
 }
@@ -190,6 +202,17 @@ input[type='submit'] {
     color: #eee;
     font-weight: 700;
     text-transform: uppercase;
+}
+
+.login a {
+    background-color: #277cea;
+    color: #eee;
+    font-weight: 700;
+    width: 100%;
+    text-transform: uppercase;
+    border-radius: 0.25rem;
+    padding: 16px;
+    padding: 1rem;
 }
 
 .login input[type='submit']:focus,
