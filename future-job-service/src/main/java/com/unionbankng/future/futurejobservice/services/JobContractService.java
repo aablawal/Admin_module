@@ -2,8 +2,6 @@ package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferRequest;
-import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.*;
 import com.unionbankng.future.futurejobservice.repositories.*;
@@ -30,8 +28,7 @@ public class JobContractService implements Serializable {
     private int  appId;
     @Value("${sidekiq.escrow.token}")
     private String token;
-    @Value("${sidekiq.escrow.baseUrl}")
-    private String baseURL;
+    private String baseURL="https://pepperest.com/EscrowService/api/Escrow";
 
 
     @Autowired
