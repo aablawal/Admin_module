@@ -29,10 +29,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .formLogin()
+                .formLogin().loginPage("/login")
 
                 .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and().oauth2Login().and()
 
                 .httpBasic().disable()
                 .anonymous().disable();
