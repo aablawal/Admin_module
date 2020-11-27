@@ -19,6 +19,10 @@ public class CustomerBankAccountService {
         return customerBankAccountRepository.save(customerBankAccount);
     }
 
+    public Boolean existsByAccountNumber(String accountNumber){
+        return customerBankAccountRepository.existsByAccountNumber(accountNumber);
+    }
+
     public Optional<CustomerBankAccount> findById(Long id){
         return customerBankAccountRepository.findById(id);
     }
