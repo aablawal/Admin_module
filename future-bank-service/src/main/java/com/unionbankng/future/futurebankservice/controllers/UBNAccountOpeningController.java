@@ -1,20 +1,23 @@
 package com.unionbankng.future.futurebankservice.controllers;
 
 
-import com.google.common.base.CharMatcher;
 import com.unionbankng.future.futurebankservice.entities.CustomerBankAccount;
 import com.unionbankng.future.futurebankservice.enums.AccountStatus;
+import com.unionbankng.future.futurebankservice.enums.RecipientType;
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.CustomerBankAccountService;
 import com.unionbankng.future.futurebankservice.services.UBNNewAccountOpeningAPIServiceHandler;
+import com.unionbankng.future.futurebankservice.util.EmailSender;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
@@ -22,6 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +36,11 @@ public class UBNAccountOpeningController {
 
     private final UBNNewAccountOpeningAPIServiceHandler ubnNewAccountOpeningAPIServiceHandler;
     private final CustomerBankAccountService customerBankAccountService;
+    private final MessageSource messageSource;
+    private final EmailSender emailSender;
+
+    @Value("${email.sender}")
+    private String emailSenderAddress;
 
     @GetMapping("/v1/ubn_account_opening/get_supported_id_types")
     public ResponseEntity<APIResponse<AccountIdTypesResponse>> getSupportedIdTypesForAccount() throws IOException {
@@ -391,6 +400,16 @@ public class UBNAccountOpeningController {
         customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
 
         customerBankAccountService.save(customerBankAccount);
+
+        logger.info("Sending confirmation to {}", jwtUserDetail.getUserFullName());
+        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
+                dataResponseResponse.body().getData().getAccountName(),dataResponseResponse.body().getData().getAccountNumber(),dataResponseResponse.body().getData().getAccountType()}
+                , LocaleContextHolder.getLocale())
+        ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Bank Account Created")
+                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
+                        .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
+
+        emailSender.sendEmail(emailBody);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
 
