@@ -57,7 +57,7 @@ public class UsersController {
 
     @GetMapping("/v1/users/get_details_with_token")
     public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore OAuth2Authentication auth) {
-
+        System.out.println(auth.getName());
         User user =  userService.findByEmail(auth.getName())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 

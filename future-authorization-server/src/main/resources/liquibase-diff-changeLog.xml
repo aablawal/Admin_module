@@ -1,9 +1,1 @@
-<?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet author="chokeme (generated)" id="1604581646731-1">
-        <addUniqueConstraint columnNames="phone_number" constraintName="UC_APP_USERPHONE_NUMBER_COL" tableName="app_user"/>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1604581686734-1">
-        <addUniqueConstraint columnNames="phone_number" constraintName="UC_APP_USERPHONE_NUMBER_COL" tableName="app_user"/>
-    </changeSet>
-</databaseChangeLog>
+

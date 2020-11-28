@@ -46,7 +46,7 @@ public class User implements Serializable {
     private String phoneNumber;
     @Column(length = 12)
     private String accountNumber;
-    private String address;
+    private String userAddress;
     @Column(length = 3)
     private String country;
     @Column(length = 50)
@@ -61,7 +61,7 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+    private Date dateUpdated;
 
     public User(User user){
         this.isEnabled = user.getIsEnabled();
@@ -83,7 +83,7 @@ public class User implements Serializable {
 
     @PreUpdate
     private void setUpdatedAt() {
-        updatedAt = new Date();
+        dateUpdated = new Date();
     }
 
     @Override

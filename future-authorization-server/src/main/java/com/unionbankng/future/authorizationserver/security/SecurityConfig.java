@@ -1,5 +1,6 @@
 package com.unionbankng.future.authorizationserver.security;
 
+import com.unionbankng.future.authorizationserver.config.LemonOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -25,17 +26,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final FutureDAOUserDetailsService futureDAOUserDetailsService;
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
+        LemonOAuth2UserService lemonOAuth2UserService = new LemonOAuth2UserService(futureDAOUserDetailsService);
         http
-                .formLogin().loginPage("/login")
-
-                .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and().oauth2Login().loginPage("/login").and()
-
-                .httpBasic().disable()
-                .anonymous().disable();
+                .formLogin().loginPage("/login").and().httpBasic().disable()
+                .anonymous().disable().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and().oauth2Login().loginPage("/login").userInfoEndpoint()
+                .userService(lemonOAuth2UserService).oidcUserService(new LemonOidcUserService(lemonOAuth2UserService));
     }
 
     @Bean
