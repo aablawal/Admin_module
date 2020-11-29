@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.unionbankng.future.futurejobservice.pojos.User;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import java.sql.*;
 
 @Service
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserService {
 
     @Value("${sidekiq.auth.database.url}")

@@ -62,8 +62,10 @@ public class JobProposalService  implements Serializable {
     }
 
     public Model findProposalById(Long id,Model model) {
+
         JobProposal proposal = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Proposal Available"));
         if (proposal != null)
+
             return appService.getProposal(proposal, model);
         else
             return null;
@@ -71,7 +73,8 @@ public class JobProposalService  implements Serializable {
 
     public Model findProposalByUserId(Long jobId, Long userId,Model model) {
         JobProposal proposal = repository.findProposalByUserId(jobId, userId);
-        if (proposal != null)
+
+        if(proposal!=null)
             return appService.getProposal(proposal, model);
         else
             return null;
