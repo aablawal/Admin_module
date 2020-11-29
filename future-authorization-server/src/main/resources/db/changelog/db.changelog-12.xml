@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="chokeme (generated)" id="1606581665292-1">
+        <addColumn tableName="app_user">
+            <column name="date_updated" type="datetime2"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1606581665292-2">
+        <addColumn tableName="app_user">
+            <column name="user_address" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1606581665292-3">
+        <dropColumn columnName="address" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1606581665292-4">
+        <dropColumn columnName="updated_at" tableName="app_user"/>
+    </changeSet>
+</databaseChangeLog>

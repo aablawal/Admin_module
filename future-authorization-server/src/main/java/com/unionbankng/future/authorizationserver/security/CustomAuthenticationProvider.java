@@ -25,6 +25,8 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     public Authentication authenticate(Authentication auth)
             throws AuthenticationException {
 
+        this.logger.info(String.format("token is : %s","================================"));
+
         String thirdPartyOauthToken = "";
         if (!(auth.getDetails() instanceof WebAuthenticationDetails)) {
             Map<String, String> map = (Map<String, String>) auth.getDetails();

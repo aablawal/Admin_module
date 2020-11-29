@@ -93,7 +93,7 @@ public class UserService {
         if(request.getStateOfResidence() != null)
             user.setStateOfResidence(request.getStateOfResidence());
         if(request.getAddress() != null)
-            user.setAddress(request.getAddress());
+            user.setUserAddress(request.getAddress());
         if(request.getCountry() != null)
             user.setCountry(request.getCountry());
         if(request.getDateOfBirth() != null)

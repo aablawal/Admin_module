@@ -64,6 +64,7 @@ public class CourseService {
 
     public Page<Course> findAllWhereIamInstructor(OAuth2Authentication authentication, Pageable pageable){
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        System.out.println(jwtUserDetail.getUserUUID());
         Instructor instructor = instructorRepository.findByInstructorUUID(jwtUserDetail.getUserUUID())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course Not Found"));
 

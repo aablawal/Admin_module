@@ -390,6 +390,10 @@ public class UBNAccountOpeningController {
 
         logger.info("Response  is :{}",dataResponseResponse);
 
+        if(customerBankAccountService.existsByAccountNumber(dataResponseResponse.body().getData().getAccountNumber()))
+            return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
+                    "this account number, no new account was created", true, dataResponseResponse.body()));
+
         CustomerBankAccount customerBankAccount = new CustomerBankAccount();
         customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
         customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
