@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JobContractExtensionRepository extends JpaRepository<JobContractExtension,Long> {
 
-    @Query(value = "SELECT TOP(1) * FROM  job_contract_extension where proposal_id=:proposalId and job_id=:jobId order by created_at desc", nativeQuery = true)
+    @Query(value = "SELECT TOP(1) * FROM  job_contract_extension where proposal_id=:proposalId and job_id=:jobId and status='PE' order by created_at desc", nativeQuery = true)
     JobContractExtension findContractByProposalAndJobId(Long proposalId, Long jobId);
 
-    @Query(value = "SELECT TOP(1) * FROM  job_contract_extension where proposal_id=:proposalId and employer_id=:userId order by created_at desc", nativeQuery = true)
+    @Query(value = "SELECT TOP(1) * FROM  job_contract_extension where proposal_id=:proposalId and employer_id=:userId and status='PE' order by created_at desc", nativeQuery = true)
     JobContractExtension findContractByProposalAndUserId(Long proposalId, Long userId);
 }
