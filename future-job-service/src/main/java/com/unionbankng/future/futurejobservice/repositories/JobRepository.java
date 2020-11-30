@@ -7,9 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
+
 @Repository
 public interface JobRepository extends JpaRepository<Job,Long> {
 
+    Optional<Job> findJobByInvitationId(String invitationId);
     @Query(value = "SELECT * FROM jobs j where j.oid=:id and j.status not in('IA','CA') order by id desc", nativeQuery = true)
     Page<Job> findByOid(Pageable pageable, Long id);
 

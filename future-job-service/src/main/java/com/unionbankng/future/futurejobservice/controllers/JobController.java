@@ -27,10 +27,11 @@ public class JobController {
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
+                                              @RequestParam(value = "team", required=true) String teamData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
                                               @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles) throws IOException{
 
-        Job addedJob=service.addJob(jobData,supportingFiles,ndaFiles);
+        Job addedJob=service.addJob(jobData,teamData,supportingFiles,ndaFiles);
         if(addedJob!=null)
           return ResponseEntity.ok().body(new APIResponse("success",true,addedJob));
         else
@@ -77,6 +78,13 @@ public class JobController {
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobById(id,model)));
     }
+
+    @GetMapping("/v1/job/invitation/{invitationId}")
+    public ResponseEntity<APIResponse> getJobByInvitationId(@PathVariable String invitationId, Model model){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.getJobByInvitationId(invitationId,model)));
+    }
+
     @GetMapping("/v1/jobs/owner/{oid}")
     public ResponseEntity<APIResponse> getJobsByOwnerId(@PathVariable Long oid,@RequestParam int page, @RequestParam int size, Model model){
         return ResponseEntity.ok().body(

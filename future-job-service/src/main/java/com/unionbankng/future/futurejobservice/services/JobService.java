@@ -1,16 +1,10 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.futurejobservice.entities.Job;
-import com.unionbankng.future.futurejobservice.entities.JobNotification;
-import com.unionbankng.future.futurejobservice.entities.JobProjectSubmission;
-import com.unionbankng.future.futurejobservice.entities.JobProposal;
+import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.repositories.JobNotificationRepository;
-import com.unionbankng.future.futurejobservice.repositories.JobProjectSubmissionRepository;
-import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
-import com.unionbankng.future.futurejobservice.repositories.JobRepository;
+import com.unionbankng.future.futurejobservice.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,13 +26,15 @@ public class JobService {
     private final JobProjectSubmissionRepository jobProjectSubmissionRepository;
     private final JobNotificationRepository jobNotificationRepository;
     private  final FileStoreService fileStoreService;
+    private final JobTeamRepository teamRepository;
 
 
-    public Job addJob(String jobData,  MultipartFile[] supporting_files,  MultipartFile[] nda_files) throws IOException {
+    public Job addJob(String jobData, String teamData,  MultipartFile[] supporting_files,  MultipartFile[] nda_files) throws IOException {
         try {
             String supporting_file_names = null;
             String nda_file_names=null;
             Job job = new ObjectMapper().readValue(jobData, Job.class);
+            JobTeam team = new ObjectMapper().readValue(teamData,JobTeam.class);
             job.setStatus(JobStatus.AC);
 
             //save files if not null
@@ -54,7 +50,15 @@ public class JobService {
                 job.supportingFiles = supporting_file_names;
 
             Job savedJob=jobRepository.save(job);
-            return savedJob;
+            if(savedJob!=null) {
+                team.setStatus(JobStatus.AC);
+                team.setJobId(savedJob.id);
+                if(team.getSelectedTeam()!=null)
+                teamRepository.save(team);
+                return  savedJob;
+            }else {
+                return null;
+            }
 
         }catch ( Exception e){
             e.printStackTrace();
@@ -117,8 +121,15 @@ public class JobService {
         jobRepository.deleteById(id);
     }
 
+
+
     public Model findJobById(Long id, Model model) {
         Job job = jobRepository.findById(id).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+        return appService.getJob(job, model);
+    }
+
+    public Model getJobByInvitationId(String  invitationId, Model model) {
+        Job job = jobRepository.findJobByInvitationId(invitationId).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
         return appService.getJob(job, model);
     }
 
