@@ -47,4 +47,19 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1606715786304-4">
+        <addColumn tableName="jobs">
+            <column name="invitation_id" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1606718573928-3">
+        <addColumn tableName="jobs">
+            <column name="team_expertise_level" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1606718573928-4">
+        <addColumn tableName="jobs">
+            <column name="team_size" type="bigint"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

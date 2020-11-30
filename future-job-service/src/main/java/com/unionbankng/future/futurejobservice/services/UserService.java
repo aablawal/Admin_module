@@ -33,7 +33,7 @@ public class UserService {
                     user.setFullName(rs.getString("first_name")+" "+rs.getString("last_name"));
                     user.setAccountNumber(rs.getString("account_number"));
                     user.setUsername(rs.getString("username"));
-                    user.setAddress(rs.getString("address"));
+                    user.setAddress(rs.getString("user_address"));
                     user.setCountry(rs.getString("country"));
                     user.setEmail(rs.getString("email"));
                     user.setImg(rs.getString("img"));
