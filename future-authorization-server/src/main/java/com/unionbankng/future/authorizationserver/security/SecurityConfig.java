@@ -42,8 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .formLogin().loginPage("/login").and().httpBasic().disable()
                 .addFilterAfter(oAuth2ClientContextFilterFilter(), SecurityContextPersistenceFilter.class)
-                .anonymous().disable().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and().oauth2Login().loginPage("/login").userInfoEndpoint()
+                .anonymous().disable().oauth2Login().loginPage("/login").userInfoEndpoint()
                 .userService(lemonOAuth2UserService).oidcUserService(new LemonOidcUserService(lemonOAuth2UserService));
     }
 
