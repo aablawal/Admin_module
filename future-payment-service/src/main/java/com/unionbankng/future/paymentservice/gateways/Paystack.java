@@ -58,6 +58,8 @@ public class Paystack implements IPayment {
     @Override
     public ResponseEntity<String> completePayment(Object request) {
 
+        logger.info("Doing payments with paystack");
+
         PaystackTransaction transaction = (PaystackTransaction) request;
 
         //check for duplicate

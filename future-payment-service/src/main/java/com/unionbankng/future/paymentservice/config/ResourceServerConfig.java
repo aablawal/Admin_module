@@ -33,7 +33,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	public void configure(HttpSecurity http) throws Exception {
 
 		http.cors().and().requestMatchers().antMatchers("/api/**").and()
-				.authorizeRequests().antMatchers("/api/**").authenticated().antMatchers("/api/webhooks/**").permitAll();
+				.authorizeRequests().antMatchers("/api/**").authenticated().antMatchers("/api/webhooks/v1/paystack").permitAll();
 
 	}
 
