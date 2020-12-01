@@ -147,4 +147,12 @@ public class UserCourseService {
 
     }
 
+    public Boolean isUserEnrolledForCourse(OAuth2Authentication authentication, Long courseId) {
+
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
+        return existByUserUUIDAndCourseId(jwtUserDetail.getUserUUID(),courseId);
+
+
+    }
 }
