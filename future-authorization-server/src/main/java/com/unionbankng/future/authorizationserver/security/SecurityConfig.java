@@ -16,9 +16,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -33,8 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         LemonOAuth2UserService lemonOAuth2UserService = new LemonOAuth2UserService(futureDAOUserDetailsService);
         http
                 .formLogin().loginPage("/login").and().httpBasic().disable()
-                .anonymous().disable().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and().oauth2Login().loginPage("/login").userInfoEndpoint()
+                .addFilterAfter(oAuth2ClientContextFilterFilter(), SecurityContextPersistenceFilter.class)
+                .anonymous().disable().oauth2Login().loginPage("/login").userInfoEndpoint()
                 .userService(lemonOAuth2UserService).oidcUserService(new LemonOidcUserService(lemonOAuth2UserService));
     }
 
@@ -81,5 +89,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
 
     }
+
+    public Filter oAuth2ClientContextFilterFilter()
+    {
+        OAuth2ClientContextFilter filter = new OAuth2ClientContextFilter();
+        filter.setRedirectStrategy(new CustomRedirectStrategy());
+        return filter;
+    }
+
+    public class CustomRedirectStrategy extends DefaultRedirectStrategy {
+
+        @Override
+        public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
+            super.sendRedirect(request, response, url + "&additional_param=value");
+        }
+
+    }
+
 
 }

@@ -40,4 +40,13 @@ public class UserCourseController {
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,userCourse));
     }
+
+    @GetMapping("/v1/user_course/check_enrollment/{courseId}")
+    public ResponseEntity<APIResponse<Boolean>> isUserEnrolled(@ApiIgnore OAuth2Authentication authentication, @PathVariable Long courseId){
+
+        Boolean enrolled = userCourseService.isUserEnrolledForCourse(authentication,courseId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,enrolled));
+    }
 }

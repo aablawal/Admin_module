@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "api")
+@RequestMapping(path = "/api")
 public class ProfileSkillsController {
 
     private final ProfileSkillService profileSkillService;
