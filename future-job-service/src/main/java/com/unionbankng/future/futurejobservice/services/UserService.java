@@ -32,6 +32,7 @@ public class UserService {
                     user.setId(rs.getLong("id"));
                     user.setFullName(rs.getString("first_name")+" "+rs.getString("last_name"));
                     user.setAccountNumber(rs.getString("account_number"));
+                    user.setAccountName(rs.getString("account_name"));
                     user.setUsername(rs.getString("username"));
                     user.setAddress(rs.getString("user_address"));
                     user.setCountry(rs.getString("country"));
