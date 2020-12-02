@@ -1,8 +1,14 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
+import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
+import com.unionbankng.future.futurejobservice.enums.JobTeamStatus;
+import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +30,10 @@ public class JobProposalService  implements Serializable {
     private final AppService appService;
     private  final JobProposalRepository repository;
     private  final FileStoreService fileStoreService;
+    private final JobRepository jobRepository;
+    private final JobTeamDetailsRepository jobTeamDetailsRepository;
 
-    public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files){
+    public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files,  Model model){
         try {
             String supporting_file_names = null;
             JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
@@ -38,7 +46,32 @@ public class JobProposalService  implements Serializable {
             if (supporting_file_names != null)
                 application.supportingFiles = supporting_file_names;
 
-            return repository.save(application);
+            JobProposal proposal= repository.save(application);
+            if(proposal!=null) {
+                Job job = jobRepository.findById(proposal.jobId).orElse(null);
+                if (job != null) {
+                    if (job.type == JobType.TEAMS_PROJECT) {
+                        //calculate user founds
+                        int money = (int)(job.getBudget() / 100)*10;
+
+                        JobTeamDetails teamMember = new JobTeamDetails();
+                        teamMember.setAmount(proposal.bidAmount);
+                        teamMember.setJobId(proposal.jobId);
+                        teamMember.setProposalId(proposal.id);
+                        teamMember.setEmployerId(proposal.employerId);
+                        teamMember.setStatus(JobTeamStatus.PE);
+                        teamMember.setDescription(proposal.about);
+                        teamMember.setPercentage(Long.valueOf(10));
+                        teamMember.setAmount(Long.valueOf(money));
+                        jobTeamDetailsRepository.save(teamMember);
+                    }
+                    return  proposal;
+                }else{
+                    return  null;
+                }
+            }else{
+                return null;
+            }
 
         }catch ( Exception e){
             e.printStackTrace();

@@ -42,6 +42,7 @@ public class JobContractService implements Serializable {
     private final  JobMilestoneRepository jobMilestoneRepository;
     private  final FileStoreService fileStoreService;
     private final BankTransferService bankTransferService;
+    private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
 
 
     public HttpHeaders getHeaders(){
@@ -168,6 +169,16 @@ public class JobContractService implements Serializable {
                      job.setStatus(JobStatus.WP);
                      job.setLastModifiedDate(new Date());
                      jobRepository.save(job);
+
+                     if(job.getType()==JobType.TEAMS_PROJECT) {
+                         JobTeamDetails teamMember = jobTeamDetailsRepository.findByProposalId(proposal.id);
+                         if (teamMember != null) {
+                             teamMember.setStatus(JobTeamStatus.AC);
+                             teamMember.setStartDate(new Date());
+                             teamMember.setEndDate(c.getTime());
+                             jobTeamDetailsRepository.save(teamMember);
+                         }
+                     }
                  }
                 jobProposalRepository.save(proposal);
                 return jobContractRepository.save(contract);

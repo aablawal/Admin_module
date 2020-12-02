@@ -48,6 +48,8 @@ public class JobProposal implements Serializable {
     public String comment;
     public String accountNumber;
     public String accountName;
+    public String accountType;
+    public String branchCode;
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     public JobProposalStatus status;
@@ -77,6 +79,8 @@ public class JobProposal implements Serializable {
         this.comment =application.comment;
         this.accountNumber =application.accountNumber;
         this.accountNumber =application.accountNumber;
+        this.branchCode=application.branchCode;
+        this.accountType=application.accountType;
         this.status =application.status;
         this.startDate =application.startDate;
         this.endDate =application.endDate;

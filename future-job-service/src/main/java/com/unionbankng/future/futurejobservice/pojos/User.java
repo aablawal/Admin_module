@@ -15,10 +15,10 @@ public class User {
     private String email;
     private String phoneNumber;
     private String accountNumber;
+    private String accountName;
     private String address;
     private String country;
     private String stateOfResidence;
     private Boolean isEnabled;
     private String createdAt;
-
 }

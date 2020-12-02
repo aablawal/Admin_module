@@ -2,6 +2,8 @@ package com.unionbankng.future.futurejobservice.controllers;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
+import com.unionbankng.future.futurejobservice.pojos.EmailMessage;
+import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +26,7 @@ public class JobController {
         response.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS,DELETE,PUT");
     }
     private final JobService service;
+    private final EmailService emailService;
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
@@ -110,6 +113,17 @@ public class JobController {
     public ResponseEntity<APIResponse<Model>> getAnyJob(@RequestParam int page, @RequestParam int size, Model model){
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.getJobs(PageRequest.of(page,size), model)));
+    }
+
+    @GetMapping("/v1/test")
+    public ResponseEntity<APIResponse> test(EmailMessage message){
+
+        message.setBody("Hello");
+        message.setRecipient("net.rabiualiyu@gmail.com");
+        message.setSubject("This is the subject");
+        emailService.sendEmail(message);
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,"Message Sent"));
     }
 
 }
