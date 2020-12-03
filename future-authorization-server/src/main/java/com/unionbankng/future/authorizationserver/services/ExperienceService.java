@@ -30,6 +30,7 @@ public class ExperienceService {
         return experienceRepository.findByProfileId(profileId,sort);
     }
 
+    @CacheEvict(value = "experiences", allEntries = true)
     public Experience save (Experience experience){
         return experienceRepository.save(experience);
     }
