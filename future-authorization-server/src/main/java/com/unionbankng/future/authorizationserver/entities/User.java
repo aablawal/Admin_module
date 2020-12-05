@@ -46,6 +46,7 @@ public class User implements Serializable {
     private String phoneNumber;
     @Column(length = 12)
     private String accountNumber;
+    private String accountName;
     private String userAddress;
     @Column(length = 3)
     private String country;

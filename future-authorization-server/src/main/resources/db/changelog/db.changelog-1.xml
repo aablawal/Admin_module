@@ -63,4 +63,9 @@
     <changeSet author="chokeme (generated)" id="1599134832030-5">
         <addUniqueConstraint columnNames="uuid" constraintName="UC_APP_USERUUID_COL" tableName="app_user"/>
     </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-3">
+        <addColumn tableName="app_user">
+            <column name="account_name" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
