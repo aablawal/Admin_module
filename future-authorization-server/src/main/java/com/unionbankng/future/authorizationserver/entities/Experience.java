@@ -32,7 +32,7 @@ public class Experience implements Serializable {
     private EmploymentType employmentType;
     @Column(nullable = false)
     private String company;
-    private Boolean current;
+    private Boolean isCurrent;
     @Column(length = 20,nullable = false)//12/2012
     private String startDate;
     @Column(length = 20,nullable = false)//12/2012
