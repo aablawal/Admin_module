@@ -2,6 +2,9 @@ package com.unionbankng.future.authorizationserver.security;
 
 import com.unionbankng.future.authorizationserver.config.LemonOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import net.devh.boot.grpc.server.security.authentication.BearerAuthenticationReader;
+import net.devh.boot.grpc.server.security.authentication.CompositeGrpcAuthenticationReader;
+import net.devh.boot.grpc.server.security.authentication.GrpcAuthenticationReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +19,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,13 +35,14 @@ import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final FutureDAOUserDetailsService futureDAOUserDetailsService;
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -104,6 +113,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             super.sendRedirect(request, response, url + "&additional_param=value");
         }
 
+    }
+
+    @Bean
+    GrpcAuthenticationReader authenticationReader() {
+        final List<GrpcAuthenticationReader> readers = new ArrayList<>();
+        // The actual token class is dependent on your spring-security library (OAuth2/JWT/...)
+        readers.add(new BearerAuthenticationReader(accessToken -> new PreAuthenticatedAuthenticationToken(accessToken, "")));
+        return new CompositeGrpcAuthenticationReader(readers);
     }
 
 

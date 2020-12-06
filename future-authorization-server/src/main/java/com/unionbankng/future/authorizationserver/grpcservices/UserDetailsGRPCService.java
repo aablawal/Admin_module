@@ -10,7 +10,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 
 @GrpcService
 @RequiredArgsConstructor
-public class userDetailsGRPCService extends SidekiqUserDetailServiceGrpc.SidekiqUserDetailServiceImplBase {
+public class UserDetailsGRPCService extends SidekiqUserDetailServiceGrpc.SidekiqUserDetailServiceImplBase {
 
     private final UserService service;
 
