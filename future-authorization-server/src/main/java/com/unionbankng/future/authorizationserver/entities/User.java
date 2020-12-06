@@ -28,6 +28,7 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String img;
+    private String coverImg;
     @NotNull
     @Column(length=32, nullable = false)
     private String firstName;
@@ -67,6 +68,7 @@ public class User implements Serializable {
         this.isEnabled = user.getIsEnabled();
         this.id = user.getId();
         this.img = user.getImg();
+        this.coverImg = user.getCoverImg();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.username = user.getUsername();

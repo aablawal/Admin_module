@@ -19,6 +19,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         final Map<String, Object> additionalInfo = new HashMap<>();
 
         additionalInfo.put("userId", user.getId());
+        additionalInfo.put("coverImg",user.getCoverImg());
         additionalInfo.put("userUUID", user.getUuid());
         additionalInfo.put("userEmail", user.getEmail());
         additionalInfo.put("userImg", user.getImg());

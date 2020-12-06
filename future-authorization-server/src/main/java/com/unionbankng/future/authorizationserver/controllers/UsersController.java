@@ -1,7 +1,9 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
+import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.pojos.UserByTokenResponse;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
@@ -76,6 +78,15 @@ public class UsersController {
         User user = userService.updatePersonalInfo(userId, request);
 
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
+    }
+
+    @PostMapping(value = "/v1/users/{userId}/update_profile", consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId,@Nullable @RequestPart("coverImg") MultipartFile coverImg,@Nullable @RequestPart("img") MultipartFile img, @Valid @RequestPart PersonalInfoUpdateRequest request)
+            throws IOException {
+
+        User user = userService.updateProfile(userId,coverImg,img,request);
+        return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
+
     }
 
     @DeleteMapping("/v1/users/delete/{userId}")

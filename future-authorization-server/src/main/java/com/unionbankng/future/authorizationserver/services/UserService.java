@@ -106,6 +106,43 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @CachePut(value = "user", key="#userId")
+    public User updateProfile(@ParameterValueKeyProvider Long userId, MultipartFile coverImg, MultipartFile img,PersonalInfoUpdateRequest request) throws IOException {
+
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+
+        if(user.getImg() != null && img != null) {
+            fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+            String source = fileStorageService.storeFile(img,userId,BlobType.IMAGE);
+            user.setImg(source);
+        }
+
+        if(user.getCoverImg() != null && coverImg != null) {
+            fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+            String source = fileStorageService.storeFile(coverImg,userId,BlobType.IMAGE);
+            user.setCoverImg(source);
+        }
+
+        if(request.getLastName() != null)
+            user.setLastName(request.getLastName());
+        if(request.getFirstName() != null)
+            user.setFirstName(request.getFirstName());
+        if(request.getStateOfResidence() != null)
+            user.setStateOfResidence(request.getStateOfResidence());
+        if(request.getAddress() != null)
+            user.setUserAddress(request.getAddress());
+        if(request.getCountry() != null)
+            user.setCountry(request.getCountry());
+        if(request.getDateOfBirth() != null)
+            user.setDateOfBirth(request.getDateOfBirth());
+        if(request.getDialingCode() != null)
+            user.setDialingCode(request.getDialingCode());
+        if(request.getPhoneNumber() != null)
+            user.setPhoneNumber(request.getPhoneNumber());
+
+        return userRepository.save(user);
+    }
+
 
     public boolean existsByUsername(String username){
         return userRepository.existsByUsername(username);
