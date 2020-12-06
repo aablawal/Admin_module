@@ -24,6 +24,7 @@ public class JobProposal implements Serializable {
     public Long userId;
     @Column(nullable = false)
     public Long employerId;
+    Long contractId;
     @NotNull
     @Column(nullable = false)
     public Long jobId;
@@ -67,6 +68,7 @@ public class JobProposal implements Serializable {
         this.userId =application.userId;
         this.jobId =application.jobId;
         this.employerId =application.employerId;
+        this.contractId=application.contractId;
         this.about =application.about;
         this.paymentTerms =application.paymentTerms;
         this.preparedCurrency =application.preparedCurrency;

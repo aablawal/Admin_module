@@ -8,6 +8,8 @@ import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,9 @@ public class JobService {
     private final JobTeamRepository teamRepository;
     private final UserService userService;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
+    private Logger logger = LoggerFactory.getLogger(JobService.class);
+
+
 
 
     public Job addJob(String jobData, String teamData,  MultipartFile[] supporting_files,  MultipartFile[] nda_files) throws IOException {
@@ -121,6 +126,7 @@ public class JobService {
                     return  savedJob;
                 }
             }else {
+                logger.info("JOBSERVICE: Unable to save Job");
                 return null;
             }
 
@@ -150,6 +156,7 @@ public class JobService {
             }
             return  jobRepository.save(job);
         }else{
+            logger.info("JOBSERVICE: Job not found");
             return  null;
         }
     }
@@ -159,6 +166,7 @@ public class JobService {
             job.setStatus(JobStatus.AC);
             return  jobRepository.save(job);
         }else{
+            logger.info("JOBSERVICE: Job not found");
             return  null;
         }
     }
@@ -175,6 +183,7 @@ public class JobService {
             }
             return  jobRepository.save(job);
         }else{
+            logger.info("JOBSERVICE: Job not found");
             return  null;
         }
     }

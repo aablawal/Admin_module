@@ -16,7 +16,6 @@ public class JobTeamDetailsService implements Serializable {
     private final JobProposalRepository repository;
     private final JobRepository jobRepository;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
-
     public List<JobTeamDetails> findTeamsByJobId(Long jobId){
         return jobTeamDetailsRepository.findByJobId(jobId);
     }

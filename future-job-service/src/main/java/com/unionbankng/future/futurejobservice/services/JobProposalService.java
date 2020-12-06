@@ -10,6 +10,8 @@ import com.unionbankng.future.futurejobservice.repositories.JobProposalRepositor
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,8 @@ public class JobProposalService  implements Serializable {
     private  final FileStoreService fileStoreService;
     private final JobRepository jobRepository;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
+    private Logger logger = LoggerFactory.getLogger(JobProposalService.class);
+
 
     public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files,  Model model){
         try {
@@ -67,9 +71,11 @@ public class JobProposalService  implements Serializable {
                     }
                     return  proposal;
                 }else{
+                    logger.info("JOBSERVICE: Unable to save Job");
                     return  null;
                 }
             }else{
+                logger.info("JOBSERVICE: Unable to save Proposal");
                 return null;
             }
 
@@ -91,11 +97,12 @@ public class JobProposalService  implements Serializable {
         JobProposal proposal= (JobProposal) data.getAttribute("proposal");
         if(proposal!=null)
             this.updateJobProposalStatus(proposal.id,"CA",model);
+        else
+            logger.info("JOBSERVICE: Proposal not found");
         return proposal;
     }
 
     public Model findProposalById(Long id,Model model) {
-
         JobProposal proposal = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Proposal Available"));
         if (proposal != null)
 
