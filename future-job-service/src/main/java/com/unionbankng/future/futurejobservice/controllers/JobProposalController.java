@@ -5,7 +5,6 @@ import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.entities.JobContract;
 import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
-import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
 import com.unionbankng.future.futurejobservice.services.JobTeamDetailsService;

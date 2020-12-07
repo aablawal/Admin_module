@@ -219,11 +219,10 @@
   </build>
   
   <modules>
-      
     <module>future-utilityservice-interface</module>
     <module>future-learn-service-interface</module>
     <module>future-bank-service-interface</module>
-
+    <module>future-authorization-server-interface</module>
   </modules>
 
   <distributionManagement>

@@ -5,6 +5,7 @@ import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.EmailMessage;
 import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
+import com.unionbankng.future.futurejobservice.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class JobController {
     }
     private final JobService service;
     private final EmailService emailService;
+    private final UserService userService;
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
@@ -116,14 +118,13 @@ public class JobController {
     }
 
     @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse> test(EmailMessage message){
-
-        message.setBody("Hello");
-        message.setRecipient("net.rabiualiyu@gmail.com");
-        message.setSubject("This is the subject");
-        emailService.sendEmail(message);
+    public ResponseEntity<APIResponse> test(){
+//
+//        message.setBody("Hello");
+//        message.setRecipient("net.rabiualiyu@gmail.com");
+//        message.setSubject("This is the subject");
+//        emailService.sendEmail(message);
         return ResponseEntity.ok().body(
-                new APIResponse("success",true,"Message Sent"));
+                new APIResponse("success",true,userService.getUserById(Long.valueOf(1))));
     }
-
 }

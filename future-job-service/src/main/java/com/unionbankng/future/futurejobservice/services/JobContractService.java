@@ -43,7 +43,7 @@ public class JobContractService implements Serializable {
     private  final JobProjectSubmissionRepository jobProjectSubmissionRepository;
     private final  JobMilestoneRepository jobMilestoneRepository;
     private  final FileStoreService fileStoreService;
-    private final BankTransferService bankTransferService;
+   // private final BankTransferService bankTransferService;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
 
 

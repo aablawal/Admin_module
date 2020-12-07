@@ -8,6 +8,8 @@ import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHan
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 
 import java.io.IOException;
@@ -17,9 +19,13 @@ import java.io.IOException;
 public class UBNFundstransferService extends UBNFundsTransferServiceGrpc.UBNFundsTransferServiceImplBase {
 
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
+    Logger logger = LoggerFactory.getLogger(UBNFundstransferService.class);
+
 
 
     public void transferFund(UBNFundsTransferRequest request, StreamObserver<UBNFundsTransferResponse> responseObserver) {
+
+        logger.info("Hello Rabiu ");
 
         UBNFundTransferRequest ubnFundTransferRequest = new UBNFundTransferRequest();
         ubnFundTransferRequest.setAmount(Double.toString(request.getAmount()));
@@ -54,8 +60,13 @@ public class UBNFundstransferService extends UBNFundsTransferServiceGrpc.UBNFund
 
         UBNFundsTransferResponse ubnFundsTransferResponse = null;
 
+
         try {
             Response<UBNFundTransferResponse> responseResponse = ubnAccountAPIServiceHandler.transferFundsUBN(ubnFundTransferRequest);
+
+
+            logger.info("Hello Rabiu "+responseResponse.message());
+
             if (!responseResponse.isSuccessful()) {
                 ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder().setCode("01").build();
 
@@ -67,6 +78,8 @@ public class UBNFundstransferService extends UBNFundsTransferServiceGrpc.UBNFund
 
 
         } catch (IOException e) {
+            logger.info(e.getMessage()+" Rabiu");
+
             e.printStackTrace();
             ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder().setCode("01").build();
         }
