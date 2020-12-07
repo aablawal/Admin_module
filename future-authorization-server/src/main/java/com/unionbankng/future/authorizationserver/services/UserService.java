@@ -111,14 +111,16 @@ public class UserService {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
-        if(user.getImg() != null && img != null) {
-            fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+        if(img != null) {
+            if(user.getImg() != null)
+               fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
             String source = fileStorageService.storeFile(img,userId,BlobType.IMAGE);
             user.setImg(source);
         }
 
-        if(user.getCoverImg() != null && coverImg != null) {
-            fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+        if(coverImg != null) {
+            if(user.getCoverImg() != null)
+               fileStorageService.deleteFileFromStorage(user.getCoverImg(), BlobType.IMAGE);
             String source = fileStorageService.storeFile(coverImg,userId,BlobType.IMAGE);
             user.setCoverImg(source);
         }
