@@ -123,22 +123,15 @@ public class UserService {
             user.setCoverImg(source);
         }
 
-        if(request.getLastName() != null)
             user.setLastName(request.getLastName());
-        if(request.getFirstName() != null)
             user.setFirstName(request.getFirstName());
-        if(request.getStateOfResidence() != null)
-            user.setStateOfResidence(request.getStateOfResidence());
-        if(request.getAddress() != null)
-            user.setUserAddress(request.getAddress());
-        if(request.getCountry() != null)
             user.setCountry(request.getCountry());
-        if(request.getDateOfBirth() != null)
+            user.setStateOfResidence(request.getStateOfResidence());
+            user.setUserAddress(request.getAddress());
+            user.setCountry(request.getCountry());
             user.setDateOfBirth(request.getDateOfBirth());
-        if(request.getDialingCode() != null)
-            user.setDialingCode(request.getDialingCode());
-        if(request.getPhoneNumber() != null)
-            user.setPhoneNumber(request.getPhoneNumber());
+            user.setCity(request.getCity());
+            user.setZipCode(request.getZipCode());
 
         return userRepository.save(user);
     }

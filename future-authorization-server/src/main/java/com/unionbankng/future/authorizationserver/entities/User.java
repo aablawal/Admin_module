@@ -41,6 +41,8 @@ public class User implements Serializable {
     @Column(nullable = false, unique = true)
     private String email;
     private String password;
+    @Column(length = 10)
+    private String zipCode;
     @Column(length=5)
     private String dialingCode;
     @Column(length=32, unique = true)
@@ -49,6 +51,8 @@ public class User implements Serializable {
     private String accountNumber;
     private String accountName;
     private String userAddress;
+    @Column(length=100)
+    private String city;
     @Column(length = 3)
     private String country;
     @Column(length = 50)
@@ -77,6 +81,8 @@ public class User implements Serializable {
         this.authProvider = user.getAuthProvider();
         this.email = user.getEmail();
         this.password = user.getPassword();
+        this.city = user.getCity();
+        this.zipCode = user.getZipCode();
     }
 
     @PrePersist
