@@ -12,7 +12,9 @@ import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 
 @Service
 public class BankTransferService {
+
     Logger logger = LoggerFactory.getLogger(BankTransferService.class);
+
     @GrpcClient("bankService")
     private  UBNFundsTransferServiceGrpc.UBNFundsTransferServiceBlockingStub ubnFundsTransferServiceBlockingStub;
 

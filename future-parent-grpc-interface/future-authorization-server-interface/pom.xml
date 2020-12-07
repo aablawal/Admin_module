@@ -9,7 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.unionbankng</groupId>
     <artifactId>future-authorization-server-interface</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
-
+    <name>future-authorization-server-interface</name>
 </project>
