@@ -71,7 +71,7 @@ public class UsersController {
     }
 
 
-    @PostMapping(value = "/v1/users/{userId}/update_profile")
+    @PostMapping(value = "/v1/users/{userId}/update_profile_details")
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody PersonalInfoUpdateRequest request) throws IOException {
 
 
