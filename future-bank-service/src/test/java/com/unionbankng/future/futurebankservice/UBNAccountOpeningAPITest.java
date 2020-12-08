@@ -70,6 +70,21 @@ public class UBNAccountOpeningAPITest extends AbstractTest {
     }
 
     @Test
+    public void getSourceOfFundTest() throws IOException {
+
+
+        Response<UBNCustomerTypeRequest> response = ubnNewAccountOpeningAPIServiceHandler.getSourceOfFund();
+
+        System.out.println(response.toString());
+        assertEquals(200,response.code());
+        assertEquals("00",response.body().getStatusCode());
+
+
+    }
+
+
+
+    @Test
     public void getStatesByCountryForAccountTest() throws IOException {
 
 

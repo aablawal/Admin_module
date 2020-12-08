@@ -47,6 +47,11 @@ public class UBNCreateAccountNewCustomerRequest {
 	private String customerSeg;
 	private String customerType;
 	private String introducerTag;
+	private String paymentNotRequired;
+	private String placeOfBirth;
+	private String stateOfOrigin;
+	private String sourceOfIncome;
+	private String kinsAddress;
 
 	
 }
