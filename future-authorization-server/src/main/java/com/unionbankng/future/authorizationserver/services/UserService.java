@@ -111,34 +111,29 @@ public class UserService {
 
         User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
-        if(user.getImg() != null && img != null) {
-            fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+        if(img != null) {
+            if(user.getImg() != null)
+               fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
             String source = fileStorageService.storeFile(img,userId,BlobType.IMAGE);
             user.setImg(source);
         }
 
-        if(user.getCoverImg() != null && coverImg != null) {
-            fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+        if(coverImg != null) {
+            if(user.getCoverImg() != null)
+               fileStorageService.deleteFileFromStorage(user.getCoverImg(), BlobType.IMAGE);
             String source = fileStorageService.storeFile(coverImg,userId,BlobType.IMAGE);
             user.setCoverImg(source);
         }
 
-        if(request.getLastName() != null)
             user.setLastName(request.getLastName());
-        if(request.getFirstName() != null)
             user.setFirstName(request.getFirstName());
-        if(request.getStateOfResidence() != null)
-            user.setStateOfResidence(request.getStateOfResidence());
-        if(request.getAddress() != null)
-            user.setUserAddress(request.getAddress());
-        if(request.getCountry() != null)
             user.setCountry(request.getCountry());
-        if(request.getDateOfBirth() != null)
+            user.setStateOfResidence(request.getStateOfResidence());
+            user.setUserAddress(request.getAddress());
+            user.setCountry(request.getCountry());
             user.setDateOfBirth(request.getDateOfBirth());
-        if(request.getDialingCode() != null)
-            user.setDialingCode(request.getDialingCode());
-        if(request.getPhoneNumber() != null)
-            user.setPhoneNumber(request.getPhoneNumber());
+            user.setCity(request.getCity());
+            user.setZipCode(request.getZipCode());
 
         return userRepository.save(user);
     }
