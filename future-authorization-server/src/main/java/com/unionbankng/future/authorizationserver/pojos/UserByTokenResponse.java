@@ -11,11 +11,13 @@ public class UserByTokenResponse {
     private String firstName;
     private String lastName;
     private String uuid;
+    private String umid;
     private String username;
     private String email;
     private String dialingCode;
     private String phoneNumber;
     private String accountNumber;
+    private String accountName;
     private String address;
     private String country;
     private String stateOfResidence;
