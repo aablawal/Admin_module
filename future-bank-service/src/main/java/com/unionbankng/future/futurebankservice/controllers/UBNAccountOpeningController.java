@@ -106,6 +106,25 @@ public class UBNAccountOpeningController {
 
     }
 
+
+    @GetMapping("/v1/ubn_account_opening/account/source")
+    public ResponseEntity<APIResponse<UBNCustomerTypeRequest>> getSourceOfFund() throws IOException {
+
+        //determine existing or non existing customer
+        Response<UBNCustomerTypeRequest> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getSourceOfFund();
+
+        if(!responseResponse.isSuccessful())
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        //update customer details with account number
+
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+
+    }
+
+
+
     @GetMapping("/v1/ubn_account_opening/get_states_by_country")
     public ResponseEntity<APIResponse<UBNStateByCountryResponse>> getStatesByCountryForAccount(@RequestParam String countryCode) throws IOException {
 

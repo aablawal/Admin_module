@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurebankservice.grpcservices;
+import com.google.gson.Gson;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferRequest;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferServiceGrpc;
@@ -25,61 +26,42 @@ public class UBNFundstransferService extends UBNFundsTransferServiceGrpc.UBNFund
 
     public void transferFund(UBNFundsTransferRequest request, StreamObserver<UBNFundsTransferResponse> responseObserver) {
 
-        logger.info("Hello Rabiu ");
-
-        UBNFundTransferRequest ubnFundTransferRequest = new UBNFundTransferRequest();
-        ubnFundTransferRequest.setAmount(Double.toString(request.getAmount()));
-        ubnFundTransferRequest.setCreditAccountBankCode(request.getCreditAccountBankCode());
-        ubnFundTransferRequest.setCreditAccountBranchCode(request.getCreditAccountBranchCode());
-        ubnFundTransferRequest.setCreditAccountName(request.getCreditAccountName());
-        ubnFundTransferRequest.setCreditAccountNumber(request.getCreditAccountNumber());
-        ubnFundTransferRequest.setCreditAccountType(request.getCreditAccountType());
-        ubnFundTransferRequest.setCreditNarration(request.getCreditNarration());
-        ubnFundTransferRequest.setCurrency(request.getCurrency());
-        ubnFundTransferRequest.setDebitAccountBranchCode(request.getDebitAccountBranchCode());
-        ubnFundTransferRequest.setDebitAccountName(request.getDebitAccountName());
-        ubnFundTransferRequest.setDebitAccountNumber(request.getDebitAccountNumber());
-        ubnFundTransferRequest.setDebitAccountType(request.getDebitAccountType());
-        ubnFundTransferRequest.setDebitInstrumentNumber(request.getDebitInstrumentNumber());
-        ubnFundTransferRequest.setDebitNarration(request.getDebitNarration());
-        ubnFundTransferRequest.setFeeEntryMode(request.getFeeEntryMode());
-        ubnFundTransferRequest.setInitBranchCode(request.getInitBranchCode());
-        ubnFundTransferRequest.setPaymentReference(request.getPaymentReference());
-        ubnFundTransferRequest.setPaymentTypeCode(request.getPaymentTypeCode());
-        ubnFundTransferRequest.setTEST22(request.getTEST22());
-        ubnFundTransferRequest.setValueDate(request.getValueDate());
-        ubnFundTransferRequest.setChannelCode(request.getChannelCode());
-        ubnFundTransferRequest.setBeneficiaryBvn(request.getBeneficiaryBvn());
-        ubnFundTransferRequest.setBeneficiaryKycLevel(request.getBeneficiaryKycLevel());
-        ubnFundTransferRequest.setSenderBvn(request.getSenderBvn());
-        ubnFundTransferRequest.setSenderKycLevel(request.getSenderKycLevel());
-        ubnFundTransferRequest.setNameEnquirySessionId(request.getNameEnquirySessionId());
-        ubnFundTransferRequest.setFtSessionId(request.getFtSessionId());
-        ubnFundTransferRequest.setTransactionLocation(request.getTransactionLocation());
-
+        UBNFundTransferRequest transfer = new UBNFundTransferRequest();
+        transfer.setAmount(Double.toString(request.getAmount()));
+        transfer.setCurrency(request.getCurrency());
+        transfer.setPaymentReference(request.getPaymentReference());
+        transfer.setInitBranchCode(request.getInitBranchCode());
+        transfer.setCreditAccountName(request.getCreditAccountName());
+        transfer.setCreditAccountNumber(request.getCreditAccountNumber());
+        transfer.setCreditAccountBankCode(request.getCreditAccountBankCode());
+        transfer.setCreditAccountBranchCode(request.getCreditAccountBranchCode());
+        transfer.setCreditAccountType(request.getCreditAccountType());
+        transfer.setCreditNarration(request.getCreditNarration());
+        transfer.setDebitAccountName(request.getDebitAccountName());
+        transfer.setDebitAccountNumber(request.getDebitAccountNumber());
+        transfer.setDebitAccountBranchCode(request.getDebitAccountBranchCode());
+        transfer.setDebitAccountType(request.getDebitAccountType());
+        transfer.setDebitNarration(request.getDebitNarration());
 
         UBNFundsTransferResponse ubnFundsTransferResponse = null;
 
 
         try {
-            Response<UBNFundTransferResponse> responseResponse = ubnAccountAPIServiceHandler.transferFundsUBN(ubnFundTransferRequest);
+            Response<UBNFundTransferResponse> responseResponse = ubnAccountAPIServiceHandler.transferFundsUBN(transfer);
 
-
-            logger.info("Hello Rabiu "+responseResponse.message());
+            logger.info("Transfer response is: {}",responseResponse.code());
 
             if (!responseResponse.isSuccessful()) {
                 ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder().setCode("01").build();
 
             } else {
                 ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder().setCode(responseResponse.body().getCode())
-                        .setReference(responseResponse.body().getReference()).setSessionId(responseResponse.body().getSessionId())
+                        .setReference(responseResponse.body().getReference())
                         .setMessage(responseResponse.body().getMessage()).build();
             }
 
 
         } catch (IOException e) {
-            logger.info(e.getMessage()+" Rabiu");
-
             e.printStackTrace();
             ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder().setCode("01").build();
         }

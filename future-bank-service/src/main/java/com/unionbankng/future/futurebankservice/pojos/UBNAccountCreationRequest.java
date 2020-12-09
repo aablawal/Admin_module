@@ -9,4 +9,5 @@ public class UBNAccountCreationRequest {
     private Long customerRecordId;
     private String customerType;
     private String introducerTag;
+    private String paymentNotRequired;
 }

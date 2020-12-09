@@ -86,13 +86,16 @@ public interface UBNNewAccountOpeningAPIService {
     Call<UBNGenericResponse> confirmUBNPaymentStatus(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
                                                        @Query("customerId") Long customerId);
 
-    @POST("account-opening/account/create")
+    @POST("account-opening/account/create/v2")
     Call<UBNCompleteAccountPaymentResponse> completeUBNAccountCreation(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
                                                      @Body UBNAccountCreationRequest request);
 
     @GET("account-opening/account")
     Call<UBNAccountDataResponse> getUBNAccountDetails(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
                                                                  @Query("id") Long id);
+
+    @GET("account-opening/account/source")
+    Call<UBNCustomerTypeRequest> getSourceOfFund(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
 
 

@@ -263,6 +263,24 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     }
 
+    public Response<UBNCustomerTypeRequest> getSourceOfFund() throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        String authorization = String.format("Bearer %s",response.getAccess_token());
+        return ubnAccountAPIService.getSourceOfFund(
+                authorization,"01").execute();
+
+    }
+
+
     public Response<UBNCreateAccountNewCustomerResponse> createUBNNewCustomerAccount(UBNCreateAccountNewCustomerRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
