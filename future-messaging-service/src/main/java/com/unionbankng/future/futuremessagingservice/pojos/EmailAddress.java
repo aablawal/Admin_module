@@ -1,10 +1,8 @@
-package com.unionbankng.future.futuremessagingservice.pojo;
+package com.unionbankng.future.futuremessagingservice.pojos;
 
 import com.unionbankng.future.futuremessagingservice.enums.RecipientType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 

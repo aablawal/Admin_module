@@ -68,6 +68,15 @@ public class UserService {
         return userRepository.findByEmailOrUsername(email,username);
     }
 
+    public String updateUserMID(Long userId, String umid){
+        User user= userRepository.findById(userId).orElse(null);
+        if(user!=null) {
+            user.setUmid(umid);
+            userRepository.save(user);
+            return  umid;
+        }
+        return  null;
+    }
     @CachePut(value = "user", key="#userId")
     public User updateProfileImage(MultipartFile image , @ParameterValueKeyProvider Long userId) throws IOException {
 

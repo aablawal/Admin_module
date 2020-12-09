@@ -1,6 +1,5 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.authorizationserver.grpc.UserDetailResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.enums.JobStatus;
@@ -75,7 +74,7 @@ public class JobService {
                             if(data.length>0 ) {
                                 Long userId = Long.parseLong(data[0]);
                                 int percentage = Integer.parseInt(data[1].replace("%", ""));
-                                UserDetailResponse currentUser=userService.getUserById(userId);
+                                User currentUser=userService.getUserById(userId);
                                 if(currentUser!=null){
 
                                     //get end date

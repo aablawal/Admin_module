@@ -7,6 +7,8 @@ import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -29,6 +31,7 @@ public class JobController {
     private final JobService service;
     private final EmailService emailService;
     private final UserService userService;
+    Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
@@ -118,13 +121,15 @@ public class JobController {
     }
 
     @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse> test(){
+    public ResponseEntity<APIResponse<String>> test(){
+
+        logger.info(userService.getUserById(Long.valueOf(1)).toString());
 //
 //        message.setBody("Hello");
 //        message.setRecipient("net.rabiualiyu@gmail.com");
 //        message.setSubject("This is the subject");
 //        emailService.sendEmail(message);
         return ResponseEntity.ok().body(
-                new APIResponse("success",true,userService.getUserById(Long.valueOf(1))));
+                new APIResponse("success",true,null));
     }
 }

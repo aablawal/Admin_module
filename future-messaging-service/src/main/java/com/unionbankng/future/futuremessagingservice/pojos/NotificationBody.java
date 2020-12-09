@@ -1,10 +1,9 @@
-package com.unionbankng.future.authorizationserver.pojos;
+package com.unionbankng.future.futuremessagingservice.pojos;
 
 import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 public @Data
 @Builder
@@ -15,5 +14,9 @@ class NotificationBody implements Serializable {
     protected String subject;
     protected String recipient;
     protected String attachment;
-    protected String redirect;
+    protected String action;
+    protected String channel;
+    protected String actionType;
+    protected String priority;
+    protected String topic;
 }

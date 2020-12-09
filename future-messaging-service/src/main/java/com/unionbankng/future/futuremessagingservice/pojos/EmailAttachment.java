@@ -1,7 +1,6 @@
-package com.unionbankng.future.futuremessagingservice.pojo;
+package com.unionbankng.future.futuremessagingservice.pojos;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 

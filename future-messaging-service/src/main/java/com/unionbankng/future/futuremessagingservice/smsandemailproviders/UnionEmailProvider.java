@@ -2,7 +2,7 @@ package com.unionbankng.future.futuremessagingservice.smsandemailproviders;
 
 import com.unionbankng.future.futuremessagingservice.config.UBNConfigurationProperties;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
-import com.unionbankng.future.futuremessagingservice.pojo.EmailBody;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

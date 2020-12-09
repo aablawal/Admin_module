@@ -44,7 +44,6 @@ public class AppService {
     }
 
     public Model getJob(Job job, Model model){
-
         model.addAttribute("job",job);
         model.addAttribute("teams", this.getTeamMembersByJobId(job.id));
         model.addAttribute("employer",userService.getUserById(job.oid));
