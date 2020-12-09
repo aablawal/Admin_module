@@ -10,6 +10,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
+import org.springframework.web.client.RestTemplate;
 
 import javax.jms.ConnectionFactory;
 
@@ -20,5 +21,9 @@ public class AuthorizationServerApplication {
 		SpringApplication.run(AuthorizationServerApplication.class, args);
 	}
 
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
+	}
 
 }

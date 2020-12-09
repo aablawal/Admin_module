@@ -28,6 +28,7 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String img;
+    private String coverImg;
     @NotNull
     @Column(length=32, nullable = false)
     private String firstName;
@@ -35,18 +36,25 @@ public class User implements Serializable {
     private String lastName;
     @Column(length=50, nullable = false, unique = true)
     private String uuid;
+    @Column(columnDefinition="TEXT")
+    private String umid;
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false, unique = true)
     private String email;
     private String password;
+    @Column(length = 10)
+    private String zipCode;
     @Column(length=5)
     private String dialingCode;
     @Column(length=32, unique = true)
     private String phoneNumber;
     @Column(length = 12)
     private String accountNumber;
-    private String address;
+    private String accountName;
+    private String userAddress;
+    @Column(length=100)
+    private String city;
     @Column(length = 3)
     private String country;
     @Column(length = 50)
@@ -61,19 +69,23 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+    private Date dateUpdated;
 
     public User(User user){
         this.isEnabled = user.getIsEnabled();
         this.id = user.getId();
         this.img = user.getImg();
+        this.coverImg = user.getCoverImg();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.username = user.getUsername();
+        this.umid=user.getUmid();
         this.uuid = user.getUuid();
         this.authProvider = user.getAuthProvider();
         this.email = user.getEmail();
         this.password = user.getPassword();
+        this.city = user.getCity();
+        this.zipCode = user.getZipCode();
     }
 
     @PrePersist
@@ -83,7 +95,7 @@ public class User implements Serializable {
 
     @PreUpdate
     private void setUpdatedAt() {
-        updatedAt = new Date();
+        dateUpdated = new Date();
     }
 
     @Override

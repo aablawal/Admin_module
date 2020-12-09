@@ -24,6 +24,7 @@ public class JobProposal implements Serializable {
     public Long userId;
     @Column(nullable = false)
     public Long employerId;
+    Long contractId;
     @NotNull
     @Column(nullable = false)
     public Long jobId;
@@ -48,6 +49,8 @@ public class JobProposal implements Serializable {
     public String comment;
     public String accountNumber;
     public String accountName;
+    public String accountType;
+    public String branchCode;
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     public JobProposalStatus status;
@@ -65,6 +68,7 @@ public class JobProposal implements Serializable {
         this.userId =application.userId;
         this.jobId =application.jobId;
         this.employerId =application.employerId;
+        this.contractId=application.contractId;
         this.about =application.about;
         this.paymentTerms =application.paymentTerms;
         this.preparedCurrency =application.preparedCurrency;
@@ -77,6 +81,8 @@ public class JobProposal implements Serializable {
         this.comment =application.comment;
         this.accountNumber =application.accountNumber;
         this.accountNumber =application.accountNumber;
+        this.branchCode=application.branchCode;
+        this.accountType=application.accountType;
         this.status =application.status;
         this.startDate =application.startDate;
         this.endDate =application.endDate;

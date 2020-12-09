@@ -58,6 +58,8 @@ public class Paystack implements IPayment {
     @Override
     public ResponseEntity<String> completePayment(Object request) {
 
+        logger.info("Doing payments with paystack");
+
         PaystackTransaction transaction = (PaystackTransaction) request;
 
         //check for duplicate
@@ -75,6 +77,7 @@ public class Paystack implements IPayment {
         BigDecimal amount = transaction.getData().getMetadata().getAmount();
 
         //do payment
+        logger.info("email, userUUID,entityId, product, amount: {},{},{},{},{}", email,userUUID,entityId,productPayingFor,amount);
 
         if (!productPayingFor.equals(ProductPayingFor.COURSE)) {
             logger.info("Payment not supported");

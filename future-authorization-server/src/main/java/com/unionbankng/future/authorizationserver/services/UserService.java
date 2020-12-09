@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,10 @@ public class UserService {
     @Cacheable(value = "user", key="#id")
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<List<User>> findUsersBySearch(String question){
+       return  userRepository .findUsersBySearch(question);
     }
 
     @Cacheable(value = "user", key="#uuId")
@@ -63,6 +68,15 @@ public class UserService {
         return userRepository.findByEmailOrUsername(email,username);
     }
 
+    public String updateUserMID(Long userId, String umid){
+        User user= userRepository.findById(userId).orElse(null);
+        if(user!=null) {
+            user.setUmid(umid);
+            userRepository.save(user);
+            return  umid;
+        }
+        return  null;
+    }
     @CachePut(value = "user", key="#userId")
     public User updateProfileImage(MultipartFile image , @ParameterValueKeyProvider Long userId) throws IOException {
 
@@ -88,7 +102,7 @@ public class UserService {
         if(request.getStateOfResidence() != null)
             user.setStateOfResidence(request.getStateOfResidence());
         if(request.getAddress() != null)
-            user.setAddress(request.getAddress());
+            user.setUserAddress(request.getAddress());
         if(request.getCountry() != null)
             user.setCountry(request.getCountry());
         if(request.getDateOfBirth() != null)
@@ -97,6 +111,38 @@ public class UserService {
             user.setDialingCode(request.getDialingCode());
         if(request.getPhoneNumber() != null)
             user.setPhoneNumber(request.getPhoneNumber());
+
+        return userRepository.save(user);
+    }
+
+    @CachePut(value = "user", key="#userId")
+    public User updateProfile(@ParameterValueKeyProvider Long userId, MultipartFile coverImg, MultipartFile img,PersonalInfoUpdateRequest request) throws IOException {
+
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+
+        if(img != null) {
+            if(user.getImg() != null)
+               fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+            String source = fileStorageService.storeFile(img,userId,BlobType.IMAGE);
+            user.setImg(source);
+        }
+
+        if(coverImg != null) {
+            if(user.getCoverImg() != null)
+               fileStorageService.deleteFileFromStorage(user.getCoverImg(), BlobType.IMAGE);
+            String source = fileStorageService.storeFile(coverImg,userId,BlobType.IMAGE);
+            user.setCoverImg(source);
+        }
+
+            user.setLastName(request.getLastName());
+            user.setFirstName(request.getFirstName());
+            user.setCountry(request.getCountry());
+            user.setStateOfResidence(request.getStateOfResidence());
+            user.setUserAddress(request.getAddress());
+            user.setCountry(request.getCountry());
+            user.setDateOfBirth(request.getDateOfBirth());
+            user.setCity(request.getCity());
+            user.setZipCode(request.getZipCode());
 
         return userRepository.save(user);
     }

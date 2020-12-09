@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient;
 
 import javax.net.ssl.*;
 import java.security.cert.CertificateException;
+import java.util.concurrent.TimeUnit;
 
 public class UnsafeOkHttpClient {
     public static OkHttpClient getUnsafeOkHttpClient() {
@@ -34,6 +35,7 @@ public class UnsafeOkHttpClient {
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
             builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override
@@ -42,7 +44,8 @@ public class UnsafeOkHttpClient {
                 }
             });
 
-            OkHttpClient okHttpClient = builder.build();
+            OkHttpClient okHttpClient = builder.connectTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
             return okHttpClient;
         } catch (Exception e) {
             throw new RuntimeException(e);

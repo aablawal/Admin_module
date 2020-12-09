@@ -1,18 +1,12 @@
 package com.unionbankng.future.authorizationserver.services;
 
-import com.google.code.ssm.api.InvalidateSingleCache;
-import com.google.code.ssm.api.ParameterValueKeyProvider;
-import com.google.code.ssm.api.ReadThroughSingleCache;
 import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.repositories.ExperienceRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,6 +30,7 @@ public class ExperienceService {
         return experienceRepository.findByProfileId(profileId,sort);
     }
 
+    @CacheEvict(value = "experiences", allEntries = true)
     public Experience save (Experience experience){
         return experienceRepository.save(experience);
     }
@@ -60,7 +55,7 @@ public class ExperienceService {
     public Experience saveFromRequest (MultipartFile file,ExperienceRequest request, Experience experience) throws IOException {
         experience.setProfileId(request.getProfileId());
         experience.setCompany(request.getCompany());
-        experience.setCurrent(request.getCurrent());
+        experience.setIsCurrent(request.getCurrent());
         experience.setDescription(request.getDescription());
         experience.setStartDate(request.getStartDate());
         experience.setEmploymentType(request.getEmploymentType());

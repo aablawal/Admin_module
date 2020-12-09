@@ -20,6 +20,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @EnableResourceServer
@@ -31,8 +34,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-
-		http.cors().and().requestMatchers().antMatchers("/api/**").and().authorizeRequests().antMatchers("/api/**").authenticated();
+		http.cors().and().requestMatchers().antMatchers("/api/**").and().authorizeRequests().anyRequest().authenticated();
 
 	}
 
@@ -77,9 +79,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	@Bean
 	public FilterRegistrationBean<CorsFilter> corFilter() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-//		corsConfiguration.setAllowCredentials(true);
+		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.addAllowedOrigin("*");
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addAllowedMethod("*");

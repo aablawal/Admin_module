@@ -29,19 +29,19 @@ public class UBNAccountOpeningAPITest extends AbstractTest {
 
     }
 
-    @Test
-    public void testGetAccountProductTypes() throws IOException {
-
-        AccountProductTypeRequest request = AccountProductTypeRequest.builder().adult(true).hasValidId(true).idCard("nin").build();
-
-        Response<AccountProductTypeResponse> response = ubnNewAccountOpeningAPIServiceHandler.getAccountProductTypes(request);
-
-        System.out.println(response.toString());
-        assertEquals(200,response.code());
-        assertEquals("00",response.body().getStatusCode());
-
-
-    }
+//    @Test
+//    public void testGetAccountProductTypes() throws IOException {
+//
+//        AccountProductTypeRequest request = AccountProductTypeRequest.builder().adult(true).hasValidId(true).idCard("nin").build();
+//
+//        Response<AccountProductTypeResponse> response = ubnNewAccountOpeningAPIServiceHandler.getAccountProductTypes(request);
+//
+//        System.out.println(response.toString());
+//        assertEquals(200,response.code());
+//        assertEquals("00",response.body().getStatusCode());
+//
+//
+//    }
 
     @Test
     public void getAccountProductDetailsTest() throws IOException {
@@ -68,6 +68,21 @@ public class UBNAccountOpeningAPITest extends AbstractTest {
 
 
     }
+
+//    @Test
+//    public void getSourceOfFundTest() throws IOException {
+//
+//
+//        Response<UBNCustomerTypeRequest> response = ubnNewAccountOpeningAPIServiceHandler.getSourceOfFund();
+//
+//        System.out.println(response.toString());
+//        assertEquals(200,response.code());
+//        assertEquals("00",response.body().getStatusCode());
+//
+//
+//    }
+
+
 
     @Test
     public void getStatesByCountryForAccountTest() throws IOException {
@@ -160,21 +175,6 @@ public class UBNAccountOpeningAPITest extends AbstractTest {
 
 
     }
-
-    @Test
-    public void getDocumentTypesTest() throws IOException {
-
-
-        Response<AccountProductTypeResponse> response = ubnNewAccountOpeningAPIServiceHandler.getDocumentTypes("SA_008");
-
-        System.out.println(response.toString());
-        assertEquals(200,response.code());
-        assertEquals("00",response.body().getStatusCode());
-
-
-    }
-
-
 
 
 

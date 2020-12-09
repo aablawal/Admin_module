@@ -1,7 +1,9 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
+import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.pojos.UserByTokenResponse;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
@@ -39,6 +41,11 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
+    @PutMapping(value = "/v1/update/user/mid/{id}")
+    public ResponseEntity<APIResponse<String>> updateUserMID(@Valid @PathVariable Long id, @RequestParam String mid, @ApiIgnore OAuth2Authentication auth)  throws IOException {
+        return ResponseEntity.ok().body(new APIResponse<>("Success",true,userService.updateUserMID(id,mid)));
+    }
+
     @GetMapping("/v1/users/{userId}")
     public ResponseEntity<APIResponse<User>> getUserById(@PathVariable Long userId) {
 
@@ -47,9 +54,17 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
+
+    @GetMapping("/v1/users/search")
+    public ResponseEntity<APIResponse> getUsersBySearch(@RequestParam String  q) {
+        List<User> user = userService.findUsersBySearch(q).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
+    }
+
+
     @GetMapping("/v1/users/get_details_with_token")
     public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore OAuth2Authentication auth) {
-
+        System.out.println(auth.getName());
         User user =  userService.findByEmail(auth.getName())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -61,13 +76,22 @@ public class UsersController {
     }
 
 
-    @PostMapping(value = "/v1/users/{userId}/update_profile")
+    @PostMapping(value = "/v1/users/{userId}/update_profile_details")
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId, @Valid @RequestBody PersonalInfoUpdateRequest request) throws IOException {
 
 
         User user = userService.updatePersonalInfo(userId, request);
 
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
+    }
+
+    @PostMapping(value = "/v1/users/{userId}/update_profile", consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId,@Nullable @RequestPart("coverImg") MultipartFile coverImg,@Nullable @RequestPart("img") MultipartFile img, @Valid @RequestPart PersonalInfoUpdateRequest request)
+            throws IOException {
+
+        User user = userService.updateProfile(userId,coverImg,img,request);
+        return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
+
     }
 
     @DeleteMapping("/v1/users/delete/{userId}")

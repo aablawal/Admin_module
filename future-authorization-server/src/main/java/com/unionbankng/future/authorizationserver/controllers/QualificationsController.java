@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "api")
+@RequestMapping(path = "/api")
 public class QualificationsController {
 
     private final QualificationService qualificationService;

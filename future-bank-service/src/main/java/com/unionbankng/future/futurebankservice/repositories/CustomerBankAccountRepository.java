@@ -11,4 +11,5 @@ public interface CustomerBankAccountRepository extends JpaRepository<CustomerBan
     List<CustomerBankAccount> findAllByUserUUID(String userUUID);
     List<CustomerBankAccount> findAllByCustomerUBNId(Long ubnId);
     Optional<CustomerBankAccount> findByAccountNumber(String accountNumber);
+    Boolean existsByAccountNumber(String accountNumber);
 }

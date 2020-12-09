@@ -1,0 +1,37 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="ACER NITRO 5 (generated)" id="1606804107085-3">
+        <createTable tableName="job_team_details">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="job_team_detailsPK"/>
+            </column>
+            <column name="amount" type="bigint"/>
+            <column name="created_at" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar (max)"/>
+            <column name="employer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="date"/>
+            <column name="job_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proposal_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="date"/>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1606715786304-4">
+        <addColumn tableName="job_team_details">
+            <column name="percentage" type="bigint"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

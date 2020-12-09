@@ -30,7 +30,7 @@ zuul:
   routes:
     authorization-server:
       path: /authserv/**
-      url: http://localhost:8082
+      url: http://localhost:8084
     job-service:
       path: /jobserv/**
       url: http://localhost:8086

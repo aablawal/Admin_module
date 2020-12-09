@@ -1,5 +1,9 @@
 package com.unionbankng.future.authorizationserver.utils;
 
+import org.springframework.ui.Model;
+
+import java.util.Map;
+
 public class Utility {
 
     public static String convertMinutesToWords(int time){

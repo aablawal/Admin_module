@@ -3,24 +3,42 @@ package com.unionbankng.future.authorizationserver.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import com.unionbankng.future.authorizationserver.entities.User;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-
-public class FutureDAOUserDetails extends User implements UserDetails {
+@Getter
+@Setter
+public class FutureDAOUserDetails extends User implements UserDetails, OidcUser {
 
     /**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
+    private Map<String, Object> attributes;
+    private String name;
+    private Map<String, Object> claims;
+    private OidcUserInfo userInfo;
+    private OidcIdToken idToken;
 
 	public FutureDAOUserDetails(User user) {
 
 		super(user);
+    }
+
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return null;
     }
 
     @Override
@@ -60,6 +78,7 @@ public class FutureDAOUserDetails extends User implements UserDetails {
     public boolean isEnabled() {
         return super.getIsEnabled();
     }
-   
-    
+
+
+
 }

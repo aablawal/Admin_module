@@ -37,4 +37,19 @@
             <column name="end_date" type="date"/>
         </createTable>
     </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1606893700632-3">
+        <addColumn tableName="job_proposals">
+            <column name="account_type" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1606893700632-4">
+        <addColumn tableName="job_proposals">
+            <column name="branch_code" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1607150764842-3">
+        <addColumn tableName="job_proposals">
+            <column name="contract_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

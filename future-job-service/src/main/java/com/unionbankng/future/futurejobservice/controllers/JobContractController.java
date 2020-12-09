@@ -1,9 +1,6 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.unionbankng.future.futurejobservice.entities.JobContract;
-import com.unionbankng.future.futurejobservice.entities.JobContractExtension;
-import com.unionbankng.future.futurejobservice.entities.JobMilestone;
-import com.unionbankng.future.futurejobservice.entities.JobProjectSubmission;
+import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import lombok.RequiredArgsConstructor;
@@ -158,11 +155,42 @@ public class JobContractController {
     }
 
 
+    @GetMapping("/v1/bank/transfer/test")
+    public ResponseEntity<APIResponse<String>> transferAmount(){
 
+//               JobTransfer transfer=new JobTransfer();
+//
+//                transfer.setUserId(Long.valueOf(1));
+//                transfer.setJobId(Long.valueOf(1));
+//                transfer.setProposalId(Long.valueOf(1));
+//                transfer.setEmployerId(Long.valueOf(1));
+//                transfer.setCreatedAt(new Date());
+//
+//                //transfer
+//                transfer.setAmount(20);
+//                transfer.setCurrency("NGN");
+//                transfer.setPaymentReference("wiudhgt6789ijhsxg");
+//                transfer.setInitBranchCode("682");
+//
+//                //credit
+//                transfer.setCreditAccountName("DEDICATED NEFT O A");
+//                transfer.setCreditAccountNumber("0055982543");
+//                transfer.setCreditAccountBankCode("032");
+//                transfer.setCreditAccountBranchCode("682");
+//                transfer.setCreditAccountType("CASA");
+//                transfer.setCreditNarration("Testing naration");
+//
+//                //debit
+//                transfer.setDebitAccountName("OLANLOKUN LANRE A");
+//                transfer.setDebitAccountNumber("0040553624");
+//                transfer.setDebitAccountBranchCode("682");
+//                transfer.setDebitAccountType("CASA");
+//                transfer.setDebitNarration("Testing naration 2");
+//
+//
+//        UBNFundsTransferResponse response= bankTransferService.transferUBNtoUBN(transfer);
 
+        return ResponseEntity.ok().body(new APIResponse("success",true, null));
 
-
-
-
-
+    }
 }

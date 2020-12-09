@@ -1,9 +1,17 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
+import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
+import com.unionbankng.future.futurejobservice.enums.JobTeamStatus;
+import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,8 +32,12 @@ public class JobProposalService  implements Serializable {
     private final AppService appService;
     private  final JobProposalRepository repository;
     private  final FileStoreService fileStoreService;
+    private final JobRepository jobRepository;
+    private final JobTeamDetailsRepository jobTeamDetailsRepository;
+    private Logger logger = LoggerFactory.getLogger(JobProposalService.class);
 
-    public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files){
+
+    public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files,  Model model){
         try {
             String supporting_file_names = null;
             JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
@@ -38,7 +50,34 @@ public class JobProposalService  implements Serializable {
             if (supporting_file_names != null)
                 application.supportingFiles = supporting_file_names;
 
-            return repository.save(application);
+            JobProposal proposal= repository.save(application);
+            if(proposal!=null) {
+                Job job = jobRepository.findById(proposal.jobId).orElse(null);
+                if (job != null) {
+                    if (job.type == JobType.TEAMS_PROJECT) {
+                        //calculate user founds
+                        int money = (int)(job.getBudget() / 100)*10;
+
+                        JobTeamDetails teamMember = new JobTeamDetails();
+                        teamMember.setAmount(proposal.bidAmount);
+                        teamMember.setJobId(proposal.jobId);
+                        teamMember.setProposalId(proposal.id);
+                        teamMember.setEmployerId(proposal.employerId);
+                        teamMember.setStatus(JobTeamStatus.PE);
+                        teamMember.setDescription(proposal.about);
+                        teamMember.setPercentage(Long.valueOf(10));
+                        teamMember.setAmount(Long.valueOf(money));
+                        jobTeamDetailsRepository.save(teamMember);
+                    }
+                    return  proposal;
+                }else{
+                    logger.info("JOBSERVICE: Unable to save Job");
+                    return  null;
+                }
+            }else{
+                logger.info("JOBSERVICE: Unable to save Proposal");
+                return null;
+            }
 
         }catch ( Exception e){
             e.printStackTrace();
@@ -58,17 +97,27 @@ public class JobProposalService  implements Serializable {
         JobProposal proposal= (JobProposal) data.getAttribute("proposal");
         if(proposal!=null)
             this.updateJobProposalStatus(proposal.id,"CA",model);
+        else
+            logger.info("JOBSERVICE: Proposal not found");
         return proposal;
     }
 
     public Model findProposalById(Long id,Model model) {
-        JobProposal proposal = repository.findById(id).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Proposal Available"));
-        return appService.getProposal(proposal, model);
+        JobProposal proposal = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Proposal Available"));
+        if (proposal != null)
+
+            return appService.getProposal(proposal, model);
+        else
+            return null;
     }
 
     public Model findProposalByUserId(Long jobId, Long userId,Model model) {
         JobProposal proposal = repository.findProposalByUserId(jobId, userId);
-        return appService.getProposal(proposal, model);
+
+        if(proposal!=null)
+            return appService.getProposal(proposal, model);
+        else
+            return null;
     }
 
 
@@ -91,6 +140,4 @@ public class JobProposalService  implements Serializable {
     public Long getProposalsCount(Long jid){
         return repository.getCountByJobId(jid);
     }
-
-
 }

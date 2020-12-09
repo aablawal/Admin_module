@@ -11,14 +11,15 @@ public class User {
     private String img;
     private String fullName;
     private String uuid;
+    private String umid;
     private String username;
     private String email;
     private String phoneNumber;
     private String accountNumber;
+    private String accountName;
     private String address;
     private String country;
     private String stateOfResidence;
     private Boolean isEnabled;
     private String createdAt;
-
 }

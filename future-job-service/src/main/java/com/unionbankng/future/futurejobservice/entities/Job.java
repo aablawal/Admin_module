@@ -39,6 +39,7 @@ public class Job implements Serializable {
     @NotNull
     @Column(nullable=false)
     public String categories;
+    public String invitationId;
     public String duration;
     @NotNull
     @Column(nullable=false)
@@ -51,6 +52,8 @@ public class Job implements Serializable {
     public boolean interview;
     public String timeline;
     public String paymentTerms;
+    public String teamExpertiseLevel;
+    public Long teamSize;
     @Column(name="nda_files", columnDefinition="TEXT")
     public String ndaFiles;
     @NotNull
@@ -77,11 +80,14 @@ public class Job implements Serializable {
         this.duration=job.duration;
         this.budget=job.budget;
         this.team=job.team;
+        this.teamSize=job.teamSize;
+        this.teamExpertiseLevel=job.teamExpertiseLevel;
         this.qualification=job.qualification;
         this.skillsRequired=job.skillsRequired;
         this.assessment=job.assessment;
         this.sampleProduct=job.sampleProduct;
         this.timeline=job.timeline;
+        this.invitationId=job.invitationId;
         this.paymentTerms=job.paymentTerms;
         this.ndaFiles=job.ndaFiles;
         this.status=job.status;

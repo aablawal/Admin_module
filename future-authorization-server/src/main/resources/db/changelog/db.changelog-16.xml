@@ -1,0 +1,54 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="ACER NITRO 5 (generated)" id="1606108200561-3">
+        <createTable tableName="notifications">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="notificationsPK"/>
+            </column>
+            <column name="attachment" type="varchar(255)"/>
+            <column name="source" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673989098-1">
+        <addColumn tableName="notifications">
+            <column name="subject" type="varchar(max)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673199991-3">
+        <addColumn tableName="notifications">
+            <column name="action" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="159967234577-5">
+        <addColumn tableName="notifications">
+            <column name="channel" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673199992-3">
+        <addColumn tableName="notifications">
+            <column name="action_type" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="15996731909993-3">
+        <addColumn tableName="notifications">
+            <column name="priority" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="15996731999994-3">
+        <addColumn tableName="notifications">
+            <column name="topic" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -22,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "api")
+@RequestMapping(path = "/api")
 public class ProfileController {
 
     private final ProfileService profileService;
@@ -45,6 +45,8 @@ public class ProfileController {
         RepresentationModel representationModel = RepresentationModel.of(profile);
         Link experiencesLink = linkTo(methodOn(ExperiencesController.class)
                 .findExperienceByProfileId(profile.getId())).withRel("experiences");
+        Link portfolioLink = linkTo(methodOn(PortfolioItemsController.class)
+                .findPortfolioItemByUserId(profile.getId(),0,10)).withRel("portfolio");
         Link qualifications = linkTo(methodOn(QualificationsController.class)
                 .findQualificationsByProfileId(profile.getId())).withRel("qualifications");
         Link Photos = linkTo(methodOn(PhotosController.class)
@@ -54,11 +56,7 @@ public class ProfileController {
         Link skills = linkTo(methodOn(ProfileSkillsController.class)
                 .findQualificationsByProfileId(profile.getId(),0,10)).withRel("skills");
 
-        representationModel.add(experiencesLink);
-        representationModel.add(qualifications);
-        representationModel.add(Photos);
-        representationModel.add(videos);
-        representationModel.add(skills);
+        representationModel.add(experiencesLink,portfolioLink,qualifications,Photos,videos,skills);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,representationModel));
     }

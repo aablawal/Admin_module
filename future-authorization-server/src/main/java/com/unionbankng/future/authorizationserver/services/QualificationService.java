@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -40,7 +41,10 @@ public class QualificationService {
         return qualificationRepository.findById(id);
     }
 
-    @CacheEvict(value = "qualification", key="#id")
+    @Caching(evict = {
+            @CacheEvict(value = "qualifications_by_profile", allEntries = true),
+            @CacheEvict(value = "qualification", key="#id")
+    })
     public void deleteById (Long id)
     {
         Qualification qualification = qualificationRepository.findById(id).orElseThrow(
@@ -54,7 +58,10 @@ public class QualificationService {
         qualificationRepository.deleteById(id);
     }
 
-    @CachePut(value = "qualification", key="#qualification.id")
+    @Caching(evict = {
+            @CacheEvict(value = "qualifications_by_profile", key="#request.profileId"),
+            @CacheEvict(value = "qualification", allEntries = true)
+    })
     public Qualification saveFromRequest (MultipartFile file,QualificationRequest request, Qualification qualification) throws IOException {
         qualification.setProfileId(request.getProfileId());
         qualification.setActivities(request.getActivities());

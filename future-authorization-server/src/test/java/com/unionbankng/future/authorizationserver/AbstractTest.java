@@ -35,7 +35,9 @@ import org.junit.runner.RunWith;
 
 @ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = AuthorizationServerApplication.class)
+@SpringBootTest(classes = AuthorizationServerApplication.class,properties = {
+        "grpc.server.port=-1" // Disable external server
+})
 @WebAppConfiguration
 public abstract class AbstractTest {
 

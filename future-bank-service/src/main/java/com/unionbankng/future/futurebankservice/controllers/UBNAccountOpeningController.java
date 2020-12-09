@@ -1,19 +1,23 @@
 package com.unionbankng.future.futurebankservice.controllers;
 
 
-import com.google.common.base.CharMatcher;
 import com.unionbankng.future.futurebankservice.entities.CustomerBankAccount;
 import com.unionbankng.future.futurebankservice.enums.AccountStatus;
+import com.unionbankng.future.futurebankservice.enums.RecipientType;
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.CustomerBankAccountService;
 import com.unionbankng.future.futurebankservice.services.UBNNewAccountOpeningAPIServiceHandler;
+import com.unionbankng.future.futurebankservice.util.EmailSender;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
@@ -21,6 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +36,11 @@ public class UBNAccountOpeningController {
 
     private final UBNNewAccountOpeningAPIServiceHandler ubnNewAccountOpeningAPIServiceHandler;
     private final CustomerBankAccountService customerBankAccountService;
+    private final MessageSource messageSource;
+    private final EmailSender emailSender;
+
+    @Value("${email.sender}")
+    private String emailSenderAddress;
 
     @GetMapping("/v1/ubn_account_opening/get_supported_id_types")
     public ResponseEntity<APIResponse<AccountIdTypesResponse>> getSupportedIdTypesForAccount() throws IOException {
@@ -95,6 +105,25 @@ public class UBNAccountOpeningController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
 
     }
+
+
+    @GetMapping("/v1/ubn_account_opening/account/source")
+    public ResponseEntity<APIResponse<UBNCustomerTypeRequest>> getSourceOfFund() throws IOException {
+
+        //determine existing or non existing customer
+        Response<UBNCustomerTypeRequest> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getSourceOfFund();
+
+        if(!responseResponse.isSuccessful())
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        //update customer details with account number
+
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+
+    }
+
+
 
     @GetMapping("/v1/ubn_account_opening/get_states_by_country")
     public ResponseEntity<APIResponse<UBNStateByCountryResponse>> getStatesByCountryForAccount(@RequestParam String countryCode) throws IOException {
@@ -260,6 +289,8 @@ public class UBNAccountOpeningController {
     public ResponseEntity<APIResponse<UBNGenericResponse>> uploadDocumentForAccount(@PathVariable Integer type,
                                                                                             @PathVariable Long recordId, @RequestPart("file") MultipartFile file) throws IOException {
 
+        logger.info("file size is {}",file.getSize());
+        logger.info("file name is {}",file.getOriginalFilename());
         //determine existing or non existing customer
         Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.uploadDocumentForAccount(recordId,type,file);
 
@@ -346,34 +377,64 @@ public class UBNAccountOpeningController {
     }
 
     @PostMapping("/v1/ubn_account_opening/complete_account_opening")
-    public ResponseEntity<APIResponse<UBNCompleteAccountPaymentResponse>> completeUBNAccountCreation(
+    public ResponseEntity<APIResponse<UBNAccountDataResponse>> completeUBNAccountCreation(
             @RequestBody @Valid CompleteUBNAccountCreationRequest request, @ApiIgnore OAuth2Authentication authentication
     ) throws IOException {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        //determine existing or non existing customer
-        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(request);
 
-        if(!responseResponse.isSuccessful())
+        //create ubn account
+        UBNAccountCreationRequest ubnAccountCreationRequest = new  UBNAccountCreationRequest();
+        ubnAccountCreationRequest.setCustomerRecordId(request.getCustomerRecordId());
+        ubnAccountCreationRequest.setCustomerType(request.getCustomerType());
+        ubnAccountCreationRequest.setIntroducerTag(request.getIntroducerTag());
+
+        logger.info("UBN account create request  is :{}",ubnAccountCreationRequest);
+
+        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
+                .completeUBNAccountCreation(ubnAccountCreationRequest);
+
+        if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
 
-        UBNCompleteAccountPaymentResponse response = responseResponse.body();
-        //extract account number from response data
-        String accNumber = CharMatcher.inRange('0', '9').retainFrom(response.getData());
-        logger.info("Account Number is :{}",accNumber);
+        Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
+                .getUBNAccountDetails(request.getCustomerRecordId());
+
+        if(!dataResponseResponse.isSuccessful())
+            return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
+
+
+        if(!dataResponseResponse.body().getStatusCode().equals("00"))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse<>("An error occurred", false, dataResponseResponse.body()));
+
+        logger.info("Response  is :{}",dataResponseResponse);
+
+        if(customerBankAccountService.existsByAccountNumber(dataResponseResponse.body().getData().getAccountNumber()))
+            return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
+                    "this account number, no new account was created", true, dataResponseResponse.body()));
 
         CustomerBankAccount customerBankAccount = new CustomerBankAccount();
-        customerBankAccount.setAccountNumber(accNumber);
-        customerBankAccount.setAccountType(request.getAccountType());
+        customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
+        customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
         customerBankAccount.setBranchCode(request.getBranchCode());
-        customerBankAccount.setAccountName(request.getAccountName());
+        customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
         customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
         customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
         customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
 
         customerBankAccountService.save(customerBankAccount);
 
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+        logger.info("Sending confirmation to {}", jwtUserDetail.getUserFullName());
+        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
+                dataResponseResponse.body().getData().getAccountName(),dataResponseResponse.body().getData().getAccountNumber(),dataResponseResponse.body().getData().getAccountType()}
+                , LocaleContextHolder.getLocale())
+        ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Bank Account Created")
+                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
+                        .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
+
+        emailSender.sendEmail(emailBody);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
 
     }
 

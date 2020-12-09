@@ -3,9 +3,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.entities.JobContract;
+import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
+import com.unionbankng.future.futurejobservice.services.JobTeamDetailsService;
 import com.unionbankng.future.futurejobservice.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +25,7 @@ import java.util.*;
 @RequestMapping(path = "api")
 public class JobProposalController {
 
+    private final JobTeamDetailsService jobTeamDetailsService;
     private final JobContractService approveJobProposal;
     private final JobProposalService service;
     private final UserService userService;
@@ -35,8 +38,8 @@ public class JobProposalController {
 
     @PostMapping(value = "/v1/job/apply", consumes = "multipart/form-data")
     public ResponseEntity<APIResponse<JobProposal>> applyJob(@Valid @RequestParam(value = "data", required = true) String ProposalData,
-                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles) throws IOException {
-        JobProposal appliedJob = service.applyJob(ProposalData, supportingFiles);
+                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,  Model model) throws IOException {
+        JobProposal appliedJob = service.applyJob(ProposalData, supportingFiles,  model);
         if (appliedJob != null)
             return ResponseEntity.ok().body(new APIResponse("success", true, appliedJob));
         else
@@ -101,5 +104,15 @@ public class JobProposalController {
             return ResponseEntity.ok().body(
                     new APIResponse("failed", false, null));
     }
+
+    @GetMapping("/v1/job/teams/{jobId}")
+    public ResponseEntity<APIResponse> findTeamsByJobId(@PathVariable Long jobId){
+        List<JobTeamDetails> response= jobTeamDetailsService.findTeamsByJobId(jobId);
+        if(response!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, response));
+        else
+            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+    }
+
 }
 

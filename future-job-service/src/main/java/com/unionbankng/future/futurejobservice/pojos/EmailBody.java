@@ -1,15 +1,16 @@
-package com.unionbankng.future.futuremessagingservice.pojo;
+package com.unionbankng.future.futurejobservice.pojos;
+
+import lombok.Builder;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
 
-import lombok.Data;
-
-
-public @Data class EmailBody implements Serializable {
+public @Data
+@Builder
+class EmailBody implements Serializable {
 
     private static final long serialVersionUID = -295422703255886286L;
-
     protected List<EmailAttachment> attachments;
     protected String body;
     protected String footer;

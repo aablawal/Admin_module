@@ -1,8 +1,10 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.Experience;
+import com.unionbankng.future.authorizationserver.entities.PortfolioItem;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
+import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
 import com.unionbankng.future.authorizationserver.services.ExperienceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "api")
+@RequestMapping(path = "/api")
 public class ExperiencesController {
 
     private final ExperienceService experienceService;
@@ -43,6 +45,8 @@ public class ExperiencesController {
         return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
 
     }
+
+
 
     @PostMapping(value = "/v1/experiences/update_existing",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<Experience>> updateExperience(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart ExperienceRequest request)

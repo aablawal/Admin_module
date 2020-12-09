@@ -15,7 +15,9 @@ public class PersonalInfoUpdateRequest {
     private String dialingCode;
     private String phoneNumber;
     private String address;
+    private String city;
     private String country;
     private String stateOfResidence;
     private Date dateOfBirth;
+    private String zipCode;
 }
