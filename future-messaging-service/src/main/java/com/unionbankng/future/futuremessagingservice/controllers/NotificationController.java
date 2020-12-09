@@ -50,4 +50,9 @@ public class NotificationController {
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findTopNotificationsByPriority(id,type)));
     }
 
+    @GetMapping(value = "/v1/messaging/test")
+    public ResponseEntity<APIResponse<String>> test(){
+        return ResponseEntity.ok().body(new APIResponse<>("Success",true,"It worked finnaly"));
+    }
+
 }

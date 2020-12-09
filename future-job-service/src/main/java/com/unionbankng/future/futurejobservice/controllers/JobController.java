@@ -130,6 +130,6 @@ public class JobController {
 //        message.setSubject("This is the subject");
 //        emailService.sendEmail(message);
         return ResponseEntity.ok().body(
-                new APIResponse("success",true,null));
+                new APIResponse("success",true,"Job serv worked"));
     }
 }
