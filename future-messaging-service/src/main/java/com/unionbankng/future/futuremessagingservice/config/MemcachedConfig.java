@@ -69,16 +69,16 @@ public class MemcachedConfig extends AbstractSSMConfiguration {
         return cf;
     }
 
-//    @Bean
-//    public CacheManager cacheManager() throws Exception {
-//        // Use SSMCacheManager instead of ExtendedSSMCacheManager if you do not
-//        // need to set per key expiration
-//        ExtendedSSMCacheManager cacheManager = new ExtendedSSMCacheManager();
-//        Cache cache = this.defaultMemcachedClient().getObject();
-//        // SSMCache(cache, 0, false) creates a cache with default key expiration
-//        // of 0 (no expiration) and flushing disabled (allowClear = false)
-//        cacheManager.setCaches(Arrays.asList(new SSMCache(cache, 0, false)));
-//        return cacheManager;
-//    }
+    @Bean
+    public CacheManager cacheManager() throws Exception {
+        // Use SSMCacheManager instead of ExtendedSSMCacheManager if you do not
+        // need to set per key expiration
+        ExtendedSSMCacheManager cacheManager = new ExtendedSSMCacheManager();
+        Cache cache = this.defaultMemcachedClient().getObject();
+        // SSMCache(cache, 0, false) creates a cache with default key expiration
+        // of 0 (no expiration) and flushing disabled (allowClear = false)
+        cacheManager.setCaches(Arrays.asList(new SSMCache(cache, 0, false)));
+        return cacheManager;
+    }
 
 }

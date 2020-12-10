@@ -12,7 +12,7 @@ class NotificationBody implements Serializable {
     private static final long serialVersionUID = -295422703255886286L;
     protected String body;
     protected String subject;
-    protected String recipient;
+    protected Long recipient;
     protected String attachment;
     protected String action;
     protected String channel;

@@ -1,11 +1,14 @@
 package com.unionbankng.future.futuremessagingservice.services;
 import com.unionbankng.future.futuremessagingservice.entities.Notification;
 import com.unionbankng.future.futuremessagingservice.enums.NotificationStatus;
+import com.unionbankng.future.futuremessagingservice.pojos.NotificationBody;
+import com.unionbankng.future.futuremessagingservice.pojos.User;
 import com.unionbankng.future.futuremessagingservice.repositories.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,15 +21,17 @@ import java.util.*;
 public class NotificationService {
 
     Logger logger = LoggerFactory.getLogger(NotificationService.class);
+
     private final NotificationRepository notificationRepository;
-    ///private final UserRepository userRepository;
-    //@Value("${google.sidekiq.push_notification_api_key}")
-    private String token="AIzaSyB9FEdOjMJl9UrB2M-NahwFmF6L0zRntpg";
+    private final UserService userService;
+    @Value("${google.sidekiq.push_notification_api_key}")
+    private String token;
     //@Value("${google.sidekiq.push_notification_server_key}")
     private String serverKey="key=AAAAQHNQc1M:APA91bGLrhyQfJXUHbXTiRozIJUq6SVdkOdY2jXYITSOkTMyJEzJ7wbSlEHaAIw5ElaF_B2N-HNnqlylhxwDWtg5q-kdjkqpym85kAxntnAzxTLcyKim5-Z02UhATQ5hEyFEXNti8Hk1";
     private String baseURL="https://fcm.googleapis.com/fcm/send";
     @Autowired
     private RestTemplate rest;
+
 
     public HttpHeaders getHeaders(){
         HttpHeaders headers = new HttpHeaders();
@@ -43,8 +48,8 @@ public class NotificationService {
             logger.info(notification.toString());
             Map<String,Object> notificationBase= new HashMap<>();
             notificationBase.put("notification",notification);
-           // notificationBase.put("source",userRepository.findById(notification.getSource()));
-           // notificationBase.put("destination",userRepository.findById(notification.getDestination()));
+            notificationBase.put("source",userService.getUserById(notification.getSource()));
+            notificationBase.put("destination",userService.getUserById(notification.getDestination()));
             preparedNotification.add(notificationBase);
         }));
         return  preparedNotification;
@@ -52,75 +57,93 @@ public class NotificationService {
     public Map<String,Object> getAbsoluteNotification(Notification notification){
         Map<String,Object> notificationBase= new HashMap<>();
         notificationBase.put("notification",notification);
-       // notificationBase.put("source",userRepository.findById(notification.getSource()));
-        //notificationBase.put("destination",userRepository.findById(notification.getDestination()));
+        notificationBase.put("source",userService.getUserById(notification.getSource()));
+        notificationBase.put("destination",userService.getUserById(notification.getDestination()));
         return  notificationBase;
     }
-//
-//    public ResponseEntity<String> pushNotification(Long userId, NotificationBody notificationBody) throws JsonProcessingException {
-//        User sender= userRepository.findById(userId).orElse(null);
-//        User recipient= userRepository.findByUmid(notificationBody.getRecipient()).orElse(null);
-//        if(sender!=null   && recipient !=null) {
-//            try {
-//
-//                if(notificationBody.getActionType()==null)
-//                    notificationBody.setActionType("REDIRECT");
-//                if(notificationBody.getPriority()==null)
-//                    notificationBody.setPriority("NORMAL");
-//
-//                //prepare traditional notification
-//                Notification traditionalNotification = new Notification();
-//                traditionalNotification.setSource(sender.getId());
-//                traditionalNotification.setDestination(recipient.getId());
-//                traditionalNotification.setMessage(notificationBody.getBody());
-//                traditionalNotification.setAttachment(notificationBody.getAttachment());
-//                traditionalNotification.setStatus(NotificationStatus.NS);
-//                traditionalNotification.setAction(notificationBody.getAction());
-//                traditionalNotification.setActionType(notificationBody.getActionType());
-//                traditionalNotification.setPriority(notificationBody.getPriority());
-//                traditionalNotification.setTopic(notificationBody.getTopic());
-//                traditionalNotification.setSubject(notificationBody.getSubject());
-//                traditionalNotification.setChannel(notificationBody.getChannel());
-//
-//                //prepare push  notification
-//                Map<String, Object> pushNotification= new HashMap<>();
-//                Map<String, Object> pushBody= new HashMap<>();
-//                pushBody.put("title",notificationBody.getSubject());
-//                pushBody.put("body",notificationBody.getBody());
-//                pushBody.put("action",notificationBody.getAction());
-//                pushBody.put("actionType", notificationBody.getActionType().toString());
-//                pushBody.put("priority", notificationBody.getPriority());
-//                pushBody.put("topic", notificationBody.getTopic());
-//                pushBody.put("icon","./favicon.ico");
-//                pushNotification.put("notification",pushBody);
-//                pushNotification.put("to",notificationBody.getRecipient());
-//
-//                HttpEntity<Object> requestEntity = new HttpEntity<Object>(pushNotification , this.getHeaders());
-//                ResponseEntity<String> response = rest.exchange(baseURL, HttpMethod.POST, requestEntity, String.class);
-//                if (response.getStatusCode().is2xxSuccessful()) {
-//                        notificationRepository.save(traditionalNotification);
-//                }else{
-//                    logger.info("Unable to fire push notification");
-//                    logger.error(response.getBody());
-//                }
-//                return response;
-//            }catch (Exception e){
-//                logger.info("Unable to fire push notification");
-//                e.printStackTrace();
-//                return  null;
-//            }
-//        }
-//        else{
-//            logger.info("Sender or recipient not found");
-//            return  null;
-//        }
-//    }
+
+    public ResponseEntity<String> pushNotification(Long userId, NotificationBody notificationBody){
+        User sender= userService.getUserById(userId);
+        User recipient= userService.getUserById(notificationBody.getRecipient());
+        if(sender!=null   && recipient !=null) {
+            try {
+                ResponseEntity<String> response = null;
+
+                if(notificationBody.getActionType()==null)
+                    notificationBody.setActionType("REDIRECT");
+                if(notificationBody.getPriority()==null)
+                    notificationBody.setPriority("NORMAL");
+
+                //prepare traditional notification
+                Notification traditionalNotification = new Notification();
+                traditionalNotification.setSource(sender.getId());
+                traditionalNotification.setDestination(recipient.getId());
+                traditionalNotification.setMessage(notificationBody.getBody());
+                traditionalNotification.setAttachment(notificationBody.getAttachment());
+                traditionalNotification.setStatus(NotificationStatus.NS);
+                traditionalNotification.setAction(notificationBody.getAction());
+                traditionalNotification.setActionType(notificationBody.getActionType());
+                traditionalNotification.setPriority(notificationBody.getPriority());
+                traditionalNotification.setTopic(notificationBody.getTopic());
+                traditionalNotification.setSubject(notificationBody.getSubject());
+                traditionalNotification.setChannel(notificationBody.getChannel());
+
+                if(recipient.getUmid()!=null) {
+                    //prepare push  notification
+                    Map<String, Object> pushNotification = new HashMap<>();
+                    Map<String, Object> pushBody = new HashMap<>();
+                    pushBody.put("title", notificationBody.getSubject());
+                    pushBody.put("body", notificationBody.getBody());
+                    pushBody.put("action", notificationBody.getAction());
+                    pushBody.put("actionType", notificationBody.getActionType().toString());
+                    pushBody.put("priority", notificationBody.getPriority());
+                    pushBody.put("topic", notificationBody.getTopic());
+                    pushBody.put("icon", "./favicon.ico");
+                    pushNotification.put("notification", pushBody);
+                    pushNotification.put("to", recipient.getUmid());
+
+                    HttpEntity<Object> requestEntity = new HttpEntity<Object>(pushNotification, this.getHeaders());
+                    response = rest.exchange(baseURL, HttpMethod.POST, requestEntity, String.class);
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        notificationRepository.save(traditionalNotification);
+                    } else {
+                        notificationRepository.save(traditionalNotification);
+                        logger.info("Unable to fire push notification");
+                        logger.error(response.getBody());
+                    }
+                }else{
+                    logger.info("No permission token to fire push notification to "+recipient.getFullName());
+                    notificationRepository.save(traditionalNotification);
+                }
+                return response;
+            }catch (Exception e){
+                logger.info("Unable to fire push notification");
+                e.printStackTrace();
+                return  null;
+            }
+        }
+        else{
+            logger.info("Sender or recipient not found");
+            return  null;
+        }
+    }
     public Notification markNotificationAsSeen(Long id){
         Notification notification=notificationRepository.findById(id).orElse(null);
         if(notification!=null)
             notification.setStatus(NotificationStatus.SE);
         return notificationRepository.save(notification);
     }
+
+    public boolean markAllAsSeen(Long id){
+        notificationRepository.updateAllAsSeen(id);
+        return  true;
+    }
+    public boolean clearAllNotifications(Long id){
+          notificationRepository.clearAll(id);
+          return  true;
+    }
+
+
     public Map<String,Object> findNotificationById(Long id){
         return getAbsoluteNotification(notificationRepository.findById(id).orElse(null));
     }

@@ -20,9 +20,6 @@ public class UBNConfigurationProperties {
     private static String AUTH_URL ;
     public static String SEND_SMS ;
     public static String EMAIL_URL;
-
-
-
     private static String CLIENT_SECRET;
     private static String CLIENT_ID;
     private static String GRANT_TYPE;
