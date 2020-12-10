@@ -22,7 +22,6 @@ public class UserService {
          User user = new User();
          user.setId(response.getId());
          user.setUuid(response.getUuid());
-         user.setUmid(response.getUmid());
          user.setFullName(response.getFullName());
          user.setCountry(response.getCountry());
          user.setAddress(response.getAddress());

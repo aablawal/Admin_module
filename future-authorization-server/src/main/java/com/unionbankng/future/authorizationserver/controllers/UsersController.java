@@ -41,11 +41,6 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
-    @PutMapping(value = "/v1/update/user/mid/{id}")
-    public ResponseEntity<APIResponse<String>> updateUserMID(@Valid @PathVariable Long id, @RequestParam String mid, @ApiIgnore OAuth2Authentication auth)  throws IOException {
-        return ResponseEntity.ok().body(new APIResponse<>("Success",true,userService.updateUserMID(id,mid)));
-    }
-
     @GetMapping("/v1/users/{userId}")
     public ResponseEntity<APIResponse<User>> getUserById(@PathVariable Long userId) {
 

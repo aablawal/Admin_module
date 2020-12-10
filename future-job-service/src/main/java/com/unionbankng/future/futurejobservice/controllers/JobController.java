@@ -3,9 +3,11 @@ import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.EmailMessage;
+import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
+import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +31,7 @@ public class JobController {
         response.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS,DELETE,PUT");
     }
     private final JobService service;
-    private final EmailService emailService;
-    private final UserService userService;
+    private final NotificationSender notificationSender;
     Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
@@ -123,12 +124,17 @@ public class JobController {
     @GetMapping("/v1/test")
     public ResponseEntity<APIResponse<String>> test(){
 
-        logger.info(userService.getUserById(Long.valueOf(1)).toString());
-//
-//        message.setBody("Hello");
-//        message.setRecipient("net.rabiualiyu@gmail.com");
-//        message.setSubject("This is the subject");
-//        emailService.sendEmail(message);
+        NotificationBody body= new NotificationBody();
+        body.setBody("Wow! this is great, can we do same around us, its amazing...");
+        body.setSubject("This is the subject");
+        body.setAttachment("none");
+        body.setActionType("REDIRECT");
+        body.setAction("/job/details/2");
+        body.setTopic("'Community'");
+        body.setChannel("S");
+        body.setRecipient(Long.valueOf(2));
+
+        notificationSender.sendEmail(body);
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,"Job serv worked"));
     }
