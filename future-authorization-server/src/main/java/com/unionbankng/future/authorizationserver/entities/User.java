@@ -36,6 +36,8 @@ public class User implements Serializable {
     private String lastName;
     @Column(length=50, nullable = false, unique = true)
     private String uuid;
+    @Column(columnDefinition="TEXT")
+    private String umid;
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false, unique = true)
@@ -77,6 +79,7 @@ public class User implements Serializable {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.username = user.getUsername();
+        this.umid=user.getUmid();
         this.uuid = user.getUuid();
         this.authProvider = user.getAuthProvider();
         this.email = user.getEmail();

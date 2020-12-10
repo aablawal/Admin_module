@@ -163,8 +163,6 @@
 			<version>2.6.4</version>
 			<scope>compile</scope>
 		</dependency>
-
-
 	</dependencies>
 
 	<dependencyManagement>

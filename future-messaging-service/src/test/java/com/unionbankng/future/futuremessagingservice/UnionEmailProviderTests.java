@@ -2,8 +2,8 @@ package com.unionbankng.future.futuremessagingservice;
 
 import com.unionbankng.future.futuremessagingservice.enums.RecipientType;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
-import com.unionbankng.future.futuremessagingservice.pojo.EmailAddress;
-import com.unionbankng.future.futuremessagingservice.pojo.EmailBody;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailAddress;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionEmailProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -3,7 +3,7 @@ package com.unionbankng.future.futuremessagingservice.jmslisteners;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
-import com.unionbankng.future.futuremessagingservice.pojo.EmailBody;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionEmailProvider;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

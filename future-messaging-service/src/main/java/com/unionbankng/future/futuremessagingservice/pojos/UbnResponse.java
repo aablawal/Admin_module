@@ -1,4 +1,4 @@
-package com.unionbankng.future.futuremessagingservice.pojo;
+package com.unionbankng.future.futuremessagingservice.pojos;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

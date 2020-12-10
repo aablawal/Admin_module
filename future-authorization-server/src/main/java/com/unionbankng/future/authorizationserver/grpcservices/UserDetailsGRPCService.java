@@ -14,35 +14,43 @@ public class UserDetailsGRPCService extends SidekiqUserDetailServiceGrpc.Sidekiq
 
     private final UserService service;
 
-    public void getUserDetail(UserDetailRequest request, StreamObserver<UserDetailResponse> responseObserver){
+    public void getUserDetail(UserDetailRequest request, StreamObserver<UserDetailResponse> responseObserver)
+    {
+        try {
+            User user = service.findById(request.getUserId()).orElse(null);
+            UserDetailResponse response = null;
+            if (user != null) {
 
-        User user = service.findById(request.getUserId()).orElse(null);
-        UserDetailResponse response=null;
-        if(user!=null){
-            response=UserDetailResponse.newBuilder()
-                    .setId(user.getId())
-                    .setUuid(user.getUuid())
-                    .setUsername(user.getUsername())
-                    .setAddress(user.getUserAddress())
-                    .setFirstName(user.getFirstName())
-                    .setLastName(user.getLastName())
-                    .setFullName(user.getFirstName()+" "+user.getLastName())
-                    .setAccountNumber(user.getAccountNumber())
-                    .setAccountName(user.getAccountName())
-                    .setAuthProvider(user.getAuthProvider().name())
-                    .setCountry(user.getCountry())
-                    .setStateOfResidence(user.getStateOfResidence())
-                    .setPhoneNumber(user.getPhoneNumber())
-                    .setIsEnabled(user.getIsEnabled())
-                    .setUpdatedAt(user.getDateUpdated().toString())
-                    .setCreatedAt(user.getCreatedAt().toString())
-                    .setDateOfBirth(user.getDateOfBirth().toString())
-                    .setDialingCode(user.getDialingCode())
-                    .setEmail(user.getEmail())
-                    .setImg(user.getImg()).build();
+                response = UserDetailResponse.newBuilder()
+                        .setId(user.getId())
+                        .setUuid(user.getUuid())
+                        .setUmid(user.getUmid()==null?"":user.getUmid())
+                        .setUsername(user.getUsername())
+                        .setAddress(user.getUserAddress() == null ? "" : user.getUserAddress())
+                        .setFirstName(user.getFirstName())
+                        .setLastName(user.getLastName())
+                        .setFullName(user.getFirstName() + " " + user.getLastName())
+                        .setAccountNumber(user.getAccountNumber() == null ? "" : user.getAccountNumber())
+                        .setAccountName(user.getAccountName() == null ? "" : user.getAccountName())
+                        .setAuthProvider(user.getAuthProvider().name())
+                        .setCountry(user.getCountry() == null ? "" : user.getCountry())
+                        .setStateOfResidence(user.getStateOfResidence() == null ? "" : user.getStateOfResidence())
+                        .setPhoneNumber(user.getPhoneNumber())
+                        .setIsEnabled(user.getIsEnabled())
+                        .setUpdatedAt(user.getDateUpdated().toString())
+                        .setCreatedAt(user.getCreatedAt().toString())
+                        .setDateOfBirth(user.getDateOfBirth() == null ? "" : user.getDateOfBirth().toString())
+                        .setDialingCode(user.getDialingCode())
+                        .setEmail(user.getEmail())
+                        .setImg(user.getImg() == null ? "" : user.getImg())
+                        .build();
 
+
+            }
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
     }
 }

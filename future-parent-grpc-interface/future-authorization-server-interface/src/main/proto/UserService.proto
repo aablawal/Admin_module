@@ -13,20 +13,21 @@ message UserDetailResponse {
     string firstName =4;
     string lastName  =5;
     string uuid =6;
-    string username =7;
-    string email =8;
-    string dialingCode =9;
-    string phoneNumber =10;
-    string accountNumber =11;
-    string accountName =12;
-    string address =13;
-    string country =14;
-    string stateOfResidence  =15;
-    string dateOfBirth =16;
-    bool isEnabled=17;
-    string authProvider=18;
-    string createdAt =19;
-    string updatedAt =20;
+    string umid =7;
+    string username =8;
+    string email =9;
+    string dialingCode =10;
+    string phoneNumber =11;
+    string accountNumber =12;
+    string accountName =13;
+    string address =14;
+    string country =15;
+    string stateOfResidence  =16;
+    string dateOfBirth =17;
+    bool isEnabled=18;
+    string authProvider=19;
+    string createdAt =20;
+    string updatedAt =21;
 }
 
 service SidekiqUserDetailService {

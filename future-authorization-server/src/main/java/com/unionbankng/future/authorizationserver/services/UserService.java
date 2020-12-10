@@ -67,7 +67,6 @@ public class UserService {
     public Optional<User> findByEmailOrUsername(@ParameterValueKeyProvider String email, @ParameterValueKeyProvider String username){
         return userRepository.findByEmailOrUsername(email,username);
     }
-
     @CachePut(value = "user", key="#userId")
     public User updateProfileImage(MultipartFile image , @ParameterValueKeyProvider Long userId) throws IOException {
 

@@ -11,6 +11,7 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import org.springframework.util.ErrorHandler;
+import org.springframework.web.client.RestTemplate;
 
 import javax.jms.ConnectionFactory;
 
@@ -21,6 +22,11 @@ public class FutureMessagingServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FutureMessagingServiceApplication.class, args);
+	}
+
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 
 	@Bean

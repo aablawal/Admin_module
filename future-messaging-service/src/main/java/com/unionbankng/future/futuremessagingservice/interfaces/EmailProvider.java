@@ -1,8 +1,6 @@
 package com.unionbankng.future.futuremessagingservice.interfaces;
 
-import com.unionbankng.future.futuremessagingservice.pojo.EmailBody;
-import com.unionbankng.future.futuremessagingservice.pojo.SMS;
-import org.thymeleaf.TemplateEngine;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 
 public interface EmailProvider {
 

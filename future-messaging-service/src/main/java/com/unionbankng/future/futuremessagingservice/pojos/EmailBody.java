@@ -1,4 +1,4 @@
-package com.unionbankng.future.futuremessagingservice.pojo;
+package com.unionbankng.future.futuremessagingservice.pojos;
 
 import java.io.Serializable;
 import java.util.List;
