@@ -23,8 +23,8 @@ public class UserDetailsGRPCService extends SidekiqUserDetailServiceGrpc.Sidekiq
 
                 response = UserDetailResponse.newBuilder()
                         .setId(user.getId())
-                        .setUuid(user.getUuid()==null?"":user.getUmid())
-                        .setUmid(user.getUmid())
+                        .setUuid(user.getUuid())
+                        .setUmid(user.getUmid()==null?"":user.getUmid())
                         .setUsername(user.getUsername())
                         .setAddress(user.getUserAddress() == null ? "" : user.getUserAddress())
                         .setFirstName(user.getFirstName())
