@@ -1,15 +1,19 @@
 package com.unionbankng.future.futuremessagingservice.controllers;
+import com.unionbankng.future.futuremessagingservice.entities.MessagingToken;
 import com.unionbankng.future.futuremessagingservice.entities.Notification;
 import com.unionbankng.future.futuremessagingservice.pojos.APIResponse;
 import com.unionbankng.future.futuremessagingservice.pojos.NotificationBody;
 import com.unionbankng.future.futuremessagingservice.services.NotificationService;
-import com.unionbankng.future.futuremessagingservice.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +23,15 @@ import java.util.Map;
 public class NotificationController {
 
     private final NotificationService notificationService;
-    private final UserService userService;
     Logger logger = LoggerFactory.getLogger(NotificationController.class);
 
+
+    @PutMapping(value = "/v1/update/user/mid/{id}")
+    public ResponseEntity<APIResponse<MessagingToken>> updateUserMID(@Valid @PathVariable Long id, @RequestParam String mid, @ApiIgnore OAuth2Authentication auth)  throws IOException {
+        return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.updateUserMID(id,mid)));
+    }
     @PostMapping(value = "/v1/push/notification/{id}")
-    public ResponseEntity<APIResponse<ResponseEntity<String>>> pushNotification(@Valid @PathVariable Long id, @Valid @RequestBody NotificationBody notificationBody)  {
+    public ResponseEntity<APIResponse<Notification>> pushNotification(@Valid @PathVariable Long id, @Valid @RequestBody NotificationBody notificationBody)  {
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.pushNotification(id,notificationBody)));
     }
     @PutMapping(value = "/v1/notification/mark/seen/{id}")
@@ -62,12 +70,4 @@ public class NotificationController {
     public ResponseEntity<APIResponse<List<Object>>> getAllNotificationsByPriority(@Valid @PathVariable Long id, @RequestParam String type){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findTopNotificationsByPriority(id,type)));
     }
-
-    @GetMapping(value = "/v1/test")
-    public ResponseEntity<APIResponse<String>> test(){
-        logger.info("Hello from messaging service");
-        logger.info(userService.getUserById(Long.valueOf(1)).toString());
-        return ResponseEntity.ok().body(new APIResponse<>("Success",true,"It worked finnaly"));
-    }
-
 }
