@@ -92,7 +92,7 @@ public class NotificationService {
 
                 //prepare traditional notification
                 Notification traditionalNotification = new Notification();
-                traditionalNotification.setSource(sender.getId());
+                traditionalNotification.setSource(userId);
                 traditionalNotification.setDestination(recipient.getId());
                 traditionalNotification.setMessage(notificationBody.getBody());
                 traditionalNotification.setAttachment(notificationBody.getAttachment());

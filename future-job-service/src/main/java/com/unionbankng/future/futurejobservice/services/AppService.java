@@ -24,6 +24,7 @@ public class AppService {
     private final UserService userService;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
 
+
     public Model getPaginated(Page page, List data, Model model){
         model.addAttribute("data",data);
         model.addAttribute("totalPages",page.getTotalPages());

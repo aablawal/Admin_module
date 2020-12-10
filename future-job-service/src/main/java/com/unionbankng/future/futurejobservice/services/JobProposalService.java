@@ -6,9 +6,12 @@ import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.enums.JobTeamStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
+import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
+import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,8 @@ public class JobProposalService  implements Serializable {
     private final JobRepository jobRepository;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
     private Logger logger = LoggerFactory.getLogger(JobProposalService.class);
+    private final UserService userService;
+    private final NotificationSender notificationSender;
 
 
     public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files,  Model model){
@@ -69,6 +74,23 @@ public class JobProposalService  implements Serializable {
                         teamMember.setAmount(Long.valueOf(money));
                         jobTeamDetailsRepository.save(teamMember);
                     }
+
+                    //fire notification
+                    User currentUser =userService.getUserById(proposal.getUserId());
+                    Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
+                    if(currentUser!=null && currentJob!=null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(currentUser.getFullName() + " applied to your  project for "+currentJob.getTitle());
+                        body.setSubject("New Proposal");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/my-job/proposals/"+proposal.getJobId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setRecipient(proposal.getEmployerId());
+                        notificationSender.sendEmail(body);
+                    }
+                    //end
+
                     return  proposal;
                 }else{
                     logger.info("JOBSERVICE: Unable to save Job");
@@ -95,10 +117,27 @@ public class JobProposalService  implements Serializable {
     public JobProposal cancelJobProposal(Long jobId, Long userId, Model model){
         Model data =this.findProposalByUserId(jobId,userId,model);
         JobProposal proposal= (JobProposal) data.getAttribute("proposal");
-        if(proposal!=null)
-            this.updateJobProposalStatus(proposal.id,"CA",model);
-        else
+        if(proposal!=null) {
+            this.updateJobProposalStatus(proposal.id, "CA", model);
+            //fire notification
+            User currentUser =userService.getUserById(proposal.getEmployerId());
+            Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
+            if(currentUser!=null && currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody(currentUser.getFullName() + " canceled  your proposal for "+currentJob.getTitle());
+                body.setSubject("Proposal Canceled");
+                body.setActionType("REDIRECT");
+                body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setRecipient(proposal.getUserId());
+                notificationSender.sendEmail(body);
+            }
+            //end
+        }
+        else {
             logger.info("JOBSERVICE: Proposal not found");
+        }
         return proposal;
     }
 
