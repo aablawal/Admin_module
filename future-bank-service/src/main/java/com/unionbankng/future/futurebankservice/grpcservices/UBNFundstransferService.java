@@ -55,9 +55,10 @@ public class UBNFundstransferService extends UBNFundsTransferServiceGrpc.UBNFund
                 ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder().setCode("01").build();
 
             } else {
-                ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder().setCode(responseResponse.body().getCode())
-                        .setReference(responseResponse.body().getReference())
-                        .setMessage(responseResponse.body().getMessage()).build();
+                ubnFundsTransferResponse = UBNFundsTransferResponse.newBuilder()
+                        .setCode(responseResponse.body().getCode()==null?"None":responseResponse.body().getCode())
+                        .setReference(responseResponse.body().getReference()==null?"None":responseResponse.body().getReference())
+                        .setMessage(responseResponse.body().getMessage()==null?"None":responseResponse.body().getMessage()).build();
             }
 
 

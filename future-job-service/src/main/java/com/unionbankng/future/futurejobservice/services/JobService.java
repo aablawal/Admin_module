@@ -5,8 +5,10 @@ import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import com.unionbankng.future.futurejobservice.enums.JobTeamStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.*;
+import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ public class JobService {
     private  final FileStoreService fileStoreService;
     private final JobTeamRepository teamRepository;
     private final UserService userService;
+    private final NotificationSender notificationSender;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
@@ -121,6 +124,25 @@ public class JobService {
 
                         }
                     }
+
+                    //fire notification
+                    User currentUser =userService.getUserById(savedJob.getOid());
+                    Job currentJob=jobRepository.findById(savedJob.getId()).orElse(null);
+                    if(currentUser!=null && currentJob!=null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody("Hi "+currentUser.getFullName() + ", your job for "+currentJob.getTitle()+" has been published");
+                        body.setSubject("Job Published");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/job/details/"+savedJob.getId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setRecipient(savedJob.getOid());
+                        notificationSender.sendEmail(body);
+                        logger.info("Notification fired");
+                    }else{
+                        logger.info("Unable to fire notifications");
+                    }
+                    //end
                     return  savedJob;
                 }else{
                     return  savedJob;
@@ -154,6 +176,26 @@ public class JobService {
                     jobProposalRepository.save(jobProposal);
                 });
             }
+
+
+            //fire notification
+            User currentUser =userService.getUserById(job.getOid());
+            Job currentJob=jobRepository.findById(job.getId()).orElse(null);
+            if(currentUser!=null && currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody("Your job for "+currentJob.getTitle()+" has been closed");
+                body.setSubject("Job Closed");
+                body.setActionType("REDIRECT");
+                body.setAction("/job/details/"+job.getId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setPriority("NORMAL");
+                body.setRecipient(job.getOid());
+                notificationSender.sendEmail(body);
+                logger.info("Notification fired");
+            }else{
+                logger.info("Unable to fire notifications");
+            }
             return  jobRepository.save(job);
         }else{
             logger.info("JOBSERVICE: Job not found");
@@ -181,6 +223,22 @@ public class JobService {
                     jobProposalRepository.deleteById(jobProposal.id);
                 });
             }
+            //fire notification
+            User currentUser =userService.getUserById(job.getOid());
+            Job currentJob=jobRepository.findById(job.getId()).orElse(null);
+            if(currentUser!=null && currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody("Hi "+currentUser.getFullName() + ", your job for "+currentJob.getTitle()+" has been published");
+                body.setSubject("Job Published");
+                body.setActionType("REDIRECT");
+                body.setAction("/job/details/"+job.getId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setPriority("NORMAL");
+                body.setRecipient(job.getOid());
+                notificationSender.sendEmail(body);
+            }
+            //end
             return  jobRepository.save(job);
         }else{
             logger.info("JOBSERVICE: Job not found");

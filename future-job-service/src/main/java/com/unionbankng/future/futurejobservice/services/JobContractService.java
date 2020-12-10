@@ -2,9 +2,13 @@ package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.*;
+import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
+import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.*;
+import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +34,13 @@ public class JobContractService implements Serializable {
     private int  appId;
     @Value("${sidekiq.escrow.token}")
     private String token;
+    @Value("${sidekiq.accountName}")
+    private String sidekiqAccountName;
+    @Value("${sidekiq.accountNumber}")
+    private String sidekiqAccountNumber;
     private String baseURL="https://pepperest.com/EscrowService/api/Escrow";
     private Logger logger = LoggerFactory.getLogger(JobContractService.class);
+
 
     @Autowired
     private RestTemplate rest;
@@ -43,8 +52,10 @@ public class JobContractService implements Serializable {
     private  final JobProjectSubmissionRepository jobProjectSubmissionRepository;
     private final  JobMilestoneRepository jobMilestoneRepository;
     private  final FileStoreService fileStoreService;
-   // private final BankTransferService bankTransferService;
+    private final BankTransferService bankTransferService;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
+    private  final NotificationSender notificationSender;
+    private final  UserService userService;
 
 
 
@@ -105,6 +116,7 @@ public class JobContractService implements Serializable {
         try {
             JobContract contract = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContract.class);
             JobProposal proposal= jobProposalRepository.findById(contract.getProposalId()).orElse(null);
+            Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
             UUID referenceId = UUID.randomUUID();
             UUID transferReferenceId = UUID.randomUUID();
             int peppFess = (int) (2.5 / 100) * contract.getAmount() + 200;
@@ -127,50 +139,102 @@ public class JobContractService implements Serializable {
 
             if(contract.getWorkMethod()=="Milestone"){
                 status=1;
-            }else {
-
-                //start to deduct amount from employers account
-//                JobTransfer transfer=new JobTransfer();
-//                transfer.setAmount(contract.getAmount());
-//                transfer.setUserId(contract.getId());
-//                transfer.setJobId(contract.getJobId());
-//                transfer.setProposalId(contract.getProposalId());
-//                transfer.setCreatedAt(new Date());
-//                UBNFundsTransferResponse response= bankTransferService.transferUBNtoUBN(transfer);
-                //end
-
-                HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
-                        + "&referenceid=" + contract.getReferenceId()
-                        + "&user_email=" + contract.getUserEmail()
-                        + "&amount=" + contract.getAmount()
-                        + "&country=" + contract.getCountry()
-                        + "&currency=" + contract.getCurrency()
-                        + "&customer_email=" + contract.getUserEmail()
-                        + "&merchant_email=" + contract.getMerchantEmail()
-                        + "&customer_account_number=" + contract.getCustomerAccountNumber()
-                        + "&merchant_account_number=" + contract.getMerchantAccountNumber()
-                        + "&customer_bank_code=" + contract.getCustomerBankCode()
-                        + "&merchant_bank_code=" + contract.getMerchantAccountNumber()
-                        + "&customer_name=" + contract.getCustomerName()
-                        + "&merchant_name=" + contract.getMerchantName()
-                        + "&customer_phone=" + contract.getCustomerPhone()
-                        + "&merchant_phone=" + contract.getMerchantPhone()
-                        + "&peppfees=" + contract.getPeppfees()
-                        + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate())
-                        + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate())
-                        + "&transfer_reference_id=" + contract.getTransferReferenceId(), HttpMethod.POST, entity, String.class);
-                if (response.getStatusCode().is2xxSuccessful()) {
-                    status = 1;
+                //fire notification
+                User currentUser =userService.getUserById(proposal.getEmployerId());
+                Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
+                if(currentUser!=null && currentJob!=null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getFullName() + " approved your contract and the amount will be paid to you base on the milestone you complete");
+                    body.setSubject("Proposal Approval");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/job/ongoing/details/"+proposal.getJobId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(proposal.getUserId());
+                    notificationSender.sendEmail(body);
                 }
-                else {
-                    logger.info("JOBSERVICE: Escrow transaction failed");
+                //end
+            }else {
+                //transfer the amount to Sidekiq main account
+                JobTransfer transfer=new JobTransfer();
+                transfer.setUserId(proposal.getUserId());
+                transfer.setJobId(proposal.getJobId());
+                transfer.setProposalId(proposal.getId());
+                transfer.setEmployerId(proposal.getEmployerId());
+                transfer.setCreatedAt(new Date());
+                //transfer
+                transfer.setAmount(contract.getAmount());
+                transfer.setCurrency("NGN");
+                transfer.setPaymentReference(contract.getTransferReferenceId());
+                transfer.setInitBranchCode("682");
+                //credit
+                transfer.setCreditAccountName(sidekiqAccountName);
+                transfer.setCreditAccountNumber(sidekiqAccountNumber);
+                transfer.setCreditAccountBankCode("032");
+                transfer.setCreditAccountBranchCode("682");
+                transfer.setCreditAccountType("CASA");
+                transfer.setCreditNarration(job.getTitle());
+                //debit
+                transfer.setDebitAccountName(proposal.getAccountName());
+                transfer.setDebitAccountNumber(proposal.getAccountNumber());
+                transfer.setDebitAccountBranchCode(proposal.getBranchCode());
+                transfer.setDebitAccountType("CASA");
+                transfer.setDebitNarration(job.getTitle());
+                UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
+
+                if(transferResponse.getCode()=="00") {
+                    HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+                    ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
+                            + "&referenceid=" + contract.getReferenceId()
+                            + "&user_email=" + contract.getUserEmail()
+                            + "&amount=" + contract.getAmount()
+                            + "&country=" + contract.getCountry()
+                            + "&currency=" + contract.getCurrency()
+                            + "&customer_email=" + contract.getUserEmail()
+                            + "&merchant_email=" + contract.getMerchantEmail()
+                            + "&customer_account_number=" + contract.getCustomerAccountNumber()
+                            + "&merchant_account_number=" + contract.getMerchantAccountNumber()
+                            + "&customer_bank_code=" + contract.getCustomerBankCode()
+                            + "&merchant_bank_code=" + contract.getMerchantAccountNumber()
+                            + "&customer_name=" + contract.getCustomerName()
+                            + "&merchant_name=" + contract.getMerchantName()
+                            + "&customer_phone=" + contract.getCustomerPhone()
+                            + "&merchant_phone=" + contract.getMerchantPhone()
+                            + "&peppfees=" + contract.getPeppfees()
+                            + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate())
+                            + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate())
+                            + "&transfer_reference_id=" + contract.getTransferReferenceId(), HttpMethod.POST, entity, String.class);
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        status = 1;
+                        //fire notification
+                        User currentUser = userService.getUserById(proposal.getEmployerId());
+                        Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
+                        if (currentUser != null && currentJob != null) {
+                            NotificationBody body = new NotificationBody();
+                            body.setBody(currentUser.getFullName() + " approved your contract and credited our escrow with the sum of " + proposal.getBidAmount());
+                            body.setSubject("Proposal Approval");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/job/ongoing/details/" + proposal.getJobId());
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(proposal.getUserId());
+                            notificationSender.sendEmail(body);
+                        }
+                        //end
+                    } else {
+                        logger.info("JOBSERVICE: Escrow transaction failed");
+                        logger.error("JOBSERVICE: Escrow "+response.getBody());
+                        status = 0;
+                    }
+                }else{
+                    logger.info("JOBSERVICE: Payment failed");
+                    logger.error(transferResponse.getMessage());
+                    logger.error(transferResponse.getCode());
                     status = 0;
                 }
             }
             if(status==1){
                  Optional<Job> jobData =jobRepository.findById(contract.getJobId());
-                 Job job =jobData.orElse(null);
                  if(job!=null) {
                      job.setStatus(JobStatus.WP);
                      job.setLastModifiedDate(new Date());
@@ -203,20 +267,29 @@ public class JobContractService implements Serializable {
             return  null;
         }
     }
-
     public  JobContractExtension requestContractExtension(String request) throws JsonProcessingException {
         try {
             JobContractExtension extensionRequest = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContractExtension.class);
             extensionRequest.setStatus(JobExtensionStatus.PE);
             JobContractExtension extension = jobContractExtensionRepository.save(extensionRequest);
             if (extension != null) {
-                JobNotification notification = new JobNotification();
-                notification.setSource(extension.getUserId());
-                notification.setDestination(extension.getEmployerId());
-                notification.setStatus(JobNotificationStatus.AC);
-                notification.setMessage("Wants to extend project delivery date to " + extension.getDate().toString());
-                notification.setAttachment(extension.getReason());
-                jobNotificationRepository.save(notification);
+
+                //fire notification 
+                User currentUser =userService.getUserById(extension.getUserId());
+                Job currentJob=jobRepository.findById(extension.getJobId()).orElse(null);
+                if(currentUser!=null && currentJob!=null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getFullName() + " want you to extend "+currentJob.getTitle()+" delivery date to " + extension.getDate().toString());
+                    body.setSubject("Contract Extension");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/my-jobs/proposal/preview/" + extension.getProposalId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(extension.getEmployerId());
+                    notificationSender.sendEmail(body);
+                }
+                //end
+
                 return extension;
             } else {
                 logger.info("JOBSERVICE: Unable to submit the contract extension");
@@ -234,12 +307,22 @@ public class JobContractService implements Serializable {
             milestone.setStatus(JobMilestoneStatus.PE);
             JobMilestone newMilestone = jobMilestoneRepository.save(milestone);
             if (newMilestone != null) {
-                JobNotification notification = new JobNotification();
-                notification.setSource(newMilestone.getUserId());
-                notification.setDestination(newMilestone.getEmployerId());
-                notification.setStatus(JobNotificationStatus.AC);
-                notification.setMessage("New milestone added ");
-                jobNotificationRepository.save(notification);
+                //fire notification
+                User currentUser =userService.getUserById(newMilestone.getUserId());
+                Job currentJob=jobRepository.findById(newMilestone.getJobId()).orElse(null);
+                if(currentUser!=null && currentJob!=null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getFullName() + " created new milestone on "+currentJob.getTitle()+" for your review and approval");
+                    body.setSubject("New Milestone");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/my-job/contract/milestones/"+newMilestone.getJobId()+"/"+newMilestone.getProposalId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(newMilestone.getEmployerId());
+                    notificationSender.sendEmail(body);
+                }
+                //end
+
                 return newMilestone;
             } else {
                 logger.info("JOBSERVICE: Unable to add new milestone");
@@ -296,13 +379,22 @@ public class JobContractService implements Serializable {
                         extension.setStatus(JobExtensionStatus.AC);
                         jobContractExtensionRepository.save(extension);
 
-                        JobNotification notification = new JobNotification();
-                        notification.setSource(extension.getEmployerId());
-                        notification.setDestination(extension.getUserId());
-                        notification.setStatus(JobNotificationStatus.AC);
-                        notification.setMessage("Approved the project delivery date extension to " + extension.getDate().toString());
-                        notification.setAttachment(extension.getReason());
-                        jobNotificationRepository.save(notification);
+                        //fire notification 
+                        User currentUser =userService.getUserById(extension.getEmployerId());
+                        Job currentJob=jobRepository.findById(extension.getJobId()).orElse(null);
+                        if(currentUser!=null && currentJob!=null) {
+                            NotificationBody body = new NotificationBody();
+                            body.setBody(currentUser.getFullName() + " approved the project delivery date extension as requested");
+                            body.setSubject("Contract Extension Approved");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/my-jobs/proposal/preview/" + extension.getProposalId());
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(extension.getUserId());
+                            notificationSender.sendEmail(body);
+                        }
+                        //end
+
 
                         return extension;
                     }else{
@@ -336,7 +428,22 @@ public class JobContractService implements Serializable {
             if (supporting_file_names != null)
                 request.supportingFiles = supporting_file_names;
 
-                return jobProjectSubmissionRepository.save(request);
+            //fire notification 
+            User currentUser =userService.getUserById(request.getUserId());
+            Job currentJob=jobRepository.findById(request.getJobId()).orElse(null);
+            if(currentUser!=null && currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody(currentUser.getFullName() + " submitted "+currentJob.getTitle()+" for your review and approval");
+                body.setSubject("Project Review");
+                body.setActionType("REDIRECT");
+                body.setAction("/job/ongoing/details/" + request.getJobId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setRecipient(request.getEmployerId());
+                notificationSender.sendEmail(body);
+            }
+            //end
+            return jobProjectSubmissionRepository.save(request);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -359,6 +466,22 @@ public class JobContractService implements Serializable {
             if(milestone!=null){
                 milestone.setStatus(JobMilestoneStatus.PA);
                 jobMilestoneRepository.save(milestone);
+
+                //fire notification 
+                User currentUser =userService.getUserById(request.getUserId());
+                Job currentJob=jobRepository.findById(request.getJobId()).orElse(null);
+                if(currentUser!=null && currentJob!=null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getFullName() + " submitted milestone for your review and approval");
+                    body.setSubject("Milestone Review");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/my-job/contract/milestones/"+request.getJobId()+"/"+request.getProposalId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(request.getEmployerId());
+                    notificationSender.sendEmail(body);
+                }
+                //end
                 return jobProjectSubmissionRepository.save(request);
             }
             else {
@@ -399,6 +522,24 @@ public class JobContractService implements Serializable {
                             + "&user_email=" + contract.getUserEmail()
                             + "&reasons=" + project.getDescription(), HttpMethod.POST, entity, String.class);
                     //done
+
+                    if(response.getStatusCode().is2xxSuccessful()){
+                        //fire notification
+                        User currentUser =userService.getUserById(project.getEmployerId());
+                        Job currentJob=jobRepository.findById(project.getJobId()).orElse(null);
+                        if(currentUser!=null && currentJob!=null) {
+                            NotificationBody body = new NotificationBody();
+                            body.setBody(currentUser.getFullName() + " ended your contract and release the sum of "+proposal.getBidAmount()+" to your bank account");
+                            body.setSubject("Contract Ended");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/job/ongoing/details/"+project.getJobId());
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(project.getUserId());
+                            notificationSender.sendEmail(body);
+                        }
+                        //end
+                    }
                 } else {
                     if (job != null)
                         job.setStatus(JobStatus.AC);
@@ -455,6 +596,7 @@ public class JobContractService implements Serializable {
                 if (JobMilestoneStatus.valueOf(newStatus) == JobMilestoneStatus.AC) {
                     milestone.setStartDate(new Date());
                     JobProposal proposal =jobProposalRepository.findById(milestone.getProposalId()).orElse(null);
+                    Job job =jobRepository.findById(proposal.getJobId()).orElse(null);
                     if(proposal!=null){
                         proposal.setStatus(JobProposalStatus.WP);
                         //send milestone amount to escrow
@@ -463,7 +605,7 @@ public class JobContractService implements Serializable {
 
                             UUID referenceId = UUID.randomUUID();
                             UUID transferReferenceId = UUID.randomUUID();
-                            int peppFess = (int) (2.5 / 100) *  milestone.getAmount().intValue() + 200;
+                            int peppFess = (int) (2.5 / 100) * milestone.getAmount().intValue() + 200;
                             contract.setPeppfees(peppFess);
                             contract.setReferenceId(referenceId.toString());
                             contract.setTransferReferenceId(transferReferenceId.toString());
@@ -475,39 +617,101 @@ public class JobContractService implements Serializable {
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
 
-                            HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                            ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
-                                    + "&referenceid=" + contract.getReferenceId()
-                                    + "&user_email=" + contract.getUserEmail()
-                                    + "&amount=" + contract.getAmount()
-                                    + "&country=" + contract.getCountry()
-                                    + "&currency=" + contract.getCurrency()
-                                    + "&customer_email=" + contract.getUserEmail()
-                                    + "&merchant_email=" + contract.getMerchantEmail()
-                                    + "&customer_account_number=" + contract.getCustomerAccountNumber()
-                                    + "&merchant_account_number=" + contract.getMerchantAccountNumber()
-                                    + "&customer_bank_code=" + contract.getCustomerBankCode()
-                                    + "&merchant_bank_code=" + contract.getMerchantAccountNumber()
-                                    + "&customer_name=" + contract.getCustomerName()
-                                    + "&merchant_name=" + contract.getMerchantName()
-                                    + "&customer_phone=" + contract.getCustomerPhone()
-                                    + "&merchant_phone=" + contract.getMerchantPhone()
-                                    + "&peppfees=" + contract.getPeppfees()
-                                    + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getStartDate())
-                                    + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getEndDate())
-                                    + "&transfer_reference_id=" + contract.getTransferReferenceId(), HttpMethod.POST, entity, String.class);
-                            if (response.getStatusCode().is2xxSuccessful())
-                                status = 1;
-                            else
-                                logger.info("JOBSERVICE: Escrow transaction failed");
 
-                            //done
+                            //transfer the milestone amount to Sidekiq main account
+                            JobTransfer transfer = new JobTransfer();
+                            transfer.setUserId(proposal.getUserId());
+                            transfer.setJobId(proposal.getJobId());
+                            transfer.setProposalId(proposal.getId());
+                            transfer.setEmployerId(proposal.getEmployerId());
+                            transfer.setCreatedAt(new Date());
+                            //transfer
+                            transfer.setAmount(contract.getAmount());
+                            transfer.setCurrency("NGN");
+                            transfer.setPaymentReference(contract.getTransferReferenceId());
+                            transfer.setInitBranchCode("682");
+                            //credit
+                            transfer.setCreditAccountName(sidekiqAccountName);
+                            transfer.setCreditAccountNumber(sidekiqAccountNumber);
+                            transfer.setCreditAccountBankCode("032");
+                            transfer.setCreditAccountBranchCode("682");
+                            transfer.setCreditAccountType("CASA");
+                            transfer.setCreditNarration(job.getTitle());
+                            //debit
+                            transfer.setDebitAccountName(proposal.getAccountName());
+                            transfer.setDebitAccountNumber(proposal.getAccountNumber());
+                            transfer.setDebitAccountBranchCode(proposal.getBranchCode());
+                            transfer.setDebitAccountType("CASA");
+                            transfer.setDebitNarration(job.getTitle());
+                            UBNFundsTransferResponse transferResponse = bankTransferService.transferUBNtoUBN(transfer);
+
+                            if (transferResponse.getCode() == "00") {
+                                //set milestone amount to the escrow
+                                HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+                                ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
+                                        + "&referenceid=" + contract.getReferenceId()
+                                        + "&user_email=" + contract.getUserEmail()
+                                        + "&amount=" + contract.getAmount()
+                                        + "&country=" + contract.getCountry()
+                                        + "&currency=" + contract.getCurrency()
+                                        + "&customer_email=" + contract.getUserEmail()
+                                        + "&merchant_email=" + contract.getMerchantEmail()
+                                        + "&customer_account_number=" + contract.getCustomerAccountNumber()
+                                        + "&merchant_account_number=" + contract.getMerchantAccountNumber()
+                                        + "&customer_bank_code=" + contract.getCustomerBankCode()
+                                        + "&merchant_bank_code=" + contract.getMerchantAccountNumber()
+                                        + "&customer_name=" + contract.getCustomerName()
+                                        + "&merchant_name=" + contract.getMerchantName()
+                                        + "&customer_phone=" + contract.getCustomerPhone()
+                                        + "&merchant_phone=" + contract.getMerchantPhone()
+                                        + "&peppfees=" + contract.getPeppfees()
+                                        + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getStartDate())
+                                        + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getEndDate())
+                                        + "&transfer_reference_id=" + contract.getTransferReferenceId(), HttpMethod.POST, entity, String.class);
+                                if (response.getStatusCode().is2xxSuccessful())
+                                    status = 1;
+                                else
+                                    status = 0;
+                                    logger.info("JOBSERVICE: Escrow transaction failed");
+
+                                //done
+                            }else{
+                                status = 0;
+                                logger.info("JOBSERVICE: Payment failed");
+                                logger.error(transferResponse.getMessage());
+                                logger.error(transferResponse.getCode());
+                            }
+                        }else{
+                            status = 0;
+                            logger.error("JOBSERVICE: Contract not found");
                         }
+                    }else{
+                        status=0;
+                        logger.error("JOBSERVICE: Proposal not found");
                     }
+                }else{
+                    status=0;
+                    logger.error("JOBSERVICE: Milestone status mismatch");
                 }
 
                 if(status==1) {
-                  return   jobMilestoneRepository.save(milestone);
+                    //fire notification 
+                    User currentUser =userService.getUserById(milestone.getEmployerId());
+                    Job currentJob=jobRepository.findById(milestone.getJobId()).orElse(null);
+                    if(currentUser!=null && currentJob!=null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(currentUser.getFullName() + " approved the milestone you submitted for "+currentJob.getTitle()+", you can proceed to start working on it");
+                        body.setSubject("Milestone Approval");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/my-job/contract/milestones/"+milestone.getJobId()+"/"+milestone.getProposalId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setRecipient(milestone.getUserId());
+                        notificationSender.sendEmail(body);
+                    }
+                    //end
+
+                    return   jobMilestoneRepository.save(milestone);
                 }
                else{
                     logger.info("JOBSERVICE: Transaction failed");
@@ -543,6 +747,23 @@ public class JobContractService implements Serializable {
                         + "&reasons=" + milestone.getDescription(), HttpMethod.POST, entity, String.class);
                 //done
                 if(response.getStatusCode().is2xxSuccessful()) {
+
+                    //fire notification 
+                    User currentUser =userService.getUserById(request.getEmployerId());
+                    Job currentJob=jobRepository.findById(request.getJobId()).orElse(null);
+                    if(currentUser!=null && currentJob!=null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(currentUser.getFullName() + " approved the milestone you submitted for "+currentJob.getTitle()+", and the sum of "+milestone.getAmount().toString()+" has been released to your account");
+                        body.setSubject("Milestone Completed");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/my-job/contract/milestones/"+request.getJobId()+"/"+request.getProposalId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setRecipient(request.getUserId());
+                        notificationSender.sendEmail(body);
+                    }
+                    //end
+                    
                     return milestone;
                 }else{
                     logger.info("JOBSERVICE: Escrow transaction failed");
