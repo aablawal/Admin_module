@@ -4,6 +4,7 @@ import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.EmailMessage;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
+import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
@@ -32,6 +33,7 @@ public class JobController {
     }
     private final JobService service;
     private final NotificationSender notificationSender;
+    private  final  UserService userService;
     Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
@@ -123,19 +125,8 @@ public class JobController {
 
     @GetMapping("/v1/test")
     public ResponseEntity<APIResponse<String>> test(){
-
-        NotificationBody body= new NotificationBody();
-        body.setBody("Wow! this is great, can we do same around us, its amazing...");
-        body.setSubject("This is the subject");
-        body.setAttachment("none");
-        body.setActionType("REDIRECT");
-        body.setAction("/job/details/2");
-        body.setTopic("'Community'");
-        body.setChannel("S");
-        body.setRecipient(Long.valueOf(2));
-
-        notificationSender.sendEmail(body);
+        User user = userService.getUserById(1l);
         return ResponseEntity.ok().body(
-                new APIResponse("success",true,"Job serv worked"));
+                new APIResponse("success",true, user));
     }
 }
