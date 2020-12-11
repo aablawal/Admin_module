@@ -70,12 +70,6 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!--GRPC-->
-		<dependency>
-			<groupId>net.devh</groupId>
-			<artifactId>grpc-spring-boot-starter</artifactId>
-			<version>2.10.1.RELEASE</version>
-		</dependency>
 		<!--Caching -->
 		<dependency>
 			<groupId>com.google.code.simple-spring-memcached</groupId>

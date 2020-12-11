@@ -11,9 +11,6 @@ server:
   port: 8083
   error:
     include-message: always
-grpc:
-  server:
-    port: 9095
 management:
   endpoints:
     web:
