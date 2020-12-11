@@ -3,7 +3,6 @@ import com.unionbankng.future.futuremessagingservice.entities.MessagingToken;
 import com.unionbankng.future.futuremessagingservice.entities.Notification;
 import com.unionbankng.future.futuremessagingservice.enums.NotificationStatus;
 import com.unionbankng.future.futuremessagingservice.pojos.NotificationBody;
-import com.unionbankng.future.futuremessagingservice.pojos.User;
 import com.unionbankng.future.futuremessagingservice.repositories.MessagingTokenRepository;
 import com.unionbankng.future.futuremessagingservice.repositories.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +25,10 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private  final MessagingTokenRepository messagingTokenRepository;
-    private final UserService userService;
     @Value("${google.sidekiq.push_notification_api_key}")
     private String token;
-    //@Value("${google.sidekiq.push_notification_server_key}")
-    private String serverKey="key=AAAAQHNQc1M:APA91bGLrhyQfJXUHbXTiRozIJUq6SVdkOdY2jXYITSOkTMyJEzJ7wbSlEHaAIw5ElaF_B2N-HNnqlylhxwDWtg5q-kdjkqpym85kAxntnAzxTLcyKim5-Z02UhATQ5hEyFEXNti8Hk1";
+    @Value("${google.sidekiq.push_notification_server_key}")
+    private String serverKey;
     private String baseURL="https://fcm.googleapis.com/fcm/send";
     @Autowired
     private RestTemplate rest;
@@ -43,26 +41,6 @@ public class NotificationService {
         headers.set("apiKey",token);
         headers.set("Authorization",serverKey);
         return  headers;
-    }
-
-    public   List<Object> getAbsoluteNotifications(List<Notification> notificationList){
-        List<Object> preparedNotification= new ArrayList<>();
-        notificationList.forEach((notification -> {
-            logger.info(notification.toString());
-            Map<String,Object> notificationBase= new HashMap<>();
-            notificationBase.put("notification",notification);
-            notificationBase.put("source",userService.getUserById(notification.getSource()));
-            notificationBase.put("destination",userService.getUserById(notification.getDestination()));
-            preparedNotification.add(notificationBase);
-        }));
-        return  preparedNotification;
-    }
-    public Map<String,Object> getAbsoluteNotification(Notification notification){
-        Map<String,Object> notificationBase= new HashMap<>();
-        notificationBase.put("notification",notification);
-        notificationBase.put("source",userService.getUserById(notification.getSource()));
-        notificationBase.put("destination",userService.getUserById(notification.getDestination()));
-        return  notificationBase;
     }
 
     public MessagingToken updateUserMID(Long userId, String umid){
@@ -80,8 +58,7 @@ public class NotificationService {
     }
 
     public Notification pushNotification(Long userId, NotificationBody notificationBody){
-        MessagingToken sender= messagingTokenRepository.findTokenByUserId(userId);
-        MessagingToken recipient= messagingTokenRepository.findTokenByUserId(notificationBody.getRecipient());
+         MessagingToken recipient= messagingTokenRepository.findTokenByUserId(notificationBody.getRecipient());
         if(recipient !=null) {
             try {
 
@@ -159,28 +136,28 @@ public class NotificationService {
           return  true;
     }
 
-    public Map<String,Object> findNotificationById(Long id){
-        return getAbsoluteNotification(notificationRepository.findById(id).orElse(null));
+    public Notification findNotificationById(Long id){
+        return notificationRepository.findById(id).orElse(null);
     }
-    public List<Object> findAllNotifications(Long id, int from, int limit){
-        return  getAbsoluteNotifications(notificationRepository.findAllNotifications(id,from,limit));
+    public List<Notification> findAllNotifications(Long id, int from, int limit){
+        return  notificationRepository.findAllNotifications(id,from,limit);
     }
-    public List<Object> findTopNotifications(Long id, int limit){
-        return  getAbsoluteNotifications(notificationRepository.findTopNotifications(id,limit));
+    public List<Notification> findTopNotifications(Long id, int limit){
+        return  notificationRepository.findTopNotifications(id,limit);
     }
-    public List<Object> findAllNotificationsByStatus(Long id, String status){
-        return  getAbsoluteNotifications(notificationRepository.findNotificationsByStatus(id,status.toUpperCase()));
+    public List<Notification> findAllNotificationsByStatus(Long id, String status){
+        return  notificationRepository.findNotificationsByStatus(id,status.toUpperCase());
     }
-    public List<Object> findTopNotificationsByPriority(Long id, String priority){
-        return  getAbsoluteNotifications(notificationRepository.findAllNotSeenNotificationsByPriority(id,priority.toUpperCase()));
+    public List<Notification> findTopNotificationsByPriority(Long id, String priority){
+        return  notificationRepository.findAllNotSeenNotificationsByPriority(id,priority.toUpperCase());
     }
     public Map<String,Object> getNotificationBase(Long id){
         Map<String, Object> notifications=new HashMap<>();
-        notifications.put("top",getAbsoluteNotifications(notificationRepository.findTopNotifications(id,20)));
-        notifications.put("seen",getAbsoluteNotifications(notificationRepository.findNotificationsByStatus(id,"SE")));
-        notifications.put("unseen",getAbsoluteNotifications(notificationRepository.findNotificationsByStatus(id, "NS")));
-        notifications.put("all",getAbsoluteNotifications(notificationRepository.findAllNotifications(id,0,50)));
-        notifications.put("important",getAbsoluteNotifications(notificationRepository.findAllNotSeenNotificationsByPriority(id,"IMPORTANT")));
+        notifications.put("top",notificationRepository.findTopNotifications(id,20));
+        notifications.put("seen",notificationRepository.findNotificationsByStatus(id,"SE"));
+        notifications.put("unseen",notificationRepository.findNotificationsByStatus(id, "NS"));
+        notifications.put("all",notificationRepository.findAllNotifications(id,0,50));
+        notifications.put("important",notificationRepository.findAllNotSeenNotificationsByPriority(id,"IMPORTANT"));
         return  notifications;
     }
 }

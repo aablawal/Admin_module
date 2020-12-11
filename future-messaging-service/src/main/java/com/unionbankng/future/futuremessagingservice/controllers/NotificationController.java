@@ -52,22 +52,22 @@ public class NotificationController {
     }
 
     @GetMapping(value = "/v1/notifications/list/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getAllNotifications(@Valid @PathVariable Long id, @RequestParam int limit, @RequestParam int from){
+    public ResponseEntity<APIResponse<List<Notification>>> getAllNotifications(@Valid @PathVariable Long id, @RequestParam int limit, @RequestParam int from){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findAllNotifications(id,from,limit)));
     }
 
     @GetMapping(value = "/v1/notifications/top/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getTopNotifications(@Valid @PathVariable Long id,  @RequestParam int limit){
+    public ResponseEntity<APIResponse<List<Notification>>> getTopNotifications(@Valid @PathVariable Long id,  @RequestParam int limit){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findTopNotifications(id,limit)));
     }
 
     @GetMapping(value = "/v1/notifications/status/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getAllNotificationsByStatus(@Valid @PathVariable Long id, @RequestParam String type){
+    public ResponseEntity<APIResponse<List<Notification>>> getAllNotificationsByStatus(@Valid @PathVariable Long id, @RequestParam String type){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findAllNotificationsByStatus(id,type)));
     }
 
     @GetMapping(value = "/v1/notifications/priority/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getAllNotificationsByPriority(@Valid @PathVariable Long id, @RequestParam String type){
+    public ResponseEntity<APIResponse<List<Notification>>> getAllNotificationsByPriority(@Valid @PathVariable Long id, @RequestParam String type){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findTopNotificationsByPriority(id,type)));
     }
 }
