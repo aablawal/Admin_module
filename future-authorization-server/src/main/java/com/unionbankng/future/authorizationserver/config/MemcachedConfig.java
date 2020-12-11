@@ -26,6 +26,8 @@ import java.util.Arrays;
 
 
 
+@RefreshScope
+@EnableCaching
 @Configuration
 public class MemcachedConfig extends AbstractSSMConfiguration {
 
