@@ -5,6 +5,7 @@ import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.EmailMessage;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.User;
+import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
@@ -33,7 +34,9 @@ public class JobController {
     }
     private final JobService service;
     private final NotificationSender notificationSender;
-    private  final  UserService userService;
+    private final UserService userService;
+    private final JobRepository jobRepository;
+
     Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
@@ -123,10 +126,16 @@ public class JobController {
                 new APIResponse("success",true,service.getJobs(PageRequest.of(page,size), model)));
     }
 
-    @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse<String>> test(){
-        User user = userService.getUserById(1l);
+    @GetMapping("/v1/test/{id}")
+    public ResponseEntity<APIResponse<String>> test(@PathVariable Long id){
+        Job job = jobRepository.findById(id).orElse(null);
         return ResponseEntity.ok().body(
-                new APIResponse("success",true, user));
+                new APIResponse("success",true, job));
+    }
+
+    @GetMapping("/v1/test1/{id}")
+    public ResponseEntity<APIResponse<String>> test1(@PathVariable Long id,Model model){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true, service.findJobById(id,model)));
     }
 }
