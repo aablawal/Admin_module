@@ -41,6 +41,7 @@ public class UserService {
             return user;
         }catch (Exception e){
             e.printStackTrace();
+            logger.error("An error occurred while connecting to  auth via GRPC");
             return  null;
         }
     }
