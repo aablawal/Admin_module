@@ -61,7 +61,6 @@ public class UserConfirmationTokenService {
         String userEmail = memcachedHelperService.getValueByKey(token);
 
         if (userEmail == null) {
-            tokenConfirm.setMessage(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()));
             tokenConfirm.setSuccess(false);
             return tokenConfirm;
         }
@@ -70,7 +69,7 @@ public class UserConfirmationTokenService {
         memcachedHelperService.clear(token);
 
         if (user == null) {
-            tokenConfirm.setMessage("We couldn't find a user with the email provided");
+
             tokenConfirm.setSuccess(false);
             return tokenConfirm;
 
