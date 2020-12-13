@@ -57,7 +57,7 @@ public class JobMilestone {
         this.startDate=request.startDate;
         this.endDate=request.endDate;
         this.status=request.status;
-        this.createdAt = request.createdAt;
+        this.createdAt = new Date();
     }
 
     @PrePersist

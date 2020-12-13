@@ -24,6 +24,10 @@ public class JobTeamDetails {
     @NotNull
     Long employerId;
     @NotNull
+    String fullName;
+    String img;
+    String email;
+    @NotNull
     Long jobId;
     Long amount;
     Long percentage;
@@ -44,6 +48,9 @@ public class JobTeamDetails {
         this.id = request.id;
         this.proposalId = request.proposalId;
         this.userId = request.userId;
+        this.fullName=request.fullName;
+        this.email=request.email;
+        this.img=request.img;
         this.employerId = request.employerId;
         this.jobId = request.jobId;
         this.amount=request.getAmount();
@@ -51,7 +58,7 @@ public class JobTeamDetails {
         this.startDate=request.startDate;
         this.endDate=request.endDate;
         this.status=request.status;
-        this.createdAt = request.createdAt;
+        this.createdAt = new Date();
     }
     @PrePersist
     private void setCreatedAt() {

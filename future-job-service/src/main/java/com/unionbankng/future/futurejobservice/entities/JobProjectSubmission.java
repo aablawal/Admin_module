@@ -47,7 +47,7 @@ public class JobProjectSubmission {
         this.description = request.description;
         this.supportingFiles=request.supportingFiles;
         this.status=request.status;
-        this.createdAt = request.createdAt;
+        this.createdAt = new Date();
     }
 
     @PrePersist

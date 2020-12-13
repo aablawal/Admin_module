@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
@@ -164,7 +165,7 @@ public class JobContractController {
 
 
     @GetMapping("/v1/bank/transfer/test")
-    public ResponseEntity<APIResponse<String>> transferAmount(){
+    public ResponseEntity<APIResponse<String>> transferAmount() throws JsonProcessingException {
 
                JobTransfer transfer=new JobTransfer();
 
@@ -175,9 +176,9 @@ public class JobContractController {
                 transfer.setCreatedAt(new Date());
 
                 //transfer
-                transfer.setAmount(100);
+                transfer.setAmount(18);
                 transfer.setCurrency("NGN");
-                transfer.setPaymentReference("sjdye9r8402emwdjesudia");
+                transfer.setPaymentReference("j2hyewd798hsoqg2t8179qw8o");
                 transfer.setInitBranchCode("682");
 
                 //credit
@@ -194,6 +195,8 @@ public class JobContractController {
                 transfer.setDebitAccountBranchCode("682");
                 transfer.setDebitAccountType("CASA");
                 transfer.setDebitNarration("New Naration");
+
+                logger.info(new ObjectMapper().writeValueAsString(transfer));
 
 
         UBNFundsTransferResponse response= bankTransferService.transferUBNtoUBN(transfer);

@@ -30,12 +30,16 @@ public class JobProposal implements Serializable {
     public Long jobId;
     @Column(columnDefinition="TEXT")
     public String  about;
+    public String fullName;
+    public String img;
+    public String email;
     @Column(columnDefinition="TEXT")
     public String paymentTerms;
     public String preparedCurrency;
     public String supportingFiles;
     public Long bidAmount;
     public Long  duration;
+    public Long percentage;
     @Column(length = 50)
     public String durationType;
     @Column(columnDefinition="TEXT")
@@ -50,6 +54,7 @@ public class JobProposal implements Serializable {
     public String accountNumber;
     public String accountName;
     public String accountType;
+    public Boolean isApplied;
     public String branchCode;
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
@@ -70,6 +75,11 @@ public class JobProposal implements Serializable {
         this.employerId =application.employerId;
         this.contractId=application.contractId;
         this.about =application.about;
+        this.fullName=application.fullName;
+        this.email=application.email;
+        this.img=application.img;
+        this.isApplied=application.isApplied;
+        this.percentage=application.percentage;
         this.paymentTerms =application.paymentTerms;
         this.preparedCurrency =application.preparedCurrency;
         this.supportingFiles =application.supportingFiles;
@@ -86,8 +96,8 @@ public class JobProposal implements Serializable {
         this.status =application.status;
         this.startDate =application.startDate;
         this.endDate =application.endDate;
-        this.lastModifiedDate =application.lastModifiedDate;
-        this.createdAt =application.createdAt;
+        this.lastModifiedDate =new Date();
+        this.createdAt =new Date();
     }
 
     @PrePersist

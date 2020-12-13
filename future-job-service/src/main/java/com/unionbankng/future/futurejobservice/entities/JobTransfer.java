@@ -72,7 +72,7 @@ public class JobTransfer {
         this.debitAccountType =  transfer.debitAccountType;
         this.initBranchCode =  transfer.initBranchCode;
         this.paymentReference =  transfer.paymentReference;
-        this.createdAt =  transfer.createdAt;
+        this.createdAt =  new Date();
     }
 
     @PrePersist
