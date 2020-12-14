@@ -61,10 +61,28 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
-    @PostMapping(value="/v1/job/completed/submit/", consumes="multipart/form-data")
+    @PostMapping(value="/v1/job/completed/submission/", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> submitContract(@Valid @RequestParam(value = "data", required=true) String projectData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles) throws IOException {
-        JobProjectSubmission response= jobContractService.submitContract(projectData,supportingFiles);
+        JobProjectSubmission response= jobContractService.submitJob(projectData,supportingFiles);
+        if(response!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, response));
+        else
+            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+    }
+
+    @PutMapping("/v1/job/completed/rejection/{jobId}/{requestId}")
+    public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId){
+        JobProjectSubmission request= jobContractService.rejectJob(jobId,requestId);
+        if(request!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, request));
+        else
+            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+    }
+
+    @GetMapping("/v1/job/completed/{proposalId}/{userId}")
+    public ResponseEntity<APIResponse> findJobSubmittedByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long userId){
+        JobProjectSubmission response= jobContractService.findJobSubmittedByProposalId(proposalId,userId);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
@@ -91,14 +109,8 @@ public class JobContractController {
     }
 
 
-    @GetMapping("/v1/job/completed/{proposalId}/{userId}")
-    public ResponseEntity<APIResponse> findJobSubmittedByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long userId){
-        JobProjectSubmission response= jobContractService.findJobSubmittedByProposalId(proposalId,userId);
-        if(response!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, response));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
-    }
+
+
 
     @PutMapping("/v1/job/contract/end/{jobId}/{proposalId}/{userId}")
     public ResponseEntity<APIResponse> endContract(@PathVariable Long jobId,@PathVariable Long proposalId, @PathVariable Long userId, @RequestParam int state){
@@ -135,6 +147,7 @@ public class JobContractController {
         else
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
+
 
     @PutMapping("/v1/my-job/contract/milestone/state/{id}")
     public ResponseEntity<APIResponse> modifyMilestoneState(@PathVariable Long id, @RequestParam String status){

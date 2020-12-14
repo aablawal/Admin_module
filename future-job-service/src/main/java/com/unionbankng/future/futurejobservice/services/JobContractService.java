@@ -458,7 +458,7 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobProjectSubmission submitContract(String projectData, MultipartFile[] supportingFiles) {
+    public JobProjectSubmission submitJob(String projectData, MultipartFile[] supportingFiles) {
         try {
             String supporting_file_names = null;
             JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
@@ -490,6 +490,24 @@ public class JobContractService implements Serializable {
             ex.printStackTrace();
             return null;
         }
+    }
+    public JobProjectSubmission rejectJob(Long jobId, Long requestId) {
+        JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
+        if(request !=null) {
+            request.setStatus(JobSubmissionStatus.RE);
+            jobProjectSubmissionRepository.save(request);
+            //fire notification
+            NotificationBody body = new NotificationBody();
+            body.setBody("Job that you submitted has been rejected by the employer");
+            body.setSubject("Project Rejected");
+            body.setActionType("REDIRECT");
+            body.setAction("/job/ongoing/details/" + request.getJobId());
+            body.setTopic("'Job'");
+            body.setChannel("S");
+            body.setRecipient(request.getEmployerId());
+            notificationSender.pushNotification(body);
+        }
+        return request;
     }
 
     public JobProjectSubmission submitCompletedMilestone(Long id, String projectData, MultipartFile[] supportingFiles) {
