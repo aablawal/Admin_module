@@ -92,8 +92,8 @@ public class Job implements Serializable {
         this.ndaFiles=job.ndaFiles;
         this.status=job.status;
         this.publishDate=job.publishDate;
-        this.lastModifiedDate=job.lastModifiedDate;
-        this.createdAt=job.createdAt;
+        this.lastModifiedDate=new Date();
+        this.createdAt= new Date();
     }
 
     @PrePersist

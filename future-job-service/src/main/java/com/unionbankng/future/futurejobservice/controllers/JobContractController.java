@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
@@ -60,10 +61,28 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
-    @PostMapping(value="/v1/job/completed/submit/", consumes="multipart/form-data")
+    @PostMapping(value="/v1/job/completed/submission/", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> submitContract(@Valid @RequestParam(value = "data", required=true) String projectData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles) throws IOException {
-        JobProjectSubmission response= jobContractService.submitContract(projectData,supportingFiles);
+        JobProjectSubmission response= jobContractService.submitJob(projectData,supportingFiles);
+        if(response!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, response));
+        else
+            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+    }
+
+    @PutMapping("/v1/job/completed/rejection/{jobId}/{requestId}")
+    public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId){
+        JobProjectSubmission request= jobContractService.rejectJob(jobId,requestId);
+        if(request!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, request));
+        else
+            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+    }
+
+    @GetMapping("/v1/job/completed/{proposalId}/{userId}")
+    public ResponseEntity<APIResponse> findJobSubmittedByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long userId){
+        JobProjectSubmission response= jobContractService.findJobSubmittedByProposalId(proposalId,userId);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
@@ -90,14 +109,8 @@ public class JobContractController {
     }
 
 
-    @GetMapping("/v1/job/completed/{proposalId}/{userId}")
-    public ResponseEntity<APIResponse> findJobSubmittedByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long userId){
-        JobProjectSubmission response= jobContractService.findJobSubmittedByProposalId(proposalId,userId);
-        if(response!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, response));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
-    }
+
+
 
     @PutMapping("/v1/job/contract/end/{jobId}/{proposalId}/{userId}")
     public ResponseEntity<APIResponse> endContract(@PathVariable Long jobId,@PathVariable Long proposalId, @PathVariable Long userId, @RequestParam int state){
@@ -135,6 +148,7 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
+
     @PutMapping("/v1/my-job/contract/milestone/state/{id}")
     public ResponseEntity<APIResponse> modifyMilestoneState(@PathVariable Long id, @RequestParam String status){
         JobMilestone milestone= jobContractService.modifyMilestoneState(id,status);
@@ -164,7 +178,7 @@ public class JobContractController {
 
 
     @GetMapping("/v1/bank/transfer/test")
-    public ResponseEntity<APIResponse<String>> transferAmount(){
+    public ResponseEntity<APIResponse<String>> transferAmount() throws JsonProcessingException {
 
                JobTransfer transfer=new JobTransfer();
 
@@ -175,9 +189,9 @@ public class JobContractController {
                 transfer.setCreatedAt(new Date());
 
                 //transfer
-                transfer.setAmount(100);
+                transfer.setAmount(18);
                 transfer.setCurrency("NGN");
-                transfer.setPaymentReference("sjdye9r8402emwdjesudia");
+                transfer.setPaymentReference("j2hyewd798hsoqg2t8179qw8o");
                 transfer.setInitBranchCode("682");
 
                 //credit
@@ -194,6 +208,8 @@ public class JobContractController {
                 transfer.setDebitAccountBranchCode("682");
                 transfer.setDebitAccountType("CASA");
                 transfer.setDebitNarration("New Naration");
+
+                logger.info(new ObjectMapper().writeValueAsString(transfer));
 
 
         UBNFundsTransferResponse response= bankTransferService.transferUBNtoUBN(transfer);

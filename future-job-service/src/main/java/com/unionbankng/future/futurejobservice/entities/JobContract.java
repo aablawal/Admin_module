@@ -86,6 +86,7 @@ public class JobContract {
         this.startDate =  request.startDate;
         this.endDate =  request.endDate;
         this.transferReferenceId =  request.transferReferenceId;
+        this.createdAt=new Date();
     }
 
     @PrePersist

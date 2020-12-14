@@ -11,7 +11,7 @@ public class NotificationSender {
     private static final String EMAIL_DESTINATION = "futurenotificationqueue";
     private final JmsTemplate jmsTemplate;
 
-    public void sendEmail(NotificationBody notificationBody){
+    public void pushNotification(NotificationBody notificationBody){
         jmsTemplate.convertAndSend(EMAIL_DESTINATION,notificationBody);
     }
 

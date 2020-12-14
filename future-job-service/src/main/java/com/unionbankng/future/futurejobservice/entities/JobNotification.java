@@ -37,7 +37,7 @@ public class JobNotification {
         this.message = notification.message;
         this.status=notification.status;
         this.attachment = notification.attachment;
-        this.createdAt = notification.createdAt;
+        this.createdAt = new Date();
     }
 
     @PrePersist

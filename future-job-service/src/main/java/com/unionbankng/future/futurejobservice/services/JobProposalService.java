@@ -47,6 +47,9 @@ public class JobProposalService  implements Serializable {
             String supporting_file_names = null;
             JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
             application.status= JobProposalStatus.PE;
+            application.setIsApplied(true);
+            application.setCreatedAt(new Date());
+            boolean isEdited=false;
 
             //save files if not null
             if (supporting_files!=null)
@@ -55,39 +58,48 @@ public class JobProposalService  implements Serializable {
             if (supporting_file_names != null)
                 application.supportingFiles = supporting_file_names;
 
+
+            User proposedUser =userService.getUserById(application.getUserId());
+            if(proposedUser!=null) {
+                application.setFullName(proposedUser.getFullName());
+                application.setEmail(proposedUser.getEmail());
+                application.setImg(proposedUser.getImg());
+            }
+
+
+
+            if(application.id!=null)
+                isEdited=true;
+
             JobProposal proposal= repository.save(application);
             if(proposal!=null) {
                 Job job = jobRepository.findById(proposal.jobId).orElse(null);
                 if (job != null) {
                     if (job.type == JobType.TEAMS_PROJECT) {
                         //calculate user founds
-                        int money = (int)(job.getBudget() / 100)*10;
 
-                        JobTeamDetails teamMember = new JobTeamDetails();
-                        teamMember.setAmount(proposal.bidAmount);
-                        teamMember.setJobId(proposal.jobId);
-                        teamMember.setProposalId(proposal.id);
-                        teamMember.setEmployerId(proposal.employerId);
-                        teamMember.setStatus(JobTeamStatus.PE);
-                        teamMember.setDescription(proposal.about);
-                        teamMember.setPercentage(Long.valueOf(10));
-                        teamMember.setAmount(Long.valueOf(money));
-                        jobTeamDetailsRepository.save(teamMember);
+                        int percentage=10; //default percentage
+                        int bidAmount = (int)(job.getBudget() / 100)*percentage;
+                        proposal.setBidAmount(Long.valueOf(bidAmount));
+                        proposal.setPercentage(Long.valueOf(percentage));
+                        proposal=repository.save(proposal);
                     }
 
-                    //fire notification
-                    User currentUser =userService.getUserById(proposal.getUserId());
-                    Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
-                    if(currentUser!=null && currentJob!=null) {
-                        NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getFullName() + " applied to your  project for "+currentJob.getTitle());
-                        body.setSubject("New Proposal");
-                        body.setActionType("REDIRECT");
-                        body.setAction("/my-job/proposals/"+proposal.getJobId());
-                        body.setTopic("'Job'");
-                        body.setChannel("S");
-                        body.setRecipient(proposal.getEmployerId());
-                        notificationSender.sendEmail(body);
+                    if(!isEdited) {
+                        //fire notification
+                        User currentUser = userService.getUserById(proposal.getUserId());
+                        Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
+                        if (currentUser != null && currentJob != null) {
+                            NotificationBody body = new NotificationBody();
+                            body.setBody(currentUser.getFullName() + " applied to your  project for " + currentJob.getTitle());
+                            body.setSubject("New Proposal");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/my-job/proposals/" + proposal.getJobId());
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(proposal.getEmployerId());
+                            notificationSender.pushNotification(body);
+                        }
                     }
                     //end
 
@@ -131,7 +143,7 @@ public class JobProposalService  implements Serializable {
                 body.setTopic("'Job'");
                 body.setChannel("S");
                 body.setRecipient(proposal.getUserId());
-                notificationSender.sendEmail(body);
+                notificationSender.pushNotification(body);
             }
             //end
         }

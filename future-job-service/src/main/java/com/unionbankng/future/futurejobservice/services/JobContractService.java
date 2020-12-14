@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import com.unionbankng.future.futurejobservice.pojos.User;
 
 @Service
 @RequiredArgsConstructor
@@ -118,11 +119,11 @@ public class JobContractService implements Serializable {
             JobProposal proposal= jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
             UUID referenceId = UUID.randomUUID();
-            UUID transferReferenceId = UUID.randomUUID();
+            String transferReferenceId=referenceId.toString().replaceAll("-","");
             int peppFess = (int) (2.5 / 100) * contract.getAmount() + 200;
             contract.setPeppfees(peppFess);
             contract.setReferenceId(referenceId.toString());
-            contract.setTransferReferenceId(transferReferenceId.toString());
+            contract.setTransferReferenceId(transferReferenceId);
             contract.setAppId(appId);
             int status=0;
 
@@ -131,7 +132,6 @@ public class JobContractService implements Serializable {
             c.add(Calendar.DATE, proposal.duration.intValue());
             contract.setEndDate(c.getTime());
             contract.setStartDate(new Date());
-
             proposal.setStatus(JobProposalStatus.WP);
             proposal.setLastModifiedDate(new Date());
             proposal.setStartDate(new Date());
@@ -140,18 +140,16 @@ public class JobContractService implements Serializable {
             if(contract.getWorkMethod()=="Milestone"){
                 status=1;
                 //fire notification
-                User currentUser =userService.getUserById(proposal.getEmployerId());
-                Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
-                if(currentUser!=null && currentJob!=null) {
+                    if(job!=null) {
                     NotificationBody body = new NotificationBody();
-                    body.setBody(currentUser.getFullName() + " approved your contract and the amount will be paid to you base on the milestone you complete");
+                    body.setBody(proposal.getFullName() + " approved your contract and the amount will be paid to you base on the milestone you complete");
                     body.setSubject("Proposal Approval");
                     body.setActionType("REDIRECT");
                     body.setAction("/job/ongoing/details/"+proposal.getJobId());
                     body.setTopic("'Job'");
                     body.setChannel("S");
                     body.setRecipient(proposal.getUserId());
-                    notificationSender.sendEmail(body);
+                    notificationSender.pushNotification(body);
                 }
                 //end
             }else {
@@ -178,11 +176,28 @@ public class JobContractService implements Serializable {
                 transfer.setDebitAccountName(proposal.getAccountName());
                 transfer.setDebitAccountNumber(proposal.getAccountNumber());
                 transfer.setDebitAccountBranchCode(proposal.getBranchCode());
+                transfer.setDebitAccountBranchCode("682");
                 transfer.setDebitAccountType("CASA");
                 transfer.setDebitNarration(job.getTitle());
+
+
+                logger.info(new ObjectMapper().writeValueAsString(transfer));
                 UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
 
-                if(transferResponse.getCode()=="00") {
+                if(transferResponse.getCode().compareTo("00")==0) {
+
+                   if(job!=null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody("Your payment of "+contract.getAmount()+" has been successful");
+                        body.setSubject("Payment Successful");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/job/ongoing/details/"+proposal.getJobId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setRecipient(proposal.getEmployerId());
+                        notificationSender.pushNotification(body);
+                    }
+
                     HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                     ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
                             + "&referenceid=" + contract.getReferenceId()
@@ -206,20 +221,28 @@ public class JobContractService implements Serializable {
                             + "&transfer_reference_id=" + contract.getTransferReferenceId(), HttpMethod.POST, entity, String.class);
                     if (response.getStatusCode().is2xxSuccessful()) {
                         status = 1;
-                        //fire notification
-                        User currentUser = userService.getUserById(proposal.getEmployerId());
-                        Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
-                        if (currentUser != null && currentJob != null) {
-                            NotificationBody body = new NotificationBody();
-                            body.setBody(currentUser.getFullName() + " approved your contract and credited our escrow with the sum of " + proposal.getBidAmount());
-                            body.setSubject("Proposal Approval");
-                            body.setActionType("REDIRECT");
-                            body.setAction("/job/ongoing/details/" + proposal.getJobId());
-                            body.setTopic("'Job'");
-                            body.setChannel("S");
-                            body.setRecipient(proposal.getUserId());
-                            notificationSender.sendEmail(body);
-                        }
+
+                        //fire notifications
+                        NotificationBody body1 = new NotificationBody();
+                        body1.setBody("Your " + contract.getAmount() +" deducted is currently in our Escrow, it will only be released to the freelancer when you confirm that the job done is okay by you.");
+                        body1.setSubject("Contract Amount is in Escrow");
+                        body1.setActionType("REDIRECT");
+                        body1.setAction("/job/ongoing/details/" + proposal.getJobId());
+                        body1.setTopic("'Job'");
+                        body1.setChannel("S");
+                        body1.setRecipient(proposal.getEmployerId());
+                        notificationSender.pushNotification(body1);
+
+                        NotificationBody body2 = new NotificationBody();
+                        body2.setBody(proposal.getFullName() + " approved your contract and credited our escrow with the sum of " + proposal.getBidAmount());
+                        body2.setSubject("Proposal Approval");
+                        body2.setActionType("REDIRECT");
+                        body2.setAction("/job/ongoing/details/" + proposal.getJobId());
+                        body2.setTopic("'Job'");
+                        body2.setChannel("S");
+                        body2.setRecipient(proposal.getUserId());
+                        notificationSender.pushNotification(body2);
+
                         //end
                     } else {
                         logger.info("JOBSERVICE: Escrow transaction failed");
@@ -241,12 +264,31 @@ public class JobContractService implements Serializable {
                      jobRepository.save(job);
 
                      if(job.getType()==JobType.TEAMS_PROJECT) {
-                         JobTeamDetails teamMember = jobTeamDetailsRepository.findByProposalId(proposal.id);
-                         if (teamMember != null) {
+
+                         JobTeamDetails existingMember=jobTeamDetailsRepository.findByProposalId(proposal.getId());
+                         if(existingMember==null){
+                             // save approved team member
+                             JobTeamDetails teamMember = new JobTeamDetails();
+                             teamMember.setImg(proposal.getImg());
+                             teamMember.setFullName(proposal.getFullName());
+                             teamMember.setEmail(proposal.getEmail());
+                             teamMember.setAmount(proposal.bidAmount);
+                             teamMember.setJobId(proposal.jobId);
+                             teamMember.setUserId(proposal.getUserId());
+                             teamMember.setProposalId(proposal.id);
+                             teamMember.setEmployerId(proposal.employerId);
                              teamMember.setStatus(JobTeamStatus.AC);
+                             teamMember.setDescription(proposal.about);
+                             teamMember.setPercentage(Long.valueOf(10));
+                             teamMember.setAmount(proposal.bidAmount);
                              teamMember.setStartDate(new Date());
                              teamMember.setEndDate(c.getTime());
                              jobTeamDetailsRepository.save(teamMember);
+                         }else{
+                             existingMember.setStartDate(new Date());
+                             existingMember.setEndDate(c.getTime());
+                             existingMember.setStatus(JobTeamStatus.AC);
+                             jobTeamDetailsRepository.save(existingMember);
                          }
                      }
                  }else{
@@ -282,11 +324,11 @@ public class JobContractService implements Serializable {
                     body.setBody(currentUser.getFullName() + " want you to extend "+currentJob.getTitle()+" delivery date to " + extension.getDate().toString());
                     body.setSubject("Contract Extension");
                     body.setActionType("REDIRECT");
-                    body.setAction("/my-jobs/proposal/preview/" + extension.getProposalId());
+                    body.setAction("/job/ongoing/details/" + extension.getJobId());
                     body.setTopic("'Job'");
                     body.setChannel("S");
                     body.setRecipient(extension.getEmployerId());
-                    notificationSender.sendEmail(body);
+                    notificationSender.pushNotification(body);
                 }
                 //end
 
@@ -319,7 +361,7 @@ public class JobContractService implements Serializable {
                     body.setTopic("'Job'");
                     body.setChannel("S");
                     body.setRecipient(newMilestone.getEmployerId());
-                    notificationSender.sendEmail(body);
+                    notificationSender.pushNotification(body);
                 }
                 //end
 
@@ -387,11 +429,11 @@ public class JobContractService implements Serializable {
                             body.setBody(currentUser.getFullName() + " approved the project delivery date extension as requested");
                             body.setSubject("Contract Extension Approved");
                             body.setActionType("REDIRECT");
-                            body.setAction("/my-jobs/proposal/preview/" + extension.getProposalId());
+                            body.setAction("/job/ongoing/details/" + extension.getJobId());
                             body.setTopic("'Job'");
                             body.setChannel("S");
                             body.setRecipient(extension.getUserId());
-                            notificationSender.sendEmail(body);
+                            notificationSender.pushNotification(body);
                         }
                         //end
 
@@ -416,7 +458,7 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobProjectSubmission submitContract(String projectData, MultipartFile[] supportingFiles) {
+    public JobProjectSubmission submitJob(String projectData, MultipartFile[] supportingFiles) {
         try {
             String supporting_file_names = null;
             JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
@@ -440,7 +482,7 @@ public class JobContractService implements Serializable {
                 body.setTopic("'Job'");
                 body.setChannel("S");
                 body.setRecipient(request.getEmployerId());
-                notificationSender.sendEmail(body);
+                notificationSender.pushNotification(body);
             }
             //end
             return jobProjectSubmissionRepository.save(request);
@@ -448,6 +490,24 @@ public class JobContractService implements Serializable {
             ex.printStackTrace();
             return null;
         }
+    }
+    public JobProjectSubmission rejectJob(Long jobId, Long requestId) {
+        JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
+        if(request !=null) {
+            request.setStatus(JobSubmissionStatus.RE);
+            jobProjectSubmissionRepository.save(request);
+            //fire notification
+            NotificationBody body = new NotificationBody();
+            body.setBody("Job that you submitted has been rejected by the employer");
+            body.setSubject("Project Rejected");
+            body.setActionType("REDIRECT");
+            body.setAction("/job/ongoing/details/" + request.getJobId());
+            body.setTopic("'Job'");
+            body.setChannel("S");
+            body.setRecipient(request.getEmployerId());
+            notificationSender.pushNotification(body);
+        }
+        return request;
     }
 
     public JobProjectSubmission submitCompletedMilestone(Long id, String projectData, MultipartFile[] supportingFiles) {
@@ -479,7 +539,7 @@ public class JobContractService implements Serializable {
                     body.setTopic("'Job'");
                     body.setChannel("S");
                     body.setRecipient(request.getEmployerId());
-                    notificationSender.sendEmail(body);
+                    notificationSender.pushNotification(body);
                 }
                 //end
                 return jobProjectSubmissionRepository.save(request);
@@ -536,7 +596,7 @@ public class JobContractService implements Serializable {
                             body.setTopic("'Job'");
                             body.setChannel("S");
                             body.setRecipient(project.getUserId());
-                            notificationSender.sendEmail(body);
+                            notificationSender.pushNotification(body);
                         }
                         //end
                     }
@@ -707,7 +767,7 @@ public class JobContractService implements Serializable {
                         body.setTopic("'Job'");
                         body.setChannel("S");
                         body.setRecipient(milestone.getUserId());
-                        notificationSender.sendEmail(body);
+                        notificationSender.pushNotification(body);
                     }
                     //end
 
@@ -760,7 +820,7 @@ public class JobContractService implements Serializable {
                         body.setTopic("'Job'");
                         body.setChannel("S");
                         body.setRecipient(request.getUserId());
-                        notificationSender.sendEmail(body);
+                        notificationSender.pushNotification(body);
                     }
                     //end
                     
