@@ -409,11 +409,11 @@ public class UBNAccountOpeningController {
 
         logger.info("UBN account create request  is :{}",ubnAccountCreationRequest);
 
-        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
+        ubnNewAccountOpeningAPIServiceHandler
                 .completeUBNAccountCreation(ubnAccountCreationRequest);
 
-        if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
+//        if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
+//            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
                 .getUBNAccountDetails(request.getCustomerRecordId());
