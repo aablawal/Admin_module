@@ -10,8 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -35,8 +38,8 @@ public class JobContractController {
     }
 
     @PostMapping("/v1/job/contract/extension/request")
-    public ResponseEntity<APIResponse> requestContractExtension(@Valid @RequestBody String extensionRequest) throws JsonProcessingException {
-        JobContractExtension response= jobContractService.requestContractExtension(extensionRequest);
+    public ResponseEntity<APIResponse> requestContractExtension(@Valid @RequestBody String extensionRequest,@ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
+        JobContractExtension response= jobContractService.requestContractExtension(authentication, extensionRequest);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
@@ -44,8 +47,8 @@ public class JobContractController {
     }
 
     @PostMapping("/v1/job/contract/extension/approve")
-    public ResponseEntity<APIResponse> approveContractExtension(@Valid @RequestBody String extensionRequest) throws JsonProcessingException {
-        JobContractExtension response= jobContractService.approveContractExtension(extensionRequest);
+    public ResponseEntity<APIResponse> approveContractExtension(@Valid @RequestBody String extensionRequest, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
+        JobContractExtension response= jobContractService.approveContractExtension(authentication, extensionRequest);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
@@ -53,8 +56,8 @@ public class JobContractController {
     }
 
     @PostMapping("/v1/job/contract/milestone/add")
-    public ResponseEntity<APIResponse> addNewMilestone(@Valid @RequestBody String milestoneRequest) throws JsonProcessingException {
-        JobMilestone response= jobContractService.addNewMilestone(milestoneRequest);
+    public ResponseEntity<APIResponse> addNewMilestone(@Valid @RequestBody String milestoneRequest, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
+        JobMilestone response= jobContractService.addNewMilestone(authentication, milestoneRequest);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
@@ -63,8 +66,8 @@ public class JobContractController {
 
     @PostMapping(value="/v1/job/completed/submission/", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> submitContract(@Valid @RequestParam(value = "data", required=true) String projectData,
-                                              @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles) throws IOException {
-        JobProjectSubmission response= jobContractService.submitJob(projectData,supportingFiles);
+                                              @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles, @ApiIgnore OAuth2Authentication authentication) throws IOException {
+        JobProjectSubmission response= jobContractService.submitJob(authentication, projectData,supportingFiles);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
@@ -72,8 +75,8 @@ public class JobContractController {
     }
 
     @PutMapping("/v1/job/completed/rejection/{jobId}/{requestId}")
-    public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId){
-        JobProjectSubmission request= jobContractService.rejectJob(jobId,requestId);
+    public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId, @ApiIgnore OAuth2Authentication authentication){
+        JobProjectSubmission request= jobContractService.rejectJob(authentication, jobId,requestId);
         if(request!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, request));
         else
@@ -91,8 +94,8 @@ public class JobContractController {
 
     @PostMapping(value="/v1/job/milestone/completed/submit/{id}", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> submitCompletedMilestone(@Valid @RequestParam(value = "data", required=true) String projectData, @PathVariable Long id,
-                                                      @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles) throws IOException {
-        JobProjectSubmission response= jobContractService.submitCompletedMilestone(id,projectData,supportingFiles);
+                                                      @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles, @ApiIgnore OAuth2Authentication authentication) throws IOException {
+        JobProjectSubmission response= jobContractService.submitCompletedMilestone(authentication, id,projectData,supportingFiles);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
@@ -113,8 +116,8 @@ public class JobContractController {
 
 
     @PutMapping("/v1/job/contract/end/{jobId}/{proposalId}/{userId}")
-    public ResponseEntity<APIResponse> endContract(@PathVariable Long jobId,@PathVariable Long proposalId, @PathVariable Long userId, @RequestParam int state){
-        JobContract contract= jobContractService.endContract(jobId,proposalId,userId,state);
+    public ResponseEntity<APIResponse> endContract(@PathVariable Long jobId,@PathVariable Long proposalId, @PathVariable Long userId, @RequestParam int state, @ApiIgnore OAuth2Authentication authentication){
+        JobContract contract= jobContractService.endContract(authentication, jobId,proposalId,userId,state);
         if(contract!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, contract));
         else
@@ -150,8 +153,8 @@ public class JobContractController {
 
 
     @PutMapping("/v1/my-job/contract/milestone/state/{id}")
-    public ResponseEntity<APIResponse> modifyMilestoneState(@PathVariable Long id, @RequestParam String status){
-        JobMilestone milestone= jobContractService.modifyMilestoneState(id,status);
+    public ResponseEntity<APIResponse> modifyMilestoneState(@PathVariable Long id, @RequestParam String status, @ApiIgnore OAuth2Authentication authentication){
+        JobMilestone milestone= jobContractService.modifyMilestoneState(authentication,id,status);
         if(milestone!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, milestone));
         else
@@ -159,8 +162,8 @@ public class JobContractController {
     }
 
     @PostMapping("/v1/job/milestone/completed/approval/{id}")
-    public ResponseEntity<APIResponse> approveCompletedMilestone(@Valid @RequestBody String request, @PathVariable Long id) throws JsonProcessingException {
-        JobMilestone response= jobContractService.approveCompletedMilestone(id,request);
+    public ResponseEntity<APIResponse> approveCompletedMilestone(@Valid @RequestBody String request, @PathVariable Long id, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
+        JobMilestone response= jobContractService.approveCompletedMilestone(authentication, id,request);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else

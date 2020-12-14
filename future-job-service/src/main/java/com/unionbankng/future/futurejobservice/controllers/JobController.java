@@ -1,23 +1,24 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.pojos.APIResponse;
-import com.unionbankng.future.futurejobservice.pojos.EmailMessage;
-import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.pojos.User;
+import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -36,16 +37,15 @@ public class JobController {
     private final NotificationSender notificationSender;
     private final UserService userService;
     private final JobRepository jobRepository;
-
     Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
                                               @RequestParam(value = "team", required=true) String teamData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
-                                              @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles) throws IOException{
+                                              @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles, @ApiIgnore OAuth2Authentication authentication) throws IOException{
 
-        Job addedJob=service.addJob(jobData,teamData,supportingFiles,ndaFiles);
+        Job addedJob=service.addJob(authentication, jobData,teamData,supportingFiles,ndaFiles);
         if(addedJob!=null)
           return ResponseEntity.ok().body(new APIResponse("success",true,addedJob));
         else
@@ -53,8 +53,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/close")
-    public  ResponseEntity<APIResponse> closeJobById(@RequestParam Long id, @RequestParam int state){
-        Job job=service.closeJobById(id,state);
+    public  ResponseEntity<APIResponse> closeJobById(@RequestParam Long id, @RequestParam int state, @ApiIgnore OAuth2Authentication authentication){
+        Job job=service.closeJobById(authentication, id,state);
         if(job!=null)
            return ResponseEntity.ok().body(new APIResponse("Job closed successful",true,job));
         else
@@ -62,8 +62,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/open")
-    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id){
-        Job job=service.openJobById(id);
+    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id, @ApiIgnore OAuth2Authentication authentication){
+        Job job=service.openJobById(authentication, id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job opened successful",true,job));
         else
@@ -71,15 +71,13 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/repeat")
-    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id){
-        Job job=service.repeatJobById(id);
+    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id, @ApiIgnore OAuth2Authentication authentication){
+        Job job=service.repeatJobById(authentication, id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job repeated successful",true,job));
         else
             return ResponseEntity.ok().body(new APIResponse("Unable to repeat the job",false,null));
     }
-
-
 
     @DeleteMapping("/v1/job/delete/{id}")
     public ResponseEntity<APIResponse> deleteJob(@PathVariable  Long id){
@@ -126,16 +124,10 @@ public class JobController {
                 new APIResponse("success",true,service.getJobs(PageRequest.of(page,size), model)));
     }
 
-    @GetMapping("/v1/test/{id}")
-    public ResponseEntity<APIResponse<String>> test(@PathVariable Long id){
-        Job job = jobRepository.findById(id).orElse(null);
+    @GetMapping("/v1/test")
+    public ResponseEntity<APIResponse<String>> test(@ApiIgnore OAuth2Authentication authentication){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return ResponseEntity.ok().body(
-                new APIResponse("success",true, job));
-    }
-
-    @GetMapping("/v1/test1/{id}")
-    public ResponseEntity<APIResponse<String>> test1(@PathVariable Long id,Model model){
-        return ResponseEntity.ok().body(
-                new APIResponse("success",true, service.findJobById(id,model)));
+                new APIResponse("success",true, jwtUserDetail));
     }
 }

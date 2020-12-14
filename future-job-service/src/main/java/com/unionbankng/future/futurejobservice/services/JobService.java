@@ -5,19 +5,20 @@ import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import com.unionbankng.future.futurejobservice.enums.JobTeamStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.TeamMember;
-import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.*;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,8 +42,9 @@ public class JobService {
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
-    public Job addJob(String jobData, String teamData,  MultipartFile[] supporting_files,  MultipartFile[] nda_files) throws IOException {
+    public Job addJob(OAuth2Authentication authentication, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
         try {
+            JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             String supporting_file_names = null;
             String nda_file_names=null;
             Job job = new ObjectMapper().readValue(jobData, Job.class);
@@ -146,11 +148,10 @@ public class JobService {
                     }
                 }
                 //fire notification
-                User currentUser = userService.getUserById(savedJob.getOid());
                 Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
-                if (currentUser != null && currentJob != null) {
+                if (currentJob != null) {
                     NotificationBody body = new NotificationBody();
-                    body.setBody("Hi " + currentUser.getFullName() + ", your job for " + currentJob.getTitle() + " has been published");
+                    body.setBody("Your job for " + currentJob.getTitle() + " has been published");
                     body.setSubject("Job Published");
                     body.setActionType("REDIRECT");
                     body.setAction("/job/details/" + savedJob.getId());
@@ -175,7 +176,7 @@ public class JobService {
         }
     }
 
-    public Job closeJobById(Long id, int state){
+    public Job closeJobById(OAuth2Authentication authentication,Long id, int state){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             if(state==1)
@@ -196,9 +197,8 @@ public class JobService {
 
 
             //fire notification
-            User currentUser =userService.getUserById(job.getOid());
             Job currentJob=jobRepository.findById(job.getId()).orElse(null);
-            if(currentUser!=null && currentJob!=null) {
+            if(currentJob!=null) {
                 NotificationBody body = new NotificationBody();
                 body.setBody("Your job for "+currentJob.getTitle()+" has been closed");
                 body.setSubject("Job Closed");
@@ -219,7 +219,7 @@ public class JobService {
             return  null;
         }
     }
-    public Job openJobById(Long id){
+    public Job openJobById(OAuth2Authentication authentication,Long id){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             job.setStatus(JobStatus.AC);
@@ -230,7 +230,7 @@ public class JobService {
         }
     }
 
-    public Job repeatJobById(Long id){
+    public Job repeatJobById(OAuth2Authentication authentication,Long id){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             job.setStatus(JobStatus.AC);
@@ -241,11 +241,10 @@ public class JobService {
                 });
             }
             //fire notification
-            User currentUser =userService.getUserById(job.getOid());
             Job currentJob=jobRepository.findById(job.getId()).orElse(null);
-            if(currentUser!=null && currentJob!=null) {
+            if(currentJob!=null) {
                 NotificationBody body = new NotificationBody();
-                body.setBody("Hi "+currentUser.getFullName() + ", your job for "+currentJob.getTitle()+" has been published");
+                body.setBody("Your job for "+currentJob.getTitle()+" has been Re-published");
                 body.setSubject("Job Published");
                 body.setActionType("REDIRECT");
                 body.setAction("/job/details/"+job.getId());
@@ -269,7 +268,6 @@ public class JobService {
         Job job = jobRepository.findById(id).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
         return appService.getJob(job, model);
     }
-
     public Model getJobByInvitationId(String  invitationId, Model model) {
         Job job = jobRepository.findJobByInvitationId(invitationId).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
         return appService.getJob(job, model);
@@ -280,8 +278,6 @@ public class JobService {
         Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
         return jobList;
     }
-
-
     public Model findJobsByOwnerId(Long id,Pageable pageable, Model model) {
         Page<Job> paginatedData= jobRepository.findByOid(pageable, id);
         Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
