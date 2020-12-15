@@ -36,7 +36,6 @@ public class JobService {
     private  final JobProposalRepository jobProposalRepository;
     private  final FileStoreService fileStoreService;
     private final JobTeamRepository teamRepository;
-    private final UserService userService;
     private final NotificationSender notificationSender;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
     private Logger logger = LoggerFactory.getLogger(JobService.class);

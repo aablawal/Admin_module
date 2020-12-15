@@ -103,7 +103,9 @@ public class JobContractService implements Serializable {
     public JobMilestone findContractMilestoneByProposalId(Long proposalId, Long userId){
         return  jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId,userId);
     }
-
+    public JobMilestone findMilestoneById(Long milestoneId){
+        return  jobMilestoneRepository.findById(milestoneId).orElse(null);
+    }
     public JobMilestone findContractMilestoneByJobId(Long proposalId, Long jobId){
         return  jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId,jobId);
     }
@@ -668,12 +670,13 @@ public class JobContractService implements Serializable {
                         if(contract!=null) {
 
                             UUID referenceId = UUID.randomUUID();
-                            UUID transferReferenceId = UUID.randomUUID();
-                            int peppFess = (int) (2.5 / 100) * milestone.getAmount().intValue() + 200;
+                            String transferReferenceId=referenceId.toString().replaceAll("-","");
+                            int peppFess = (int) (2.5 / 100) * contract.getAmount() + 200;
                             contract.setPeppfees(peppFess);
-                            contract.setReferenceId(referenceId.toString());
-                            contract.setTransferReferenceId(transferReferenceId.toString());
+                            contract.setReferenceId(transferReferenceId);
+                            contract.setTransferReferenceId(transferReferenceId);
                             contract.setAppId(appId);
+                            contract.setPeppfees(peppFess);
 
                             Calendar c = Calendar.getInstance();
                             c.setTime(new Date());
@@ -681,16 +684,15 @@ public class JobContractService implements Serializable {
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
 
-
-                            //transfer the milestone amount to Sidekiq main account
-                            JobTransfer transfer = new JobTransfer();
+                            //transfer the amount to Escrow
+                            JobTransfer transfer=new JobTransfer();
                             transfer.setUserId(proposal.getUserId());
                             transfer.setJobId(proposal.getJobId());
                             transfer.setProposalId(proposal.getId());
                             transfer.setEmployerId(proposal.getEmployerId());
                             transfer.setCreatedAt(new Date());
                             //transfer
-                            transfer.setAmount(contract.getAmount());
+                            transfer.setAmount(Integer.parseInt(milestone.getAmount().toString()));
                             transfer.setCurrency("NGN");
                             transfer.setPaymentReference(contract.getTransferReferenceId());
                             transfer.setInitBranchCode("682");
@@ -705,11 +707,14 @@ public class JobContractService implements Serializable {
                             transfer.setDebitAccountName(proposal.getAccountName());
                             transfer.setDebitAccountNumber(proposal.getAccountNumber());
                             transfer.setDebitAccountBranchCode(proposal.getBranchCode());
+                            transfer.setDebitAccountBranchCode("682");
                             transfer.setDebitAccountType("CASA");
                             transfer.setDebitNarration(job.getTitle());
-                            UBNFundsTransferResponse transferResponse = bankTransferService.transferUBNtoUBN(transfer);
 
-                            if (transferResponse.getCode() == "00") {
+                            logger.info(new ObjectMapper().writeValueAsString(transfer));
+                            UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
+
+                            if(transferResponse.getCode().compareTo("00")==0) {
                                 //set milestone amount to the escrow
                                 HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                                 ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
@@ -732,12 +737,14 @@ public class JobContractService implements Serializable {
                                         + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getStartDate())
                                         + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getEndDate())
                                         + "&transfer_reference_id=" + contract.getTransferReferenceId(), HttpMethod.POST, entity, String.class);
-                                if (response.getStatusCode().is2xxSuccessful())
+                                if (response.getStatusCode().is2xxSuccessful()) {
                                     status = 1;
-                                else
+                                    logger.info("JOBSERVICE: Escrow transaction succeeded");
+                                }
+                                else {
                                     status = 0;
                                     logger.info("JOBSERVICE: Escrow transaction failed");
-
+                                }
                                 //done
                             }else{
                                 status = 0;
@@ -773,7 +780,6 @@ public class JobContractService implements Serializable {
                         notificationSender.pushNotification(body);
                     }
                     //end
-
                     return   jobMilestoneRepository.save(milestone);
                 }
                else{

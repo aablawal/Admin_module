@@ -106,8 +106,8 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/cancel")
-    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid, Model model,@ApiIgnore OAuth2Authentication authentication) {
-        JobProposal canceledProposal = service.cancelJobProposal(authentication,jid, uid, model);
+    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid,@ApiIgnore OAuth2Authentication authentication) {
+        JobProposal canceledProposal = service.cancelJobProposal(authentication,jid, uid);
         if (canceledProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, canceledProposal));
@@ -115,6 +115,18 @@ public class JobProposalController {
             return ResponseEntity.ok().body(
                     new APIResponse("failed", false, null));
     }
+
+    @PutMapping("/v1/job/proposal/change/percentage")
+    public ResponseEntity<APIResponse> changePercentage(@RequestParam Long pid, @RequestParam int percentage,@ApiIgnore OAuth2Authentication authentication) {
+        JobProposal updateProposal = service.changeProposalPercentage(authentication,pid, percentage);
+        if (updateProposal != null)
+            return ResponseEntity.ok().body(
+                    new APIResponse("success", true, updateProposal));
+        else
+            return ResponseEntity.ok().body(
+                    new APIResponse("failed", false, null));
+    }
+
 
     @GetMapping("/v1/job/teams/{jobId}")
     public ResponseEntity<APIResponse> findTeamsByJobId(@PathVariable Long jobId){

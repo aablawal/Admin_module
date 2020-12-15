@@ -43,11 +43,28 @@ public class JobProposalService  implements Serializable {
             String supporting_file_names = null;
             JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-
-            application.status= JobProposalStatus.PE;
+            Job job = jobRepository.findById(application.jobId).orElse(null);
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
+            application.setLastModifiedDate(new Date());
             boolean isEdited=false;
+
+            if(application.id!=null) {
+                isEdited = true;
+            }
+            if(!isEdited) {
+                application.status = JobProposalStatus.PE;
+            }
+
+            if (job.type == JobType.TEAMS_PROJECT && !isEdited) {
+                //calculate user founds
+                if(application.percentage==null) {
+                    int percentage = 10; //default percentage
+                    int bidAmount = (int) (job.getBudget() / 100) * percentage;
+                    application.setBidAmount(Long.valueOf(bidAmount));
+                    application.setPercentage(Long.valueOf(percentage));
+                }
+            }
 
             //save files if not null
             if (supporting_files!=null)
@@ -55,21 +72,12 @@ public class JobProposalService  implements Serializable {
             //cross verify if attached files processed
             if (supporting_file_names != null)
                 application.supportingFiles = supporting_file_names;
-            if(application.id!=null)
-                isEdited=true;
+
 
             JobProposal proposal= repository.save(application);
             if(proposal!=null) {
-                Job job = jobRepository.findById(proposal.jobId).orElse(null);
+
                 if (job != null) {
-                    if (job.type == JobType.TEAMS_PROJECT) {
-                        //calculate user founds
-                        int percentage=10; //default percentage
-                        int bidAmount = (int)(job.getBudget() / 100)*percentage;
-                        proposal.setBidAmount(Long.valueOf(bidAmount));
-                        proposal.setPercentage(Long.valueOf(percentage));
-                        proposal=repository.save(proposal);
-                    }
 
                     if(!isEdited) {
                         //fire notification
@@ -111,17 +119,44 @@ public class JobProposalService  implements Serializable {
         return repository.save(proposal);
     }
 
-    public JobProposal cancelJobProposal(OAuth2Authentication authentication,Long jobId, Long userId, Model model){
-        Model data =this.findProposalByUserId(jobId,userId,model);
-        JobProposal proposal= (JobProposal) data.getAttribute("proposal");
+    public JobProposal cancelJobProposal(OAuth2Authentication authentication,Long jobId, Long userId){
+        JobProposal proposal=repository.findProposalByUserId(jobId,userId);
         if(proposal!=null) {
-            this.updateJobProposalStatus(authentication,proposal.id, "CA", model);
+            proposal.setStatus(JobProposalStatus.IA);
+            repository.save(proposal);
             //fire notification
             Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
             if(currentJob!=null) {
                 NotificationBody body = new NotificationBody();
                 body.setBody("Your proposal for  "+currentJob.getTitle()+" has been canceled");
                 body.setSubject("Proposal Canceled");
+                body.setActionType("REDIRECT");
+                body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setRecipient(proposal.getUserId());
+                notificationSender.pushNotification(body);
+            }
+            //end
+        }
+        else {
+            logger.info("JOBSERVICE: Proposal not found");
+        }
+        return proposal;
+    }
+    public  JobProposal changeProposalPercentage( OAuth2Authentication authentication,Long proposalId, int percentage){
+        JobProposal proposal=repository.findById(proposalId).orElse(null);
+        if(proposal!=null) {
+            Job currentJob =jobRepository.findById(proposal.getJobId()).orElse(null);
+            int bidAmount = (int) (currentJob.getBudget() / 100) *  percentage;
+            proposal.setPercentage(Long.valueOf(percentage));
+            proposal.setBidAmount(Long.valueOf(bidAmount));
+            repository.save(proposal);
+            //fire notification
+            if(currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody("The responsibility  for  "+currentJob.getTitle()+" has been changed to "+percentage+"% now and amount to NGN "+bidAmount+'.');
+                body.setSubject("Responsibility Change");
                 body.setActionType("REDIRECT");
                 body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
                 body.setTopic("'Job'");
