@@ -285,6 +285,22 @@ public class UBNAccountOpeningController {
 
     }
 
+    @GetMapping("/v1/ubn_account_opening/get_account_details")
+    public ResponseEntity<APIResponse<UBNAccountDataResponse>> getAccountDetails(@RequestParam Long recordId) throws IOException {
+
+        //determine existing or non existing customer
+        Response<UBNAccountDataResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
+                .getUBNAccountDetails(recordId);
+
+        if(!responseResponse.isSuccessful())
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+
+    }
+
+
+
     @PostMapping(value = "/v1/ubn_account_opening/upload_document/{type}/{recordId}",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<UBNGenericResponse>> uploadDocumentForAccount(@PathVariable Integer type,
                                                                                             @PathVariable Long recordId, @RequestPart("file") MultipartFile file) throws IOException {
@@ -358,6 +374,8 @@ public class UBNAccountOpeningController {
 
     }
 
+
+
     @GetMapping("/v1/ubn_account_opening/confirm_payment_status")
     public ResponseEntity<APIResponse<UBNGenericResponse>> confirmUBNPaymentStatus(
             @RequestParam Long customerId
@@ -391,11 +409,11 @@ public class UBNAccountOpeningController {
 
         logger.info("UBN account create request  is :{}",ubnAccountCreationRequest);
 
-        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler
+        ubnNewAccountOpeningAPIServiceHandler
                 .completeUBNAccountCreation(ubnAccountCreationRequest);
 
-        if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+//        if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
+//            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
                 .getUBNAccountDetails(request.getCustomerRecordId());
