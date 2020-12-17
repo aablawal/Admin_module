@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.*;
+import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.*;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -15,16 +16,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import com.unionbankng.future.futurejobservice.pojos.User;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +49,6 @@ public class JobContractService implements Serializable {
     private final JobContractRepository jobContractRepository;
     private final JobContractExtensionRepository jobContractExtensionRepository;
     private final JobProposalRepository jobProposalRepository;
-    private final JobNotificationRepository jobNotificationRepository;
     private  final JobProjectSubmissionRepository jobProjectSubmissionRepository;
     private final  JobMilestoneRepository jobMilestoneRepository;
     private  final FileStoreService fileStoreService;
@@ -102,22 +101,25 @@ public class JobContractService implements Serializable {
     public JobMilestone findContractMilestoneByProposalId(Long proposalId, Long userId){
         return  jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId,userId);
     }
-
+    public JobMilestone findMilestoneById(Long milestoneId){
+        return  jobMilestoneRepository.findById(milestoneId).orElse(null);
+    }
     public JobMilestone findContractMilestoneByJobId(Long proposalId, Long jobId){
         return  jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId,jobId);
     }
-
     public List<JobMilestone> findAllContractMilestoneByProposalJobIdAndStatus(Long proposalId, Long jobId, String status){
         return  jobMilestoneRepository.findAllMilestonesByProposalJobAndStatus(proposalId,jobId,status);
     }
     public List<JobMilestone> findAllContractMilestoneByProposalJobId(Long proposalId, Long jobId){
         return  jobMilestoneRepository.findAllMilestonesByProposalAndJobId(proposalId,jobId);
     }
-    public JobContract approveJobProposal(String  request, Model model) throws JsonProcessingException {
+    public JobContract approveJobProposal(OAuth2Authentication authentication,String  request, Model model) throws JsonProcessingException {
         try {
             JobContract contract = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContract.class);
             JobProposal proposal= jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
             UUID referenceId = UUID.randomUUID();
             String transferReferenceId=referenceId.toString().replaceAll("-","");
             int peppFess = (int) (2.5 / 100) * contract.getAmount() + 200;
@@ -142,7 +144,7 @@ public class JobContractService implements Serializable {
                 //fire notification
                     if(job!=null) {
                     NotificationBody body = new NotificationBody();
-                    body.setBody(proposal.getFullName() + " approved your contract and the amount will be paid to you base on the milestone you complete");
+                    body.setBody(currentUser.getUserFullName() + " approved your contract and the amount will be paid to you base on the milestone you complete");
                     body.setSubject("Proposal Approval");
                     body.setActionType("REDIRECT");
                     body.setAction("/job/ongoing/details/"+proposal.getJobId());
@@ -234,7 +236,7 @@ public class JobContractService implements Serializable {
                         notificationSender.pushNotification(body1);
 
                         NotificationBody body2 = new NotificationBody();
-                        body2.setBody(proposal.getFullName() + " approved your contract and credited our escrow with the sum of " + proposal.getBidAmount());
+                        body2.setBody(currentUser.getUserFullName()+ " approved your contract and credited our escrow with the sum of " + proposal.getBidAmount());
                         body2.setSubject("Proposal Approval");
                         body2.setActionType("REDIRECT");
                         body2.setAction("/job/ongoing/details/" + proposal.getJobId());
@@ -309,19 +311,19 @@ public class JobContractService implements Serializable {
             return  null;
         }
     }
-    public  JobContractExtension requestContractExtension(String request) throws JsonProcessingException {
+    public  JobContractExtension requestContractExtension(OAuth2Authentication authentication,String request) throws JsonProcessingException {
         try {
             JobContractExtension extensionRequest = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContractExtension.class);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             extensionRequest.setStatus(JobExtensionStatus.PE);
             JobContractExtension extension = jobContractExtensionRepository.save(extensionRequest);
             if (extension != null) {
 
-                //fire notification 
-                User currentUser =userService.getUserById(extension.getUserId());
+                //fire notification
                 Job currentJob=jobRepository.findById(extension.getJobId()).orElse(null);
-                if(currentUser!=null && currentJob!=null) {
+                if(currentJob!=null) {
                     NotificationBody body = new NotificationBody();
-                    body.setBody(currentUser.getFullName() + " want you to extend "+currentJob.getTitle()+" delivery date to " + extension.getDate().toString());
+                    body.setBody(currentUser.getUserFullName()+" want you to help extend delivery date for "+currentJob.getTitle()+" to " + extension.getDate().toString());
                     body.setSubject("Contract Extension");
                     body.setActionType("REDIRECT");
                     body.setAction("/job/ongoing/details/" + extension.getJobId());
@@ -331,7 +333,6 @@ public class JobContractService implements Serializable {
                     notificationSender.pushNotification(body);
                 }
                 //end
-
                 return extension;
             } else {
                 logger.info("JOBSERVICE: Unable to submit the contract extension");
@@ -343,18 +344,19 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public  JobMilestone addNewMilestone(String request) throws JsonProcessingException {
+    public  JobMilestone addNewMilestone(OAuth2Authentication authentication,String request) throws JsonProcessingException {
         try {
             JobMilestone milestone = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobMilestone.class);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             milestone.setStatus(JobMilestoneStatus.PE);
             JobMilestone newMilestone = jobMilestoneRepository.save(milestone);
             if (newMilestone != null) {
                 //fire notification
-                User currentUser =userService.getUserById(newMilestone.getUserId());
+
                 Job currentJob=jobRepository.findById(newMilestone.getJobId()).orElse(null);
-                if(currentUser!=null && currentJob!=null) {
+                if(currentJob!=null) {
                     NotificationBody body = new NotificationBody();
-                    body.setBody(currentUser.getFullName() + " created new milestone on "+currentJob.getTitle()+" for your review and approval");
+                    body.setBody(currentUser.getUserFullName() + " created new milestone on "+currentJob.getTitle()+" for your review and approval");
                     body.setSubject("New Milestone");
                     body.setActionType("REDIRECT");
                     body.setAction("/my-job/contract/milestones/"+newMilestone.getJobId()+"/"+newMilestone.getProposalId());
@@ -378,10 +380,11 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public  JobContractExtension approveContractExtension(String request) throws JsonProcessingException {
+    public  JobContractExtension approveContractExtension(OAuth2Authentication authentication,String request) throws JsonProcessingException {
         try {
             JobContractExtension extensionRequest = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContractExtension.class);
             JobContractExtension extension = jobContractExtensionRepository.findContractByProposalAndJobId(extensionRequest.getProposalId(), extensionRequest.getJobId());
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             ResponseEntity<String> response = null;
 
             if (extension != null) {
@@ -422,11 +425,10 @@ public class JobContractService implements Serializable {
                         jobContractExtensionRepository.save(extension);
 
                         //fire notification 
-                        User currentUser =userService.getUserById(extension.getEmployerId());
                         Job currentJob=jobRepository.findById(extension.getJobId()).orElse(null);
-                        if(currentUser!=null && currentJob!=null) {
+                        if(proposal!=null && currentJob!=null) {
                             NotificationBody body = new NotificationBody();
-                            body.setBody(currentUser.getFullName() + " approved the project delivery date extension as requested");
+                            body.setBody(currentUser.getUserFullName()+"  approved  your request for the delivery date extension as requested");
                             body.setSubject("Contract Extension Approved");
                             body.setActionType("REDIRECT");
                             body.setAction("/job/ongoing/details/" + extension.getJobId());
@@ -458,10 +460,11 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobProjectSubmission submitJob(String projectData, MultipartFile[] supportingFiles) {
+    public JobProjectSubmission submitJob(OAuth2Authentication authentication,String projectData, MultipartFile[] supportingFiles) {
         try {
             String supporting_file_names = null;
             JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             request.setStatus(JobSubmissionStatus.PE);
 
             if (supportingFiles!=null)
@@ -471,11 +474,10 @@ public class JobContractService implements Serializable {
                 request.supportingFiles = supporting_file_names;
 
             //fire notification 
-            User currentUser =userService.getUserById(request.getUserId());
             Job currentJob=jobRepository.findById(request.getJobId()).orElse(null);
-            if(currentUser!=null && currentJob!=null) {
+            if(currentJob!=null) {
                 NotificationBody body = new NotificationBody();
-                body.setBody(currentUser.getFullName() + " submitted "+currentJob.getTitle()+" for your review and approval");
+                body.setBody(currentUser.getUserFullName()+ " submitted "+currentJob.getTitle()+" for your review and approval");
                 body.setSubject("Project Review");
                 body.setActionType("REDIRECT");
                 body.setAction("/job/ongoing/details/" + request.getJobId());
@@ -491,7 +493,7 @@ public class JobContractService implements Serializable {
             return null;
         }
     }
-    public JobProjectSubmission rejectJob(Long jobId, Long requestId) {
+    public JobProjectSubmission rejectJob(OAuth2Authentication authentication,Long jobId, Long requestId) {
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
         if(request !=null) {
             request.setStatus(JobSubmissionStatus.RE);
@@ -510,10 +512,11 @@ public class JobContractService implements Serializable {
         return request;
     }
 
-    public JobProjectSubmission submitCompletedMilestone(Long id, String projectData, MultipartFile[] supportingFiles) {
+    public JobProjectSubmission submitCompletedMilestone(OAuth2Authentication authentication,Long id, String projectData, MultipartFile[] supportingFiles) {
         try {
             String supporting_file_names = null;
             JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             request.setStatus(JobSubmissionStatus.PE);
 
             if (supportingFiles!=null)
@@ -527,12 +530,11 @@ public class JobContractService implements Serializable {
                 milestone.setStatus(JobMilestoneStatus.PA);
                 jobMilestoneRepository.save(milestone);
 
-                //fire notification 
-                User currentUser =userService.getUserById(request.getUserId());
+                //fire notification
                 Job currentJob=jobRepository.findById(request.getJobId()).orElse(null);
-                if(currentUser!=null && currentJob!=null) {
+                if(currentJob!=null) {
                     NotificationBody body = new NotificationBody();
-                    body.setBody(currentUser.getFullName() + " submitted milestone for your review and approval");
+                    body.setBody(currentUser.getUserFullName()+ " submitted milestone for your review and approval");
                     body.setSubject("Milestone Review");
                     body.setActionType("REDIRECT");
                     body.setAction("/my-job/contract/milestones/"+request.getJobId()+"/"+request.getProposalId());
@@ -556,12 +558,13 @@ public class JobContractService implements Serializable {
     }
 
 
-    public JobContract endContract(Long jobId, Long proposalId, Long userId,  int state) {
+    public JobContract endContract(OAuth2Authentication authentication,Long jobId, Long proposalId, Long userId,  int state) {
         try {
             Job job = jobRepository.findById(jobId).orElse(null);
             JobProposal proposal= jobProposalRepository.findProposalByUserId(jobId,userId);
             JobContract contract = jobContractRepository.findContractByProposalAndJobId(proposalId,jobId);
             JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposalId,jobId);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             ResponseEntity<String> response;
 
             if(contract!=null) {
@@ -585,11 +588,10 @@ public class JobContractService implements Serializable {
 
                     if(response.getStatusCode().is2xxSuccessful()){
                         //fire notification
-                        User currentUser =userService.getUserById(project.getEmployerId());
                         Job currentJob=jobRepository.findById(project.getJobId()).orElse(null);
-                        if(currentUser!=null && currentJob!=null) {
+                        if(currentJob!=null) {
                             NotificationBody body = new NotificationBody();
-                            body.setBody(currentUser.getFullName() + " ended your contract and release the sum of "+proposal.getBidAmount()+" to your bank account");
+                            body.setBody(currentUser.getUserFullName() + " ended your contract and release the sum of "+proposal.getBidAmount()+" to your bank account");
                             body.setSubject("Contract Ended");
                             body.setActionType("REDIRECT");
                             body.setAction("/job/ongoing/details/"+project.getJobId());
@@ -646,9 +648,10 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobMilestone modifyMilestoneState(Long id, String newStatus) {
+    public JobMilestone modifyMilestoneState(OAuth2Authentication authentication,Long id, String newStatus) {
         try {
             JobMilestone milestone = jobMilestoneRepository.findById(id).orElse(null);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             int status=0;
 
             if (milestone != null) {
@@ -664,12 +667,13 @@ public class JobContractService implements Serializable {
                         if(contract!=null) {
 
                             UUID referenceId = UUID.randomUUID();
-                            UUID transferReferenceId = UUID.randomUUID();
-                            int peppFess = (int) (2.5 / 100) * milestone.getAmount().intValue() + 200;
+                            String transferReferenceId=referenceId.toString().replaceAll("-","");
+                            int peppFess = (int) (2.5 / 100) * contract.getAmount() + 200;
                             contract.setPeppfees(peppFess);
-                            contract.setReferenceId(referenceId.toString());
-                            contract.setTransferReferenceId(transferReferenceId.toString());
+                            contract.setReferenceId(transferReferenceId);
+                            contract.setTransferReferenceId(transferReferenceId);
                             contract.setAppId(appId);
+                            contract.setPeppfees(peppFess);
 
                             Calendar c = Calendar.getInstance();
                             c.setTime(new Date());
@@ -677,16 +681,15 @@ public class JobContractService implements Serializable {
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
 
-
-                            //transfer the milestone amount to Sidekiq main account
-                            JobTransfer transfer = new JobTransfer();
+                            //transfer the amount to Escrow
+                            JobTransfer transfer=new JobTransfer();
                             transfer.setUserId(proposal.getUserId());
                             transfer.setJobId(proposal.getJobId());
                             transfer.setProposalId(proposal.getId());
                             transfer.setEmployerId(proposal.getEmployerId());
                             transfer.setCreatedAt(new Date());
                             //transfer
-                            transfer.setAmount(contract.getAmount());
+                            transfer.setAmount(Integer.parseInt(milestone.getAmount().toString()));
                             transfer.setCurrency("NGN");
                             transfer.setPaymentReference(contract.getTransferReferenceId());
                             transfer.setInitBranchCode("682");
@@ -701,11 +704,14 @@ public class JobContractService implements Serializable {
                             transfer.setDebitAccountName(proposal.getAccountName());
                             transfer.setDebitAccountNumber(proposal.getAccountNumber());
                             transfer.setDebitAccountBranchCode(proposal.getBranchCode());
+                            transfer.setDebitAccountBranchCode("682");
                             transfer.setDebitAccountType("CASA");
                             transfer.setDebitNarration(job.getTitle());
-                            UBNFundsTransferResponse transferResponse = bankTransferService.transferUBNtoUBN(transfer);
 
-                            if (transferResponse.getCode() == "00") {
+                            logger.info(new ObjectMapper().writeValueAsString(transfer));
+                            UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
+
+                            if(transferResponse.getCode().compareTo("00")==0) {
                                 //set milestone amount to the escrow
                                 HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                                 ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
@@ -728,12 +734,14 @@ public class JobContractService implements Serializable {
                                         + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getStartDate())
                                         + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getEndDate())
                                         + "&transfer_reference_id=" + contract.getTransferReferenceId(), HttpMethod.POST, entity, String.class);
-                                if (response.getStatusCode().is2xxSuccessful())
+                                if (response.getStatusCode().is2xxSuccessful()) {
                                     status = 1;
-                                else
+                                    logger.info("JOBSERVICE: Escrow transaction succeeded");
+                                }
+                                else {
                                     status = 0;
                                     logger.info("JOBSERVICE: Escrow transaction failed");
-
+                                }
                                 //done
                             }else{
                                 status = 0;
@@ -756,11 +764,10 @@ public class JobContractService implements Serializable {
 
                 if(status==1) {
                     //fire notification 
-                    User currentUser =userService.getUserById(milestone.getEmployerId());
                     Job currentJob=jobRepository.findById(milestone.getJobId()).orElse(null);
-                    if(currentUser!=null && currentJob!=null) {
+                    if(currentJob!=null) {
                         NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getFullName() + " approved the milestone you submitted for "+currentJob.getTitle()+", you can proceed to start working on it");
+                        body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for "+currentJob.getTitle()+", you can proceed to start working on it");
                         body.setSubject("Milestone Approval");
                         body.setActionType("REDIRECT");
                         body.setAction("/my-job/contract/milestones/"+milestone.getJobId()+"/"+milestone.getProposalId());
@@ -770,7 +777,6 @@ public class JobContractService implements Serializable {
                         notificationSender.pushNotification(body);
                     }
                     //end
-
                     return   jobMilestoneRepository.save(milestone);
                 }
                else{
@@ -787,11 +793,12 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobMilestone approveCompletedMilestone(Long id, String requestData) {
+    public JobMilestone approveCompletedMilestone(OAuth2Authentication authentication,Long id, String requestData) {
         try {
             JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(requestData, JobProjectSubmission.class);
             JobMilestone milestone= jobMilestoneRepository.findById(id).orElse(null);
             JobContract contract=jobContractRepository.findContractByProposalAndJobId(milestone.getProposalId(), milestone.getJobId());
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             if(milestone!=null){
                 milestone.setStatus(JobMilestoneStatus.CO);
                 contract.setClearedAmount(milestone.getAmount().intValue());
@@ -809,11 +816,10 @@ public class JobContractService implements Serializable {
                 if(response.getStatusCode().is2xxSuccessful()) {
 
                     //fire notification 
-                    User currentUser =userService.getUserById(request.getEmployerId());
                     Job currentJob=jobRepository.findById(request.getJobId()).orElse(null);
-                    if(currentUser!=null && currentJob!=null) {
+                    if(currentJob!=null) {
                         NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getFullName() + " approved the milestone you submitted for "+currentJob.getTitle()+", and the sum of "+milestone.getAmount().toString()+" has been released to your account");
+                        body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for "+currentJob.getTitle()+", and the sum of "+milestone.getAmount().toString()+" has been released to your account");
                         body.setSubject("Milestone Completed");
                         body.setActionType("REDIRECT");
                         body.setAction("/my-job/contract/milestones/"+request.getJobId()+"/"+request.getProposalId());

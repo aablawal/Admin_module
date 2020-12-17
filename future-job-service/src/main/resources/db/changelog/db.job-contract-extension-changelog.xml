@@ -25,4 +25,7 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608115546722-2">
+        <addNotNullConstraint columnDataType="varchar(255)" columnName="status" tableName="job_contract_extension" validate="true"/>
+    </changeSet>
 </databaseChangeLog>
