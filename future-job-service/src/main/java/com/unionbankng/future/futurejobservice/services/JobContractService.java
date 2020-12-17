@@ -7,7 +7,6 @@ import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.*;
 import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
@@ -50,7 +49,6 @@ public class JobContractService implements Serializable {
     private final JobContractRepository jobContractRepository;
     private final JobContractExtensionRepository jobContractExtensionRepository;
     private final JobProposalRepository jobProposalRepository;
-    private final JobNotificationRepository jobNotificationRepository;
     private  final JobProjectSubmissionRepository jobProjectSubmissionRepository;
     private final  JobMilestoneRepository jobMilestoneRepository;
     private  final FileStoreService fileStoreService;
@@ -109,7 +107,6 @@ public class JobContractService implements Serializable {
     public JobMilestone findContractMilestoneByJobId(Long proposalId, Long jobId){
         return  jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId,jobId);
     }
-
     public List<JobMilestone> findAllContractMilestoneByProposalJobIdAndStatus(Long proposalId, Long jobId, String status){
         return  jobMilestoneRepository.findAllMilestonesByProposalJobAndStatus(proposalId,jobId,status);
     }
