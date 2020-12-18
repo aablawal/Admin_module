@@ -124,4 +124,38 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
+    public Response<UbnEnquiryResponse> accountEnquiry(UbnCustomerEnquiry request) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        return ubnAccountAPIService.accountEnquiry(response.getAccess_token(),request).execute();
+
+    }
+
+    public Response<UBNAccountStatementResponse> accountStatement(UBNAccountStatementRequest request) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+
+        logger.info("Auth token response is : {}",response);
+
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        return ubnAccountAPIService.accountStatement(response.getAccess_token(),request).execute();
+
+    }
+
+
+
+
+
 }
