@@ -65,4 +65,34 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608281004396-2">
+        <addColumn tableName="job_contracts">
+            <column name="description" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608281004396-3">
+        <addColumn tableName="job_contracts">
+            <column name="feedback" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608281004396-4">
+        <addColumn tableName="job_contracts">
+            <column name="rate" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608302038848-2">
+        <addColumn tableName="job_contracts">
+            <column name="is_settled" type="bit"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608302038848-3">
+        <addColumn tableName="job_contracts">
+            <column name="settlement" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608302038848-4">
+        <addColumn tableName="job_contracts">
+            <column name="status" type="int"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

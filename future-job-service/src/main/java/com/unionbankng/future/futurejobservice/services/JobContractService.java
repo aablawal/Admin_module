@@ -51,6 +51,7 @@ public class JobContractService implements Serializable {
     private final JobProposalRepository jobProposalRepository;
     private  final JobProjectSubmissionRepository jobProjectSubmissionRepository;
     private final  JobMilestoneRepository jobMilestoneRepository;
+    private final  JobRateRepository jobRateRepository;
     private  final FileStoreService fileStoreService;
     private final BankTransferService bankTransferService;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
@@ -558,91 +559,130 @@ public class JobContractService implements Serializable {
     }
 
 
-    public JobContract endContract(OAuth2Authentication authentication,Long jobId, Long proposalId, Long userId,  int state) {
+    public JobContract endContract(OAuth2Authentication authentication, Rate rating, Long jobId, Long proposalId, Long userId, int state) {
         try {
             Job job = jobRepository.findById(jobId).orElse(null);
             JobProposal proposal= jobProposalRepository.findProposalByUserId(jobId,userId);
             JobContract contract = jobContractRepository.findContractByProposalAndJobId(proposalId,jobId);
-            JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposalId,jobId);
+            JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposalId,userId);
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-            ResponseEntity<String> response;
 
             if(contract!=null) {
+                contract.setRate(rating.getRate());
+                contract.setDescription(rating.getDescription());
+                contract.setFeedback(rating.getFeedback());
+
                 if (state == 1) {
                     contract.setEndDate(new Date());
-                    if (job != null)
-                        job.setStatus(JobStatus.CO);
-                    if (project != null)
-                        project.setStatus(JobSubmissionStatus.CO);
-                    if (proposal != null) {
-                        proposal.setStatus(JobProposalStatus.CO);
-                        proposal.setEndDate(new Date());
-                    }
+                    contract.setIsSettled(true);
+                    contract.setSettlement(contract.getReferenceId());
+                    contract.setStatus(JobProposalStatus.CO);
+
+
                     //start to release escrow amount to freelancer
                     HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
+                    ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
                             + "&referenceid=" + contract.getReferenceId()
                             + "&user_email=" + contract.getUserEmail()
-                            + "&reasons=" + project.getDescription(), HttpMethod.POST, entity, String.class);
+                            + "&reasons=" + job.getTitle(), HttpMethod.POST, entity, String.class);
                     //done
 
                     if(response.getStatusCode().is2xxSuccessful()){
+
+                        if(rating!=null) {
+                            Rate rate = jobRateRepository.findByUserId(proposal.getUserId());
+                            if (rate != null) {
+                                rate.setRate((rate.getRate() + rating.getRate()));
+                                rate.setFeedback(rating.getFeedback());
+                                rate.setDescription(rating.getDescription());
+                                rate.setLastModifiedDate(new Date());
+                                 jobRateRepository.save(rate);
+                            } else {
+                                rating.setLastModifiedDate(new Date());
+                                rating.setUserId(proposal.getUserId());
+                                jobRateRepository.save(rating);
+                            }
+                        }
+
+
+                        if(job!=null) {
+                            job.setStatus(JobStatus.CO);
+                            jobRepository.save(job);
+                        }
+                        if(proposal!=null) {
+                            proposal.setStatus(JobProposalStatus.CO);
+                            proposal.setEndDate(new Date());
+                            jobProposalRepository.save(proposal);
+                        }
+                        if(project!=null) {
+                            project.setStatus(JobSubmissionStatus.CO);
+                            jobProjectSubmissionRepository.save(project);
+                        }
+                        jobContractRepository.save(contract);
                         //fire notification
-                        Job currentJob=jobRepository.findById(project.getJobId()).orElse(null);
+                        Job currentJob=jobRepository.findById(jobId).orElse(null);
                         if(currentJob!=null) {
                             NotificationBody body = new NotificationBody();
                             body.setBody(currentUser.getUserFullName() + " ended your contract and release the sum of "+proposal.getBidAmount()+" to your bank account");
                             body.setSubject("Contract Ended");
                             body.setActionType("REDIRECT");
-                            body.setAction("/job/ongoing/details/"+project.getJobId());
+                            body.setAction("/job/ongoing/details/"+jobId);
                             body.setTopic("'Job'");
                             body.setChannel("S");
-                            body.setRecipient(project.getUserId());
+                            body.setRecipient(proposal.getUserId());
                             notificationSender.pushNotification(body);
                         }
                         //end
-                    }
-                } else {
-                    if (job != null)
-                        job.setStatus(JobStatus.AC);
-                    if (project != null)
-                        project.setStatus(JobSubmissionStatus.RE);
-                    if (proposal != null) {
-                        proposal.setStatus(JobProposalStatus.IA);
-                        proposal.setEndDate(new Date());
-                    }
-
-                    //start to reqRefund escrow amount to the employer
-                    HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    response = rest.exchange(baseURL + "/Transaction/reqRefund?appid=" + appId
-                            + "&referenceid=" + contract.getReferenceId()
-                            + "&user_email=" + contract.getUserEmail()
-                            + "&reasons=" + project.getDescription(), HttpMethod.POST, entity, String.class);
-                    //done
-                }
-
-                if (response != null) {
-                    if (response.getStatusCode().is2xxSuccessful()) {
-                        jobRepository.save(job);
-                        jobProposalRepository.save(proposal);
-                        jobProjectSubmissionRepository.save(project);
-                        jobContractRepository.save(contract);
                         return contract;
-                    } else {
-                        logger.info("JOBSERVICE: Escrow transaction failed");
-                        return null;
+                    }else{
+                        logger.info("JOBSERV: Escrow transaction Failed");
+                        return  null;
                     }
                 } else {
-                    logger.info("JOBSERVICE: Escrow transaction failed");
-                    return null;
-                }
+                        contract.setEndDate(new Date());
+                        contract.setIsSettled(false);
+                        contract.setFeedback(String.valueOf(state));
+                        contract.setSettlement("Contract ended without settlement");
+                        contract.setDescription("Employer ended the contract");
+                        contract.setStatus(JobProposalStatus.RE);
 
+
+                        if (job != null) {
+                            job.setStatus(JobStatus.IA);
+                            jobRepository.save(job);
+                        }
+                        if (project != null) {
+                            project.setStatus(JobSubmissionStatus.RE);
+                            jobProjectSubmissionRepository.save(project);
+                        }
+                        if (proposal != null){
+                            proposal.setStatus(JobProposalStatus.RE);
+                            proposal.setEndDate(new Date());
+                            jobProposalRepository.save(proposal);
+                        }
+                        jobContractRepository.save(contract);
+                        //fire notification
+                        Job currentJob=jobRepository.findById(jobId).orElse(null);
+                        if(currentJob!=null) {
+                            NotificationBody body = new NotificationBody();
+                            body.setBody(currentUser.getUserFullName() + " ended your contract for "+currentJob.getTitle()+", you are not find with it? you can raise dispute.");
+                            body.setSubject("Contract Ended");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/job/details/"+jobId);
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(proposal.getUserId());
+                            notificationSender.pushNotification(body);
+                        }
+                    //end
+                    return  contract;
+                }
             }else{
                 logger.info("JOBSERVICE: Contract not found");
                 return  null;
             }
-
         } catch (Exception ex) {
+            logger.info(ex.getMessage());
             ex.printStackTrace();
             return null;
         }

@@ -94,6 +94,8 @@ public class JobProposalController {
                 new APIResponse("success", true, service.updateJobProposalStatus(authentication, id, status, model)));
     }
 
+
+
     @PostMapping("/v1/job/proposal/approve")
     public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
         JobContract approval = approveJobProposal.approveJobProposal(authentication, approvalRequest, model);
@@ -115,6 +117,19 @@ public class JobProposalController {
             return ResponseEntity.ok().body(
                     new APIResponse("failed", false, null));
     }
+
+    @PutMapping("/v1/job/proposal/decline/{proposalId}")
+    public ResponseEntity<APIResponse> declineJobProposal(@PathVariable Long proposalId,@ApiIgnore OAuth2Authentication authentication) {
+        JobProposal declinedProposal = service.declineJobProposal(authentication,proposalId);
+        if (declinedProposal != null)
+            return ResponseEntity.ok().body(
+                    new APIResponse("success", true, declinedProposal));
+        else
+            return ResponseEntity.ok().body(
+                    new APIResponse("failed", false, null));
+    }
+
+
 
     @PutMapping("/v1/job/proposal/change/percentage")
     public ResponseEntity<APIResponse> changePercentage(@RequestParam Long pid, @RequestParam int percentage,@ApiIgnore OAuth2Authentication authentication) {
