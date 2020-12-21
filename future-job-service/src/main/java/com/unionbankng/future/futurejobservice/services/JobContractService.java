@@ -55,6 +55,7 @@ public class JobContractService implements Serializable {
     private  final FileStoreService fileStoreService;
     private final BankTransferService bankTransferService;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
+    private  final  JobContractDisputeRepository jobContractDisputeRepository;
     private  final NotificationSender notificationSender;
     private final  UserService userService;
 
@@ -439,8 +440,6 @@ public class JobContractService implements Serializable {
                             notificationSender.pushNotification(body);
                         }
                         //end
-
-
                         return extension;
                     }else{
                         logger.info("JOBSERVICE: Escrow transaction failed");
@@ -494,6 +493,49 @@ public class JobContractService implements Serializable {
             return null;
         }
     }
+
+    public JobContractDispute raiseDispute(OAuth2Authentication authentication,String projectData, MultipartFile[] attachmentFiles) {
+        try {
+            String attachments = null;
+            JobContractDispute request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobContractDispute.class);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
+            request.setStatus(JobContractDisputeStatus.PE);
+            request.setUserId(currentUser.getUserId());
+
+            if (attachmentFiles!=null)
+                attachments = this.fileStoreService.storeFiles(attachmentFiles, request.getProposalId());
+
+            if (attachments != null)
+                request.attachment = attachments;
+
+            //fire notification
+            JobContractDispute dispute=jobContractDisputeRepository.save(request);
+            if(dispute!=null) {
+                Job currentJob= jobRepository.findById(dispute.getJobId()).orElse(null);
+                if(currentJob!=null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getUserFullName() + " raised a dispute on " + currentJob.getTitle() + "");
+                    body.setSubject("Dispute Raised Against you");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/job/details/" + dispute.getJobId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(dispute.getEmployerId());
+                    notificationSender.pushNotification(body);
+                }
+            }else{
+                logger.info("JOBSERV: Unable to raise a dispute, the dispute request is not valid");
+                return  null;
+
+            }
+            //end
+            return dispute;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
     public JobProjectSubmission rejectJob(OAuth2Authentication authentication,Long jobId, Long requestId) {
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
         if(request !=null) {
@@ -518,15 +560,17 @@ public class JobContractService implements Serializable {
             String supporting_file_names = null;
             JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+            JobMilestone milestone=jobMilestoneRepository.findById(id).orElse(null);
             request.setStatus(JobSubmissionStatus.PE);
 
             if (supportingFiles!=null)
                 supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId());
 
-            if (supporting_file_names != null)
+            if (supporting_file_names != null) {
                 request.supportingFiles = supporting_file_names;
+                milestone.supportingFiles=supporting_file_names;
+            }
 
-            JobMilestone milestone=jobMilestoneRepository.findById(id).orElse(null);
             if(milestone!=null){
                 milestone.setStatus(JobMilestoneStatus.PA);
                 jobMilestoneRepository.save(milestone);
@@ -842,7 +886,7 @@ public class JobContractService implements Serializable {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             if(milestone!=null){
                 milestone.setStatus(JobMilestoneStatus.CO);
-                contract.setClearedAmount(milestone.getAmount().intValue());
+                contract.setClearedAmount((contract.getClearedAmount()+ milestone.getAmount().intValue()));
 
                 jobMilestoneRepository.save(milestone);
                 jobContractRepository.save(contract);

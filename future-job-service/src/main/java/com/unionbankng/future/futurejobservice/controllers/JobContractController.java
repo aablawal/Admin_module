@@ -73,6 +73,17 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
+    @PostMapping(value="/v1/job/contract/raise/dispute", consumes="multipart/form-data")
+    public ResponseEntity<APIResponse> raiseDispute(@Valid @RequestParam(value = "data") String projectData,
+                                                      @RequestParam(value = "attachment", required = false) MultipartFile[] supportingFiles, @ApiIgnore OAuth2Authentication authentication) throws IOException {
+        JobContractDispute response= jobContractService.raiseDispute(authentication, projectData,supportingFiles);
+        if(response!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, response));
+        else
+            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+    }
+
+
     @PutMapping("/v1/job/completed/rejection/{jobId}/{requestId}")
     public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId, @ApiIgnore OAuth2Authentication authentication){
         JobProjectSubmission request= jobContractService.rejectJob(authentication, jobId,requestId);

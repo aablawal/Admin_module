@@ -1,19 +1,22 @@
 package com.unionbankng.future.futurejobservice.entities;
+
+import com.unionbankng.future.futurejobservice.enums.JobContractDisputeStatus;
 import com.unionbankng.future.futurejobservice.enums.JobMilestoneStatus;
 import lombok.*;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
-@Table(name="job_milestones")
+@Table(name="job_contract_disputes")
 @Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobMilestone {
+public class JobContractDispute {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -21,49 +24,44 @@ public class JobMilestone {
     @NotNull
     Long proposalId;
     @NotNull
+    Long contractId;
+    @NotNull
     Long userId;
     @NotNull
     Long employerId;
     @NotNull
     Long jobId;
-    @NotNull
-    Long amount;
-    @Temporal(TemporalType.DATE)
-    Date startDate;
-    @NotNull
-    @Temporal(TemporalType.DATE)
-    Date endDate;
-    @NotNull
-    @Column(columnDefinition="TEXT")
-    String title;
-    public String supportingFiles;
-    @NotNull
     @Column(columnDefinition="TEXT")
     String description;
+    public String attachment;
     @NotNull
     @Enumerated(EnumType.STRING)
-    JobMilestoneStatus status;
+    JobContractDisputeStatus status;
     @Temporal(TemporalType.DATE)
     Date createdAt;
+    @Temporal(TemporalType.DATE)
+    Date lastModifiedDate;
 
-    public JobMilestone(JobMilestone request) {
+    public JobContractDispute(JobContractDispute request) {
         this.id = request.id;
         this.proposalId = request.proposalId;
         this.userId = request.userId;
         this.employerId = request.employerId;
         this.jobId = request.jobId;
-        this.title = request.title;
-        this.amount=request.getAmount();
         this.description=request.description;
-        this.supportingFiles=request.supportingFiles;
-        this.startDate=request.startDate;
-        this.endDate=request.endDate;
+        this.attachment=request.attachment;
         this.status=request.status;
         this.createdAt = new Date();
+        this.lastModifiedDate=new Date();
     }
 
     @PrePersist
     private void setCreatedAt() {
+        createdAt = new Date();
+    }
+
+    @PreUpdate
+    private void setLastModifiedDate() {
         createdAt = new Date();
     }
 
