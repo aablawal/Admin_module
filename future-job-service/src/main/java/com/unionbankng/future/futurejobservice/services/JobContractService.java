@@ -577,6 +577,7 @@ public class JobContractService implements Serializable {
                     contract.setIsSettled(true);
                     contract.setSettlement(contract.getReferenceId());
                     contract.setStatus(JobProposalStatus.CO);
+                    proposal.setStatus(JobProposalStatus.CO);
 
 
                     //start to release escrow amount to freelancer
