@@ -18,6 +18,6 @@ public class UserCourseProgressRequest {
     private Long courseId;
     private String userUUID;
     private Lecture lecturesTaken;
-    private Integer currentLectureId;
+    private Integer currentLectureIndex;
 
 }

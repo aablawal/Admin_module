@@ -1,10 +1,8 @@
 package com.unionbankng.future.learn.services;
 
-import com.unionbankng.future.learn.entities.Instructor;
 import com.unionbankng.future.learn.entities.UserCourseProgress;
 import com.unionbankng.future.learn.pojo.JwtUserDetail;
 import com.unionbankng.future.learn.pojo.UserCourseProgressRequest;
-import com.unionbankng.future.learn.repositories.InstructorRepository;
 import com.unionbankng.future.learn.repositories.LectureRepository;
 import com.unionbankng.future.learn.repositories.UserCourseProgressRepository;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
@@ -13,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +29,17 @@ public class UserCourseProgressService {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
+        return computePercentageAndSaveProgress(courseProgressRequest,jwtUserDetail.getUserUUID());
+    }
+
+    public UserCourseProgress computePercentageAndSaveProgress(UserCourseProgressRequest courseProgressRequest,String userUUID){
+
         //compute
         Long courseLectureCount = lectureRepository.countAllByCourseId(courseProgressRequest.getCourseId());
         UserCourseProgress progress = new UserCourseProgress();
 
         if(courseProgressRequest.getProgressId() != null){
-            progress =  userCourseProgressRepository.findByCourseIdAndUserUUID(courseProgressRequest.getCourseId(),jwtUserDetail.getUserUUID()).orElse(
+            progress =  userCourseProgressRepository.findByCourseIdAndUserUUID(courseProgressRequest.getCourseId(),userUUID).orElse(
 
                     new UserCourseProgress()
             );
@@ -50,10 +51,11 @@ public class UserCourseProgressService {
         Double percent = (double)(progressLectureCount / courseLectureCountInteger) * 100;
 
         progress.setCourseId(courseProgressRequest.getCourseId());
-        progress.setCurrentLectureId(courseProgressRequest.getCurrentLectureId());
-        progress.getLecturesTaken().add(courseProgressRequest.getLecturesTaken());
+        progress.setCurrentLectureId(courseProgressRequest.getCurrentLectureIndex());
+        if(courseProgressRequest.getLecturesTaken() != null)
+            progress.getLecturesTaken().add(courseProgressRequest.getLecturesTaken());
         progress.setProgressPercentage(percent);
-        progress.setUserUUID(jwtUserDetail.getUserUUID());
+        progress.setUserUUID(userUUID);
 
         return userCourseProgressRepository.save(progress);
     }

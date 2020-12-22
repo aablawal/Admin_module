@@ -76,6 +76,20 @@ public class LectureService {
 
     }
 
+    public void deleteLecture(Long lectureId)  {
+
+        Lecture lecture = findById(lectureId).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecture Not Found")
+        );
+
+        if(lecture.getType().equals(LectureType.VIDEO))
+            futureStreamingService.deleteOutputAsset(lecture.getOutputAssetName());
+
+
+        lectureRepository.delete(lecture);
+
+    }
+
 
     public String generateStreamingLinks(Long lectureId){
 

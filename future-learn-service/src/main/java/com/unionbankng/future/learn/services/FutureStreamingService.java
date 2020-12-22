@@ -15,6 +15,7 @@ public class FutureStreamingService {
     private AzureMediaStreamingServiceGrpc.AzureMediaStreamingServiceBlockingStub azureMediaStreamingServiceBlockingStub;
 
 
+
     public StreamLinksResponse getStreamingUrlsFromLocator(String locatorName)  {
 
         StreamLinkRequest streamLinkRequest = StreamLinkRequest.newBuilder().setLocatorName(locatorName).build();
