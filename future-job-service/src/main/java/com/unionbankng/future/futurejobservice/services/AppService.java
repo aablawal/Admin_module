@@ -4,6 +4,7 @@ import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobRateRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class AppService {
 
     private final JobProposalRepository jobProposalRepository;
     private final JobRepository jobRepository;
+    private final JobRateRepository jobRateRepository;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
 
 
@@ -60,6 +62,7 @@ public class AppService {
         model.addAttribute("teams", jobTeamDetailsRepository.findByJobId(proposal.jobId));
         model.addAttribute("job",jobRepository.findById(proposal.jobId));
         model.addAttribute("proposal",proposal);
+        model.addAttribute("rating",jobRateRepository.findByUserId(proposal.getUserId()));
         return  model;
     }
     public  Model getProposalCollection(Page<JobProposal> page, Model model){
@@ -69,6 +72,7 @@ public class AppService {
             data.put("proposal", proposal);
             data.put("teams",  jobTeamDetailsRepository.findByJobId(proposal.jobId));
             data.put("job",jobRepository.findById(proposal.jobId));
+            data.put("rating",jobRateRepository.findByUserId(proposal.getUserId()));
             baseList.add(data);
         }
         return  this.getPaginated(page,baseList,model);

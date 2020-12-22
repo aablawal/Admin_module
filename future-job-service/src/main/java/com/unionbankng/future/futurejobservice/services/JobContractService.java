@@ -51,9 +51,11 @@ public class JobContractService implements Serializable {
     private final JobProposalRepository jobProposalRepository;
     private  final JobProjectSubmissionRepository jobProjectSubmissionRepository;
     private final  JobMilestoneRepository jobMilestoneRepository;
+    private final  JobRateRepository jobRateRepository;
     private  final FileStoreService fileStoreService;
     private final BankTransferService bankTransferService;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
+    private  final  JobContractDisputeRepository jobContractDisputeRepository;
     private  final NotificationSender notificationSender;
     private final  UserService userService;
 
@@ -438,8 +440,6 @@ public class JobContractService implements Serializable {
                             notificationSender.pushNotification(body);
                         }
                         //end
-
-
                         return extension;
                     }else{
                         logger.info("JOBSERVICE: Escrow transaction failed");
@@ -493,6 +493,49 @@ public class JobContractService implements Serializable {
             return null;
         }
     }
+
+    public JobContractDispute raiseDispute(OAuth2Authentication authentication,String projectData, MultipartFile[] attachmentFiles) {
+        try {
+            String attachments = null;
+            JobContractDispute request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobContractDispute.class);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
+            request.setStatus(JobContractDisputeStatus.PE);
+            request.setUserId(currentUser.getUserId());
+
+            if (attachmentFiles!=null)
+                attachments = this.fileStoreService.storeFiles(attachmentFiles, request.getProposalId());
+
+            if (attachments != null)
+                request.attachment = attachments;
+
+            //fire notification
+            JobContractDispute dispute=jobContractDisputeRepository.save(request);
+            if(dispute!=null) {
+                Job currentJob= jobRepository.findById(dispute.getJobId()).orElse(null);
+                if(currentJob!=null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getUserFullName() + " raised a dispute on " + currentJob.getTitle() + "");
+                    body.setSubject("Dispute Raised Against you");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/job/details/" + dispute.getJobId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(dispute.getEmployerId());
+                    notificationSender.pushNotification(body);
+                }
+            }else{
+                logger.info("JOBSERV: Unable to raise a dispute, the dispute request is not valid");
+                return  null;
+
+            }
+            //end
+            return dispute;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
     public JobProjectSubmission rejectJob(OAuth2Authentication authentication,Long jobId, Long requestId) {
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
         if(request !=null) {
@@ -517,15 +560,17 @@ public class JobContractService implements Serializable {
             String supporting_file_names = null;
             JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+            JobMilestone milestone=jobMilestoneRepository.findById(id).orElse(null);
             request.setStatus(JobSubmissionStatus.PE);
 
             if (supportingFiles!=null)
                 supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId());
 
-            if (supporting_file_names != null)
+            if (supporting_file_names != null) {
                 request.supportingFiles = supporting_file_names;
+                milestone.supportingFiles=supporting_file_names;
+            }
 
-            JobMilestone milestone=jobMilestoneRepository.findById(id).orElse(null);
             if(milestone!=null){
                 milestone.setStatus(JobMilestoneStatus.PA);
                 jobMilestoneRepository.save(milestone);
@@ -558,91 +603,131 @@ public class JobContractService implements Serializable {
     }
 
 
-    public JobContract endContract(OAuth2Authentication authentication,Long jobId, Long proposalId, Long userId,  int state) {
+    public JobContract endContract(OAuth2Authentication authentication, Rate rating, Long jobId, Long proposalId, Long userId, int state) {
         try {
             Job job = jobRepository.findById(jobId).orElse(null);
             JobProposal proposal= jobProposalRepository.findProposalByUserId(jobId,userId);
             JobContract contract = jobContractRepository.findContractByProposalAndJobId(proposalId,jobId);
-            JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposalId,jobId);
+            JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposalId,userId);
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-            ResponseEntity<String> response;
 
             if(contract!=null) {
+                contract.setRate(rating.getRate());
+                contract.setDescription(rating.getDescription());
+                contract.setFeedback(rating.getFeedback());
+
                 if (state == 1) {
                     contract.setEndDate(new Date());
-                    if (job != null)
-                        job.setStatus(JobStatus.CO);
-                    if (project != null)
-                        project.setStatus(JobSubmissionStatus.CO);
-                    if (proposal != null) {
-                        proposal.setStatus(JobProposalStatus.CO);
-                        proposal.setEndDate(new Date());
-                    }
+                    contract.setIsSettled(true);
+                    contract.setSettlement(contract.getReferenceId());
+                    contract.setStatus(JobProposalStatus.CO);
+                    proposal.setStatus(JobProposalStatus.CO);
+
+
                     //start to release escrow amount to freelancer
                     HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
+                    ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
                             + "&referenceid=" + contract.getReferenceId()
                             + "&user_email=" + contract.getUserEmail()
-                            + "&reasons=" + project.getDescription(), HttpMethod.POST, entity, String.class);
+                            + "&reasons=" + job.getTitle(), HttpMethod.POST, entity, String.class);
                     //done
 
                     if(response.getStatusCode().is2xxSuccessful()){
+
+                        if(rating!=null) {
+                            Rate rate = jobRateRepository.findByUserId(proposal.getUserId());
+                            if (rate != null) {
+                                rate.setRate((rate.getRate() + rating.getRate()));
+                                rate.setFeedback(rating.getFeedback());
+                                rate.setDescription(rating.getDescription());
+                                rate.setLastModifiedDate(new Date());
+                                 jobRateRepository.save(rate);
+                            } else {
+                                rating.setLastModifiedDate(new Date());
+                                rating.setUserId(proposal.getUserId());
+                                jobRateRepository.save(rating);
+                            }
+                        }
+
+
+                        if(job!=null) {
+                            job.setStatus(JobStatus.CO);
+                            jobRepository.save(job);
+                        }
+                        if(proposal!=null) {
+                            proposal.setStatus(JobProposalStatus.CO);
+                            proposal.setEndDate(new Date());
+                            jobProposalRepository.save(proposal);
+                        }
+                        if(project!=null) {
+                            project.setStatus(JobSubmissionStatus.CO);
+                            jobProjectSubmissionRepository.save(project);
+                        }
+                        jobContractRepository.save(contract);
                         //fire notification
-                        Job currentJob=jobRepository.findById(project.getJobId()).orElse(null);
+                        Job currentJob=jobRepository.findById(jobId).orElse(null);
                         if(currentJob!=null) {
                             NotificationBody body = new NotificationBody();
                             body.setBody(currentUser.getUserFullName() + " ended your contract and release the sum of "+proposal.getBidAmount()+" to your bank account");
                             body.setSubject("Contract Ended");
                             body.setActionType("REDIRECT");
-                            body.setAction("/job/ongoing/details/"+project.getJobId());
+                            body.setAction("/job/ongoing/details/"+jobId);
                             body.setTopic("'Job'");
                             body.setChannel("S");
-                            body.setRecipient(project.getUserId());
+                            body.setRecipient(proposal.getUserId());
                             notificationSender.pushNotification(body);
                         }
                         //end
-                    }
-                } else {
-                    if (job != null)
-                        job.setStatus(JobStatus.AC);
-                    if (project != null)
-                        project.setStatus(JobSubmissionStatus.RE);
-                    if (proposal != null) {
-                        proposal.setStatus(JobProposalStatus.IA);
-                        proposal.setEndDate(new Date());
-                    }
-
-                    //start to reqRefund escrow amount to the employer
-                    HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    response = rest.exchange(baseURL + "/Transaction/reqRefund?appid=" + appId
-                            + "&referenceid=" + contract.getReferenceId()
-                            + "&user_email=" + contract.getUserEmail()
-                            + "&reasons=" + project.getDescription(), HttpMethod.POST, entity, String.class);
-                    //done
-                }
-
-                if (response != null) {
-                    if (response.getStatusCode().is2xxSuccessful()) {
-                        jobRepository.save(job);
-                        jobProposalRepository.save(proposal);
-                        jobProjectSubmissionRepository.save(project);
-                        jobContractRepository.save(contract);
                         return contract;
-                    } else {
-                        logger.info("JOBSERVICE: Escrow transaction failed");
-                        return null;
+                    }else{
+                        logger.info("JOBSERV: Escrow transaction Failed");
+                        return  null;
                     }
                 } else {
-                    logger.info("JOBSERVICE: Escrow transaction failed");
-                    return null;
-                }
+                        contract.setEndDate(new Date());
+                        contract.setIsSettled(false);
+                        contract.setFeedback(String.valueOf(state));
+                        contract.setSettlement("Contract ended without settlement");
+                        contract.setDescription("Employer ended the contract");
+                        contract.setStatus(JobProposalStatus.RE);
 
+
+                        if (job != null) {
+                            job.setStatus(JobStatus.IA);
+                            jobRepository.save(job);
+                        }
+                        if (project != null) {
+                            project.setStatus(JobSubmissionStatus.RE);
+                            jobProjectSubmissionRepository.save(project);
+                        }
+                        if (proposal != null){
+                            proposal.setStatus(JobProposalStatus.RE);
+                            proposal.setEndDate(new Date());
+                            jobProposalRepository.save(proposal);
+                        }
+                        jobContractRepository.save(contract);
+                        //fire notification
+                        Job currentJob=jobRepository.findById(jobId).orElse(null);
+                        if(currentJob!=null) {
+                            NotificationBody body = new NotificationBody();
+                            body.setBody(currentUser.getUserFullName() + " ended your contract for "+currentJob.getTitle()+", you are not find with it? you can raise dispute.");
+                            body.setSubject("Contract Ended");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/job/details/"+jobId);
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(proposal.getUserId());
+                            notificationSender.pushNotification(body);
+                        }
+                    //end
+                    return  contract;
+                }
             }else{
                 logger.info("JOBSERVICE: Contract not found");
                 return  null;
             }
-
         } catch (Exception ex) {
+            logger.info(ex.getMessage());
             ex.printStackTrace();
             return null;
         }
@@ -801,7 +886,7 @@ public class JobContractService implements Serializable {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             if(milestone!=null){
                 milestone.setStatus(JobMilestoneStatus.CO);
-                contract.setClearedAmount(milestone.getAmount().intValue());
+                contract.setClearedAmount((contract.getClearedAmount()+ milestone.getAmount().intValue()));
 
                 jobMilestoneRepository.save(milestone);
                 jobContractRepository.save(contract);

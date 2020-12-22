@@ -1,32 +1,24 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet author="ACER NITRO 5 (generated)" id="1606278019563-2">
-        <createTable tableName="job_milestones">
+    <changeSet author="ACER NITRO 5 (generated)" id="1608564046410-2">
+        <createTable tableName="job_contract_disputes">
             <column autoIncrement="true" name="id" type="bigint">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="job_milestonesPK"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="job_contract_disputesPK"/>
             </column>
+            <column name="attachment" type="varchar(255)"/>
             <column name="created_at" type="date"/>
-            <column name="description" type="varchar (max)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="description" type="varchar (max)"/>
             <column name="employer_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="end_date" type="date"/>
             <column name="job_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
+            <column name="last_modified_date" type="date"/>
             <column name="proposal_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="start_date" type="date"/>
             <column name="status" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="title" type="varchar (max)">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="bigint">
@@ -34,9 +26,11 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="ACER NITRO 5 (generated)" id="1608552222499-2">
-        <addColumn tableName="job_milestones">
-            <column name="supporting_files" type="varchar(255)"/>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608565489145-2">
+        <addColumn tableName="job_contract_disputes">
+            <column name="contract_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

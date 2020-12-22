@@ -144,6 +144,33 @@ public class JobProposalService  implements Serializable {
         }
         return proposal;
     }
+
+    public JobProposal declineJobProposal(OAuth2Authentication authentication,Long proposalId){
+        JobProposal proposal=repository.findById(proposalId).orElse(null);
+        if(proposal!=null) {
+            proposal.setStatus(JobProposalStatus.RE);
+            repository.save(proposal);
+            //fire notification
+            Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
+            if(currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody("Your proposal for  "+currentJob.getTitle()+" has been rejected");
+                body.setSubject("Proposal Rejected");
+                body.setActionType("REDIRECT");
+                body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setRecipient(proposal.getUserId());
+                notificationSender.pushNotification(body);
+            }
+            //end
+        }
+        else {
+            logger.info("JOBSERVICE: Proposal not found");
+        }
+        return proposal;
+    }
+
     public  JobProposal changeProposalPercentage( OAuth2Authentication authentication,Long proposalId, int percentage){
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
