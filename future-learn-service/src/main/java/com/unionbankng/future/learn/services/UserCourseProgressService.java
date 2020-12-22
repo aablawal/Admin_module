@@ -48,7 +48,10 @@ public class UserCourseProgressService {
         int progressLectureCount = progress.getLecturesTaken().size();
         int courseLectureCountInteger = courseLectureCount.intValue();
 
-        Double percent = (double)(progressLectureCount / courseLectureCountInteger) * 100;
+        Double percent = 0.00;
+
+        if(courseLectureCountInteger > 0)
+           percent = (double)(progressLectureCount / courseLectureCountInteger) * 100;
 
         progress.setCourseId(courseProgressRequest.getCourseId());
         progress.setCurrentLectureId(courseProgressRequest.getCurrentLectureIndex());
