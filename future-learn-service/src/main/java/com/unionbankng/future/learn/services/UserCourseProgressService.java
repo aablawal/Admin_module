@@ -56,8 +56,10 @@ public class UserCourseProgressService {
 
         Double percent = 0.00;
 
-        if(courseLectureCountInteger > 0)
-           percent = (double)(progressLectureCount / courseLectureCountInteger) * 100;
+        if(courseLectureCountInteger > 0) {
+            percent = (double) (progressLectureCount / courseLectureCountInteger) * 100;
+            logger.info("Calculating {}/{} * {}",progressLectureCount,courseLectureCountInteger,100);
+        }
 
         logger.info("Calculated progress percent is : {}",percent);
 
