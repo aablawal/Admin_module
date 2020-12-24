@@ -10,6 +10,8 @@ import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import com.unionbankng.future.authorizationserver.utils.Utility;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,6 +30,7 @@ public class SecurityService {
 
     private final UserService userService;
     private final MemcachedHelperService memcachedHelperService;
+    private final Logger logger = LoggerFactory.getLogger(SecurityService.class);
     private final MessageSource messageSource;
     private final EmailSender emailSender;
     private final PasswordEncoder encoder;
@@ -48,9 +51,13 @@ public class SecurityService {
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         String token = UUID.randomUUID().toString();
+        logger.info("Password reset token is : {}",user.getEmail());
+
         memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
 
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
+
+        logger.info("generated url is : {}",generatedURL);
 
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,
                 Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
@@ -63,7 +70,9 @@ public class SecurityService {
 
     public Boolean confirmForgotPasswordToken(String token){
 
+        logger.info("Submitted Token is : {}",token);
         String userEmail = memcachedHelperService.getValueByKey(token);
+        logger.info("Email is : {}",userEmail);
         return userEmail != null;
 
     }
