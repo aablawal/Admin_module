@@ -16,6 +16,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "api")
@@ -34,7 +36,7 @@ public class UserCourseProgressController {
     }
 
     @PostMapping("/v1/user_course_progress/save_my_progress")
-    public ResponseEntity<APIResponse<UserCourseProgress>> saveMyCourseProgress(@RequestBody UserCourseProgressRequest request,
+    public ResponseEntity<APIResponse<UserCourseProgress>> saveMyCourseProgress(@RequestBody @Valid UserCourseProgressRequest request,
                                                                @ApiIgnore OAuth2Authentication authentication){
 
         UserCourseProgress userCourseProgress = userCourseProgressService.computePercentageAndSaveProgress(request,authentication);
