@@ -54,20 +54,17 @@ public class UserCourseProgressService {
 
         logger.info("Converted lecture count and progress lecture count :{}{}",courseLectureCountInteger,progressLectureCount);
 
-        double percent = 0;
 
         if(courseLectureCountInteger > 0) {
-            percent = (progressLectureCount / courseLectureCountInteger) * 100;
-            logger.info("Calculating {}/{} * {}",progressLectureCount,courseLectureCountInteger,100);
+            double percent = (progressLectureCount / courseLectureCountInteger) * 100;
+            progress.setProgressPercentage(percent);
+            logger.info("Calculating {}",percent);
         }
-
-        logger.info("Calculated progress percent is : {}",percent);
 
         progress.setCourseId(courseProgressRequest.getCourseId());
         progress.setCurrentLectureId(courseProgressRequest.getCurrentLectureIndex());
         if(courseProgressRequest.getLecturesTaken() != null)
             progress.getLecturesTaken().add(courseProgressRequest.getLecturesTaken());
-        progress.setProgressPercentage(percent);
         progress.setUserUUID(userUUID);
 
         return userCourseProgressRepository.save(progress);
