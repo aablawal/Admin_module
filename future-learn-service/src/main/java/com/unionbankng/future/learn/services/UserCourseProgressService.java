@@ -14,6 +14,10 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 @Service
 @RequiredArgsConstructor
 public class UserCourseProgressService {
@@ -21,7 +25,7 @@ public class UserCourseProgressService {
     private final UserCourseProgressRepository userCourseProgressRepository;
     private final LectureRepository lectureRepository;
     private Logger logger = LoggerFactory.getLogger(UserCourseProgressService.class);
-
+    private static DecimalFormat df2 = new DecimalFormat("#.##");
     public UserCourseProgress save(UserCourseProgress userCourseProgress){
         return userCourseProgressRepository.save(userCourseProgress);
     }
@@ -56,10 +60,10 @@ public class UserCourseProgressService {
 
 
         if(courseLectureCountInteger > 0) {
-            double div = progressLectureCount / courseLectureCountInteger;
-            double percent = div * 100;
-            progress.setProgressPercentage(percent);
-            logger.info("Calculating {}",percent);
+            double percent = ((double)progressLectureCount / courseLectureCountInteger)* 100;
+            BigDecimal bd = new BigDecimal(percent).setScale(2, RoundingMode.HALF_UP);
+            progress.setProgressPercentage(bd.doubleValue());
+            logger.info("Calculating {}",bd.doubleValue());
         }
 
         progress.setCourseId(courseProgressRequest.getCourseId());

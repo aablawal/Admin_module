@@ -78,8 +78,7 @@ public class SecurityService {
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new APIResponse("Token expired or not found",false,null));
-
-        memcachedHelperService.clear(token);
+        
 
         if(!passwordValidator.validatePassword(password))
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
@@ -90,6 +89,8 @@ public class SecurityService {
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         user.setPassword(encoder.encode(password));
+
+        memcachedHelperService.clear(token);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Password reset successful",true,null));
