@@ -51,13 +51,10 @@ public class SecurityService {
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         String token = UUID.randomUUID().toString();
-        logger.info("Password reset token is : {}",user.getEmail());
 
-        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
+        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
 
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
-
-        logger.info("generated url is : {}",generatedURL);
 
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,
                 Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
@@ -70,9 +67,7 @@ public class SecurityService {
 
     public Boolean confirmForgotPasswordToken(String token){
 
-        logger.info("Submitted Token is : {}",token);
         String userEmail = memcachedHelperService.getValueByKey(token);
-        logger.info("Email is : {}",userEmail);
         return userEmail != null;
 
     }
