@@ -52,11 +52,12 @@ public class UserCourseProgressService {
         int progressLectureCount = progress.getLecturesTaken().size();
         int courseLectureCountInteger = courseLectureCount.intValue();
 
-        logger.info("Converted lecture count and progress lecture count :{}{}",courseLectureCountInteger,progressLectureCount);
+        logger.info("Converted lecture count and progress lecture count :{},{}",courseLectureCountInteger,progressLectureCount);
 
 
         if(courseLectureCountInteger > 0) {
-            double percent = (progressLectureCount / courseLectureCountInteger) * 100;
+            double div = progressLectureCount / courseLectureCountInteger;
+            double percent = div * 100;
             progress.setProgressPercentage(percent);
             logger.info("Calculating {}",percent);
         }
