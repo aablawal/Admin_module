@@ -52,7 +52,7 @@ public class UserCourseProgressService {
         int progressLectureCount = progress.getLecturesTaken().size();
         int courseLectureCountInteger = courseLectureCount.intValue();
 
-        logger.info("Converted lecture count and progress lecture count :{}{}",courseLectureCountInteger,courseLectureCountInteger);
+        logger.info("Converted lecture count and progress lecture count :{}{}",courseLectureCountInteger,progressLectureCount);
 
         Double percent = 0.00;
 
