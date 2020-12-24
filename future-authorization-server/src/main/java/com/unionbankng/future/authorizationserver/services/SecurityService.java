@@ -90,6 +90,8 @@ public class SecurityService {
 
         user.setPassword(encoder.encode(password));
 
+        userService.save(user);
+
         memcachedHelperService.clear(token);
 
         return ResponseEntity.status(HttpStatus.OK).body(
