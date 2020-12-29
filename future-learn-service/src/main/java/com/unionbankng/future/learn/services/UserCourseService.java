@@ -6,6 +6,7 @@ import com.unionbankng.future.learn.grpcserver.CoursePaymentResponse;
 import com.unionbankng.future.learn.grpcserver.Status;
 import com.unionbankng.future.learn.pojo.CourseEnrollmentRequest;
 import com.unionbankng.future.learn.pojo.JwtUserDetail;
+import com.unionbankng.future.learn.pojo.UserCourseProgressRequest;
 import com.unionbankng.future.learn.repositories.UserCourseRepository;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class UserCourseService {
     private final UserCourseRepository userCourseRepository;
     private final CourseService courseService;
     private final InstructorService instructorService;
+    private final UserCourseProgressService userCourseProgressService;
 
     public UserCourse save(UserCourse userCourse){
         return userCourseRepository.save(userCourse);
@@ -87,6 +89,15 @@ public class UserCourseService {
         userCourse.setCourseId(courseEnrollmentRequest.getCourseEnrollingForId());
         userCourse.setUserUUID(userUUID);
 
+
+        //start course progress
+        UserCourseProgressRequest userCourseProgressRequest = new UserCourseProgressRequest();
+        userCourseProgressRequest.setCourseId(courseEnrollmentRequest.getCourseEnrollingForId());
+        userCourseProgressRequest.setCurrentLectureIndex(0);
+        userCourseProgressRequest.setUserUUID(userUUID);
+
+        userCourseProgressService.computePercentageAndSaveProgress(userCourseProgressRequest,userUUID);
+
         return save(userCourse);
 
     }
@@ -117,6 +128,14 @@ public class UserCourseService {
         userCourse.setCourseId(Integer.toUnsignedLong(request.getCourseId()));
         userCourse.setUserUUID(request.getUserUUID());
 
+
+        //start course progress
+        UserCourseProgressRequest userCourseProgressRequest = new UserCourseProgressRequest();
+        userCourseProgressRequest.setCourseId(Integer.toUnsignedLong(request.getCourseId()));
+        userCourseProgressRequest.setCurrentLectureIndex(0);
+        userCourseProgressRequest.setUserUUID(request.getUserUUID());
+
+        userCourseProgressService.computePercentageAndSaveProgress(userCourseProgressRequest,request.getUserUUID());
 
         //send email
 

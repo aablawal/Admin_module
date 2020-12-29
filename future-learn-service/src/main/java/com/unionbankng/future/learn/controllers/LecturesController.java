@@ -88,6 +88,15 @@ public class LecturesController {
                 new APIResponse("Request successful",true,lecture));
     }
 
+    @DeleteMapping("/v1/lectures/delete/{lectureId}")
+    public ResponseEntity<APIResponse<String>> deleteLecture(@PathVariable Long lectureId) {
+
+        lectureService.deleteLecture(lectureId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,"Request Successful"));
+    }
+
 
 
 

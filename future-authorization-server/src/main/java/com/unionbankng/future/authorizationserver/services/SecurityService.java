@@ -10,6 +10,8 @@ import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import com.unionbankng.future.authorizationserver.utils.Utility;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,6 +30,7 @@ public class SecurityService {
 
     private final UserService userService;
     private final MemcachedHelperService memcachedHelperService;
+    private final Logger logger = LoggerFactory.getLogger(SecurityService.class);
     private final MessageSource messageSource;
     private final EmailSender emailSender;
     private final PasswordEncoder encoder;
@@ -48,7 +51,8 @@ public class SecurityService {
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         String token = UUID.randomUUID().toString();
-        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute);
+
+        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
 
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
 
@@ -74,8 +78,7 @@ public class SecurityService {
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new APIResponse("Token expired or not found",false,null));
-
-        memcachedHelperService.clear(token);
+        
 
         if(!passwordValidator.validatePassword(password))
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
@@ -86,6 +89,10 @@ public class SecurityService {
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         user.setPassword(encoder.encode(password));
+
+        userService.save(user);
+
+        memcachedHelperService.clear(token);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Password reset successful",true,null));
