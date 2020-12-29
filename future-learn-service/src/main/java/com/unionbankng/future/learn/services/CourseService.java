@@ -96,7 +96,6 @@ public class CourseService {
 
         return createCourse(request, jwtUserDetail.getUserUUID());
 
-
     }//create course
 
 
@@ -147,9 +146,32 @@ public class CourseService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only Instructors and the course creator can publish a course");
 
         course.setIsPublished(true);
-
         save(course);
-
-
     }
+
+    public Course updateCourse(Long courseId, CreateCourseRequest request, OAuth2Authentication authentication){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        String userId= jwtUserDetail.getUserUUID();
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if(course!=null) {
+            course.setCourseTitle(request.getCourseTitle());
+            course.setCreatorUUID(userId);
+            course.setEstimatedTimeToComplete(request.getEstimatedTimeToComplete());
+            course.setDescription(request.getDescription());
+            course.setShortDesc(request.getShortDesc());
+            course.setIsPaid(request.getIsPaid());
+            course.setIsPublished(request.getIsPublished());
+            course.setOutcomes(request.getOutcomes());
+            course.setRequirements(request.getRequirements());
+            course.setPrice(request.getPrice());
+            return save(course);
+        }else{
+            return null;
+        }
+    }//update course
+
+    public  Boolean deleteCourseById(Long courseId){
+        courseRepository.deleteById(courseId);
+        return  true;
+    }//edit course
 }
