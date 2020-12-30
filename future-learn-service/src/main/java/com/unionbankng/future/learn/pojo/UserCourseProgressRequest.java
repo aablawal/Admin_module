@@ -15,7 +15,6 @@ import java.util.List;
 @Data
 public class UserCourseProgressRequest {
 
-    @NotNull
     private Long progressId;
     @NotNull
     private Long courseId;
