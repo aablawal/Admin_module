@@ -68,8 +68,13 @@ public class UserCourseProgressService {
 
         progress.setCourseId(courseProgressRequest.getCourseId());
         progress.setCurrentLectureId(courseProgressRequest.getCurrentLectureIndex());
-        if(courseProgressRequest.getLecturesTaken() != null)
-            progress.getLecturesTaken().add(courseProgressRequest.getLecturesTaken());
+
+        if(courseProgressRequest.getLecturesTaken() != null) {
+            if(!progress.getLecturesTaken().contains(courseProgressRequest.getLecturesTaken())) {
+                progress.getLecturesTaken().add(courseProgressRequest.getLecturesTaken());
+            }
+        }
+
         progress.setUserUUID(userUUID);
 
         return userCourseProgressRepository.save(progress);
