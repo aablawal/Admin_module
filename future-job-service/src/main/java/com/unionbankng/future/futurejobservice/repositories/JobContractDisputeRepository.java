@@ -7,3 +7,4 @@ import org.springframework.stereotype.Repository;
 public interface JobContractDisputeRepository extends JpaRepository<JobContractDispute,Long> {
     JobContractDispute findByContractId(Long contractId);
 }
+

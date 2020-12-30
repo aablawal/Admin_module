@@ -61,22 +61,20 @@ public class CoursesController {
     public ResponseEntity<APIResponse<Page<Course>>> getAllCourses(@RequestParam int page, @RequestParam int size){
 
         Page<Course> courses = courseService.findAllByIsPublished(true,PageRequest.of(page,size));
-
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
     }
-
-
 
     @PostMapping("/v1/courses/create_course")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@RequestBody CreateCourseRequest request,
                                                                @ApiIgnore OAuth2Authentication authentication){
 
         Course course = courseService.createCourse(request,authentication);
-
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,course));
     }
+
+
 
     @PostMapping(value = "/v1/courses/{courseId}/upload_course_img",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<Course>> uploadCourseImage(@NotNull @RequestPart("image") MultipartFile image,
@@ -98,5 +96,20 @@ public class CoursesController {
                 new APIResponse("Request successful",true,"Course publish successful"));
     }
 
+
+    @PutMapping("/v1/courses/update_course/{courseId}")
+    public ResponseEntity<APIResponse<Course>> updateCourseAPI(@PathVariable Long courseId,@RequestBody CreateCourseRequest request,
+                                                               @ApiIgnore OAuth2Authentication authentication){
+        Course course = courseService.updateCourse(courseId,request,authentication);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,course));
+    }
+
+    @DeleteMapping("/v1/courses/delete_course/{courseId}")
+    public ResponseEntity<APIResponse<Boolean>> deleteCourseById(@PathVariable Long courseId){
+        Boolean state = courseService.deleteCourseById(courseId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,state));
+    }
 
 }
