@@ -55,11 +55,8 @@ public class UserCourseProgressService {
             );
         }
 
-        if(courseProgressRequest.getLecturesTaken() != null) {
-            if(!progress.getLecturesTaken().contains(courseProgressRequest.getLecturesTaken())) {
-                progress.getLecturesTaken().add(courseProgressRequest.getLecturesTaken());
-            }
-        }
+        if(courseProgressRequest.getLecturesTaken() != null && !progress.getLecturesTaken().contains(courseProgressRequest.getLecturesTaken()))
+            progress.getLecturesTaken().add(courseProgressRequest.getLecturesTaken());
 
         int progressLectureCount = progress.getLecturesTaken().size();
         int courseLectureCountInteger = courseLectureCount.intValue();
