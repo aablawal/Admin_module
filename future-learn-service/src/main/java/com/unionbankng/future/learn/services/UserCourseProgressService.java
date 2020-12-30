@@ -44,7 +44,9 @@ public class UserCourseProgressService {
         Long courseLectureCount = lectureRepository.countAllByCourseId(courseProgressRequest.getCourseId());
         UserCourseProgress progress = new UserCourseProgress();
 
-        logger.info("Overall lecture count for course is: {}",courseLectureCount);
+        if(courseProgressRequest.getProgressId() == null &&
+                userCourseProgressRepository.existsByCourseIdAndUserUUID(courseProgressRequest.getCourseId(),userUUID))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Progress already exist");
 
         if(courseProgressRequest.getProgressId() != null){
             progress =  userCourseProgressRepository.findByCourseIdAndUserUUID(courseProgressRequest.getCourseId(),userUUID).orElse(
@@ -75,6 +77,7 @@ public class UserCourseProgressService {
         progress.setCourseId(courseProgressRequest.getCourseId());
         progress.setCurrentLectureId(courseProgressRequest.getCurrentLectureIndex());
         progress.setUserUUID(userUUID);
+
 
         return userCourseProgressRepository.save(progress);
     }
