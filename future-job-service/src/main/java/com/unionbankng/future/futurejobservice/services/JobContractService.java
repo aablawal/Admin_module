@@ -157,39 +157,39 @@ public class JobContractService implements Serializable {
                 }
                 //end
             }else {
-                //transfer the amount to Sidekiq main account
-                JobTransfer transfer=new JobTransfer();
-                transfer.setUserId(proposal.getUserId());
-                transfer.setJobId(proposal.getJobId());
-                transfer.setProposalId(proposal.getId());
-                transfer.setEmployerId(proposal.getEmployerId());
-                transfer.setCreatedAt(new Date());
-                //transfer
-                transfer.setAmount(contract.getAmount());
-                transfer.setCurrency("NGN");
-                transfer.setPaymentReference(contract.getTransferReferenceId());
-                transfer.setInitBranchCode("682");
-                //credit
-                transfer.setCreditAccountName(sidekiqAccountName);
-                transfer.setCreditAccountNumber(sidekiqAccountNumber);
-                transfer.setCreditAccountBankCode("032");
-                transfer.setCreditAccountBranchCode("682");
-                transfer.setCreditAccountType("CASA");
-                transfer.setCreditNarration(job.getTitle());
-                //debit
-                transfer.setDebitAccountName(proposal.getAccountName());
-                transfer.setDebitAccountNumber(proposal.getAccountNumber());
-                transfer.setDebitAccountBranchCode(proposal.getBranchCode());
-                transfer.setDebitAccountBranchCode("682");
-                transfer.setDebitAccountType("CASA");
-                transfer.setDebitNarration(job.getTitle());
+//                //transfer the amount to Sidekiq main account
+//                JobTransfer transfer=new JobTransfer();
+//                transfer.setUserId(proposal.getUserId());
+//                transfer.setJobId(proposal.getJobId());
+//                transfer.setProposalId(proposal.getId());
+//                transfer.setEmployerId(proposal.getEmployerId());
+//                transfer.setCreatedAt(new Date());
+//                //transfer
+//                transfer.setAmount(contract.getAmount());
+//                transfer.setCurrency("NGN");
+//                transfer.setPaymentReference(contract.getTransferReferenceId());
+//                transfer.setInitBranchCode("682");
+//                //credit
+//                transfer.setCreditAccountName(sidekiqAccountName);
+//                transfer.setCreditAccountNumber(sidekiqAccountNumber);
+//                transfer.setCreditAccountBankCode("032");
+//                transfer.setCreditAccountBranchCode("682");
+//                transfer.setCreditAccountType("CASA");
+//                transfer.setCreditNarration(job.getTitle());
+//                //debit
+//                transfer.setDebitAccountName(proposal.getAccountName());
+//                transfer.setDebitAccountNumber(proposal.getAccountNumber());
+//                transfer.setDebitAccountBranchCode(proposal.getBranchCode());
+//                transfer.setDebitAccountBranchCode("682");
+//                transfer.setDebitAccountType("CASA");
+//                transfer.setDebitNarration(job.getTitle());
 
+//
+//                logger.info(new ObjectMapper().writeValueAsString(transfer));
+//                UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
 
-                logger.info(new ObjectMapper().writeValueAsString(transfer));
-                UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
-
-                if(transferResponse.getCode().compareTo("00")==0) {
-
+               // if(transferResponse.getCode().compareTo("00")==0) {
+                if(1==1){
                    if(job!=null) {
                         NotificationBody body = new NotificationBody();
                         body.setBody("Your payment of "+contract.getAmount()+" has been successful");
@@ -255,8 +255,8 @@ public class JobContractService implements Serializable {
                     }
                 }else{
                     logger.info("JOBSERVICE: Payment failed");
-                    logger.error(transferResponse.getMessage());
-                    logger.error(transferResponse.getCode());
+//                    logger.error(transferResponse.getMessage());
+//                    logger.error(transferResponse.getCode());
                     status = 0;
                 }
             }
@@ -766,37 +766,38 @@ public class JobContractService implements Serializable {
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
 
-                            //transfer the amount to Escrow
-                            JobTransfer transfer=new JobTransfer();
-                            transfer.setUserId(proposal.getUserId());
-                            transfer.setJobId(proposal.getJobId());
-                            transfer.setProposalId(proposal.getId());
-                            transfer.setEmployerId(proposal.getEmployerId());
-                            transfer.setCreatedAt(new Date());
-                            //transfer
-                            transfer.setAmount(Integer.parseInt(milestone.getAmount().toString()));
-                            transfer.setCurrency("NGN");
-                            transfer.setPaymentReference(contract.getTransferReferenceId());
-                            transfer.setInitBranchCode("682");
-                            //credit
-                            transfer.setCreditAccountName(sidekiqAccountName);
-                            transfer.setCreditAccountNumber(sidekiqAccountNumber);
-                            transfer.setCreditAccountBankCode("032");
-                            transfer.setCreditAccountBranchCode("682");
-                            transfer.setCreditAccountType("CASA");
-                            transfer.setCreditNarration(job.getTitle());
-                            //debit
-                            transfer.setDebitAccountName(proposal.getAccountName());
-                            transfer.setDebitAccountNumber(proposal.getAccountNumber());
-                            transfer.setDebitAccountBranchCode(proposal.getBranchCode());
-                            transfer.setDebitAccountBranchCode("682");
-                            transfer.setDebitAccountType("CASA");
-                            transfer.setDebitNarration(job.getTitle());
+//                            //transfer the amount to Escrow
+//                            JobTransfer transfer=new JobTransfer();
+//                            transfer.setUserId(proposal.getUserId());
+//                            transfer.setJobId(proposal.getJobId());
+//                            transfer.setProposalId(proposal.getId());
+//                            transfer.setEmployerId(proposal.getEmployerId());
+//                            transfer.setCreatedAt(new Date());
+//                            //transfer
+//                            transfer.setAmount(Integer.parseInt(milestone.getAmount().toString()));
+//                            transfer.setCurrency("NGN");
+//                            transfer.setPaymentReference(contract.getTransferReferenceId());
+//                            transfer.setInitBranchCode("682");
+//                            //credit
+//                            transfer.setCreditAccountName(sidekiqAccountName);
+//                            transfer.setCreditAccountNumber(sidekiqAccountNumber);
+//                            transfer.setCreditAccountBankCode("032");
+//                            transfer.setCreditAccountBranchCode("682");
+//                            transfer.setCreditAccountType("CASA");
+//                            transfer.setCreditNarration(job.getTitle());
+//                            //debit
+//                            transfer.setDebitAccountName(proposal.getAccountName());
+//                            transfer.setDebitAccountNumber(proposal.getAccountNumber());
+//                            transfer.setDebitAccountBranchCode(proposal.getBranchCode());
+//                            transfer.setDebitAccountBranchCode("682");
+//                            transfer.setDebitAccountType("CASA");
+//                            transfer.setDebitNarration(job.getTitle());
+//
+//                            logger.info(new ObjectMapper().writeValueAsString(transfer));
+//                            UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
 
-                            logger.info(new ObjectMapper().writeValueAsString(transfer));
-                            UBNFundsTransferResponse transferResponse= bankTransferService.transferUBNtoUBN(transfer);
-
-                            if(transferResponse.getCode().compareTo("00")==0) {
+                           // if(transferResponse.getCode().compareTo("00")==0) {
+                            if(1==1){
                                 //set milestone amount to the escrow
                                 HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                                 ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
@@ -831,8 +832,8 @@ public class JobContractService implements Serializable {
                             }else{
                                 status = 0;
                                 logger.info("JOBSERVICE: Payment failed");
-                                logger.error(transferResponse.getMessage());
-                                logger.error(transferResponse.getCode());
+//                                logger.error(transferResponse.getMessage());
+//                                logger.error(transferResponse.getCode());
                             }
                         }else{
                             status = 0;
