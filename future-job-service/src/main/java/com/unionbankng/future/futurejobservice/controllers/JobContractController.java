@@ -148,6 +148,11 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
+    @GetMapping("/v1/job/contract/milestones/spent/amount/{proposalId}/{jobId}")
+    public ResponseEntity<APIResponse<Long>> findTotalMilestonesSpentAmountByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){
+        return ResponseEntity.ok().body(new APIResponse("success",true, jobContractService.findTotalSpentAmountByProposalId(proposalId,jobId)));
+    }
+
     @GetMapping("/v1/job/contract/all/milestones/{proposalId}/{jobId}")
     public ResponseEntity<APIResponse> findAllContractMilestonesByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){
         List<JobMilestone> response= jobContractService.findAllContractMilestoneByProposalJobId(proposalId,jobId);

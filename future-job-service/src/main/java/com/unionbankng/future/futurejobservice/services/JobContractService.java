@@ -109,6 +109,9 @@ public class JobContractService implements Serializable {
     public JobMilestone findContractMilestoneByJobId(Long proposalId, Long jobId){
         return  jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId,jobId);
     }
+    public Long findTotalSpentAmountByProposalId(Long proposalId, Long jobId){
+        return  jobMilestoneRepository.findTotalSpentAmountByProposalId(proposalId,jobId);
+    }
     public List<JobMilestone> findAllContractMilestoneByProposalJobIdAndStatus(Long proposalId, Long jobId, String status){
         return  jobMilestoneRepository.findAllMilestonesByProposalJobAndStatus(proposalId,jobId,status);
     }
