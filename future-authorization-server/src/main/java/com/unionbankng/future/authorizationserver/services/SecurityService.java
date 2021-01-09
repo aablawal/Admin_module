@@ -10,6 +10,11 @@ import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import com.unionbankng.future.authorizationserver.utils.Utility;
 import lombok.RequiredArgsConstructor;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +41,8 @@ public class SecurityService {
     private final PasswordEncoder encoder;
     private PasswordValidator passwordValidator = PasswordValidator.
             buildValidator(false, true, true, 6, 40);
+
+    private final RealmResource keycloakRealmResource;
 
 
     @Value("${email.sender}")
@@ -75,6 +82,7 @@ public class SecurityService {
     public ResponseEntity resetPassword(String token, String password){
 
         String userEmail = memcachedHelperService.getValueByKey(token);
+
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new APIResponse("Token expired or not found",false,null));
@@ -85,6 +93,7 @@ public class SecurityService {
                     new APIResponse(messageSource.getMessage("password.validation.error",
                             null, LocaleContextHolder.getLocale()),false,null));
 
+
         User user  = userService.findByEmail(userEmail).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
@@ -92,11 +101,31 @@ public class SecurityService {
 
         userService.save(user);
 
+        //reset keycloak password
+        if(!resetUserKeycloakPasswordCredential(user.getUuid(),password))
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new APIResponse("Password reset failed, can't connect to server",false,null));
+
+
         memcachedHelperService.clear(token);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Password reset successful",true,null));
 
+
+    }
+
+    private Boolean resetUserKeycloakPasswordCredential(String userUUID, String password) {
+
+        UsersResource usersResource = keycloakRealmResource.users();
+        UserResource userResource = usersResource.get(userUUID);
+
+        CredentialRepresentation cr = new CredentialRepresentation();
+        cr.setType(CredentialRepresentation.PASSWORD);
+        cr.setValue(password);
+        userResource.resetPassword(cr);
+
+        return true;
 
     }
 
@@ -121,6 +150,11 @@ public class SecurityService {
 
         user.setPassword(encoder.encode(request.getPassword()));
         userService.save(user);
+
+        //reset keycloak password
+        if(!resetUserKeycloakPasswordCredential(user.getUuid(),request.getPassword()))
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new APIResponse("Password reset failed, can't connect to server",false,null));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request Successful",true,null));

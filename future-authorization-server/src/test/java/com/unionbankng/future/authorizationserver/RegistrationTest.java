@@ -51,7 +51,7 @@ public class RegistrationTest extends AbstractTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().is2xxSuccessful());
 
 
     }

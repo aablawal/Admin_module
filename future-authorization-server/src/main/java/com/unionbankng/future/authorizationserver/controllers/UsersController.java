@@ -1,9 +1,7 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
-import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.pojos.UserByTokenResponse;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
@@ -12,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,6 +18,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -58,9 +56,9 @@ public class UsersController {
 
 
     @GetMapping("/v1/users/get_details_with_token")
-    public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore OAuth2Authentication auth) {
-        System.out.println(auth.getName());
-        User user =  userService.findByEmail(auth.getName())
+    public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore Principal principal) {
+        System.out.println(principal.getName());
+        User user =  userService.findByEmail(principal.getName())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         UserByTokenResponse userByTokenResponse = new UserByTokenResponse();
