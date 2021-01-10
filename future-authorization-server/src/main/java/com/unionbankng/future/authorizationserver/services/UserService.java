@@ -92,7 +92,7 @@ public class UserService {
 
 
         Boolean isKeycloakPropertyChanged = !user.getLastName().equals(request.getLastName()) ||
-                !user.getLastName().equals(request.getLastName());
+                !user.getFirstName().equals(request.getFirstName());
 
         if (request.getLastName() != null) {
             user.setLastName(request.getLastName());
@@ -140,7 +140,7 @@ public class UserService {
 
 
         Boolean isKeycloakPropertyChanged = !user.getLastName().equals(request.getLastName()) ||
-                !user.getLastName().equals(request.getLastName());
+                !user.getFirstName().equals(request.getFirstName());
 
 
         user.setLastName(request.getLastName());

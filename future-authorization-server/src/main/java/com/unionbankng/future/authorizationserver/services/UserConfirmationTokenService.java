@@ -36,7 +36,7 @@ public class UserConfirmationTokenService {
     private final UserService userService;
     private final EmailSender emailSender;
     private final MemcachedHelperService memcachedHelperService;
-    private final RealmResource keycloakRealmResource;
+    private final KeycloakService keycloakService;
 
     @Value("${email.sender}")
     private String emailSenderAddress;
@@ -63,6 +63,7 @@ public class UserConfirmationTokenService {
 
     public TokenConfirm confirmUserAccountByToken(String token) {
 
+        logger.info("=============================");
         TokenConfirm tokenConfirm = new TokenConfirm();
 
         String userEmail = memcachedHelperService.getValueByKey(token);
@@ -73,7 +74,7 @@ public class UserConfirmationTokenService {
         }
 
         User user = userService.findByEmail(userEmail).orElse(null);
-        memcachedHelperService.clear(token);
+
 
         if (user == null) {
 
@@ -82,25 +83,19 @@ public class UserConfirmationTokenService {
 
         }
 
-        tokenConfirm.setSuccess(true);
-        tokenConfirm.setUserId(user.getId());
-
-        //enable user on keycloak acc
-        UsersResource usersResource = keycloakRealmResource.users();
-        UserResource userResource = usersResource.get(user.getUuid());
-
-        UserRepresentation userRepresentation = userResource.toRepresentation();
-        userRepresentation.setEnabled(true);
-        userRepresentation.setEmailVerified(true);
-
-        userResource.update(userRepresentation);
+        //enable keycloak user
+        keycloakService.enableKeyCloakUser(user.getUuid());
 
         user.setIsEnabled(true);
         userService.save(user);
 
+        memcachedHelperService.clear(token);
+        tokenConfirm.setSuccess(true);
+        tokenConfirm.setUserId(user.getId());
 
         return tokenConfirm;
     }
+
 
 
 }

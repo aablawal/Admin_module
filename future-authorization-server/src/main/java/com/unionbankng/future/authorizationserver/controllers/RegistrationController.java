@@ -1,6 +1,7 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.TokenConfirm;
@@ -36,8 +37,8 @@ public class RegistrationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     new APIResponse(messageSource.getMessage("username.exist", null, LocaleContextHolder.getLocale()),false,null));
 
-//        if(request.getAuthProvider().equals(AuthProvider.GOOGLE))
-//            return registrationService.googleRegistration(request);
+        if(request.getAuthProvider().equals(AuthProvider.GOOGLE))
+            return registrationService.googleRegistration(request);
 
         return registrationService.register(request);
     }

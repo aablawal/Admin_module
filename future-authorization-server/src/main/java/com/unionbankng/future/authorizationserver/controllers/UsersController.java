@@ -57,8 +57,8 @@ public class UsersController {
 
     @GetMapping("/v1/users/get_details_with_token")
     public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore Principal principal) {
-        System.out.println(principal.getName());
-        User user =  userService.findByEmail(principal.getName())
+        System.out.println(principal);
+        User user =  userService.findByUuid(principal.getName())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         UserByTokenResponse userByTokenResponse = new UserByTokenResponse();

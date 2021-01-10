@@ -17,7 +17,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
@@ -25,6 +24,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Arrays;
 
 @RestController
@@ -396,10 +396,10 @@ public class UBNAccountOpeningController {
 
     @PostMapping("/v1/ubn_account_opening/complete_account_opening")
     public ResponseEntity<APIResponse<UBNAccountDataResponse>> completeUBNAccountCreation(
-            @RequestBody @Valid CompleteUBNAccountCreationRequest request, @ApiIgnore OAuth2Authentication authentication
+            @RequestBody @Valid CompleteUBNAccountCreationRequest request, @ApiIgnore Principal principal
     ) throws IOException {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         //create ubn account
         UBNAccountCreationRequest ubnAccountCreationRequest = new  UBNAccountCreationRequest();
