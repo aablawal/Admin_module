@@ -22,7 +22,7 @@ public interface JobRepository extends JpaRepository<Job,Long> {
     @Query(value = "SELECT * FROM jobs j where j.oid=:id and j.status=:status order by id desc", nativeQuery = true)
     Page<Job> findJobsByOwnerIdAndStatus(Pageable pageable, Long id, String status);
 
-    @Query(value = "SELECT * FROM jobs j WHERE (j.id in(SELECT jp.job_id FROM job_proposals jp where (jp.user_id=:id or jp.employer_id=:id) and jp.status=:status)  or j.oid=:id and status=:status)", nativeQuery = true)
+    @Query(value = "SELECT * FROM jobs j WHERE (j.id in(SELECT jp.job_id FROM job_proposals jp where (jp.user_id=:id or jp.employer_id=:id) and jp.status=:status)  or j.oid=:id and status=:status) order by id desc", nativeQuery = true)
     Page<Job> findJobsByUserIdAndStatus(Pageable pageable, Long id, String status);
 
 }

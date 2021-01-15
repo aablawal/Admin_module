@@ -86,7 +86,7 @@ public class JobContractController {
 
     @PutMapping("/v1/job/completed/rejection/{jobId}/{requestId}")
     public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId, @ApiIgnore OAuth2Authentication authentication){
-        JobProjectSubmission request= jobContractService.rejectJob(authentication, jobId,requestId);
+        JobProjectSubmission request= jobContractService.rejectJob(jobId,requestId);
         if(request!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, request));
         else
@@ -169,22 +169,15 @@ public class JobContractController {
 
     @PutMapping("/v1/my-job/contract/milestone/state/{id}")
     public ResponseEntity<APIResponse> modifyMilestoneState(@PathVariable Long id, @RequestParam String status, @ApiIgnore OAuth2Authentication authentication){
-        JobMilestone milestone= jobContractService.modifyMilestoneState(authentication,id,status);
-        if(milestone!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, milestone));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+        APIResponse response= jobContractService.modifyMilestoneState(authentication,id,status);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/v1/job/milestone/completed/approval/{id}")
     public ResponseEntity<APIResponse> approveCompletedMilestone(@Valid @RequestBody String request, @PathVariable Long id, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
-        JobMilestone response= jobContractService.approveCompletedMilestone(authentication, id,request);
-        if(response!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, response));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+        APIResponse response= jobContractService.approveCompletedMilestone(authentication, id,request);
+        return ResponseEntity.ok().body(response);
     }
-
 
     @GetMapping("/v1/job/contract/{proposalId}/{jobId}")
     public ResponseEntity<APIResponse> findJobContractByProposalAndJobId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -21,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @EnableResourceServer
@@ -37,6 +39,12 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 				.and().requestMatchers().antMatchers("/api/**")
 				.and().authorizeRequests()
 				.antMatchers("/api/**").authenticated();
+//
+//		http.cors().and().authorizeRequests().antMatchers(HttpMethod.OPTIONS, "**").denyAll
+//				()
+//				.and().requestMatchers().antMatchers("/api/**")
+//				.and().authorizeRequests()
+//				.antMatchers("/api/**").authenticated();
     }
 
 	@Override
@@ -81,12 +89,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration configAutenticacao = new CorsConfiguration();
 		configAutenticacao.setAllowCredentials(true);
-		configAutenticacao.addAllowedOrigin("*");
 		configAutenticacao.addAllowedHeader("*");
-		configAutenticacao.addAllowedMethod("*");
+		configAutenticacao.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq.azurewebsites.net"));
+		configAutenticacao.setAllowedMethods(Arrays.asList("GET","PUT","POST","UPDATE","DELETE"));
 		configAutenticacao.setMaxAge(3600L);
 		source.registerCorsConfiguration("/**", configAutenticacao); // Global for all paths
-
 		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<CorsFilter>(new CorsFilter(source));
 		bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		return bean;

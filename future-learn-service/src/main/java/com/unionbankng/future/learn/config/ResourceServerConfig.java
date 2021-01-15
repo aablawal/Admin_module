@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @EnableResourceServer
@@ -80,9 +81,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.setAllowCredentials(true);
-		corsConfiguration.addAllowedOrigin("*");
 		corsConfiguration.addAllowedHeader("*");
-		corsConfiguration.addAllowedMethod("*");
+		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq.azurewebsites.net"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET","PUT","POST","UPDATE","DELETE"));
 		corsConfiguration.setMaxAge(3600L);
 		source.registerCorsConfiguration("/**", corsConfiguration); // Global for all paths
 

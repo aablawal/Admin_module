@@ -2,8 +2,8 @@ package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
-import com.unionbankng.future.futurejobservice.entities.JobContract;
 import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
+import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
@@ -22,7 +22,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -31,7 +30,7 @@ import java.util.*;
 public class JobProposalController {
 
     private final JobTeamDetailsService jobTeamDetailsService;
-    private final JobContractService approveJobProposal;
+    private final JobContractService contractService;
     private final JobProposalService service;
     private final UserService userService;
     Logger logger = LoggerFactory.getLogger(JobProposalController.class);
@@ -45,8 +44,8 @@ public class JobProposalController {
 
     @PostMapping(value = "/v1/job/apply", consumes = "multipart/form-data")
     public ResponseEntity<APIResponse> applyJob(@Valid @RequestParam(value = "data", required = true) String proposalData,
-                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,  Model model,OAuth2Authentication authentication) throws JsonProcessingException {
-          JobProposal appliedJob = service.applyJob(authentication, proposalData, supportingFiles,  model);
+                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles) throws JsonProcessingException {
+        JobProposal appliedJob = service.applyJob(proposalData, supportingFiles);
         if (appliedJob != null) {
             logger.info("Success");
             return ResponseEntity.ok().body(new APIResponse("success", true, appliedJob));
@@ -89,27 +88,20 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/status")
-    public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status, Model model, @ApiIgnore OAuth2Authentication authentication) {
+    public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status) {
         return ResponseEntity.ok().body(
-                new APIResponse("success", true, service.updateJobProposalStatus(authentication, id, status, model)));
+                new APIResponse("success", true, service.updateJobProposalStatus(id, JobProposalStatus.valueOf(status))));
     }
-
-
 
     @PostMapping("/v1/job/proposal/approve")
     public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
-        JobContract approval = approveJobProposal.approveJobProposal(authentication, approvalRequest, model);
-        if (approval != null)
-            return ResponseEntity.ok().body(
-                    new APIResponse("success", true, approval));
-        else
-            return ResponseEntity.ok().body(
-                    new APIResponse("failed", false, null));
+        APIResponse response = contractService.approveJobProposal(authentication, approvalRequest);
+        return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/v1/job/proposal/cancel")
-    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid,@ApiIgnore OAuth2Authentication authentication) {
-        JobProposal canceledProposal = service.cancelJobProposal(authentication,jid, uid);
+    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid) {
+        JobProposal canceledProposal = service.cancelJobProposal(jid, uid);
         if (canceledProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, canceledProposal));
@@ -119,8 +111,8 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/decline/{proposalId}")
-    public ResponseEntity<APIResponse> declineJobProposal(@PathVariable Long proposalId,@ApiIgnore OAuth2Authentication authentication) {
-        JobProposal declinedProposal = service.declineJobProposal(authentication,proposalId);
+    public ResponseEntity<APIResponse> declineJobProposal(@PathVariable Long proposalId) {
+        JobProposal declinedProposal = service.declineJobProposal(proposalId);
         if (declinedProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, declinedProposal));
@@ -132,8 +124,8 @@ public class JobProposalController {
 
 
     @PutMapping("/v1/job/proposal/change/percentage")
-    public ResponseEntity<APIResponse> changePercentage(@RequestParam Long pid, @RequestParam int percentage,@ApiIgnore OAuth2Authentication authentication) {
-        JobProposal updateProposal = service.changeProposalPercentage(authentication,pid, percentage);
+    public ResponseEntity<APIResponse> changePercentage(@RequestParam Long pid, @RequestParam int percentage) {
+        JobProposal updateProposal = service.changeProposalPercentage(pid, percentage);
         if (updateProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, updateProposal));
