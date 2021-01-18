@@ -33,7 +33,7 @@ public class JobContractController {
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response){
         response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS,DELETE,PUT");
+        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
     }
 
     @PostMapping("/v1/job/contract/extension/request")

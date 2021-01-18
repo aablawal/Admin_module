@@ -39,7 +39,7 @@ public class JobProposalController {
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,DELETE,PUT");
+        response.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT");
     }
 
     @PostMapping(value = "/v1/job/apply", consumes = "multipart/form-data")
