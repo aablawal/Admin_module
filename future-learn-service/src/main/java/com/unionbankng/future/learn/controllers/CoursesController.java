@@ -10,15 +10,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
-
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,20 +27,20 @@ public class CoursesController {
 
 
     @GetMapping("/v1/courses/get_where_iam_instructor")
-    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByInstructor(@ApiIgnore OAuth2Authentication authentication
+    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByInstructor(@ApiIgnore Principal principal
     , @RequestParam int page, @RequestParam int size){
 
-        Page<Course> courses = courseService.findAllWhereIamInstructor(authentication, PageRequest.of(page,size));
+        Page<Course> courses = courseService.findAllWhereIamInstructor(principal, PageRequest.of(page,size));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
     }
 
     @GetMapping("/v1/courses/get_where_iam_creator")
-    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByCreator(@ApiIgnore OAuth2Authentication authentication
+    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByCreator(@ApiIgnore Principal principal
             , @RequestParam int page, @RequestParam int size){
 
-        Page<Course> courses = courseService.findAllWhereIamCreator(authentication, PageRequest.of(page,size));
+        Page<Course> courses = courseService.findAllWhereIamCreator(principal, PageRequest.of(page,size));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
@@ -67,9 +65,9 @@ public class CoursesController {
 
     @PostMapping("/v1/courses/create_course")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@RequestBody CreateCourseRequest request,
-                                                               @ApiIgnore OAuth2Authentication authentication){
+                                                               @ApiIgnore Principal principal){
 
-        Course course = courseService.createCourse(request,authentication);
+        Course course = courseService.createCourse(request,principal);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,course));
     }
@@ -88,9 +86,9 @@ public class CoursesController {
 
     @PostMapping("/v1/courses/publish/{courseId}")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@PathVariable Long courseId,
-                                                               @ApiIgnore OAuth2Authentication authentication){
+                                                               @ApiIgnore Principal principal){
 
-        courseService.publishCourse(courseId,authentication);
+        courseService.publishCourse(courseId,principal);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,"Course publish successful"));
@@ -99,8 +97,8 @@ public class CoursesController {
 
     @PutMapping("/v1/courses/update_course/{courseId}")
     public ResponseEntity<APIResponse<Course>> updateCourseAPI(@PathVariable Long courseId,@RequestBody CreateCourseRequest request,
-                                                               @ApiIgnore OAuth2Authentication authentication){
-        Course course = courseService.updateCourse(courseId,request,authentication);
+                                                               @ApiIgnore Principal principal){
+        Course course = courseService.updateCourse(courseId,request,principal);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,course));
     }

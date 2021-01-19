@@ -18,12 +18,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -41,9 +41,9 @@ public class JobService {
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
-    public Job addJob(OAuth2Authentication authentication, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
+    public Job addJob(Principal principal, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
         try {
-            JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+            JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             String supporting_file_names = null;
             String nda_file_names=null;
             Job job = new ObjectMapper().readValue(jobData, Job.class);
@@ -175,7 +175,7 @@ public class JobService {
         }
     }
 
-    public Job closeJobById(OAuth2Authentication authentication,Long id, int state){
+    public Job closeJobById(Principal principal,Long id, int state){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             if(state==1)
@@ -218,7 +218,7 @@ public class JobService {
             return  null;
         }
     }
-    public Job openJobById(OAuth2Authentication authentication,Long id){
+    public Job openJobById(Principal principal,Long id){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             job.setStatus(JobStatus.AC);
@@ -229,7 +229,7 @@ public class JobService {
         }
     }
 
-    public Job repeatJobById(OAuth2Authentication authentication,Long id){
+    public Job repeatJobById(Principal principal,Long id){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             job.setStatus(JobStatus.AC);

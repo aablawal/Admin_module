@@ -3,7 +3,6 @@ import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
-import com.unionbankng.future.futurejobservice.services.EmailService;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,9 +42,9 @@ public class JobController {
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
                                               @RequestParam(value = "team", required=true) String teamData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
-                                              @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles, @ApiIgnore OAuth2Authentication authentication) throws IOException{
+                                              @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles, @ApiIgnore Principal principal) throws IOException{
 
-        Job addedJob=service.addJob(authentication, jobData,teamData,supportingFiles,ndaFiles);
+        Job addedJob=service.addJob(principal, jobData,teamData,supportingFiles,ndaFiles);
         if(addedJob!=null)
           return ResponseEntity.ok().body(new APIResponse("success",true,addedJob));
         else
@@ -53,8 +52,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/close")
-    public  ResponseEntity<APIResponse> closeJobById(@RequestParam Long id, @RequestParam int state, @ApiIgnore OAuth2Authentication authentication){
-        Job job=service.closeJobById(authentication, id,state);
+    public  ResponseEntity<APIResponse> closeJobById(@RequestParam Long id, @RequestParam int state, @ApiIgnore Principal principal){
+        Job job=service.closeJobById(principal, id,state);
         if(job!=null)
            return ResponseEntity.ok().body(new APIResponse("Job closed successful",true,job));
         else
@@ -62,8 +61,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/open")
-    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id, @ApiIgnore OAuth2Authentication authentication){
-        Job job=service.openJobById(authentication, id);
+    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id, @ApiIgnore Principal principal){
+        Job job=service.openJobById(principal, id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job opened successful",true,job));
         else
@@ -71,8 +70,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/repeat")
-    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id, @ApiIgnore OAuth2Authentication authentication){
-        Job job=service.repeatJobById(authentication, id);
+    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id, @ApiIgnore Principal principal){
+        Job job=service.repeatJobById(principal, id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job repeated successful",true,job));
         else
@@ -125,8 +124,8 @@ public class JobController {
     }
 
     @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse<String>> test(@ApiIgnore OAuth2Authentication authentication){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+    public ResponseEntity<APIResponse<String>> test(@ApiIgnore Principal principal){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         return ResponseEntity.ok().body(
                 new APIResponse("success",true, jwtUserDetail));
     }

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.Serializable;
+import java.security.Principal;
 import java.util.Date;
 
 @Service
@@ -38,11 +38,11 @@ public class JobProposalService  implements Serializable {
     private final NotificationSender notificationSender;
 
 
-    public JobProposal applyJob(OAuth2Authentication authentication,String applicationData, MultipartFile[] supporting_files,  Model model){
+    public JobProposal applyJob(Principal principal, String applicationData, MultipartFile[] supporting_files, Model model){
         try {
             String supporting_file_names = null;
             JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             Job job = jobRepository.findById(application.jobId).orElse(null);
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
@@ -112,14 +112,14 @@ public class JobProposalService  implements Serializable {
         }
     }
 
-    public JobProposal updateJobProposalStatus(OAuth2Authentication authentication,Long id, String newStatus, Model model){
+    public JobProposal updateJobProposalStatus(Principal principal,Long id, String newStatus, Model model){
         Model data =this.findProposalById(id,model);
         JobProposal proposal= (JobProposal) data.getAttribute("proposal");
         proposal.setStatus(JobProposalStatus.valueOf(newStatus.toUpperCase()));
         return repository.save(proposal);
     }
 
-    public JobProposal cancelJobProposal(OAuth2Authentication authentication,Long jobId, Long userId){
+    public JobProposal cancelJobProposal(Principal principal,Long jobId, Long userId){
         JobProposal proposal=repository.findProposalByUserId(jobId,userId);
         if(proposal!=null) {
             proposal.setStatus(JobProposalStatus.IA);
@@ -145,7 +145,7 @@ public class JobProposalService  implements Serializable {
         return proposal;
     }
 
-    public JobProposal declineJobProposal(OAuth2Authentication authentication,Long proposalId){
+    public JobProposal declineJobProposal(Principal principal,Long proposalId){
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
             proposal.setStatus(JobProposalStatus.RE);
@@ -171,7 +171,7 @@ public class JobProposalService  implements Serializable {
         return proposal;
     }
 
-    public  JobProposal changeProposalPercentage( OAuth2Authentication authentication,Long proposalId, int percentage){
+    public  JobProposal changeProposalPercentage( Principal principal,Long proposalId, int percentage){
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
             Job currentJob =jobRepository.findById(proposal.getJobId()).orElse(null);

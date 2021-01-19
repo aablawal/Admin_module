@@ -11,10 +11,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -36,10 +36,10 @@ public class CourseContentController {
 
 
     @GetMapping("/v1/course_content/find_where_iam_creator")
-    public ResponseEntity<APIResponse<List<CourseContent>>> findWhereIAmIsCreator(@ApiIgnore OAuth2Authentication authentication,
+    public ResponseEntity<APIResponse<List<CourseContent>>> findWhereIAmIsCreator(@ApiIgnore Principal principal,
                                                                                  @RequestParam int page, @RequestParam int size){
 
-        Page<CourseContent> courseContents = courseContentService.findAllByCreatorUUID(authentication, PageRequest.of(page,size));
+        Page<CourseContent> courseContents = courseContentService.findAllByCreatorUUID(principal, PageRequest.of(page,size));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courseContents));
@@ -48,9 +48,9 @@ public class CourseContentController {
 
     @PostMapping("/v1/course_content/create_content")
     public ResponseEntity<APIResponse<CourseContent>> createContent(@RequestBody CourseContentRequest request,
-                                                                   @ApiIgnore OAuth2Authentication authentication){
+                                                                   @ApiIgnore Principal principal){
 
-        CourseContent courseContent = courseContentService.createNewContent(request,authentication);
+        CourseContent courseContent = courseContentService.createNewContent(request,principal);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courseContent));

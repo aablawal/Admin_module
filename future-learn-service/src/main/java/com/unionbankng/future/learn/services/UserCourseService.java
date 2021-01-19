@@ -13,12 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,9 +56,9 @@ public class UserCourseService {
         return userCourseRepository.countAllByUserUUID(userUUID);
     }
 
-    public UserCourse enrollForFreeCourse(CourseEnrollmentRequest courseEnrollmentRequest, OAuth2Authentication authentication){
+    public UserCourse enrollForFreeCourse(CourseEnrollmentRequest courseEnrollmentRequest, Principal principal){
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         return enrollForFreeCourse(courseEnrollmentRequest,jwtUserDetail.getUserUUID());
 
@@ -146,9 +146,9 @@ public class UserCourseService {
     }
 
 
-    public List<Course> getMyCourses(OAuth2Authentication authentication){
+    public List<Course> getMyCourses(Principal principal){
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         return getMyCourses(jwtUserDetail.getUserUUID());
 
@@ -166,9 +166,9 @@ public class UserCourseService {
 
     }
 
-    public Boolean isUserEnrolledForCourse(OAuth2Authentication authentication, Long courseId) {
+    public Boolean isUserEnrolledForCourse(Principal principal, Long courseId) {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         return existByUserUUIDAndCourseId(jwtUserDetail.getUserUUID(),courseId);
 

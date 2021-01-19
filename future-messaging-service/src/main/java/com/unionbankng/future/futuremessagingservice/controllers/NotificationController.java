@@ -7,10 +7,9 @@ import com.unionbankng.future.futuremessagingservice.services.NotificationServic
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class NotificationController {
 
 
     @PutMapping(value = "/v1/update/user/mid/{id}")
-    public ResponseEntity<APIResponse<MessagingToken>> updateUserMID(@Valid @PathVariable Long id, @RequestParam String mid, @ApiIgnore OAuth2Authentication auth)  throws IOException {
+    public ResponseEntity<APIResponse<MessagingToken>> updateUserMID(@Valid @PathVariable Long id, @RequestParam String mid) {
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.updateUserMID(id,mid)));
     }
     @PostMapping(value = "/v1/push/notification/{id}")

@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
+import java.security.Principal;
 import java.util.*;
 
 @RestController
@@ -45,8 +44,8 @@ public class JobProposalController {
 
     @PostMapping(value = "/v1/job/apply", consumes = "multipart/form-data")
     public ResponseEntity<APIResponse> applyJob(@Valid @RequestParam(value = "data", required = true) String proposalData,
-                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,  Model model,OAuth2Authentication authentication) throws JsonProcessingException {
-          JobProposal appliedJob = service.applyJob(authentication, proposalData, supportingFiles,  model);
+                                                @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles, Model model, Principal principal) throws JsonProcessingException {
+          JobProposal appliedJob = service.applyJob(principal, proposalData, supportingFiles,  model);
         if (appliedJob != null) {
             logger.info("Success");
             return ResponseEntity.ok().body(new APIResponse("success", true, appliedJob));
@@ -89,16 +88,16 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/status")
-    public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status, Model model, @ApiIgnore OAuth2Authentication authentication) {
+    public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status, Model model, @ApiIgnore Principal principal) {
         return ResponseEntity.ok().body(
-                new APIResponse("success", true, service.updateJobProposalStatus(authentication, id, status, model)));
+                new APIResponse("success", true, service.updateJobProposalStatus(principal, id, status, model)));
     }
 
 
 
     @PostMapping("/v1/job/proposal/approve")
-    public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
-        JobContract approval = approveJobProposal.approveJobProposal(authentication, approvalRequest, model);
+    public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore Principal principal) throws JsonProcessingException {
+        JobContract approval = approveJobProposal.approveJobProposal(principal, approvalRequest, model);
         if (approval != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, approval));
@@ -108,8 +107,8 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/cancel")
-    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid,@ApiIgnore OAuth2Authentication authentication) {
-        JobProposal canceledProposal = service.cancelJobProposal(authentication,jid, uid);
+    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid,@ApiIgnore Principal principal) {
+        JobProposal canceledProposal = service.cancelJobProposal(principal,jid, uid);
         if (canceledProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, canceledProposal));
@@ -119,8 +118,8 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/decline/{proposalId}")
-    public ResponseEntity<APIResponse> declineJobProposal(@PathVariable Long proposalId,@ApiIgnore OAuth2Authentication authentication) {
-        JobProposal declinedProposal = service.declineJobProposal(authentication,proposalId);
+    public ResponseEntity<APIResponse> declineJobProposal(@PathVariable Long proposalId,@ApiIgnore Principal principal) {
+        JobProposal declinedProposal = service.declineJobProposal(principal,proposalId);
         if (declinedProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, declinedProposal));
@@ -132,8 +131,8 @@ public class JobProposalController {
 
 
     @PutMapping("/v1/job/proposal/change/percentage")
-    public ResponseEntity<APIResponse> changePercentage(@RequestParam Long pid, @RequestParam int percentage,@ApiIgnore OAuth2Authentication authentication) {
-        JobProposal updateProposal = service.changeProposalPercentage(authentication,pid, percentage);
+    public ResponseEntity<APIResponse> changePercentage(@RequestParam Long pid, @RequestParam int percentage,@ApiIgnore Principal principal) {
+        JobProposal updateProposal = service.changeProposalPercentage(principal,pid, percentage);
         if (updateProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, updateProposal));

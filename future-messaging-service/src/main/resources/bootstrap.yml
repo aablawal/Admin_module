@@ -18,23 +18,29 @@ management:
         include: refresh
 ---
 spring:
-  profiles: development
   cloud:
     config:
       uri: http://localhost:8082
       label: develop
+  config:
+    activate:
+      on-profile: developement
 ---
 spring:
-  profiles: staging
   cloud:
     config:
       uri: http://future-config-server
-      label: staging
+      label: keycloak
+  config:
+    activate:
+      on-profile: staging
 ---
 
 spring:
-  profiles: production
   cloud:
     config:
       uri: http://future-config-server
       label: master
+  config:
+    activate:
+      on-profile: master
