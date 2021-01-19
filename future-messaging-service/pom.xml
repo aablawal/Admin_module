@@ -40,11 +40,6 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-stream</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.azure.spring</groupId>
-			<artifactId>azure-spring-cloud-stream-binder-servicebus-queue</artifactId>
-			<version>2.0.0</version>
-		</dependency>
 		<!--Code Optimization-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

@@ -20,26 +20,26 @@ management:
 spring:
   cloud:
     config:
-      uri: http://localhost:8082
-      label: develop
+      label: keycloak
   config:
+    import: configserver:http://localhost:8082
     activate:
-      on-profile: developement
+      on-profile: development
 ---
 spring:
   cloud:
     config:
-      uri: http://future-config-server
+      import: configserver:http://future-config-server
       label: keycloak
   config:
     activate:
-      on-profile: staging
+      on-profile: keycloak
 ---
 
 spring:
   cloud:
     config:
-      uri: http://future-config-server
+      import: optional:configserver:http://future-config-server
       label: master
   config:
     activate:
