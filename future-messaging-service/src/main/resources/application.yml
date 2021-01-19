@@ -21,6 +21,7 @@ spring:
   cloud:
     config:
       label: keycloak
+      profile: development
   config:
     import: configserver:http://localhost:8082
     activate:
@@ -33,7 +34,7 @@ spring:
       label: keycloak
   config:
     activate:
-      on-profile: keycloak
+      on-profile: staging
 ---
 
 spring:
