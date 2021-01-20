@@ -41,9 +41,8 @@ public class JobService {
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
-    public Job addJob(Principal principal, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
+    public Job addJob( String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
         try {
-            JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             String supporting_file_names = null;
             String nda_file_names=null;
             Job job = new ObjectMapper().readValue(jobData, Job.class);
@@ -175,7 +174,8 @@ public class JobService {
         }
     }
 
-    public Job closeJobById(Principal principal,Long id, int state){
+
+    public Job closeJobById(Long id, int state){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             if(state==1)
@@ -193,8 +193,6 @@ public class JobService {
                     jobProposalRepository.save(jobProposal);
                 });
             }
-
-
             //fire notification
             Job currentJob=jobRepository.findById(job.getId()).orElse(null);
             if(currentJob!=null) {
@@ -218,7 +216,8 @@ public class JobService {
             return  null;
         }
     }
-    public Job openJobById(Principal principal,Long id){
+
+    public Job openJobById(Long id){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             job.setStatus(JobStatus.AC);
@@ -229,7 +228,8 @@ public class JobService {
         }
     }
 
-    public Job repeatJobById(Principal principal,Long id){
+
+    public Job repeatJobById(Long id){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             job.setStatus(JobStatus.AC);

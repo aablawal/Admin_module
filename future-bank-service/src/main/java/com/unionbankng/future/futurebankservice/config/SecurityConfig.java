@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
+
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(jsr250Enabled = true)
 @RequiredArgsConstructor
@@ -54,12 +56,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     public FilterRegistrationBean<CorsFilter> corFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
         CorsConfiguration configAutenticacao = new CorsConfiguration();
         configAutenticacao.setAllowCredentials(true);
-        configAutenticacao.addAllowedOrigin("*");
         configAutenticacao.addAllowedHeader("*");
-        configAutenticacao.addAllowedMethod("*");
+        configAutenticacao.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq.azurewebsites.net"));
+        configAutenticacao.setAllowedMethods(Arrays.asList("GET","PUT","POST","UPDATE","DELETE"));
         configAutenticacao.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", configAutenticacao); // Global for all paths
 

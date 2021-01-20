@@ -30,7 +30,7 @@ public class JobController {
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response){
         response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS,DELETE,PUT");
+        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
     }
     private final JobService service;
     private final NotificationSender notificationSender;
@@ -42,9 +42,10 @@ public class JobController {
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
                                               @RequestParam(value = "team", required=true) String teamData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
-                                              @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles, @ApiIgnore Principal principal) throws IOException{
 
-        Job addedJob=service.addJob(principal, jobData,teamData,supportingFiles,ndaFiles);
+                                              @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles) throws IOException{
+
+        Job addedJob=service.addJob(jobData,teamData,supportingFiles,ndaFiles);
         if(addedJob!=null)
           return ResponseEntity.ok().body(new APIResponse("success",true,addedJob));
         else
@@ -52,8 +53,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/close")
-    public  ResponseEntity<APIResponse> closeJobById(@RequestParam Long id, @RequestParam int state, @ApiIgnore Principal principal){
-        Job job=service.closeJobById(principal, id,state);
+    public  ResponseEntity<APIResponse> closeJobById(@RequestParam Long id, @RequestParam int state){
+        Job job=service.closeJobById(id,state);
         if(job!=null)
            return ResponseEntity.ok().body(new APIResponse("Job closed successful",true,job));
         else
@@ -61,8 +62,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/open")
-    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id, @ApiIgnore Principal principal){
-        Job job=service.openJobById(principal, id);
+    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id){
+        Job job=service.openJobById(id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job opened successful",true,job));
         else
@@ -70,8 +71,8 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/repeat")
-    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id, @ApiIgnore Principal principal){
-        Job job=service.repeatJobById(principal, id);
+    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id){
+        Job job=service.repeatJobById(id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job repeated successful",true,job));
         else

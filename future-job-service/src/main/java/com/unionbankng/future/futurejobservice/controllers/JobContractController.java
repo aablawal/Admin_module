@@ -33,7 +33,7 @@ public class JobContractController {
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response){
         response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS,DELETE,PUT");
+        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
     }
 
     @PostMapping("/v1/job/contract/extension/request")
@@ -87,6 +87,7 @@ public class JobContractController {
     @PutMapping("/v1/job/completed/rejection/{jobId}/{requestId}")
     public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId, @ApiIgnore Principal principal){
         JobProjectSubmission request= jobContractService.rejectJob(principal, jobId,requestId);
+
         if(request!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, request));
         else
@@ -148,6 +149,15 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
+    @GetMapping("/v1/job/contract/milestones/spent/amount/{proposalId}/{jobId}")
+    public ResponseEntity<APIResponse<Long>> findTotalMilestonesSpentAmountByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){
+        Long amount=jobContractService.findTotalSpentAmountByProposalId(proposalId,jobId);
+        if(amount!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true,amount));
+        else
+            return ResponseEntity.ok().body(new APIResponse("success",false,null));
+    }
+
     @GetMapping("/v1/job/contract/all/milestones/{proposalId}/{jobId}")
     public ResponseEntity<APIResponse> findAllContractMilestonesByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){
         List<JobMilestone> response= jobContractService.findAllContractMilestoneByProposalJobId(proposalId,jobId);
@@ -160,22 +170,15 @@ public class JobContractController {
 
     @PutMapping("/v1/my-job/contract/milestone/state/{id}")
     public ResponseEntity<APIResponse> modifyMilestoneState(@PathVariable Long id, @RequestParam String status, @ApiIgnore Principal principal){
-        JobMilestone milestone= jobContractService.modifyMilestoneState(principal,id,status);
-        if(milestone!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, milestone));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+        APIResponse response= jobContractService.modifyMilestoneState(principal,id,status);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/v1/job/milestone/completed/approval/{id}")
     public ResponseEntity<APIResponse> approveCompletedMilestone(@Valid @RequestBody String request, @PathVariable Long id, @ApiIgnore Principal principal) throws JsonProcessingException {
-        JobMilestone response= jobContractService.approveCompletedMilestone(principal, id,request);
-        if(response!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, response));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+        APIResponse response= jobContractService.approveCompletedMilestone(principal, id,request);
+        return ResponseEntity.ok().body(response);
     }
-
 
     @GetMapping("/v1/job/contract/{proposalId}/{jobId}")
     public ResponseEntity<APIResponse> findJobContractByProposalAndJobId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){

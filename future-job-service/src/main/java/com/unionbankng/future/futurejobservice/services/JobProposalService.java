@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.services;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
@@ -38,12 +39,15 @@ public class JobProposalService  implements Serializable {
     private final NotificationSender notificationSender;
 
 
-    public JobProposal applyJob(Principal principal, String applicationData, MultipartFile[] supporting_files, Model model){
+    public JobProposal applyJob(Principal principal, String applicationData, MultipartFile[] supporting_files)throws JsonProcessingException {
+        JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
+        return applyJob(application, supporting_files);
+    }
+
+    public JobProposal applyJob(JobProposal application, MultipartFile[] supporting_files){
         try {
             String supporting_file_names = null;
-            JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-            Job job = jobRepository.findById(application.jobId).orElse(null);
+              Job job = jobRepository.findById(application.jobId).orElse(null);
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
@@ -112,14 +116,18 @@ public class JobProposalService  implements Serializable {
         }
     }
 
-    public JobProposal updateJobProposalStatus(Principal principal,Long id, String newStatus, Model model){
-        Model data =this.findProposalById(id,model);
-        JobProposal proposal= (JobProposal) data.getAttribute("proposal");
-        proposal.setStatus(JobProposalStatus.valueOf(newStatus.toUpperCase()));
-        return repository.save(proposal);
+
+    public JobProposal updateJobProposalStatus(Long proposalId, JobProposalStatus status) {
+        JobProposal proposal = repository.findById(proposalId).orElse(null);
+        if (proposal != null) {
+            proposal.setStatus(status);
+            return repository.save(proposal);
+        } else {
+            return null;
+        }
     }
 
-    public JobProposal cancelJobProposal(Principal principal,Long jobId, Long userId){
+    public JobProposal cancelJobProposal(Long jobId, Long userId){
         JobProposal proposal=repository.findProposalByUserId(jobId,userId);
         if(proposal!=null) {
             proposal.setStatus(JobProposalStatus.IA);
@@ -145,7 +153,8 @@ public class JobProposalService  implements Serializable {
         return proposal;
     }
 
-    public JobProposal declineJobProposal(Principal principal,Long proposalId){
+
+    public JobProposal declineJobProposal(Long proposalId){
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
             proposal.setStatus(JobProposalStatus.RE);
@@ -171,7 +180,7 @@ public class JobProposalService  implements Serializable {
         return proposal;
     }
 
-    public  JobProposal changeProposalPercentage( Principal principal,Long proposalId, int percentage){
+    public  JobProposal changeProposalPercentage(Long proposalId, int percentage){
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
             Job currentJob =jobRepository.findById(proposal.getJobId()).orElse(null);
