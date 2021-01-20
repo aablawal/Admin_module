@@ -8,15 +8,13 @@ import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionE
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.TemplateEngine;
 
 import java.util.Calendar;
-import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
@@ -30,22 +28,19 @@ public class EmailListener {
 
     private final ObjectMapper mapper;
 
-//    @Bean
-//    public Consumer<String> sendEmail(){
-//        return emailRequest ->{
-//            try {
-//                logger.info("Received message: {}", emailRequest);
-//                EmailBody emailBody = mapper.readValue(emailRequest, EmailBody.class);
-//                logger.info("Received message: {}", emailBody.getSubject());
-//                EmailProvider emailProvider = new UnionEmailProvider();
-//                emailProvider.send(processEmailTemplate(emailBody));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        };
-//    }
 
+    @JmsListener(destination = QUEUE_NAME, containerFactory = "jmsListenerContainerFactory")
+    public void receiveMessage(String json) throws JsonProcessingException {
 
+        EmailBody emailBody = mapper.readValue(json, EmailBody.class);
+        logger.info("Received message: {}", emailBody.getSubject());
+        EmailProvider emailProvider = new UnionEmailProvider();
+        try {
+            emailProvider.send(processEmailTemplate(emailBody));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private EmailBody processEmailTemplate(EmailBody emailBody){
 
