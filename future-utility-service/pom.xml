@@ -83,6 +83,11 @@
 			<version>1.0.0-beta-6</version>
 		</dependency>
 		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+			<version>6.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.microsoft.rest</groupId>
 			<artifactId>client-runtime</artifactId>
 			<version>1.7.10</version>

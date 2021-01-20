@@ -18,30 +18,31 @@ management:
         include: refresh
 ---
 spring:
-  cloud:
-    config:
-      label: keycloak
-      profile: development
   config:
-    import: configserver:http://localhost:8082
     activate:
       on-profile: development
----
-spring:
+    import: optional:configserver:http://localhost:8082
   cloud:
     config:
-      import: configserver:http://future-config-server
-      label: keycloak
+      label: develop
+      profile: development
+---
+spring:
   config:
     activate:
       on-profile: staging
----
-
-spring:
+    import: optional:configserver:http://future-config-server
   cloud:
     config:
-      import: optional:configserver:http://future-config-server
-      label: master
+      label: staging
+      profile: staging
+---
+spring:
   config:
     activate:
       on-profile: master
+    import: optional:configserver:http://future-config-server
+  cloud:
+    config:
+      label: master
+      profile: master

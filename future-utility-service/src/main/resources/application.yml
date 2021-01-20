@@ -16,29 +16,31 @@ management:
         include: refresh
 ---
 spring:
-  cloud:
-    config:
-      uri: http://localhost:8082
-      label: develop
   config:
     activate:
-      on-profile: develop
----
-spring:
+      on-profile: development
+    import: optional:configserver:http://localhost:8082
   cloud:
     config:
-      uri: http://future-config-server
-      label: staging
+      label: develop
+      profile: development
+---
+spring:
   config:
     activate:
       on-profile: staging
----
-
-spring:
+    import: optional:configserver:http://future-config-server
   cloud:
     config:
-      uri: http://future-config-server
-      label: master
+      label: staging
+      profile: staging
+---
+spring:
   config:
     activate:
-      on-profile: production
+      on-profile: master
+    import: optional:configserver:http://future-config-server
+  cloud:
+    config:
+      label: master
+      profile: master

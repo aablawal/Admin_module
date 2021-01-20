@@ -66,10 +66,6 @@ public class AzureMediaServiceConfiguration {
         try {
             // Does a Transform already exist with the desired name? Assume that an existing Transform with the desired name
             // also uses the same recipe or Preset for processing content.
-            System.out.println(initMediaManager().transforms()
-                    .getAsync(resourceGroup, accountName, TRANSFORM_NAME)
-                    .toBlocking()
-                    .first());
             transform = initMediaManager().transforms()
                     .getAsync(resourceGroup, accountName, TRANSFORM_NAME)
                     .toBlocking()

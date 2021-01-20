@@ -7,7 +7,6 @@ import com.unionbankng.future.futuremessagingservice.services.NotificationServic
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
