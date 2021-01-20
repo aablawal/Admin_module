@@ -31,9 +31,10 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.cors().and().requestMatchers().antMatchers("/api/**").and().authorizeRequests()
-                .antMatchers("/api/webhooks/**").permitAll()
-                .anyRequest().authenticated();
+        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/api/webhooks/**").permitAll()
+                .and().requestMatchers().antMatchers("/api/**")
+                .and().authorizeRequests()
+                .antMatchers("/api/**").authenticated();
     }
 
     @Autowired
