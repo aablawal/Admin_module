@@ -41,10 +41,6 @@
 			<artifactId>spring-cloud-azure-servicebus-queue-stream-binder</artifactId>
 			<version>2.0.0-beta.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-stream</artifactId>
-		</dependency>
 		<!--Code Optimization-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
