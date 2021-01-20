@@ -30,10 +30,11 @@ public class EmailListener {
     private final ObjectMapper mapper;
 
     @Bean
-    Consumer<String> sendEmail(){
+    public Consumer<String> sendEmail(){
 
         return emailRequest ->{
             try {
+                logger.info("Received message: {}", emailRequest);
                 EmailBody emailBody = mapper.readValue(emailRequest, EmailBody.class);
                 logger.info("Received message: {}", emailBody.getSubject());
                 EmailProvider emailProvider = new UnionEmailProvider();
