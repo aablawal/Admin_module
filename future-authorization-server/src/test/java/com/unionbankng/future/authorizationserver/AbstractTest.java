@@ -99,7 +99,7 @@ public abstract class AbstractTest {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("username", "okemedjbabs@gmail.com");
-        params.add("password", "test123");
+        params.add("password", "password");
         params.add("grant_type", "password");
 
         HttpHeaders headers = new HttpHeaders();
