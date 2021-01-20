@@ -15,7 +15,7 @@
 	<description>The learn service </description>
 
 	<properties>
-		<java.version>14</java.version>
+		<java.version>11</java.version>
 		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 		<keycloak.version>12.0.1</keycloak.version>
@@ -211,7 +211,7 @@
 				<version>${jib-maven-plugin.version}</version>
 				<configuration>
 					<from>
-						<image>adoptopenjdk/openjdk14:alpine-jre-nightly</image>
+						<image>adoptopenjdk/openjdk11:alpine-jre-nightly</image>
 					</from>
 					<to>
 						<auth>
