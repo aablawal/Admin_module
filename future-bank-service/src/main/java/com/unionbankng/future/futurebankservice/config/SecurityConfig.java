@@ -34,7 +34,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.cors().and().requestMatchers().antMatchers("/api/**").and().authorizeRequests().anyRequest().authenticated();
+        http.cors().and().requestMatchers().antMatchers("/api*").and().authorizeRequests().anyRequest().authenticated();
     }
 
     @Autowired
@@ -43,6 +43,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);
     }
+
+
 
     @Bean
     @Override
