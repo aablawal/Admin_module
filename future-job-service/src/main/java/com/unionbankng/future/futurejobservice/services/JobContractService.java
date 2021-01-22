@@ -91,6 +91,17 @@ public class JobContractService implements Serializable {
         }
     }
 
+    public Long getTotalJobEarningByUserId(Long userId){
+        return  jobContractRepository.getTotalJobEarningByUserId(userId).orElse(0l);
+    }
+
+    public Long getTotalJobExpenditureByUser(Long userId){
+        return  jobContractRepository.getTotalJobExpenditureByUserId(userId).orElse(0l);
+    }
+
+    public Long getTotalJobCompletedByUser(Long userId){
+        return  jobContractRepository.getTotalJobCompletedByUser(userId).orElse(0l);
+    }
     public JobContract findJobContractByProposalAndJobId(Long proposalId, Long jobId) {
         return jobContractRepository.findContractByProposalAndJobId(proposalId, jobId);
     }

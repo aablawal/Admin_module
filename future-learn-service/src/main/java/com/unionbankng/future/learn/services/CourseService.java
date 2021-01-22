@@ -50,6 +50,10 @@ public class CourseService {
         return courseRepository.findAllByIsPublished(isPublished,pageable);
     }
 
+    public Long getTotalCourseCreatedByUserUUID(String  userUUID){
+        return  courseRepository.getTotalCourseCreatedByUserUUID(userUUID).orElse(0l);
+    }
+
     public Optional<Course> findById(Long courseId){
         return courseRepository.findById(courseId);
     }
