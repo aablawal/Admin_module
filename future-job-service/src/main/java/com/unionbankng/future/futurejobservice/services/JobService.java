@@ -298,4 +298,8 @@ public class JobService {
         Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
         return jobList;
     }
+
+    public Long getTotalJobPostedByUserId(Long userId){
+        return  jobRepository.getTotalJobPostedByUserId(userId).orElse(0l);
+    }
 }

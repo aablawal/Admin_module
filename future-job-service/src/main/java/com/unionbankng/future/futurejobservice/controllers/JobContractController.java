@@ -198,6 +198,23 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
+    @GetMapping("/v1/total/job/earning/by/{id}")
+    public ResponseEntity<APIResponse> getTotalJobEarningByUser(@PathVariable Long id){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,jobContractService.getTotalJobEarningByUserId(id)));
+    }
+
+    @GetMapping("/v1/total/job/expenditure/by/{id}")
+    public ResponseEntity<APIResponse> getTotalJobExpenditureByUser(@PathVariable Long id){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,jobContractService.getTotalJobExpenditureByUser(id)));
+    }
+
+    @GetMapping("/v1/total/job/completed/by/{id}")
+    public ResponseEntity<APIResponse> getTotalJobCompletedByUser(@PathVariable Long id){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,jobContractService.getTotalJobCompletedByUser(id)));
+    }
 
     @GetMapping("/v1/bank/transfer/test")
     public ResponseEntity<APIResponse<String>> transferAmount() throws JsonProcessingException {

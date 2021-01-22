@@ -39,6 +39,8 @@ public class CourseContentService {
         return courseContentRepository.findAllByCreatorUUID(creatorUUID,pageable);
     }
 
+
+
     public CourseContent createNewContent(CourseContentRequest request,Principal principal){
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);

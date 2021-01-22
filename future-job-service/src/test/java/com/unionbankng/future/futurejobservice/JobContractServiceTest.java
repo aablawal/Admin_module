@@ -130,7 +130,7 @@ class JobContractServiceTest {
 
     @Test
     void rejectJob() {
-        JobProjectSubmission contract=  jobContractService.rejectJob(jobId,requestId);
+        JobProjectSubmission contract=  jobContractService.rejectJob(null,jobId,requestId);
         Assert.assertEquals(jobId,contract.getJobId());
     }
 

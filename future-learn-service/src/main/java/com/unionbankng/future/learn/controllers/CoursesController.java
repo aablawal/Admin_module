@@ -110,4 +110,9 @@ public class CoursesController {
                 new APIResponse("Request successful",true,state));
     }
 
+    @GetMapping("/v1/total/course/created/by/{uuid}")
+    public ResponseEntity<APIResponse<Long>> getTotalCourseCreatedByUser(@PathVariable String  uuid){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,courseService.getTotalCourseCreatedByUserUUID(uuid)));
+    }
 }

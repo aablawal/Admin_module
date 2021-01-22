@@ -90,7 +90,11 @@ public class JobController {
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobById(id,model)));
     }
-
+    @GetMapping("/v1/total/job/posted/by/{id}")
+    public ResponseEntity<APIResponse> getTotalJobPostedByUser(@PathVariable Long id){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.getTotalJobPostedByUserId(id)));
+    }
     @GetMapping("/v1/job/invitation/{invitationId}")
     public ResponseEntity<APIResponse> getJobByInvitationId(@PathVariable String invitationId, Model model){
         return ResponseEntity.ok().body(

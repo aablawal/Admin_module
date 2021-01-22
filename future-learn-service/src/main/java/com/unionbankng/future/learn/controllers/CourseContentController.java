@@ -73,6 +73,4 @@ public class CourseContentController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,"Content deleted successfully"));
     }
-
-
 }
