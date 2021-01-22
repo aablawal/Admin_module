@@ -79,9 +79,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         Keycloak keycloak = KeycloakBuilder.builder() //
                 .serverUrl(props.getAuthServerUrl()) //
                 .realm(props.getRealm()) //
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS) //
+                .grantType(OAuth2Constants.PASSWORD) //
                 .clientId(props.getResource()) //
-                .clientSecret((String) props.getCredentials().get("secret")) //
+                //.clientSecret((String) props.getCredentials().get("secret"))
+                .username("admin")
+                .password("admin")//
                 .build();
 
         return keycloak;
