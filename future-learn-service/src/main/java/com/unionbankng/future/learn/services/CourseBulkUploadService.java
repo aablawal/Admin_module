@@ -159,7 +159,7 @@ public class CourseBulkUploadService {
                     Course savedCourse=courseRepository.save(course);
                     return new APIResponse("success", true, savedCourse);
                 }else{
-                    return new APIResponse("Invalid Cover Image URL", false,null);
+                    return new APIResponse("Unable to upload Cover Image", false,null);
                 }
 
             }
@@ -289,7 +289,7 @@ public class CourseBulkUploadService {
                                    lectures.add(savedLecture);
 
                            }else{
-                               return  new APIResponse("Invalid URL Detected on Row "+row.getRowNum(),false,null);
+                               return  new APIResponse("Unable to Upload Video of Row "+row.getRowNum(),false,null);
 
                            }
                        }
