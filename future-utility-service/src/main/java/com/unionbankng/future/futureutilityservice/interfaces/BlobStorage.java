@@ -1,7 +1,6 @@
 package com.unionbankng.future.futureutilityservice.interfaces;
-
-
 import com.unionbankng.future.futureutilityservice.enums.BlobType;
+import java.io.IOException;
 
 public interface BlobStorage {
 

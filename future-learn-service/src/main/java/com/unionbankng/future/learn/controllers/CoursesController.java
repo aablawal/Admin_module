@@ -2,8 +2,10 @@ package com.unionbankng.future.learn.controllers;
 
 
 import com.unionbankng.future.learn.entities.Course;
+import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.CreateCourseRequest;
+import com.unionbankng.future.learn.services.CourseBulkUploadService;
 import com.unionbankng.future.learn.services.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ import java.security.Principal;
 public class CoursesController {
 
     private final CourseService courseService;
+    private final CourseBulkUploadService courseBulkUploadService;
 
 
     @GetMapping("/v1/courses/get_where_iam_instructor")
@@ -72,7 +76,10 @@ public class CoursesController {
                 new APIResponse("Request successful",true,course));
     }
 
-
+    @PostMapping(value = "/v1/courses/create_course_from_file", consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> createCourseFromFileAPI(@RequestParam(value = "courseFile") MultipartFile courseFile, @ApiIgnore Principal principal) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(courseBulkUploadService.uploadBulkCourseFiles(principal,courseFile));
+    }
 
     @PostMapping(value = "/v1/courses/{courseId}/upload_course_img",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<Course>> uploadCourseImage(@NotNull @RequestPart("image") MultipartFile image,
@@ -87,7 +94,6 @@ public class CoursesController {
     @PostMapping("/v1/courses/publish/{courseId}")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@PathVariable Long courseId,
                                                                @ApiIgnore Principal principal){
-
         courseService.publishCourse(courseId,principal);
 
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -115,4 +121,6 @@ public class CoursesController {
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,courseService.getTotalCourseCreatedByUserUUID(uuid)));
     }
+
+
 }
