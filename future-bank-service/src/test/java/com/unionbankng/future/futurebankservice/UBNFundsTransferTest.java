@@ -61,7 +61,7 @@ public class UBNFundsTransferTest extends AbstractTest {
     public void accountEnquiryTest() throws IOException {
 
         UbnCustomerEnquiry request = new UbnCustomerEnquiry();
-        request.setAccountNumber("0040553624");
+        request.setAccountNumber("0097275445");
         request.setAccountType("CASA");
 
 

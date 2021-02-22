@@ -43,16 +43,9 @@ public class AzureBlobStorage implements BlobStorage {
 
     @Override
     public String uploadFromURL(String url, BlobType blobType, String fileName) throws IOException {
-        InputStream targetStream = new URL(url).openStream();
-        BlobClient blobClient = blobType.equals(BlobType.IMAGE) ? imageContainerClient.getBlobClient(fileName)
-                : videoContainerClient.getBlobClient(fileName);
 
-        logger.info("Uploading to Blob storage as blob: {}",blobClient.getBlobUrl());
-        byte []array=targetStream.readAllBytes();
-
-        blobClient.upload(targetStream,targetStream.readAllBytes().length );
-
-        return blobClient.getBlobUrl();
+        byte[] bytes = new URL(url).openStream().readAllBytes();
+        return upload(bytes,blobType,fileName);
     }
 
 
