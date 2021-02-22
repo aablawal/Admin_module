@@ -7,13 +7,20 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
+import java.util.concurrent.Executor;
+
 public interface UtilityServiceInterface {
-
-
 
     @Multipart
     @POST("api/v1/video_stream/upload")
-    Call<APIResponse<StreamingLocatorResponse>> upload(@Part() MultipartBody.Part file);
+    Call<APIResponse<StreamingLocatorResponse>> uploadAndGetStreamFromMultipart(@Part() MultipartBody.Part file);
 
+    @FormUrlEncoded
+    @POST("api/v1/video_stream/upload_from_url")
+    Call<APIResponse<StreamingLocatorResponse>> uploadAndGetStreamFromURL(@Field("url") String url);
+
+    @FormUrlEncoded
+    @POST("api/v1/media/upload_from_url")
+    Call<APIResponse<String>> uploadMediaFromURL(@Field("url") String url, @Field("type") String type,@Field("filename") String filename);
 
 }

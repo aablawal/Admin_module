@@ -602,6 +602,8 @@ public class JobContractService implements Serializable {
         }
     }
 
+
+
     public JobProjectSubmission rejectJob(Principal principal, Long jobId, Long
             requestId) {
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);

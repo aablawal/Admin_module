@@ -1,12 +1,11 @@
 package com.unionbankng.future.learn.pojo;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 
 @Data
 public class UploadFileFromURLResponse {
     @NotNull
-    private String fileName;
+    private String streamingLocatorName;
     @NotNull
-    private MultipartFile file;
+    private String outputAssetName;
 }

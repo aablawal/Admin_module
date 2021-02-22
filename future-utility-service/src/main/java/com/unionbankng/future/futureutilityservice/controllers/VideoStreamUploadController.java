@@ -5,10 +5,7 @@ import com.unionbankng.future.futureutilityservice.pojos.StreamingLocatorRespons
 import com.unionbankng.future.futureutilityservice.services.AzureMediaServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -32,6 +29,14 @@ public class VideoStreamUploadController {
         }
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Failed",false,null));
+
+    }
+
+
+    @PostMapping(value = "/v1/video_stream/upload_from_url")
+    public ResponseEntity<APIResponse<StreamingLocatorResponse>> uploadFileFromUrl(@RequestParam String url) {
+        StreamingLocatorResponse streamingLocatorResponse = azureMediaServiceService.uploadAndGetStreamingLocatorFromURL(url);
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,streamingLocatorResponse));
 
     }
 }

@@ -5,5 +5,6 @@ import java.io.IOException;
 public interface BlobStorage {
 
     String upload (byte[] fileByte, BlobType blobType, String fileName);
+    String uploadFromURL (String url, BlobType blobType, String fileName) throws IOException;
     void delete (String identifier, BlobType blobType);
 }

@@ -1,5 +1,4 @@
 package com.unionbankng.future.learn.services;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import com.unionbankng.future.learn.entities.*;
@@ -7,20 +6,15 @@ import com.unionbankng.future.learn.enums.LectureType;
 import com.unionbankng.future.learn.pojo.*;
 import com.unionbankng.future.learn.repositories.*;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
-import liquibase.util.file.FilenameUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 import retrofit2.Response;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -29,10 +23,10 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
 
 @Service
 @RequiredArgsConstructor
@@ -41,13 +35,11 @@ public class CourseBulkUploadService {
     Logger logger = LoggerFactory.getLogger(CourseBulkUploadService.class);
     private final CourseRepository courseRepository;
     private final InstructorRepository instructorRepository;
-    private final FileStorageService fileStorageService;
     private final CourseContentRepository courseContentRepository;
     private final LectureRepository lectureRepository;
     private final QuestionOptionRepository questionOptionRepository;
-    private  final QuestionRepository questionRepository;
-    private  final UtilityServiceInterfaceService utilityServiceInterfaceService;
-    private String[] allowedVideoExtensions = new String[]{"mp4","3gp","mkv","avi"};
+    private final QuestionRepository questionRepository;
+    private final UtilityServiceInterfaceService utilityServiceInterfaceService;
 
 
     public String getCell(Cell cell) {
@@ -59,22 +51,53 @@ public class CourseBulkUploadService {
             return cell.getStringCellValue();
     }
 
-    public APIResponse<String> saveFile(String url, Long userId, BlobType blobType){
+    public APIResponse<String> saveFile(String url, BlobType blobType) {
         try {
-            logger.info("Uploading ... "+url);
-            String response = fileStorageService.storeFileFromURL(url, userId, blobType);
-           // Response<APIResponse<StreamingLocatorResponse>> responseResponse = utilityServiceInterfaceService.uploadVideoStream(token,file);
+            logger.info("Uploading File ... " + url);
+            String ext = url.substring(url.lastIndexOf("."));
+            if (ext != null) {
 
-            return new APIResponse("success", true, response);
-        }catch (FileNotFoundException ex){
-            return new APIResponse("File not found", false, null);
-        }
-        catch (Exception ex){
+                UUID uuid = UUID.randomUUID();
+                String uniqueness = uuid.toString();
+                String fileName = uniqueness + ext;
+                logger.info("Uploading..."+url);
+                Response<APIResponse<String>> response = utilityServiceInterfaceService.uploadMediaFromURL(url, fileName, blobType.toString());
+
+                if (response.isSuccessful()) {
+                    return new APIResponse("success", true, response.body().getPayload());
+                }
+                else
+                {
+                    logger.info(response.errorBody().toString());
+                    logger.info(String.valueOf(response.isSuccessful()));
+                    return new APIResponse(response.errorBody().string(), false, null);
+                }
+
+            } else {
+                return new APIResponse("Cover image URL not supported", false, null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return new APIResponse("Error occurred", false, null);
         }
     }
 
-    public APIResponse saveCourseInformation(JwtUserDetail jwtUserDetail,Sheet courseSheet) {
+    public StreamingLocatorResponse saveStreamingVideo(String url) {
+        try {
+            logger.info("Uploading Video ... " + url);
+            Response<APIResponse<StreamingLocatorResponse>> response = utilityServiceInterfaceService.uploadVideoStreamFromURL(url);
+            //generate streaming like and asset name
+            if (response.isSuccessful())
+                return response.body().getPayload();
+            return null;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            logger.info(ex.getMessage());
+            return null;
+        }
+    }
+
+    public APIResponse saveCourseInformation(JwtUserDetail jwtUserDetail, Sheet courseSheet) {
         try {
             Stream<Row> streamRow = StreamSupport.stream(courseSheet.spliterator(), false);
             //create instructors
@@ -98,7 +121,7 @@ public class CourseBulkUploadService {
             course.setInstructors(instructors);
 
             if (courseSheet.getLastRowNum() == 0 && courseSheet.getRow(0) == null) {
-                return new APIResponse("No Course information found", false,null);
+                return new APIResponse("No Course information found", false, null);
 
             } else {
                 streamRow.forEach(row -> {
@@ -145,7 +168,9 @@ public class CourseBulkUploadService {
                             course.setIsPaid(D.get(1) == "Paid" ? true : false);
                             break;
                         case "D12":
-                            APIResponse<String> response = this.saveFile(D.get(1), jwtUserDetail.getUserId(), BlobType.IMAGE);
+                            String url=D.get(1);
+                            APIResponse<String> response = this.saveFile(url,  BlobType.IMAGE);
+                            logger.info("Upload response");
                             logger.info(response.getMessage());
                             if (response.isSuccess())
                                 course.setCourseImg(response.getPayload());
@@ -154,172 +179,172 @@ public class CourseBulkUploadService {
                 });
 
                 course.setIsPublished(Boolean.TRUE);
-                logger.info(course.getCourseImg()+" ...URL saved");
-                if(course.getCourseImg()!=null){
-                    Course savedCourse=courseRepository.save(course);
+                logger.info(course.getCourseImg() + " ...URL saved");
+                if (course.getCourseImg() != null) {
+                    Course savedCourse = courseRepository.save(course);
                     return new APIResponse("success", true, savedCourse);
-                }else{
-                    return new APIResponse("Unable to upload Cover Image", false,null);
+                } else {
+                    return new APIResponse("Unable to upload Cover Image", false, null);
                 }
 
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-            return  new APIResponse(ex.getMessage(),false,null);
+            return new APIResponse(ex.getMessage(), false, null);
         }
     }
 
-    public APIResponse saveCourseContents(JwtUserDetail jwtUserDetail,Course course, Sheet contentSheet) throws JsonProcessingException {
-       try {
-           List<Lecture> lectures = new ArrayList<>();
-           Row headerRow = contentSheet.getRow(0);
+    public APIResponse saveCourseContents(JwtUserDetail jwtUserDetail, Course course, Sheet contentSheet) {
+        try {
+            List<Lecture> lectures = new ArrayList<>();
+            Row headerRow = contentSheet.getRow(0);
 
-           if (contentSheet.getLastRowNum() == 1 && contentSheet.getRow(1) == null) {
-               logger.info("No course content found");
-               return  new APIResponse("No course content found",false,null);
-           } else {
+            if (contentSheet.getLastRowNum() == 1 && contentSheet.getRow(1) == null) {
+                logger.info("No course content found");
+                return new APIResponse("No course content found", false, null);
+            } else {
 
-               for (Row row : contentSheet) {
-                   if (row.getRowNum() > 0) {
-                       ArrayList<Question> questionsBase = new ArrayList<>();
-                       ArrayList<QuestionOption> optionsBase = new ArrayList<>();
-                       Lecture lecture = new Lecture();
-                       Question question = new Question();
-                       CourseContent content = new CourseContent();
+                for (Row row : contentSheet) {
+                    if (row.getRowNum() > 0) {
+                        ArrayList<Question> questionsBase = new ArrayList<>();
+                        ArrayList<QuestionOption> optionsBase = new ArrayList<>();
+                        Lecture lecture = new Lecture();
+                        Question question = new Question();
+                        CourseContent content = new CourseContent();
 
-                       if (getCell(row.getCell(3)).equals("Video")) {
-                           for (Cell cell : row) {
-                               String value = getCell(cell);
-                               String columnId = CellReference.convertNumToColString(cell.getColumnIndex());
-                               switch (columnId) {
-                                   case "C":
-                                       lecture.setTitle(value);
-                                       content.setCourseContentText(value);
-                                       content.setCourseId(course.getId());
-                                       content.setCreatorUUID(course.getCreatorUUID());
-                                       content.setIndexNo(row.getRowNum());
-                                       break;
-                                   case "D":
-                                       lecture.setType(LectureType.VIDEO);
-                                       break;
-                                   case "E":
-                                       logger.info("Preparing for upload: "+value);
-                                       APIResponse<String> response = this.saveFile(value, jwtUserDetail.getUserId(), BlobType.VIDEO);
-                                       logger.info(response.getMessage());
-                                       if (response.isSuccess()) {
-                                           lecture.setStreamingLocatorName(response.getPayload());
-                                           lecture.setOutputAssetName(response.getPayload());
-                                       }else{
-                                           logger.info("Unable to Upload Video");
-                                       }
-                                       break;
-                               }
-                           }
-                       } else if (getCell(row.getCell(3)).equals("Quiz")) {
-                           lecture.setType(LectureType.QUIZ);
-                           for (Cell cell : row) {
-                               String value = getCell(cell);
-                               String columnId = CellReference.convertNumToColString(cell.getColumnIndex());
-                               QuestionOption option = new QuestionOption();
-                               switch (columnId) {
-                                   case "F":
-                                       question.setQuestionText(value);
-                                       question.setIndexNo(row.getRowNum());
-                                       break;
-                                   case "G":
-                                       option.setIndexNo(1);
-                                       option.setOptionText(value);
-                                       optionsBase.add(questionOptionRepository.save(option));
+                        if (getCell(row.getCell(3)).equals("Video")) {
+                            for (Cell cell : row) {
+                                String value = getCell(cell);
+                                String columnId = CellReference.convertNumToColString(cell.getColumnIndex());
+                                switch (columnId) {
+                                    case "C":
+                                        lecture.setTitle(value);
+                                        content.setCourseContentText(value);
+                                        content.setCourseId(course.getId());
+                                        content.setCreatorUUID(course.getCreatorUUID());
+                                        content.setIndexNo(row.getRowNum());
+                                        break;
+                                    case "D":
+                                        lecture.setType(LectureType.VIDEO);
+                                        break;
+                                    case "E":
+                                        logger.info("Preparing video for upload: " + value);
+                                        StreamingLocatorResponse response = this.saveStreamingVideo(value);
+                                        logger.info(response.getAssetName());
+                                        if (response != null) {
+                                            lecture.setStreamingLocatorName(response.getLocatorName());
+                                            lecture.setOutputAssetName(response.getAssetName());
+                                        } else {
+                                            logger.info("Unable to Upload Video");
+                                        }
+                                        break;
+                                }
+                            }
+                        } else if (getCell(row.getCell(3)).equals("Quiz")) {
+                            lecture.setType(LectureType.QUIZ);
+                            for (Cell cell : row) {
+                                String value = getCell(cell);
+                                String columnId = CellReference.convertNumToColString(cell.getColumnIndex());
+                                QuestionOption option = new QuestionOption();
+                                switch (columnId) {
+                                    case "F":
+                                        question.setQuestionText(value);
+                                        question.setIndexNo(row.getRowNum());
+                                        break;
+                                    case "G":
+                                        option.setIndexNo(1);
+                                        option.setOptionText(value);
+                                        optionsBase.add(questionOptionRepository.save(option));
 
-                                       break;
-                                   case "H":
-                                       option.setOptionText(value);
-                                       option.setIndexNo(2);
-                                       optionsBase.add(questionOptionRepository.save(option));
-                                       break;
-                                   case "I":
-                                       option.setOptionText(value);
-                                       option.setIndexNo(3);
-                                       optionsBase.add(questionOptionRepository.save(option));
-                                       break;
-                                   case "J":
-                                       option.setOptionText(value);
-                                       option.setIndexNo(4);
-                                       optionsBase.add(questionOptionRepository.save(option));
-                                       break;
-                                   case "K":
-                                       option.setOptionText(value);
-                                       option.setIndexNo(5);
-                                       optionsBase.add(questionOptionRepository.save(option));
-                                       break;
-                                   case "L":
-                                       String correctAnswer = getCell(row.getCell(11));
-                                       if (getCell(headerRow.getCell(6)).equals(correctAnswer))
-                                           question.setAnswerIndex(1);
-                                       if (getCell(headerRow.getCell(7)).equals(correctAnswer))
-                                           question.setAnswerIndex(2);
-                                       if (getCell(headerRow.getCell(8)).equals(correctAnswer))
-                                           question.setAnswerIndex(3);
-                                       if (getCell(headerRow.getCell(9)).equals(correctAnswer))
-                                           question.setAnswerIndex(4);
-                                       if (getCell(headerRow.getCell(10)).equals(correctAnswer))
-                                           question.setAnswerIndex(5);
-                                       break;
-                               }
-                           }
+                                        break;
+                                    case "H":
+                                        option.setOptionText(value);
+                                        option.setIndexNo(2);
+                                        optionsBase.add(questionOptionRepository.save(option));
+                                        break;
+                                    case "I":
+                                        option.setOptionText(value);
+                                        option.setIndexNo(3);
+                                        optionsBase.add(questionOptionRepository.save(option));
+                                        break;
+                                    case "J":
+                                        option.setOptionText(value);
+                                        option.setIndexNo(4);
+                                        optionsBase.add(questionOptionRepository.save(option));
+                                        break;
+                                    case "K":
+                                        option.setOptionText(value);
+                                        option.setIndexNo(5);
+                                        optionsBase.add(questionOptionRepository.save(option));
+                                        break;
+                                    case "L":
+                                        String correctAnswer = getCell(row.getCell(11));
+                                        if (getCell(headerRow.getCell(6)).equals(correctAnswer))
+                                            question.setAnswerIndex(1);
+                                        if (getCell(headerRow.getCell(7)).equals(correctAnswer))
+                                            question.setAnswerIndex(2);
+                                        if (getCell(headerRow.getCell(8)).equals(correctAnswer))
+                                            question.setAnswerIndex(3);
+                                        if (getCell(headerRow.getCell(9)).equals(correctAnswer))
+                                            question.setAnswerIndex(4);
+                                        if (getCell(headerRow.getCell(10)).equals(correctAnswer))
+                                            question.setAnswerIndex(5);
+                                        break;
+                                }
+                            }
 
-                       }
+                        }
 
-                       lecture.setIndexNo(row.getRowNum());
-                       lecture.setCreatorUUID(jwtUserDetail.getUserUUID());
-                       lecture.setCourseId(course.getId());
-                       lecture.setCourseContentId(course.getId());
+                        lecture.setIndexNo(row.getRowNum());
+                        lecture.setCreatorUUID(jwtUserDetail.getUserUUID());
+                        lecture.setCourseId(course.getId());
+                        lecture.setCourseContentId(course.getId());
 
+                        //save course content details if its Video
+                        if (getCell(row.getCell(3)).equals("Video")) {
+                            if (lecture.getStreamingLocatorName() != null) {
+                                CourseContent savedContent = courseContentRepository.save(content);
+                                if (savedContent != null)
+                                    lecture.setCourseContentId(savedContent.getId());
 
-                       //save course content details if its Video
-                       if (getCell(row.getCell(3)).equals("Video")) {
-                           if(lecture.getStreamingLocatorName()!=null) {
-                               CourseContent savedContent = courseContentRepository.save(content);
-                               if (savedContent != null)
-                                   lecture.setCourseContentId(savedContent.getId());
+                                //save lecture if its video
+                                Lecture savedLecture = lectureRepository.save(lecture);
+                                if (savedLecture != null)
+                                    lectures.add(savedLecture);
 
-                               //save lecture if its video
-                               Lecture savedLecture = lectureRepository.save(lecture);
-                               if (savedLecture != null)
-                                   lectures.add(savedLecture);
+                            } else {
+                                return new APIResponse("Unable to Upload Video of Row " + row.getRowNum(), false, null);
 
-                           }else{
-                               return  new APIResponse("Unable to Upload Video of Row "+row.getRowNum(),false,null);
+                            }
+                        } else {
+                            // set questions if its quiz
+                            if (getCell(row.getCell(3)).equals("Quiz")) {
+                                lecture.setQuestions(questionsBase);
+                            }
+                            //save lecture
+                            Lecture savedLecture = lectureRepository.save(lecture);
+                            if (savedLecture != null)
+                                lectures.add(savedLecture);
 
-                           }
-                       }
-                        else {
-                           // set questions if its quiz
-                           if (getCell(row.getCell(3)).equals("Quiz")) {
-                               lecture.setQuestions(questionsBase);
-                           }
-                           //save lecture
-                           Lecture savedLecture = lectureRepository.save(lecture);
-                           if (savedLecture != null)
-                               lectures.add(savedLecture);
+                            if (savedLecture != null && getCell(row.getCell(3)).equals("Quiz")) {
+                                question.setLectureId(savedLecture.getId());
+                                question.setOptions(optionsBase);
+                                questionsBase.add(question);
+                                logger.info(new ObjectMapper().writeValueAsString(question));
+                                questionRepository.save(question);
+                            }
+                        }
+                    }
+                }
+            }
+            return new APIResponse("success", true, lectures);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new APIResponse(ex.getMessage(), false, null);
+        }
 
-                           if (savedLecture != null && getCell(row.getCell(3)).equals("Quiz")) {
-                               question.setLectureId(savedLecture.getId());
-                               question.setOptions(optionsBase);
-                               questionsBase.add(question);
-                               logger.info(new ObjectMapper().writeValueAsString(question));
-                               questionRepository.save(question);
-                           }
-                       }
-                   }
-               }
-           }
-           return new APIResponse("success", true, lectures);
-       }catch (Exception ex){
-           ex.printStackTrace();
-           return  new APIResponse(ex.getMessage(),false,null);
-       }
     }
+
 
     public APIResponse uploadBulkCourseFiles(Principal principal, MultipartFile courseFile) throws IOException {
         try {

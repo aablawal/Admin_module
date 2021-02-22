@@ -1,5 +1,6 @@
 package com.unionbankng.future.learn.services;
 
+import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.StreamingLocatorResponse;
 import com.unionbankng.future.learn.retrofitservices.UtilityServiceInterface;
@@ -56,10 +57,15 @@ public class UtilityServiceInterfaceService {
         MultipartBody.Part fileData =
                 MultipartBody.Part.createFormData("file", "fileName.mp4", requestFile);
 
-
-        String authorization = String.format("Bearer %s",token);
-        return utilityServiceInterface.upload(
+        return utilityServiceInterface.uploadAndGetStreamFromMultipart(
                 fileData).execute();
 
+    }
+    public Response<APIResponse<StreamingLocatorResponse>> uploadVideoStreamFromURL(String url) throws IOException {
+        return utilityServiceInterface.uploadAndGetStreamFromURL(url).execute();
+    }
+
+    public Response<APIResponse<String>> uploadMediaFromURL(String url, String type, String filename) throws IOException {
+        return utilityServiceInterface.uploadMediaFromURL(url,type,filename).execute();
     }
 }
