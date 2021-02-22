@@ -4,6 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobErrorCode;
 import com.azure.storage.blob.models.BlobStorageException;
+import com.sun.mail.iap.ByteArray;
 import com.unionbankng.future.futureutilityservice.enums.BlobType;
 import com.unionbankng.future.futureutilityservice.interfaces.BlobStorage;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,8 @@ public class AzureBlobStorage implements BlobStorage {
                 : videoContainerClient.getBlobClient(fileName);
 
         logger.info("Uploading to Blob storage as blob: {}",blobClient.getBlobUrl());
+        byte []array=targetStream.readAllBytes();
+
         blobClient.upload(targetStream,targetStream.readAllBytes().length );
 
         return blobClient.getBlobUrl();

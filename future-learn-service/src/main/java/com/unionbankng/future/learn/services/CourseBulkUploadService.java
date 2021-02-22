@@ -1,7 +1,7 @@
 package com.unionbankng.future.learn.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import com.unionbankng.future.learn.entities.*;
+import com.unionbankng.future.learn.enums.BlobType;
 import com.unionbankng.future.learn.enums.LectureType;
 import com.unionbankng.future.learn.pojo.*;
 import com.unionbankng.future.learn.repositories.*;
@@ -51,7 +51,7 @@ public class CourseBulkUploadService {
             return cell.getStringCellValue();
     }
 
-    public APIResponse<String> saveFile(String url, BlobType blobType) {
+    public APIResponse<String> saveFile(String url, com.unionbankng.future.learn.enums.BlobType blobType) {
         try {
             logger.info("Uploading File ... " + url);
             String ext = url.substring(url.lastIndexOf("."));
@@ -61,7 +61,8 @@ public class CourseBulkUploadService {
                 String uniqueness = uuid.toString();
                 String fileName = uniqueness + ext;
                 logger.info("Uploading..."+url);
-                Response<APIResponse<String>> response = utilityServiceInterfaceService.uploadMediaFromURL(url, fileName, blobType.toString());
+                UploadMediaFromURLRequest request= new UploadMediaFromURLRequest(url,blobType,fileName);
+                Response<APIResponse<String>> response = utilityServiceInterfaceService.uploadMediaFromURL(request);
 
                 if (response.isSuccessful()) {
                     return new APIResponse("success", true, response.body().getPayload());

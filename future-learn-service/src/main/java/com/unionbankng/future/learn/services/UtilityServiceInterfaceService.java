@@ -3,6 +3,7 @@ package com.unionbankng.future.learn.services;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.StreamingLocatorResponse;
+import com.unionbankng.future.learn.pojo.UploadMediaFromURLRequest;
 import com.unionbankng.future.learn.retrofitservices.UtilityServiceInterface;
 import lombok.RequiredArgsConstructor;
 import okhttp3.MediaType;
@@ -65,7 +66,7 @@ public class UtilityServiceInterfaceService {
         return utilityServiceInterface.uploadAndGetStreamFromURL(url).execute();
     }
 
-    public Response<APIResponse<String>> uploadMediaFromURL(String url, String type, String filename) throws IOException {
-        return utilityServiceInterface.uploadMediaFromURL(url,type,filename).execute();
+    public Response<APIResponse<String>> uploadMediaFromURL(UploadMediaFromURLRequest request) throws IOException {
+        return utilityServiceInterface.uploadMediaFromURL(request).execute();
     }
 }

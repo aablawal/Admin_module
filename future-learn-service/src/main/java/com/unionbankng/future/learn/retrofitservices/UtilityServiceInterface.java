@@ -2,6 +2,7 @@ package com.unionbankng.future.learn.retrofitservices;
 
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.StreamingLocatorResponse;
+import com.unionbankng.future.learn.pojo.UploadMediaFromURLRequest;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -19,8 +20,7 @@ public interface UtilityServiceInterface {
     @POST("api/v1/video_stream/upload_from_url")
     Call<APIResponse<StreamingLocatorResponse>> uploadAndGetStreamFromURL(@Field("url") String url);
 
-    @FormUrlEncoded
     @POST("api/v1/media/upload_from_url")
-    Call<APIResponse<String>> uploadMediaFromURL(@Field("url") String url, @Field("type") String type,@Field("filename") String filename);
+    Call<APIResponse<String>> uploadMediaFromURL(@Body UploadMediaFromURLRequest request);
 
 }

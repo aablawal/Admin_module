@@ -3,6 +3,7 @@ package com.unionbankng.future.futureutilityservice.controllers;
 import com.unionbankng.future.futureutilityservice.enums.BlobType;
 import com.unionbankng.future.futureutilityservice.interfaceimpl.AzureBlobStorage;
 import com.unionbankng.future.futureutilityservice.pojos.APIResponse;
+import com.unionbankng.future.futureutilityservice.pojos.UploadMediaFromURLRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,8 @@ public class MediaUploadController {
     private final AzureBlobStorage azureBlobStorage;
 
     @PostMapping(value = "/v1/media/upload_from_url")
-    public ResponseEntity<APIResponse<String>> mediaFromURL(@RequestParam String url, @RequestParam BlobType type,@RequestParam String fileName) throws IOException {
-            String response = azureBlobStorage.uploadFromURL(url, type,fileName);
+    public ResponseEntity<APIResponse<String>> mediaFromURL(@RequestBody UploadMediaFromURLRequest request) throws IOException {
+            String response = azureBlobStorage.uploadFromURL(request.getUrl(), request.getType(), request.getFilename());
             return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,response));
     }
 
