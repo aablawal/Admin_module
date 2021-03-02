@@ -4,50 +4,36 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Course implements Serializable {
+@Table(name="embedded_course_lectures")
+public class EmbeddedCourseLecture implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
+    private Integer indexNo;
+    @Column(nullable = false)
+    private Long courseId;
     @Column(columnDefinition="TEXT")
     private String description;
-    @Column(columnDefinition="TEXT")
-    private String requirements;
-    @Column(columnDefinition = "boolean default false")
-    private Boolean isPaid;
-    @Column(precision = 19, scale = 2)
-    private BigDecimal price;
+    @Column(columnDefinition="TEXT", nullable = false)
+    private String title;
     @Column(nullable = false)
-    private String courseTitle;
-    @Column(nullable = false)
-    private String shortDesc;
-    @Column(columnDefinition="TEXT")
-    private String outcomes;
-    private String courseImg;
-    @Column(columnDefinition = "boolean default false")
+    private String url;
+    private String duration;
+    @Column(columnDefinition = "boolean default true")
     private Boolean isPublished;
-    @ManyToMany
-    private List<Instructor> instructors = new ArrayList<>();
-    private String estimatedTimeToComplete;
-    private String accountNumber;
-    private String accountName;
-    @Column(columnDefinition="TEXT")
-    private String paymentTerms;
-    @Column(nullable = false)
     private String creatorUUID;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -67,7 +53,7 @@ public class Course implements Serializable {
 
     @Override
     public boolean equals(Object course) {
-        return this.id.equals(((Course)course).getId());
+        return this.id.equals(((EmbeddedCourseLecture)course).getId());
 
     }
 }

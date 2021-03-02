@@ -1,15 +1,24 @@
 package com.unionbankng.future.learn.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.code.ssm.api.ParameterValueKeyProvider;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import com.unionbankng.future.learn.entities.Course;
+import com.unionbankng.future.learn.entities.EmbeddedCourse;
+import com.unionbankng.future.learn.entities.EmbeddedCourseLecture;
 import com.unionbankng.future.learn.entities.Instructor;
+import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.CreateCourseRequest;
 import com.unionbankng.future.learn.pojo.JwtUserDetail;
 import com.unionbankng.future.learn.repositories.CourseRepository;
+import com.unionbankng.future.learn.repositories.EmbeddedCourseLectureRepository;
+import com.unionbankng.future.learn.repositories.EmbeddedCourseRepository;
 import com.unionbankng.future.learn.repositories.InstructorRepository;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +39,10 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final InstructorRepository instructorRepository;
     private final FileStorageService fileStorageService;
+    private final EmbeddedCourseRepository embeddedCourseRepository;
+    private final EmbeddedCourseLectureRepository embeddedCourseLectureRepository;
+    Logger logger = LoggerFactory.getLogger(CourseService.class);
+
 
     public Course save(Course course){
         return courseRepository.save(course);
@@ -137,6 +148,66 @@ public class CourseService {
     }//create course
 
 
+    //create course from URL
+    public APIResponse createEmbeddedCourse(String  courseData,  String lecturesData, Principal principal) {
+        try {
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            EmbeddedCourse course = new ObjectMapper().readValue(courseData, EmbeddedCourse.class);
+            EmbeddedCourseLecture[] lectures = new ObjectMapper().readValue(lecturesData, EmbeddedCourseLecture[].class);
+
+            course.setCreatorUUID(currentUser.getUserUUID());
+            course.setIsPaid(course.getPaymentOption()==null?false:true);
+            course.setIsPublished(true);
+
+            EmbeddedCourse savedCourse = embeddedCourseRepository.save(course);
+            if (savedCourse != null) {
+                int i=0;
+                for (EmbeddedCourseLecture lecture : lectures) {
+                    i++;
+                    lecture.setCreatorUUID(currentUser.getUserUUID());
+                    lecture.setIndexNo(i);
+                    lecture.setIsPublished(true);
+                    lecture.setCourseId(savedCourse.getId());
+
+                    logger.info(new ObjectMapper().writeValueAsString(lecture));
+                    embeddedCourseLectureRepository.save(lecture);
+                }
+                return new APIResponse("success", true, savedCourse);
+
+            } else {
+                return new APIResponse("Unable to create course", false, null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new APIResponse("Failed", false, ex.getMessage());
+        }
+    }
+    public APIResponse<Map<String, Object>> findEmbeddedCourseById(Long id){
+        Map<String,Object> courseData=new HashMap<>();
+        EmbeddedCourse course= embeddedCourseRepository.findById(id).orElse(null);
+        if(course!=null) {
+            List<EmbeddedCourseLecture> lectures = embeddedCourseLectureRepository.findAllByCourseId(id);
+            courseData.put("course",course);
+            courseData.put("lectures",lectures);
+            return   new APIResponse("success", true, courseData);
+        }else{
+            return new APIResponse("Course not found", false, null);
+        }
+    }
+    public APIResponse<ArrayList<Map<String, Object>>> findEmbeddedCourses(){
+        ArrayList<Map<String,Object>> baseList=new ArrayList<>();
+        List<EmbeddedCourse> courses= embeddedCourseRepository.findAll();
+        for (EmbeddedCourse course: courses) {
+            Map<String,Object> courseData=new HashMap<>();
+            if(course!=null) {
+                List<EmbeddedCourseLecture> lectures = embeddedCourseLectureRepository.findAllByCourseId(course.getId());
+                courseData.put("course", course);
+                courseData.put("lectures", lectures);
+                baseList.add(courseData);
+            }
+        }
+        return   new APIResponse("success", true, baseList);
+    }
     public void publishCourse(Long courseId, Principal principal) {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);

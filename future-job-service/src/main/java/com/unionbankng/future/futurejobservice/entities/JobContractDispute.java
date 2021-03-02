@@ -33,6 +33,8 @@ public class JobContractDispute {
     Long jobId;
     @Column(columnDefinition="TEXT")
     String description;
+    @Column(columnDefinition="TEXT")
+    String referenceId;
     public String attachment;
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -48,6 +50,7 @@ public class JobContractDispute {
         this.userId = request.userId;
         this.employerId = request.employerId;
         this.jobId = request.jobId;
+        this.referenceId=request.referenceId;
         this.description=request.description;
         this.attachment=request.attachment;
         this.status=request.status;

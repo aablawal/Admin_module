@@ -124,8 +124,8 @@ class JobContractServiceTest {
         dispute.setProposalId(proposalId);
         dispute.setContractId(contractId);
         dispute.setDescription("The work i did is great, i need my money");
-        JobContractDispute savedDispute=  jobContractService.raiseDispute("Test User",userId,dispute,null);
-        Assert.assertEquals(jobId,savedDispute.getJobId());
+        APIResponse response=  jobContractService.raiseDispute("Test User",userId,dispute,null);
+        Assert.assertEquals(true,response.isSuccess());
     }
 
     @Test

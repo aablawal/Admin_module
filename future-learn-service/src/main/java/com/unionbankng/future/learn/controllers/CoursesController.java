@@ -1,7 +1,9 @@
 package com.unionbankng.future.learn.controllers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.learn.entities.Course;
+import com.unionbankng.future.learn.entities.EmbeddedCourse;
 import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.CreateCourseRequest;
@@ -59,12 +61,26 @@ public class CoursesController {
                 new APIResponse("Request successful",true,course));
     }
 
+    @GetMapping("/v1/courses/embedded/{courseId}")
+    public ResponseEntity<APIResponse> findEmbeddedCourseById(@PathVariable Long courseId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+               courseService.findEmbeddedCourseById(courseId));
+    }
+
+
     @GetMapping("/v1/courses")
     public ResponseEntity<APIResponse<Page<Course>>> getAllCourses(@RequestParam int page, @RequestParam int size){
 
         Page<Course> courses = courseService.findAllByIsPublished(true,PageRequest.of(page,size));
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
+    }
+
+    @GetMapping("/v1/courses/embedded")
+    public ResponseEntity<APIResponse> getAllEmbeddedCourses() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                courseService.findEmbeddedCourses());
     }
 
     @PostMapping("/v1/courses/create_course")
@@ -79,6 +95,11 @@ public class CoursesController {
     @PostMapping(value = "/v1/courses/create_course_from_file", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse> createCourseFromFileAPI(@RequestParam(value = "courseFile") MultipartFile courseFile, @ApiIgnore Principal principal) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(courseBulkUploadService.uploadBulkCourseFiles(principal,courseFile));
+    }
+
+    @PostMapping(value = "/v1/courses/create_course_from_url", consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> createCourseFromURL(@RequestParam(value = "course") String course, @RequestParam(value = "lectures") String lectures,  @ApiIgnore Principal principal) throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.createEmbeddedCourse(course,lectures,principal));
     }
 
     @PostMapping(value = "/v1/courses/{courseId}/upload_course_img",consumes = { "multipart/form-data" })

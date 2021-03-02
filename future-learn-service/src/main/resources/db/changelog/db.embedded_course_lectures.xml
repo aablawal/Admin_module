@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="ACER NITRO 5 (generated)" id="1614613241615-3">
+        <createTable tableName="embedded_course_lectures">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="embedded_course_lecturesPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="creatoruuid" type="varchar(255)"/>
+            <column name="description" type="varchar (max)"/>
+            <column name="duration" type="varchar(255)"/>
+            <column name="index" type="bigint"/>
+            <column defaultValueBoolean="true" name="is_published" type="bit"/>
+            <column name="title" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime2"/>
+            <column name="url" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614635826578-6">
+        <addColumn tableName="embedded_course_lectures">
+            <column name="index_no" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614635826578-7">
+        <dropColumn columnName="index" tableName="embedded_course_lectures"/>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614665782723-6">
+        <addColumn tableName="embedded_course_lectures">
+            <column name="course_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

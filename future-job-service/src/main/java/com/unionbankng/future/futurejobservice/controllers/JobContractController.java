@@ -76,11 +76,7 @@ public class JobContractController {
     @PostMapping(value="/v1/job/contract/raise/dispute", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> raiseDispute(@Valid @RequestParam(value = "data") String projectData,
                                                       @RequestParam(value = "attachment", required = false) MultipartFile[] supportingFiles, @ApiIgnore Principal principal) throws IOException {
-        JobContractDispute response= jobContractService.raiseDispute(principal, projectData,supportingFiles);
-        if(response!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, response));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+        return ResponseEntity.ok().body(jobContractService.raiseDispute(principal, projectData, supportingFiles));
     }
 
 

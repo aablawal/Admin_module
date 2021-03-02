@@ -2,6 +2,7 @@ package com.unionbankng.future.futuremessagingservice.services;
 import com.unionbankng.future.futuremessagingservice.entities.MessagingToken;
 import com.unionbankng.future.futuremessagingservice.entities.Notification;
 import com.unionbankng.future.futuremessagingservice.enums.NotificationStatus;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailMessage;
 import com.unionbankng.future.futuremessagingservice.pojos.NotificationBody;
 import com.unionbankng.future.futuremessagingservice.repositories.MessagingTokenRepository;
 import com.unionbankng.future.futuremessagingservice.repositories.NotificationRepository;
@@ -25,6 +26,8 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private  final MessagingTokenRepository messagingTokenRepository;
+    private final EmailService emailService;
+
     @Value("${google.sidekiq.push_notification_api_key}")
     private String token;
     @Value("${google.sidekiq.push_notification_server_key}")
@@ -95,19 +98,22 @@ public class NotificationService {
                     pushNotification.put("notification", pushBody);
                     pushNotification.put("to", recipient.getToken());
 
+
+                    if(notificationBody.getPriority().equals("Yes")){
+                         //send an email for priority notifications
+                    }
+
                     HttpEntity<Object> requestEntity = new HttpEntity<Object>(pushNotification, this.getHeaders());
                     ResponseEntity<String> response = rest.exchange(baseURL, HttpMethod.POST, requestEntity, String.class);
-                    if (response.getStatusCode().is2xxSuccessful()) {
-                       return notificationRepository.save(traditionalNotification);
-                    } else {
+                    if (!response.getStatusCode().is2xxSuccessful()) {
                         logger.info("Unable to fire push notification");
                         logger.error(response.getBody());
-                        return notificationRepository.save(traditionalNotification);
                     }
+
                 }else{
                     logger.info("No permission token to fire push notification");
-                    return  notificationRepository.save(traditionalNotification);
                 }
+                return notificationRepository.save(traditionalNotification);
 
             }catch (Exception e){
                 logger.info("Unable to fire push notification");

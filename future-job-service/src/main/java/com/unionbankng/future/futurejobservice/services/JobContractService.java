@@ -151,11 +151,12 @@ public class JobContractService implements Serializable {
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
             UUID referenceId = UUID.randomUUID();
             String transferReferenceId = referenceId.toString().replaceAll("-", "");
-            int peppFess = (int) (2.5 / 100) * contract.getAmount() + 200;
-            contract.setPeppfees(peppFess);
+
+            contract.setPeppfees(0); //set peprest charges to zero
             contract.setReferenceId(referenceId.toString());
             contract.setTransferReferenceId(transferReferenceId);
             contract.setAppId(appId);
+
             int status = 0;
             String remark = null;
 
@@ -180,6 +181,7 @@ public class JobContractService implements Serializable {
                     body.setAction("/job/ongoing/details/" + proposal.getJobId());
                     body.setTopic("'Job'");
                     body.setChannel("S");
+                    body.setPriority("YES");
                     body.setRecipient(proposal.getUserId());
                     notificationSender.pushNotification(body);
                 }
@@ -223,6 +225,7 @@ public class JobContractService implements Serializable {
                         body.setAction("/job/ongoing/details/" + proposal.getJobId());
                         body.setTopic("'Job'");
                         body.setChannel("S");
+                        body.setPriority("YES");
                         body.setRecipient(proposal.getEmployerId());
                         notificationSender.pushNotification(body);
                     }
@@ -260,6 +263,7 @@ public class JobContractService implements Serializable {
                         body1.setAction("/job/ongoing/details/" + proposal.getJobId());
                         body1.setTopic("'Job'");
                         body1.setChannel("S");
+                        body1.setPriority("YES");
                         body1.setRecipient(proposal.getEmployerId());
                         notificationSender.pushNotification(body1);
 
@@ -270,6 +274,7 @@ public class JobContractService implements Serializable {
                         body2.setAction("/job/ongoing/details/" + proposal.getJobId());
                         body2.setTopic("'Job'");
                         body2.setChannel("S");
+                        body2.setPriority("YES");
                         body2.setRecipient(proposal.getUserId());
                         notificationSender.pushNotification(body2);
 
@@ -384,11 +389,9 @@ public class JobContractService implements Serializable {
     }
 
     public JobMilestone addNewMilestone(Principal principal, String request) throws JsonProcessingException {
-
         JobMilestone milestone = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobMilestone.class);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         return addNewMilestone(currentUser.getUserFullName(), milestone);
-
     }
 
 
@@ -408,11 +411,11 @@ public class JobContractService implements Serializable {
                     body.setAction("/my-job/contract/milestones/" + newMilestone.getJobId() + "/" + newMilestone.getProposalId());
                     body.setTopic("'Job'");
                     body.setChannel("S");
+                    body.setPriority("YES");
                     body.setRecipient(newMilestone.getEmployerId());
                     notificationSender.pushNotification(body);
                 }
                 //end
-
                 return newMilestone;
             } else {
                 logger.info("JOBSERVICE: Unable to add new milestone");
@@ -459,7 +462,6 @@ public class JobContractService implements Serializable {
                         jobContractRepository.save(contract);
                     else
                         logger.info("JOBSERVICE: Escrow transaction failed");
-
                 }
 
                 Optional<JobProposal> proposalData = jobProposalRepository.findById(extension.getProposalId());
@@ -486,6 +488,7 @@ public class JobContractService implements Serializable {
                             body.setAction("/job/ongoing/details/" + extension.getJobId());
                             body.setTopic("'Job'");
                             body.setChannel("S");
+                            body.setPriority("YES");
                             body.setRecipient(extension.getUserId());
                             notificationSender.pushNotification(body);
                         }
@@ -541,6 +544,7 @@ public class JobContractService implements Serializable {
                 body.setAction("/job/ongoing/details/" + request.getJobId());
                 body.setTopic("'Job'");
                 body.setChannel("S");
+                body.setPriority("YES");
                 body.setRecipient(request.getEmployerId());
                 notificationSender.pushNotification(body);
             }
@@ -552,7 +556,7 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobContractDispute raiseDispute(Principal principal, String
+    public APIResponse raiseDispute(Principal principal, String
             projectData, MultipartFile[] attachmentFiles) throws
             JsonProcessingException {
         JobContractDispute request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobContractDispute.class);
@@ -560,45 +564,69 @@ public class JobContractService implements Serializable {
         return raiseDispute(currentUser.getUserFullName(), currentUser.getUserId(), request, attachmentFiles);
     }
 
-    public JobContractDispute raiseDispute(String userName, Long
+    public APIResponse raiseDispute(String userName, Long
             userId, JobContractDispute request, MultipartFile[] attachmentFiles) {
         try {
             String attachments = null;
+            ResponseEntity<String> response = null;
+            UUID referenceId = UUID.randomUUID();
+            String disputeReferenceId = referenceId.toString().replaceAll("-", "");
+            String transactionReferenceId="";
+            JobContract contract= jobContractRepository.findById(request.getContractId()).orElse(null);
+            if(contract!=null)
+                transactionReferenceId=contract.getReferenceId();
 
+
+            logger.info("The trans id is:"+transactionReferenceId);
             request.setStatus(JobContractDisputeStatus.PE);
             request.setUserId(userId);
+            request.setReferenceId(disputeReferenceId);
 
             if (attachmentFiles != null)
                 attachments = this.fileStoreService.storeFiles(attachmentFiles, request.getProposalId());
-
             if (attachments != null)
                 request.attachment = attachments;
 
-            //fire notification
-            JobContractDispute dispute = jobContractDisputeRepository.save(request);
-            if (dispute != null) {
-                Job currentJob = jobRepository.findById(dispute.getJobId()).orElse(null);
-                if (currentJob != null) {
-                    NotificationBody body = new NotificationBody();
-                    body.setBody(userName + " raised a dispute on " + currentJob.getTitle() + "");
-                    body.setSubject("Dispute Raised Against you");
-                    body.setActionType("REDIRECT");
-                    body.setAction("/job/details/" + dispute.getJobId());
-                    body.setTopic("'Job'");
-                    body.setChannel("S");
-                    body.setRecipient(dispute.getEmployerId());
-                    notificationSender.pushNotification(body);
-                }
-            } else {
-                logger.info("JOBSERV: Unable to raise a dispute, the dispute request is not valid");
-                return null;
+            HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+            response = rest.exchange(baseURL + "/Dispute/reportDispute?appid=" + appId
+                    + "&referenceid=" + transactionReferenceId
+                    + "&dispute_referenceid=" + request.getReferenceId()
+                    + "&dispute_category=contract-" + request.getContractId().toString()
+                    + "&dispute_description=" + request.getDescription(), HttpMethod.POST, entity, String.class);
+            //done
+            if (response.getStatusCode().is2xxSuccessful()) {
+                //fire notification
+                JobContractDispute dispute = jobContractDisputeRepository.save(request);
+                if (dispute != null) {
+                    Job currentJob = jobRepository.findById(dispute.getJobId()).orElse(null);
+                    if (currentJob != null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(userName + " raised a dispute on " + currentJob.getTitle() + "");
+                        body.setSubject("Dispute Raised Against you");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/job/details/" + dispute.getJobId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setPriority("YES");
+                        body.setRecipient(dispute.getEmployerId());
+                        notificationSender.pushNotification(body);
+                    }
+                    return new APIResponse("success", true, dispute);
 
+                } else {
+                    logger.info("JOBSERV: Unable to raise a dispute, the dispute request is not valid");
+                    return new APIResponse("Unable to raise a dispute, the dispute request is not valid", false, null);
+                }
+            }
+            else {
+                logger.info("JOBSERVICE: Escrow transaction failed");
+                return new APIResponse("Escrow transaction failed", false, null);
             }
             //end
-            return dispute;
+
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            return new APIResponse(ex.getMessage(), false, null);
         }
     }
 
@@ -618,6 +646,7 @@ public class JobContractService implements Serializable {
             body.setAction("/job/ongoing/details/" + request.getJobId());
             body.setTopic("'Job'");
             body.setChannel("S");
+            body.setPriority("YES");
             body.setRecipient(request.getEmployerId());
             notificationSender.pushNotification(body);
         }
@@ -663,6 +692,7 @@ public class JobContractService implements Serializable {
                     body.setAction("/my-job/contract/milestones/" + request.getJobId() + "/" + request.getProposalId());
                     body.setTopic("'Job'");
                     body.setChannel("S");
+                    body.setPriority("YES");
                     body.setRecipient(request.getEmployerId());
                     notificationSender.pushNotification(body);
                 }
@@ -756,6 +786,7 @@ public class JobContractService implements Serializable {
                             body.setAction("/job/ongoing/details/" + jobId);
                             body.setTopic("'Job'");
                             body.setChannel("S");
+                            body.setPriority("YES");
                             body.setRecipient(proposal.getUserId());
                             notificationSender.pushNotification(body);
                         }

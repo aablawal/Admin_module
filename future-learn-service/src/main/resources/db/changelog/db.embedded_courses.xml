@@ -1,0 +1,49 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet author="ACER NITRO 5 (generated)" id="1614613241615-4">
+        <createTable tableName="embedded_courses">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="embedded_coursesPK"/>
+            </column>
+            <column name="course_img" type="varchar(255)"/>
+            <column name="course_title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="creatoruuid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar (max)"/>
+            <column name="duration" type="varchar(255)"/>
+            <column name="full_description" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="instructor" type="varchar(255)"/>
+            <column defaultValueBoolean="false" name="is_paid" type="bit"/>
+            <column defaultValueBoolean="false" name="is_published" type="bit"/>
+            <column name="price" type="numeric(19, 2)"/>
+            <column name="requirements" type="varchar (max)"/>
+            <column name="updated_at" type="datetime2"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614613648953-6">
+        <addColumn tableName="embedded_courses">
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614613648953-7">
+        <dropColumn columnName="course_title" tableName="embedded_courses"/>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614614139423-6">
+        <addColumn tableName="embedded_courses">
+            <column name="category" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614614886263-6">
+        <addColumn tableName="embedded_courses">
+            <column name="payment_option" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
