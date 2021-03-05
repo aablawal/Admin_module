@@ -4,9 +4,6 @@
     <include file="db/changelog/db.changelog-2.xml" />
     <include file="db/changelog/db.changelog-3.xml" />
     <include file="db/changelog/db.changelog-4.xml" />
-    <include file="db/changelog/db.embedded_course_lectures.xml"/>
-    <include file="db/changelog/db.embedded_courses.xml" />
-
 <!--    <changeSet id="1561040019818-1" author="chris">-->
 <!--        <sqlFile dbms="h2,mssql"-->
 <!--                 path="db/migrations/migration-1.sql" />-->

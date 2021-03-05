@@ -1,5 +1,6 @@
 package com.unionbankng.future.learn.entities;
 
+import com.unionbankng.future.learn.enums.CourseType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,8 +24,11 @@ public class Course implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long category;
     @Column(columnDefinition="TEXT")
     private String description;
+    @Enumerated
+    private CourseType type;
     @Column(columnDefinition="TEXT")
     private String requirements;
     @Column(columnDefinition = "boolean default false")
