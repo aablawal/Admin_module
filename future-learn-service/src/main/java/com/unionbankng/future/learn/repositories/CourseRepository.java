@@ -14,6 +14,7 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
 
     Page<Course> findAllByCreatorUUID(String creatorUUID, Pageable pageable);
     Page<Course> findAllByIsPublished(Boolean isPublished, Pageable pageable);
+    Page<Course> findAllByCategory(Long categoryId, Pageable pageable);
     List<Course> findAllByIdIn(List<Long> ids);
     @Query(value = "SELECT c FROM Course c where :instructor MEMBER OF c.instructors")
     Page<Course> findAllByInstructorsIn(Instructor instructor, Pageable pageable);

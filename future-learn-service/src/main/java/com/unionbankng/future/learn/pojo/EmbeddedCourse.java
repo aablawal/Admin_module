@@ -1,23 +1,14 @@
-package com.unionbankng.future.learn.entities;
+package com.unionbankng.future.learn.pojo;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name="embedded_courses")
+@Data
 public class EmbeddedCourse implements Serializable {
-
-    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,6 +53,5 @@ public class EmbeddedCourse implements Serializable {
     @Override
     public boolean equals(Object course) {
         return this.id.equals(((EmbeddedCourse)course).getId());
-
     }
 }

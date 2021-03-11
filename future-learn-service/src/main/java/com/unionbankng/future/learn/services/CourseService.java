@@ -1,20 +1,13 @@
 package com.unionbankng.future.learn.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.code.ssm.api.ParameterValueKeyProvider;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
-import com.unionbankng.future.learn.entities.Course;
-import com.unionbankng.future.learn.entities.EmbeddedCourse;
-import com.unionbankng.future.learn.entities.EmbeddedCourseLecture;
-import com.unionbankng.future.learn.entities.Instructor;
-import com.unionbankng.future.learn.pojo.APIResponse;
-import com.unionbankng.future.learn.pojo.CreateCourseRequest;
-import com.unionbankng.future.learn.pojo.JwtUserDetail;
-import com.unionbankng.future.learn.repositories.CourseRepository;
-import com.unionbankng.future.learn.repositories.EmbeddedCourseLectureRepository;
-import com.unionbankng.future.learn.repositories.EmbeddedCourseRepository;
-import com.unionbankng.future.learn.repositories.InstructorRepository;
+import com.unionbankng.future.learn.entities.*;
+import com.unionbankng.future.learn.enums.CourseType;
+import com.unionbankng.future.learn.enums.LectureType;
+import com.unionbankng.future.learn.pojo.*;
+import com.unionbankng.future.learn.repositories.*;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -39,8 +32,8 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final InstructorRepository instructorRepository;
     private final FileStorageService fileStorageService;
-    private final EmbeddedCourseRepository embeddedCourseRepository;
-    private final EmbeddedCourseLectureRepository embeddedCourseLectureRepository;
+    private final LectureRepository lectureRepository;
+    private final CourseContentRepository courseContentRepository;
     Logger logger = LoggerFactory.getLogger(CourseService.class);
 
 
@@ -59,6 +52,9 @@ public class CourseService {
 
     public Page<Course> findAllByIsPublished(Boolean isPublished, Pageable pageable){
         return courseRepository.findAllByIsPublished(isPublished,pageable);
+    }
+    public Page<Course> findAllByCategory(Long categoryId, Pageable pageable){
+        return courseRepository.findAllByCategory(categoryId,pageable);
     }
 
     public Long getTotalCourseCreatedByUserUUID(String  userUUID){
@@ -131,6 +127,7 @@ public class CourseService {
             instructors.add(instructorRepository.save(instructor));
         }
 
+        course.setType(CourseType.INTERNAL);
         course.setCourseTitle(request.getCourseTitle());
         course.setCreatorUUID(creatorUUID);
         course.setEstimatedTimeToComplete(request.getEstimatedTimeToComplete());
@@ -140,6 +137,7 @@ public class CourseService {
         course.setIsPaid(request.getIsPaid());
         course.setIsPublished(request.getIsPublished());
         course.setOutcomes(request.getOutcomes());
+        course.setCategory(request.getCategory());
         course.setRequirements(request.getRequirements());
         course.setPrice(request.getPrice());
 
@@ -152,25 +150,69 @@ public class CourseService {
     public APIResponse createEmbeddedCourse(String  courseData,  String lecturesData, Principal principal) {
         try {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-            EmbeddedCourse course = new ObjectMapper().readValue(courseData, EmbeddedCourse.class);
-            EmbeddedCourseLecture[] lectures = new ObjectMapper().readValue(lecturesData, EmbeddedCourseLecture[].class);
+            EmbeddedCourse embeddedCourse = new ObjectMapper().readValue(courseData, EmbeddedCourse.class);
+            EmbeddedCourseLecture[]  embeddedCourseLectures = new ObjectMapper().readValue(lecturesData, EmbeddedCourseLecture[].class);
+            embeddedCourse.setCreatorUUID(currentUser.getUserUUID());
+            embeddedCourse.setIsPaid(false);
+            embeddedCourse.setIsPublished(true);
 
+            //instances of the Sidekiq course objects
+            Course course = new Course();
+            ArrayList<Instructor> instructors = new ArrayList<>();
+
+            //preparing instructor
+            Instructor instructor = instructorRepository.findByInstructorUUID(currentUser.getUserUUID()).orElse(new Instructor());
+            instructor.setNumberOfCourses(instructor.getNumberOfCourses() == null ? 0: instructor.getNumberOfCourses() + 1);
+            instructor.setInstructorUUID(currentUser.getUserUUID());
+            instructors.add(instructorRepository.save(instructor));
+
+            //course details
+            course.setType(CourseType.EXTERNAL);
+            course.setCourseTitle(embeddedCourse.getTitle());
             course.setCreatorUUID(currentUser.getUserUUID());
-            course.setIsPaid(course.getPaymentOption()==null?false:true);
-            course.setIsPublished(true);
+            course.setEstimatedTimeToComplete(embeddedCourse.getDuration());
+            course.setInstructors(instructors);
+            course.setDescription(embeddedCourse.getFullDescription());
+            course.setShortDesc(embeddedCourse.getDescription());
+            course.setIsPaid(embeddedCourse.getIsPaid());
+            course.setIsPublished(embeddedCourse.getIsPublished());
+            course.setRequirements(embeddedCourse.getRequirements());
+            course.setPrice(embeddedCourse.getPrice());
+            course.setCategory(embeddedCourse.getCategory());
+            course.setCourseImg(embeddedCourse.getCourseImg());
 
-            EmbeddedCourse savedCourse = embeddedCourseRepository.save(course);
+            Course savedCourse = courseRepository.save(course);
             if (savedCourse != null) {
                 int i=0;
-                for (EmbeddedCourseLecture lecture : lectures) {
+                for (EmbeddedCourseLecture embeddedCourseLecture: embeddedCourseLectures) {
                     i++;
-                    lecture.setCreatorUUID(currentUser.getUserUUID());
-                    lecture.setIndexNo(i);
-                    lecture.setIsPublished(true);
-                    lecture.setCourseId(savedCourse.getId());
+                    embeddedCourseLecture.setCourseId(savedCourse.getId());
+                    embeddedCourseLecture.setCreatorUUID(currentUser.getUserUUID());
+                    embeddedCourseLecture.setIndexNo(i);
+                    embeddedCourseLecture.setIsPublished(true);
+                    embeddedCourseLecture.setCourseId(savedCourse.getId());
 
-                    logger.info(new ObjectMapper().writeValueAsString(lecture));
-                    embeddedCourseLectureRepository.save(lecture);
+                    //create course content
+                    CourseContent courseContent = new CourseContent();
+                    courseContent.setCourseContentText(embeddedCourseLecture.getTitle());
+                    courseContent.setCourseId(embeddedCourseLecture.getCourseId());
+                    courseContent.setCreatorUUID(embeddedCourseLecture.getCreatorUUID());
+                    courseContent.setIndexNo(embeddedCourseLecture.getIndexNo());
+                    CourseContent savedCourseContent= courseContentRepository.save(courseContent);
+
+                    //generate sidekiq lecture
+                    Lecture lecture = new Lecture();
+                    lecture.setCourseContentId(savedCourseContent.getId());
+                    lecture.setCourseId(savedCourse.getId());
+                    lecture.setCreatorUUID(embeddedCourseLecture.getCreatorUUID());
+                    lecture.setDuration(embeddedCourseLecture.getDuration());
+                    lecture.setOutputAssetName(embeddedCourse.getInstructor());
+                    lecture.setStreamingLocatorName(embeddedCourseLecture.getUrl());
+                    lecture.setIndexNo(embeddedCourseLecture.getIndexNo());
+                    lecture.setTitle(embeddedCourseLecture.getTitle());
+                    lecture.setType(LectureType.VIDEO);
+
+                    lectureRepository.save(lecture);
                 }
                 return new APIResponse("success", true, savedCourse);
 
@@ -181,32 +223,6 @@ public class CourseService {
             ex.printStackTrace();
             return new APIResponse("Failed", false, ex.getMessage());
         }
-    }
-    public APIResponse<Map<String, Object>> findEmbeddedCourseById(Long id){
-        Map<String,Object> courseData=new HashMap<>();
-        EmbeddedCourse course= embeddedCourseRepository.findById(id).orElse(null);
-        if(course!=null) {
-            List<EmbeddedCourseLecture> lectures = embeddedCourseLectureRepository.findAllByCourseId(id);
-            courseData.put("course",course);
-            courseData.put("lectures",lectures);
-            return   new APIResponse("success", true, courseData);
-        }else{
-            return new APIResponse("Course not found", false, null);
-        }
-    }
-    public APIResponse<ArrayList<Map<String, Object>>> findEmbeddedCourses(){
-        ArrayList<Map<String,Object>> baseList=new ArrayList<>();
-        List<EmbeddedCourse> courses= embeddedCourseRepository.findAll();
-        for (EmbeddedCourse course: courses) {
-            Map<String,Object> courseData=new HashMap<>();
-            if(course!=null) {
-                List<EmbeddedCourseLecture> lectures = embeddedCourseLectureRepository.findAllByCourseId(course.getId());
-                courseData.put("course", course);
-                courseData.put("lectures", lectures);
-                baseList.add(courseData);
-            }
-        }
-        return   new APIResponse("success", true, baseList);
     }
     public void publishCourse(Long courseId, Principal principal) {
 

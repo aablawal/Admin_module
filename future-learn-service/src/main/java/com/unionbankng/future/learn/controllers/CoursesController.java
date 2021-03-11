@@ -3,8 +3,6 @@ package com.unionbankng.future.learn.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.learn.entities.Course;
-import com.unionbankng.future.learn.entities.EmbeddedCourse;
-import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.CreateCourseRequest;
 import com.unionbankng.future.learn.services.CourseBulkUploadService;
@@ -21,7 +19,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,14 +58,6 @@ public class CoursesController {
                 new APIResponse("Request successful",true,course));
     }
 
-    @GetMapping("/v1/courses/embedded/{courseId}")
-    public ResponseEntity<APIResponse> findEmbeddedCourseById(@PathVariable Long courseId){
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-               courseService.findEmbeddedCourseById(courseId));
-    }
-
-
     @GetMapping("/v1/courses")
     public ResponseEntity<APIResponse<Page<Course>>> getAllCourses(@RequestParam int page, @RequestParam int size){
 
@@ -77,11 +66,13 @@ public class CoursesController {
                 new APIResponse("Request successful",true,courses));
     }
 
-    @GetMapping("/v1/courses/embedded")
-    public ResponseEntity<APIResponse> getAllEmbeddedCourses() {
+    @GetMapping("/v1/courses_by_category")
+    public ResponseEntity<APIResponse<Page<Course>>> getAllCoursesByCategory(@RequestParam Long id, @RequestParam int page, @RequestParam int size){
+        Page<Course> courses = courseService.findAllByCategory(id,PageRequest.of(page,size));
         return ResponseEntity.status(HttpStatus.OK).body(
-                courseService.findEmbeddedCourses());
+                new APIResponse("Request successful",true,courses));
     }
+
 
     @PostMapping("/v1/courses/create_course")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@RequestBody CreateCourseRequest request,

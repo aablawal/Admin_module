@@ -19,6 +19,7 @@ public class CreateCourseRequest {
     @NotNull
     private Boolean isPaid;
     private BigDecimal price;
+    private Long category;
     @NotNull
     private String courseTitle;
     @NotNull
