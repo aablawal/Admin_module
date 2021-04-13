@@ -8,6 +8,8 @@ import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,13 +48,21 @@ public class UsersController {
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
-
-
     @GetMapping("/v1/users/search")
     public ResponseEntity<APIResponse> getUsersBySearch(@RequestParam String  q) {
         List<User> user = userService.findUsersBySearch(q).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
+
+    @GetMapping("/v1/users")
+    public ResponseEntity<APIResponse> getUsers(@RequestParam int  page,  @RequestParam int size) {
+        Page<User> userPage = userService.findUsers(PageRequest.of(page,size));
+        if(userPage.isEmpty())
+            return ResponseEntity.ok().body(new APIResponse<>("No User Found",true,null));
+        else
+            return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,userPage));
+    }
+
 
 
     @GetMapping("/v1/users/get_details_with_token")
