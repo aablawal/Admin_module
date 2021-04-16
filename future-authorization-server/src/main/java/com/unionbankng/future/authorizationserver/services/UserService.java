@@ -44,8 +44,6 @@ public class UserService {
     public Page<User> findUsers(Pageable  pageable) {
         return userRepository.findAll(pageable);
     }
-
-
     @Cacheable(value = "user", key = "#uuId")
     public Optional<User> findByUuid(String uuId) {
         return userRepository.findByUuid(uuId);

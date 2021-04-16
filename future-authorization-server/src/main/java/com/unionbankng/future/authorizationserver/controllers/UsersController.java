@@ -53,7 +53,6 @@ public class UsersController {
         List<User> user = userService.findUsersBySearch(q).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
-
     @GetMapping("/v1/users")
     public ResponseEntity<APIResponse> getUsers(@RequestParam int  page,  @RequestParam int size) {
         Page<User> userPage = userService.findUsers(PageRequest.of(page,size));
