@@ -233,4 +233,14 @@
     <changeSet author="chokeme (generated)" id="1604586976227-25">
         <addForeignKeyConstraint baseColumnNames="course_id" baseTableName="course_instructors" constraintName="FKr71flmbykqdxlnkdhdcx2tr4k" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="course" validate="true"/>
     </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614690394179-6">
+        <addColumn tableName="course">
+            <column name="type" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1614767177717-3">
+        <addColumn tableName="course">
+            <column name="category" type="bigint"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -1,12 +1,11 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.pojos.APIResponse;
-import com.unionbankng.future.futurejobservice.pojos.EmailMessage;
-import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.services.EmailService;
+import com.unionbankng.future.futurejobservice.pojos.*;
+import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -16,9 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,16 +30,19 @@ public class JobController {
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response){
         response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS,DELETE,PUT");
+        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
     }
     private final JobService service;
     private final NotificationSender notificationSender;
+    private final UserService userService;
+    private final JobRepository jobRepository;
     Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
                                               @RequestParam(value = "team", required=true) String teamData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
+
                                               @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles) throws IOException{
 
         Job addedJob=service.addJob(jobData,teamData,supportingFiles,ndaFiles);
@@ -74,8 +79,6 @@ public class JobController {
             return ResponseEntity.ok().body(new APIResponse("Unable to repeat the job",false,null));
     }
 
-
-
     @DeleteMapping("/v1/job/delete/{id}")
     public ResponseEntity<APIResponse> deleteJob(@PathVariable  Long id){
         service.deleteJobById(id);
@@ -87,7 +90,11 @@ public class JobController {
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobById(id,model)));
     }
-
+    @GetMapping("/v1/total/job/posted/by/{id}")
+    public ResponseEntity<APIResponse> getTotalJobPostedByUser(@PathVariable Long id){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.getTotalJobPostedByUserId(id)));
+    }
     @GetMapping("/v1/job/invitation/{invitationId}")
     public ResponseEntity<APIResponse> getJobByInvitationId(@PathVariable String invitationId, Model model){
         return ResponseEntity.ok().body(
@@ -122,20 +129,9 @@ public class JobController {
     }
 
     @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse<String>> test(){
-
-        NotificationBody body= new NotificationBody();
-        body.setBody("Wow! this is great, can we do same around us, its amazing...");
-        body.setSubject("This is the subject");
-        body.setAttachment("none");
-        body.setActionType("REDIRECT");
-        body.setAction("/job/details/2");
-        body.setTopic("'Community'");
-        body.setChannel("S");
-        body.setRecipient(Long.valueOf(2));
-
-        notificationSender.sendEmail(body);
+    public ResponseEntity<APIResponse<String>> test(@ApiIgnore Principal principal){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         return ResponseEntity.ok().body(
-                new APIResponse("success",true,"Job serv worked"));
+                new APIResponse("success",true, jwtUserDetail));
     }
 }

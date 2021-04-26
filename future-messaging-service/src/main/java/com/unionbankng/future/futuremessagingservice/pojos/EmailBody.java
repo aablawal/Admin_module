@@ -3,6 +3,7 @@ package com.unionbankng.future.futuremessagingservice.pojos;
 import java.io.Serializable;
 import java.util.List;
 
+import ch.qos.logback.core.joran.action.Action;
 import lombok.Data;
 
 
@@ -16,5 +17,6 @@ public @Data class EmailBody implements Serializable {
     protected List<EmailAddress> recipients;
     protected EmailAddress sender;
     protected String subject;
+
 
 }

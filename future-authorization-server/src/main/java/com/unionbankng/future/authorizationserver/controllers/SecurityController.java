@@ -30,6 +30,7 @@ public class SecurityController {
     @GetMapping("v1/security/confirm_reset_token")
     public ResponseEntity<APIResponse> confirmResetToken(@RequestParam String token){
 
+
         Boolean isSuccess = securityService.confirmForgotPasswordToken(token);
 
         return ResponseEntity.status(HttpStatus.OK).body(

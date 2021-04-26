@@ -15,7 +15,7 @@ public interface UBNAccountAPIService {
                                                   @Query("client_secret") String clientSecret,@Query("grant_type") String grantType,
                                                   @Query("client_id") String clientId);
 
-    @POST("BVNValidationService2/verifyBVN")
+    @POST("BVNValidationService/verifyBVN")
     Call<ValidateBvnResponse> validateBVN(@Query("access_token") String accessToken, @Body ValidateBvnRequest request);
 
     @POST("ubnmiserv/secured/openaccount")
@@ -30,6 +30,12 @@ public interface UBNAccountAPIService {
     @POST("ubnmiserv/secured/fundstransfer")
     Call<UBNFundTransferResponse> fundsTransferUBN(@Query("access_token") String accessToken, @Body UBNFundTransferRequest request);
 
+    @POST("ubnmiserv/secured/cbaaccountenquiry")
+    Call<UbnEnquiryResponse> accountEnquiry(@Query("access_token") String accessToken, @Body UbnCustomerEnquiry request);
+
+
+    @POST("ubnmiserv/secured/accountNumber")
+    Call<UBNAccountStatementResponse> accountStatement(@Query("access_token") String accessToken, @Body UBNAccountStatementRequest request);
 
 
 

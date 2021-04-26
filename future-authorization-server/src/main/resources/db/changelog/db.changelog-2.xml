@@ -11,18 +11,18 @@
             <column name="type" type="varchar(255)"/>
         </createTable>
     </changeSet>
-<!--    <changeSet author="chokeme (generated)" id="1599673191008-2">-->
-<!--        <createTable tableName="user_confirmation_token">-->
-<!--            <column autoIncrement="true" name="id" type="bigint">-->
-<!--                <constraints nullable="false" primaryKey="true" primaryKeyName="user_confirmation_tokenPK"/>-->
-<!--            </column>-->
-<!--            <column name="expiry_date" type="datetime2"/>-->
-<!--            <column name="token" type="varchar(255)"/>-->
-<!--            <column name="user_id" type="bigint">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--        </createTable>-->
-<!--    </changeSet>-->
+    <changeSet author="chokeme (generated)" id="1599673191008-2">
+        <createTable tableName="user_confirmation_token">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_confirmation_tokenPK"/>
+            </column>
+            <column name="expiry_date" type="datetime2"/>
+            <column name="token" type="varchar(255)"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
     <changeSet author="chokeme (generated)" id="1599673191008-3">
         <addColumn tableName="app_user">
             <column name="address" type="varchar(255)"/>
@@ -43,10 +43,10 @@
             <column name="state_of_residence" type="varchar(50)"/>
         </addColumn>
     </changeSet>
-<!--    <changeSet author="chokeme (generated)" id="1599673191008-7">-->
-<!--        <addUniqueConstraint columnNames="token" constraintName="UC_USER_CONFIRMATION_TOKENTOKEN_COL" tableName="user_confirmation_token"/>-->
-<!--    </changeSet>-->
-<!--    <changeSet author="chokeme (generated)" id="1599673191008-8">-->
-<!--        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_confirmation_token" constraintName="FK23f70bn1nnupeobqk4em641lh" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="app_user" validate="true"/>-->
-<!--    </changeSet>-->
+    <changeSet author="chokeme (generated)" id="1599673191008-7">
+        <addUniqueConstraint columnNames="token" constraintName="UC_USER_CONFIRMATION_TOKENTOKEN_COL" tableName="user_confirmation_token"/>
+    </changeSet>
+    <changeSet author="chokeme (generated)" id="1599673191008-8">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_confirmation_token" constraintName="FK23f70bn1nnupeobqk4em641lh" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="app_user" validate="true"/>
+    </changeSet>
 </databaseChangeLog>

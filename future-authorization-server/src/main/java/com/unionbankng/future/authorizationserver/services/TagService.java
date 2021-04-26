@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +19,14 @@ public class TagService {
 
     private final TagRepository tagRepository;
 
+    public Optional<Tag> findById (Long id){
+        return tagRepository.findById(id);
+    }
 
     @Cacheable(value = "tags_by_name", key="#likelyName")
     public List<Tag> getTagsByTypeAndNameLike (TagType tagType, String likelyName){
         return tagRepository.findByTypeAndNameLike(tagType,likelyName);
     }
-
-
     @Cacheable(value = "tags", key="#tagType")
     public List<Tag> getAllTagsByType (TagType tagType){
         return tagRepository.findByType(tagType);

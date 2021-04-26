@@ -63,14 +63,14 @@ pipeline {
             script {
                   if (GLOBAL_ENVIRONMENT == 'staging') {
                     
-                    sh "kubectl config use-context marcus-developement-cluster"
-					sh "kubectl set image deployment/future-config-server future-config-server=${ACR_LOGINSERVER}/future-config-server --namespace project-future"
-					sh "kubectl rollout restart deployment/future-config-server --namespace project-future"
+                    sh "kubectl config use-context aks-dv-cluster-dev"
+					sh "kubectl set image deployment/future-config-server future-config-server=${ACR_LOGINSERVER}/future-config-server --namespace sidekiq"
+					sh "kubectl rollout restart deployment/future-config-server --namespace sidekiq"
 					
                   } else {
                     sh "kubectl config use-context MarcusProdAKSClust"
-                    sh "kubectl set image deployment/future-config-server config-server=${ACR_LOGINSERVER}/future-config-server --namespace project-future"
-					sh "kubectl rollout restart deployment/future-config-server --namespace project-future"
+                    sh "kubectl set image deployment/future-config-server config-server=${ACR_LOGINSERVER}/future-config-server --namespace sidekiq"
+					sh "kubectl rollout restart deployment/future-config-server --namespace sidekiq"
                   }
                 }
             

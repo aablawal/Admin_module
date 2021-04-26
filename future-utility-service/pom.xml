@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.3.RELEASE</version>
+		<version>2.4.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unionbankng.future</groupId>
@@ -15,8 +15,8 @@
 	<description>Utility Service for project future handles everything that does not have an ideal service ranging from document upload etc</description>
 
 	<properties>
-		<java.version>14</java.version>
-		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+		<java.version>11</java.version>
+		<spring-cloud.version>2020.0.0</spring-cloud.version>
 		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
 	</properties>
 
@@ -63,6 +63,7 @@
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-testing</artifactId>
 			<scope>test</scope>
+			<version>1.31.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.unionbankng</groupId>
@@ -80,6 +81,11 @@
 			<groupId>com.microsoft.azure.mediaservices.v2018_07_01</groupId>
 			<artifactId>azure-mgmt-media</artifactId>
 			<version>1.0.0-beta-6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+			<version>6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.rest</groupId>
@@ -127,7 +133,7 @@
 				<version>${jib-maven-plugin.version}</version>
 				<configuration>
 					<from>
-						<image>adoptopenjdk/openjdk14:alpine-jre-nightly</image>
+						<image>adoptopenjdk/openjdk11:alpine-jre-nightly</image>
 					</from>
 					<to>
 						<auth>

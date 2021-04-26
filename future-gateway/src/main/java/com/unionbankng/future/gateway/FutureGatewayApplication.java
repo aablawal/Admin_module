@@ -16,6 +16,4 @@ public class FutureGatewayApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FutureGatewayApplication.class, args);
 	}
-
-
 }

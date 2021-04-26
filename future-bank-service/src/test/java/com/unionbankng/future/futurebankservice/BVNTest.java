@@ -32,8 +32,9 @@ public class BVNTest extends AbstractTest {
 
         Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(validateBvnRequest);
 
-        assertEquals("01",response.body().getResponseCode());
         assertEquals(200,response.code());
+        assertEquals("01",response.body().getResponseCode());
+
 
     }
 
@@ -45,8 +46,9 @@ public class BVNTest extends AbstractTest {
 
         Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(validateBvnRequest);
 
-        assertEquals("00",response.body().getResponseCode());
         assertEquals(200,response.code());
+        assertEquals("00",response.body().getResponseCode());
+
 
     }
 

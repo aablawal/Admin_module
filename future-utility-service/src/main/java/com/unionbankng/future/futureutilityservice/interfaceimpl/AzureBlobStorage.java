@@ -4,6 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobErrorCode;
 import com.azure.storage.blob.models.BlobStorageException;
+import com.sun.mail.iap.ByteArray;
 import com.unionbankng.future.futureutilityservice.enums.BlobType;
 import com.unionbankng.future.futureutilityservice.interfaces.BlobStorage;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 @Component
 @RequiredArgsConstructor
@@ -36,6 +40,14 @@ public class AzureBlobStorage implements BlobStorage {
         return blobClient.getBlobUrl();
 
     }
+
+    @Override
+    public String uploadFromURL(String url, BlobType blobType, String fileName) throws IOException {
+
+        byte[] bytes = new URL(url).openStream().readAllBytes();
+        return upload(bytes,blobType,fileName);
+    }
+
 
     @Override
     public void delete(String identifier,BlobType blobType){

@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -24,9 +24,9 @@ public class LectureNoteController {
 
     @GetMapping("/v1/lecture_note/get_by_course_and_iam")
     public ResponseEntity<APIResponse<Page<LectureNote>>> findAllByCourseIdAndUserUUID(@RequestParam Long courseId,
-                                                                                       @ApiIgnore OAuth2Authentication authentication){
+                                                                                       @ApiIgnore Principal principal){
 
-        List<LectureNote> lectureNotes = lectureNoteService.findAllByCourseIdAndIam(courseId, authentication);
+        List<LectureNote> lectureNotes = lectureNoteService.findAllByCourseIdAndIam(courseId, principal);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,lectureNotes));
@@ -34,9 +34,9 @@ public class LectureNoteController {
 
     @GetMapping(value = "/v1/lecture_note/get_by_lecture_and_userUUID")
     public ResponseEntity<APIResponse<List<LectureNote>>> findAllByLectureIdAndUserUUID(@RequestParam Long lectureId,
-                                                                                        @ApiIgnore OAuth2Authentication authentication) {
+                                                                                        @ApiIgnore Principal principal) {
 
-        List<LectureNote> lectureNotes = lectureNoteService.findAllByLectureIdAndIam(lectureId,authentication);
+        List<LectureNote> lectureNotes = lectureNoteService.findAllByLectureIdAndIam(lectureId,principal);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,lectureNotes));
     }

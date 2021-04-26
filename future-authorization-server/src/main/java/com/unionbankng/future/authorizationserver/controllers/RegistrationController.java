@@ -40,7 +40,7 @@ public class RegistrationController {
         if(request.getAuthProvider().equals(AuthProvider.GOOGLE))
             return registrationService.googleRegistration(request);
 
-        return registrationService.emailRegistration(request);
+        return registrationService.register(request);
     }
 
     @PostMapping("/v1/registration/confirmation")
@@ -50,7 +50,7 @@ public class RegistrationController {
 
         if (!tokenConfirm.getSuccess())
              return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-                    new APIResponse<>(tokenConfirm.getMessage(),false,null));
+                    new APIResponse<>(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()),false,null));
 
 
         return ResponseEntity.ok().body(

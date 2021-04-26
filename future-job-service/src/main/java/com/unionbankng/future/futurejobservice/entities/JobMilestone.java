@@ -36,6 +36,7 @@ public class JobMilestone {
     @NotNull
     @Column(columnDefinition="TEXT")
     String title;
+    public String supportingFiles;
     @NotNull
     @Column(columnDefinition="TEXT")
     String description;
@@ -54,10 +55,11 @@ public class JobMilestone {
         this.title = request.title;
         this.amount=request.getAmount();
         this.description=request.description;
+        this.supportingFiles=request.supportingFiles;
         this.startDate=request.startDate;
         this.endDate=request.endDate;
         this.status=request.status;
-        this.createdAt = request.createdAt;
+        this.createdAt = new Date();
     }
 
     @PrePersist

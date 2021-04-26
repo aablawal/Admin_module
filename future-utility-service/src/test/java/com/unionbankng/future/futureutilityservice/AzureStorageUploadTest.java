@@ -28,5 +28,11 @@ public class AzureStorageUploadTest {
         azureBlobStorage.delete("test.txt", BlobType.IMAGE);
     }
 
+    @Test
+    public void uploadFromURLAndDeleteTest() throws IOException {
+        azureBlobStorage.uploadFromURL("https://kinsta.com/wp-content/uploads/2019/08/jpg-vs-jpeg.jpg", BlobType.IMAGE,"jpg-vs-jpeg.jpg");
+        azureBlobStorage.delete("jpg-vs-jpeg.jpg", BlobType.IMAGE);
+    }
+
 
 }

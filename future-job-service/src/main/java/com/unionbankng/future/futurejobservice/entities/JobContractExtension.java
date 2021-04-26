@@ -44,7 +44,7 @@ public class JobContractExtension {
         this.date = request.date;
         this.reason = request.reason;
         this.status=request.status;
-        this.createdAt = request.createdAt;
+        this.createdAt =new Date();
     }
 
     @PrePersist

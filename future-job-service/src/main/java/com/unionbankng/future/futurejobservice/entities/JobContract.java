@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.entities;
+import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -36,6 +37,13 @@ public class JobContract {
     String currency;
     String customerEmail;
     String merchantEmail;
+    Boolean isSettled;
+    String settlement;
+    JobProposalStatus status;
+    Long rate;
+    String description;
+    @Column(columnDefinition="TEXT")
+    String feedback;
     @NotNull
     String merchantAccountNumber;
     @NotNull
@@ -69,11 +77,17 @@ public class JobContract {
         this.referenceId =  request.referenceId;
         this.userEmail =  request.userEmail;
         this.amount =  request.amount;
+        this.isSettled=request.isSettled;
+        this.settlement=request.settlement;
         this.clearedAmount=request.clearedAmount;
+        this.status=request.status;
         this.country =  request.country;
         this.currency =  request.currency;
         this.customerEmail =  request.customerEmail;
         this.merchantEmail =  request.merchantEmail;
+        this.rate =request.rate;
+        this.description=request.description;
+        this.feedback=request.feedback;
         this.merchantAccountNumber =  request.merchantAccountNumber;
         this.customerAccountNumber=request.customerAccountNumber;
         this.merchantBankCode =  request.merchantBankCode;
@@ -86,6 +100,7 @@ public class JobContract {
         this.startDate =  request.startDate;
         this.endDate =  request.endDate;
         this.transferReferenceId =  request.transferReferenceId;
+        this.createdAt=new Date();
     }
 
     @PrePersist

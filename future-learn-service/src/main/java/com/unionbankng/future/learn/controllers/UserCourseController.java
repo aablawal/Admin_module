@@ -9,10 +9,10 @@ import com.unionbankng.future.learn.services.UserCourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -24,9 +24,9 @@ public class UserCourseController {
 
 
     @GetMapping("/v1/user_course/get_my_courses")
-    public ResponseEntity<APIResponse<List<Course>>> getMyCourses(@ApiIgnore OAuth2Authentication authentication){
+    public ResponseEntity<APIResponse<List<Course>>> getMyCourses(@ApiIgnore Principal principal){
 
-        List<Course> courses = userCourseService.getMyCourses(authentication);
+        List<Course> courses = userCourseService.getMyCourses(principal);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
@@ -34,17 +34,17 @@ public class UserCourseController {
 
     @PostMapping(value = "/v1/user_course/enroll")
     public ResponseEntity<APIResponse<UserCourse>> enrollForCourse(@RequestBody CourseEnrollmentRequest request
-            ,@ApiIgnore OAuth2Authentication authentication) {
+            ,@ApiIgnore Principal principal) {
 
-        UserCourse userCourse = userCourseService.enrollForFreeCourse(request,authentication);
+        UserCourse userCourse = userCourseService.enrollForFreeCourse(request,principal);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,userCourse));
     }
 
     @GetMapping("/v1/user_course/check_enrollment/{courseId}")
-    public ResponseEntity<APIResponse<Boolean>> isUserEnrolled(@ApiIgnore OAuth2Authentication authentication, @PathVariable Long courseId){
+    public ResponseEntity<APIResponse<Boolean>> isUserEnrolled(@ApiIgnore Principal principal, @PathVariable Long courseId){
 
-        Boolean enrolled = userCourseService.isUserEnrolledForCourse(authentication,courseId);
+        Boolean enrolled = userCourseService.isUserEnrolledForCourse(principal,courseId);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,enrolled));

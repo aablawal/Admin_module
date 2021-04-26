@@ -10,9 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +34,9 @@ public class CourseQuestionCommentService {
         return courseQuestionCommentRepository.countAllByCourseQuestionId(courseQuestionId);
     }
 
-    public CourseQuestionComment addCommentToQuestion(AddCourseQuestionCommentRequest request, OAuth2Authentication authentication) {
+    public CourseQuestionComment addCommentToQuestion(AddCourseQuestionCommentRequest request, Principal principal) {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         return addCommentToQuestion(request,jwtUserDetail.getUserUUID(),jwtUserDetail.getUserFullName());
     }

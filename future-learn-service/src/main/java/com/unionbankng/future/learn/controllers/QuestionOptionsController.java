@@ -1,20 +1,14 @@
 package com.unionbankng.future.learn.controllers;
 
 
-import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.entities.Question;
 import com.unionbankng.future.learn.entities.QuestionOption;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.services.QuestionOptionService;
-import com.unionbankng.future.learn.services.QuestionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

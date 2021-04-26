@@ -7,6 +7,7 @@ import com.unionbankng.future.authorizationserver.interfaceimpl.GoogleOauthProvi
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
 import com.unionbankng.future.authorizationserver.services.MemcachedHelperService;
+import com.unionbankng.future.authorizationserver.services.RegistrationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -14,6 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import javax.ws.rs.core.Response;
+
+import java.net.URI;
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class RegistrationTest extends AbstractTest {
@@ -22,10 +29,10 @@ public class RegistrationTest extends AbstractTest {
     private ObjectMapper mapper;
 
     @MockBean
-    MemcachedHelperService memcachedHelperService;
+    private GoogleOauthProvider googleOauthProvider;
 
     @MockBean
-    private GoogleOauthProvider googleOauthProvider;
+    private RegistrationService registrationService;
 
     @Override
     @Before
@@ -48,10 +55,13 @@ public class RegistrationTest extends AbstractTest {
 
         String body = mapper.writeValueAsString(request);
 
+        Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
+        Mockito.when(registrationService.createUserOnKeycloak(request)).thenReturn(response);
+
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().is2xxSuccessful());
 
 
     }
@@ -60,6 +70,7 @@ public class RegistrationTest extends AbstractTest {
     public void googleRegistrationSuccessful() throws Exception {
         RegistrationRequest request = new RegistrationRequest();
         request.setUsername("baba100");
+        request.setPassword("Pass@word123");
         request.setThirdPartyToken("1/fFAGRNJru1FTz70BzhT3Zg");
         request.setAuthProvider(AuthProvider.GOOGLE);
 
@@ -72,7 +83,8 @@ public class RegistrationTest extends AbstractTest {
         thirdPartyOauthResponse.setImage("https://localhost:8080/test_image.com");
 
         Mockito.when(googleOauthProvider.authentcate("1/fFAGRNJru1FTz70BzhT3Zg")).thenReturn(thirdPartyOauthResponse);
-
+        Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
+        Mockito.when(registrationService.createUserOnKeycloak(request)).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)

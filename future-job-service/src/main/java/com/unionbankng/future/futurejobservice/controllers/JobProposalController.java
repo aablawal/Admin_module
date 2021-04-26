@@ -2,22 +2,26 @@ package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
-import com.unionbankng.future.futurejobservice.entities.JobContract;
 import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
+import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
 import com.unionbankng.future.futurejobservice.services.JobTeamDetailsService;
 import com.unionbankng.future.futurejobservice.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
+import java.security.Principal;
 import java.util.*;
 
 @RestController
@@ -26,24 +30,31 @@ import java.util.*;
 public class JobProposalController {
 
     private final JobTeamDetailsService jobTeamDetailsService;
-    private final JobContractService approveJobProposal;
+    private final JobContractService contractService;
     private final JobProposalService service;
     private final UserService userService;
+    Logger logger = LoggerFactory.getLogger(JobProposalController.class);
+
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,DELETE,PUT");
+        response.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT");
     }
 
     @PostMapping(value = "/v1/job/apply", consumes = "multipart/form-data")
-    public ResponseEntity<APIResponse<JobProposal>> applyJob(@Valid @RequestParam(value = "data", required = true) String ProposalData,
-                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,  Model model) throws IOException {
-        JobProposal appliedJob = service.applyJob(ProposalData, supportingFiles,  model);
-        if (appliedJob != null)
+    public ResponseEntity<APIResponse> applyJob(@Valid @RequestParam(value = "data", required = true) String proposalData,
+
+                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,@ApiIgnore Principal principal) throws JsonProcessingException {
+        JobProposal appliedJob = service.applyJob(principal,proposalData, supportingFiles);
+        if (appliedJob != null) {
+            logger.info("Success");
             return ResponseEntity.ok().body(new APIResponse("success", true, appliedJob));
-        else
+        }
+        else {
+            logger.info("Failed");
             return ResponseEntity.ok().body(new APIResponse("failed", false, null));
+        }
     }
 
     @GetMapping("/v1/job/proposal/{id}")
@@ -78,25 +89,21 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/status")
-    public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status, Model model) {
+
+    public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status) {
         return ResponseEntity.ok().body(
-                new APIResponse("success", true, service.updateJobProposalStatus(id, status, model)));
+                new APIResponse("success", true, service.updateJobProposalStatus(id, JobProposalStatus.valueOf(status))));
     }
 
     @PostMapping("/v1/job/proposal/approve")
-    public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model) throws JsonProcessingException {
-        JobContract approval = approveJobProposal.approveJobProposal(approvalRequest, model);
-        if (approval != null)
-            return ResponseEntity.ok().body(
-                    new APIResponse("success", true, approval));
-        else
-            return ResponseEntity.ok().body(
-                    new APIResponse("failed", false, null));
+    public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore Principal principal) throws JsonProcessingException {
+        APIResponse response = contractService.approveJobProposal(principal, approvalRequest);
+        return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/v1/job/proposal/cancel")
-    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid, Model model) {
-        JobProposal canceledProposal = service.cancelJobProposal(jid, uid, model);
+    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid) {
+        JobProposal canceledProposal = service.cancelJobProposal(jid, uid);
         if (canceledProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, canceledProposal));
@@ -104,6 +111,32 @@ public class JobProposalController {
             return ResponseEntity.ok().body(
                     new APIResponse("failed", false, null));
     }
+
+    @PutMapping("/v1/job/proposal/decline/{proposalId}")
+
+    public ResponseEntity<APIResponse> declineJobProposal(@PathVariable Long proposalId) {
+        JobProposal declinedProposal = service.declineJobProposal(proposalId);
+        if (declinedProposal != null)
+            return ResponseEntity.ok().body(
+                    new APIResponse("success", true, declinedProposal));
+        else
+            return ResponseEntity.ok().body(
+                    new APIResponse("failed", false, null));
+    }
+
+
+
+    @PutMapping("/v1/job/proposal/change/percentage")
+    public ResponseEntity<APIResponse> changePercentage(@RequestParam Long pid, @RequestParam int percentage) {
+        JobProposal updateProposal = service.changeProposalPercentage(pid, percentage);
+        if (updateProposal != null)
+            return ResponseEntity.ok().body(
+                    new APIResponse("success", true, updateProposal));
+        else
+            return ResponseEntity.ok().body(
+                    new APIResponse("failed", false, null));
+    }
+
 
     @GetMapping("/v1/job/teams/{jobId}")
     public ResponseEntity<APIResponse> findTeamsByJobId(@PathVariable Long jobId){

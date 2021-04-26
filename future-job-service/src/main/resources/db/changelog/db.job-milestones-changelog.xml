@@ -34,4 +34,9 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet author="ACER NITRO 5 (generated)" id="1608552222499-2">
+        <addColumn tableName="job_milestones">
+            <column name="supporting_files" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

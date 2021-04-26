@@ -34,7 +34,7 @@ public class JobTeam {
         this.invitationId = jobTeam.invitationId;
         this.selectedTeam = jobTeam.selectedTeam;
         this.status=jobTeam.status;
-        this.createdAt = jobTeam.createdAt;
+        this.createdAt = new Date();
     }
 
     @PrePersist

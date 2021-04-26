@@ -1,16 +1,15 @@
 package com.unionbankng.future.futurejobservice.services;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
-import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
-import com.unionbankng.future.futurejobservice.enums.JobTeamStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
-import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,10 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.security.Principal;
 import java.util.Date;
 
 @Service
@@ -36,58 +35,68 @@ public class JobProposalService  implements Serializable {
     private  final JobProposalRepository repository;
     private  final FileStoreService fileStoreService;
     private final JobRepository jobRepository;
-    private final JobTeamDetailsRepository jobTeamDetailsRepository;
     private Logger logger = LoggerFactory.getLogger(JobProposalService.class);
-    private final UserService userService;
     private final NotificationSender notificationSender;
 
 
-    public JobProposal applyJob(String applicationData, MultipartFile[] supporting_files,  Model model){
+    public JobProposal applyJob(Principal principal, String applicationData, MultipartFile[] supporting_files)throws JsonProcessingException {
+        JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
+        return applyJob(application, supporting_files);
+    }
+
+    public JobProposal applyJob(JobProposal application, MultipartFile[] supporting_files){
         try {
             String supporting_file_names = null;
-            JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
-            application.status= JobProposalStatus.PE;
+              Job job = jobRepository.findById(application.jobId).orElse(null);
+            application.setIsApplied(true);
+            application.setCreatedAt(new Date());
+            application.setLastModifiedDate(new Date());
+            boolean isEdited=false;
+
+            if(application.id!=null) {
+                isEdited = true;
+            }
+            if(!isEdited) {
+                application.status = JobProposalStatus.PE;
+            }
+
+            if (job.type == JobType.TEAMS_PROJECT && !isEdited) {
+                //calculate user founds
+                if(application.percentage==null) {
+                    int percentage = 10; //default percentage
+                    int bidAmount = (int) (job.getBudget() / 100) * percentage;
+                    application.setBidAmount(Long.valueOf(bidAmount));
+                    application.setPercentage(Long.valueOf(percentage));
+                }
+            }
 
             //save files if not null
             if (supporting_files!=null)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, application.userId);
+                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, application.userId.toString());
             //cross verify if attached files processed
             if (supporting_file_names != null)
                 application.supportingFiles = supporting_file_names;
 
+
             JobProposal proposal= repository.save(application);
             if(proposal!=null) {
-                Job job = jobRepository.findById(proposal.jobId).orElse(null);
+
                 if (job != null) {
-                    if (job.type == JobType.TEAMS_PROJECT) {
-                        //calculate user founds
-                        int money = (int)(job.getBudget() / 100)*10;
 
-                        JobTeamDetails teamMember = new JobTeamDetails();
-                        teamMember.setAmount(proposal.bidAmount);
-                        teamMember.setJobId(proposal.jobId);
-                        teamMember.setProposalId(proposal.id);
-                        teamMember.setEmployerId(proposal.employerId);
-                        teamMember.setStatus(JobTeamStatus.PE);
-                        teamMember.setDescription(proposal.about);
-                        teamMember.setPercentage(Long.valueOf(10));
-                        teamMember.setAmount(Long.valueOf(money));
-                        jobTeamDetailsRepository.save(teamMember);
-                    }
-
-                    //fire notification
-                    User currentUser =userService.getUserById(proposal.getUserId());
-                    Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
-                    if(currentUser!=null && currentJob!=null) {
-                        NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getFullName() + " applied to your  project for "+currentJob.getTitle());
-                        body.setSubject("New Proposal");
-                        body.setActionType("REDIRECT");
-                        body.setAction("/my-job/proposals/"+proposal.getJobId());
-                        body.setTopic("'Job'");
-                        body.setChannel("S");
-                        body.setRecipient(proposal.getEmployerId());
-                        notificationSender.sendEmail(body);
+                    if(!isEdited) {
+                        //fire notification
+                        Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
+                        if (currentJob != null) {
+                            NotificationBody body = new NotificationBody();
+                            body.setBody("You have new proposal for " + currentJob.getTitle());
+                            body.setSubject("New Proposal");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/my-job/proposals/" + proposal.getJobId());
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(proposal.getEmployerId());
+                            notificationSender.pushNotification(body);
+                        }
                     }
                     //end
 
@@ -107,31 +116,89 @@ public class JobProposalService  implements Serializable {
         }
     }
 
-    public JobProposal updateJobProposalStatus(Long id, String newStatus, Model model){
-        Model data =this.findProposalById(id,model);
-        JobProposal proposal= (JobProposal) data.getAttribute("proposal");
-        proposal.setStatus(JobProposalStatus.valueOf(newStatus.toUpperCase()));
-        return repository.save(proposal);
+
+    public JobProposal updateJobProposalStatus(Long proposalId, JobProposalStatus status) {
+        JobProposal proposal = repository.findById(proposalId).orElse(null);
+        if (proposal != null) {
+            proposal.setStatus(status);
+            return repository.save(proposal);
+        } else {
+            return null;
+        }
     }
 
-    public JobProposal cancelJobProposal(Long jobId, Long userId, Model model){
-        Model data =this.findProposalByUserId(jobId,userId,model);
-        JobProposal proposal= (JobProposal) data.getAttribute("proposal");
+    public JobProposal cancelJobProposal(Long jobId, Long userId){
+        JobProposal proposal=repository.findProposalByUserId(jobId,userId);
         if(proposal!=null) {
-            this.updateJobProposalStatus(proposal.id, "CA", model);
+            proposal.setStatus(JobProposalStatus.IA);
+            repository.save(proposal);
             //fire notification
-            User currentUser =userService.getUserById(proposal.getEmployerId());
             Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
-            if(currentUser!=null && currentJob!=null) {
+            if(currentJob!=null) {
                 NotificationBody body = new NotificationBody();
-                body.setBody(currentUser.getFullName() + " canceled  your proposal for "+currentJob.getTitle());
+                body.setBody("Your proposal for  "+currentJob.getTitle()+" has been canceled");
                 body.setSubject("Proposal Canceled");
                 body.setActionType("REDIRECT");
                 body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
                 body.setTopic("'Job'");
                 body.setChannel("S");
                 body.setRecipient(proposal.getUserId());
-                notificationSender.sendEmail(body);
+                notificationSender.pushNotification(body);
+            }
+            //end
+        }
+        else {
+            logger.info("JOBSERVICE: Proposal not found");
+        }
+        return proposal;
+    }
+
+
+    public JobProposal declineJobProposal(Long proposalId){
+        JobProposal proposal=repository.findById(proposalId).orElse(null);
+        if(proposal!=null) {
+            proposal.setStatus(JobProposalStatus.RE);
+            repository.save(proposal);
+            //fire notification
+            Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
+            if(currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody("Your proposal for  "+currentJob.getTitle()+" has been rejected");
+                body.setSubject("Proposal Rejected");
+                body.setActionType("REDIRECT");
+                body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setRecipient(proposal.getUserId());
+                notificationSender.pushNotification(body);
+            }
+            //end
+        }
+        else {
+            logger.info("JOBSERVICE: Proposal not found");
+        }
+        return proposal;
+    }
+
+    public  JobProposal changeProposalPercentage(Long proposalId, int percentage){
+        JobProposal proposal=repository.findById(proposalId).orElse(null);
+        if(proposal!=null) {
+            Job currentJob =jobRepository.findById(proposal.getJobId()).orElse(null);
+            int bidAmount = (int) (currentJob.getBudget() / 100) *  percentage;
+            proposal.setPercentage(Long.valueOf(percentage));
+            proposal.setBidAmount(Long.valueOf(bidAmount));
+            repository.save(proposal);
+            //fire notification
+            if(currentJob!=null) {
+                NotificationBody body = new NotificationBody();
+                body.setBody("The responsibility  for  "+currentJob.getTitle()+" has been changed to "+percentage+"% now and amount to NGN "+bidAmount+'.');
+                body.setSubject("Responsibility Change");
+                body.setActionType("REDIRECT");
+                body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
+                body.setTopic("'Job'");
+                body.setChannel("S");
+                body.setRecipient(proposal.getUserId());
+                notificationSender.pushNotification(body);
             }
             //end
         }
@@ -144,7 +211,6 @@ public class JobProposalService  implements Serializable {
     public Model findProposalById(Long id,Model model) {
         JobProposal proposal = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Proposal Available"));
         if (proposal != null)
-
             return appService.getProposal(proposal, model);
         else
             return null;
