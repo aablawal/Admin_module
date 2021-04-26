@@ -99,7 +99,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         CorsConfiguration configAutenticacao = new CorsConfiguration();
         configAutenticacao.setAllowCredentials(true);
         configAutenticacao.addAllowedHeader("*");
-        configAutenticacao.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq-frontend.azurewebsites.net/"));
+        configAutenticacao.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq-frontend.azurewebsites.net"));
         configAutenticacao.setAllowedMethods(Arrays.asList("GET","PUT","POST","UPDATE","DELETE"));
         configAutenticacao.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", configAutenticacao); // Global for all paths
