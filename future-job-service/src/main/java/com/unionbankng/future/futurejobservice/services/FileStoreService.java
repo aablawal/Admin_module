@@ -17,13 +17,13 @@ public class FileStoreService {
     @GrpcClient("blobStorageService")
     private  BlobStorageServiceGrpc.BlobStorageServiceBlockingStub blobStorageServiceBlockingStub;
 
-    public String storeFiles(MultipartFile[] files, Long jid){
+    public String storeFiles(MultipartFile[] files, String prefix){
         if (files.length > 0) {
             StringBuilder fileNames = new StringBuilder();
             Arrays.asList(files).stream().forEach(file -> {
                 String name = null;
                 try {
-                    name = this.storeFile(file, jid, BlobType.IMAGE);
+                    name = this.storeFile(file, prefix, BlobType.IMAGE);
                     fileNames.append(name).append(",");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -35,11 +35,11 @@ public class FileStoreService {
         return  null;
     }
 
-    public String storeFile(MultipartFile file, Long userId,BlobType blobType) throws IOException {
+    public String storeFile(MultipartFile file, String prefix,BlobType blobType) throws IOException {
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
-        String fileName = userId + "_" + System.currentTimeMillis() + fileExtension;
+        String fileName = prefix + "_" + System.currentTimeMillis() + fileExtension;
 
         StorageUploadRequest storageUploadRequest = StorageUploadRequest.newBuilder().setFileName(fileName)
                 .setBlobType(blobType).setFileByte(ByteString.copyFrom(file.getBytes())).build();

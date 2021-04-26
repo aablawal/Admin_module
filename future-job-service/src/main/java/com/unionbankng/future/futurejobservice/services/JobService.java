@@ -5,7 +5,6 @@ import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
 import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import com.unionbankng.future.futurejobservice.enums.JobTeamStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.TeamMember;
 import com.unionbankng.future.futurejobservice.repositories.*;
@@ -49,9 +48,9 @@ public class JobService {
 
             //save files if not null
             if (nda_files!=null)
-                nda_file_names = this.fileStoreService.storeFiles(nda_files, job.oid);
+                nda_file_names = this.fileStoreService.storeFiles(nda_files, job.oid.toString());
             if (supporting_files!=null)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, job.oid);
+                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, job.oid.toString());
 
             //cross verify if attached files processed
             if (nda_file_names != null)

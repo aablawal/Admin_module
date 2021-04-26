@@ -529,7 +529,7 @@ public class JobContractService implements Serializable {
             request.setStatus(JobSubmissionStatus.PE);
 
             if (supportingFiles != null)
-                supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId());
+                supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId().toString());
 
             if (supporting_file_names != null)
                 request.supportingFiles = supporting_file_names;
@@ -583,7 +583,7 @@ public class JobContractService implements Serializable {
             request.setReferenceId(disputeReferenceId);
 
             if (attachmentFiles != null)
-                attachments = this.fileStoreService.storeFiles(attachmentFiles, request.getProposalId());
+                attachments = this.fileStoreService.storeFiles(attachmentFiles, request.getProposalId().toString());
             if (attachments != null)
                 request.attachment = attachments;
 
@@ -671,7 +671,7 @@ public class JobContractService implements Serializable {
             request.setStatus(JobSubmissionStatus.PE);
 
             if (supportingFiles != null)
-                supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId());
+                supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId().toString());
 
             if (supporting_file_names != null) {
                 request.supportingFiles = supporting_file_names;

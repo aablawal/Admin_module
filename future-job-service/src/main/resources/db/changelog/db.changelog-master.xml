@@ -12,6 +12,7 @@
     <include file="db/changelog/db.job-teams-changelog.xml"/>
     <include file="db/changelog/db.job-ratings-changelog.xml"/>
     <include file="db/changelog/db.job-categories-changelog.xml"/>
+    <include file="db/changelog/db.chat-files-changelog.xml"/>
 <!--    <changeSet id="1561040019818-1" author="chris">-->
 <!--        <sqlFile dbms="h2,mssql" path="db/migrations/migration-1.sql" />-->
 <!--    </changeSet>-->

@@ -33,4 +33,9 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1619419080895-3">
+        <addColumn tableName="job_contract_disputes">
+            <column name="reference_id" type="TEXT"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

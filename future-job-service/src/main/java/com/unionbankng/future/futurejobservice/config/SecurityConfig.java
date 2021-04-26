@@ -35,7 +35,6 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers("/api/v1/jobs","/api/v1/jobs/type/**").permitAll().and()
                 .requestMatchers().antMatchers("/api/**").and().authorizeRequests().antMatchers("/api/**").authenticated();
-
     }
 
     @Autowired

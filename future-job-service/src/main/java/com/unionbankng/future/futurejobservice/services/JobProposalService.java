@@ -72,7 +72,7 @@ public class JobProposalService  implements Serializable {
 
             //save files if not null
             if (supporting_files!=null)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, application.userId);
+                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, application.userId.toString());
             //cross verify if attached files processed
             if (supporting_file_names != null)
                 application.supportingFiles = supporting_file_names;
