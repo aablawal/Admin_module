@@ -212,11 +212,19 @@ public class JobContractController {
                 new APIResponse("success",true,jobContractService.getTotalJobCompletedByUser(id)));
     }
 
+    @PostMapping("/v1/job/contract/settle_payment/{referenceId}")
+    public ResponseEntity<APIResponse> settleContractPaymentById(@Valid @PathVariable String referenceId, Principal principal) throws JsonProcessingException {
+        return ResponseEntity.ok().body(jobContractService.settleContractPaymentById(principal, referenceId));
+    }
+
+    @PostMapping("/v1/job/contract/reverse_payment/{transactionId}")
+    public ResponseEntity<APIResponse> reverseContractPaymentById(@Valid @PathVariable String transactionId, Principal principal) throws JsonProcessingException {
+        return ResponseEntity.ok().body(jobContractService.reverseContractPaymentById(principal, transactionId));
+    }
     @GetMapping("/v1/bank/transfer/test")
     public ResponseEntity<APIResponse<String>> transferAmount() throws JsonProcessingException {
 
-               JobTransfer transfer=new JobTransfer();
-
+               JobPayment transfer=new JobPayment();
                 transfer.setUserId(Long.valueOf(1));
                 transfer.setJobId(Long.valueOf(1));
                 transfer.setProposalId(Long.valueOf(1));

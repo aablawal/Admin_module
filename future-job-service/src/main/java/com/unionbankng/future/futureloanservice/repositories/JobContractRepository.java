@@ -12,7 +12,7 @@ public interface JobContractRepository extends JpaRepository<JobContract, Long> 
 
 
     List<JobContract> findByJobId(Long jobId);
-
+    Optional<JobContract> findByReferenceId(String referenceId);
     @Query(value = "SELECT TOP(1) * FROM  job_contracts where proposal_id=:proposalId and job_id=:jobId order by created_at desc", nativeQuery = true)
     JobContract findContractByProposalAndJobId(Long proposalId, Long jobId);
 

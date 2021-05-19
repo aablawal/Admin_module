@@ -9,6 +9,7 @@ import com.unionbankng.future.futureloanservice.enums.*;
 import com.unionbankng.future.futureloanservice.pojos.APIResponse;
 import com.unionbankng.future.futureloanservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futureloanservice.pojos.NotificationBody;
+import com.unionbankng.future.futureloanservice.pojos.Payment;
 import com.unionbankng.future.futureloanservice.repositories.*;
 import com.unionbankng.future.futureloanservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futureloanservice.util.NotificationSender;
@@ -40,9 +41,12 @@ public class JobContractService implements Serializable {
     private String sidekiqAccountName;
     @Value("${sidekiq.accountNumber}")
     private String sidekiqAccountNumber;
+    private String UBNAccountName = "UBN Account Name";
+    private String UBNAccountNumber = "0095788138";
+    private String PepperestAccountName = "Pepperest Account Name";
+    private String PepperestAccountNumber = "0062775073";
     private String baseURL = "https://pepperest.com/EscrowService/api/Escrow";
     private Logger logger = LoggerFactory.getLogger(JobContractService.class);
-
 
     @Autowired
     private RestTemplate rest;
@@ -55,8 +59,10 @@ public class JobContractService implements Serializable {
     private final JobRateRepository jobRateRepository;
     private final FileStoreService fileStoreService;
     private final BankTransferService bankTransferService;
+    private final JobPaymentService jobPaymentService;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
     private final JobContractDisputeRepository jobContractDisputeRepository;
+    private final JobPaymentRepository jobPaymentRepository;
     private final NotificationSender notificationSender;
 
 
@@ -90,17 +96,18 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public Long getTotalJobEarningByUserId(Long userId){
-        return  jobContractRepository.getTotalJobEarningByUserId(userId).orElse(0l);
+    public Long getTotalJobEarningByUserId(Long userId) {
+        return jobContractRepository.getTotalJobEarningByUserId(userId).orElse(0l);
     }
 
-    public Long getTotalJobExpenditureByUser(Long userId){
-        return  jobContractRepository.getTotalJobExpenditureByUserId(userId).orElse(0l);
+    public Long getTotalJobExpenditureByUser(Long userId) {
+        return jobContractRepository.getTotalJobExpenditureByUserId(userId).orElse(0l);
     }
 
-    public Long getTotalJobCompletedByUser(Long userId){
-        return  jobContractRepository.getTotalJobCompletedByUser(userId).orElse(0l);
+    public Long getTotalJobCompletedByUser(Long userId) {
+        return jobContractRepository.getTotalJobCompletedByUser(userId).orElse(0l);
     }
+
     public JobContract findJobContractByProposalAndJobId(Long proposalId, Long jobId) {
         return jobContractRepository.findContractByProposalAndJobId(proposalId, jobId);
     }
@@ -149,11 +156,11 @@ public class JobContractService implements Serializable {
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
             UUID referenceId = UUID.randomUUID();
-            String transferReferenceId = referenceId.toString().replaceAll("-", "");
+            String contractReferenceId = referenceId.toString().replaceAll("-", "");
 
             contract.setPeppfees(0); //set peprest charges to zero
-            contract.setReferenceId(referenceId.toString());
-            contract.setTransferReferenceId(transferReferenceId);
+            contract.setReferenceId(contractReferenceId);
+            contract.setTransferReferenceId(contractReferenceId);
             contract.setAppId(appId);
 
             int status = 0;
@@ -187,35 +194,16 @@ public class JobContractService implements Serializable {
                 //end
             } else {
                 //transfer the amount to Sidekiq main account
-                JobTransfer transfer = new JobTransfer();
-                transfer.setUserId(proposal.getUserId());
-                transfer.setJobId(proposal.getJobId());
-                transfer.setProposalId(proposal.getId());
-                transfer.setEmployerId(proposal.getEmployerId());
-                transfer.setCreatedAt(new Date());
-                //transfer
-                transfer.setAmount(contract.getAmount());
-                transfer.setCurrency("NGN");
-                transfer.setPaymentReference(contract.getTransferReferenceId());
-                transfer.setInitBranchCode("682");
-                //credit
-                transfer.setCreditAccountName(sidekiqAccountName);
-                transfer.setCreditAccountNumber(sidekiqAccountNumber);
-                transfer.setCreditAccountBankCode("032");
-                transfer.setCreditAccountBranchCode("682");
-                transfer.setCreditAccountType("CASA");
-                transfer.setCreditNarration(job.getTitle());
-                //debit
-                transfer.setDebitAccountName(proposal.getAccountName());
-                transfer.setDebitAccountNumber(proposal.getAccountNumber());
-                transfer.setDebitAccountBranchCode(proposal.getBranchCode());
-                transfer.setDebitAccountBranchCode("682");
-                transfer.setDebitAccountType("CASA");
-                transfer.setDebitNarration(job.getTitle());
-                logger.info(new ObjectMapper().writeValueAsString(transfer));
-                UBNFundsTransferResponse transferResponse = bankTransferService.transferUBNtoUBN(transfer);
-
-                if (transferResponse.getCode().compareTo("00") == 0) {
+                Payment payment = new Payment();
+                payment.setProposalId(contract.getProposalId());
+                payment.setAmount(contract.getAmount());
+                payment.setNarration("Transfer from Employer to Escrow account for job Contract");
+                payment.setCreditAccountName(sidekiqAccountName);
+                payment.setCreditAccountNumber(sidekiqAccountNumber);
+                payment.setDebitAccountName(proposal.getAccountName());
+                payment.setDebitAccountNumber(proposal.getAccountNumber());
+                APIResponse paymentResponse=jobPaymentService.makePayment(payment);
+                if (paymentResponse.isSuccess()) {
                     if (job != null) {
                         NotificationBody body = new NotificationBody();
                         body.setBody("Your payment of " + contract.getAmount() + " has been successful");
@@ -287,11 +275,7 @@ public class JobContractService implements Serializable {
                     }
                 } else {
                     status = 0;
-                    remark = transferResponse.getCode() + ": Payment Failed " + transferResponse.getMessage();
-                    logger.info("JOBSERVICE: Payment failed");
-                    logger.error(transferResponse.getMessage());
-                    logger.error(transferResponse.getCode());
-
+                    remark =paymentResponse.getMessage();
                 }
             }
             if (status == 1) {
@@ -427,12 +411,10 @@ public class JobContractService implements Serializable {
     }
 
 
-    public JobContractExtension approveContractExtension(Principal principal, String request) throws
-            JsonProcessingException {
+    public JobContractExtension approveContractExtension(Principal principal, String request) throws JsonProcessingException {
         JobContractExtension extensionRequest = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContractExtension.class);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         return approveContractExtension(currentUser.getUserFullName(), extensionRequest);
-
     }
 
     public JobContractExtension approveContractExtension(String userName, JobContractExtension
@@ -570,13 +552,13 @@ public class JobContractService implements Serializable {
             ResponseEntity<String> response = null;
             UUID referenceId = UUID.randomUUID();
             String disputeReferenceId = referenceId.toString().replaceAll("-", "");
-            String transactionReferenceId="";
-            JobContract contract= jobContractRepository.findById(request.getContractId()).orElse(null);
-            if(contract!=null)
-                transactionReferenceId=contract.getReferenceId();
+            String transactionReferenceId = "";
+            JobContract contract = jobContractRepository.findById(request.getContractId()).orElse(null);
+            if (contract != null)
+                transactionReferenceId = contract.getReferenceId();
 
 
-            logger.info("The trans id is:"+transactionReferenceId);
+            logger.info("The trans id is:" + transactionReferenceId);
             request.setStatus(JobContractDisputeStatus.PE);
             request.setUserId(userId);
             request.setReferenceId(disputeReferenceId);
@@ -616,8 +598,7 @@ public class JobContractService implements Serializable {
                     logger.info("JOBSERV: Unable to raise a dispute, the dispute request is not valid");
                     return new APIResponse("Unable to raise a dispute, the dispute request is not valid", false, null);
                 }
-            }
-            else {
+            } else {
                 logger.info("JOBSERVICE: Escrow transaction failed");
                 return new APIResponse("Escrow transaction failed", false, null);
             }
@@ -628,8 +609,6 @@ public class JobContractService implements Serializable {
             return new APIResponse(ex.getMessage(), false, null);
         }
     }
-
-
 
     public JobProjectSubmission rejectJob(Principal principal, Long jobId, Long
             requestId) {
@@ -876,11 +855,12 @@ public class JobContractService implements Serializable {
                         if (contract != null) {
 
                             UUID referenceId = UUID.randomUUID();
-                            String transferReferenceId = referenceId.toString().replaceAll("-", "");
-                            int peppFess = (int) (2.5 / 100) * contract.getAmount() + 200;
+                            String contractReferenceId = referenceId.toString().replaceAll("-", "");
+                            int peppFess = 0; //set peperest charges to zero
+
                             contract.setPeppfees(peppFess);
-                            contract.setReferenceId(transferReferenceId);
-                            contract.setTransferReferenceId(transferReferenceId);
+                            contract.setReferenceId(contractReferenceId);
+                            contract.setTransferReferenceId(contractReferenceId);
                             contract.setAppId(appId);
                             contract.setPeppfees(peppFess);
 
@@ -890,37 +870,18 @@ public class JobContractService implements Serializable {
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
 
-                            //transfer the amount to Escrow
-                            JobTransfer transfer = new JobTransfer();
-                            transfer.setUserId(proposal.getUserId());
-                            transfer.setJobId(proposal.getJobId());
-                            transfer.setProposalId(proposal.getId());
-                            transfer.setEmployerId(proposal.getEmployerId());
-                            transfer.setCreatedAt(new Date());
-                            //transfer
-                            transfer.setAmount(Integer.parseInt(milestone.getAmount().toString()));
-                            transfer.setCurrency("NGN");
-                            transfer.setPaymentReference(contract.getTransferReferenceId());
-                            transfer.setInitBranchCode("682");
-                            //credit
-                            transfer.setCreditAccountName(sidekiqAccountName);
-                            transfer.setCreditAccountNumber(sidekiqAccountNumber);
-                            transfer.setCreditAccountBankCode("032");
-                            transfer.setCreditAccountBranchCode("682");
-                            transfer.setCreditAccountType("CASA");
-                            transfer.setCreditNarration(job.getTitle());
-                            //debit
-                            transfer.setDebitAccountName(proposal.getAccountName());
-                            transfer.setDebitAccountNumber(proposal.getAccountNumber());
-                            transfer.setDebitAccountBranchCode(proposal.getBranchCode());
-                            transfer.setDebitAccountBranchCode("682");
-                            transfer.setDebitAccountType("CASA");
-                            transfer.setDebitNarration(job.getTitle());
 
-                            logger.info(new ObjectMapper().writeValueAsString(transfer));
-                            UBNFundsTransferResponse transferResponse = bankTransferService.transferUBNtoUBN(transfer);
+                            Payment payment = new Payment();
+                            payment.setProposalId(contract.getProposalId());
+                            payment.setAmount(Integer.parseInt(milestone.getAmount().toString()));
+                            payment.setNarration("Transfer from Employer to Escrow account for Milestone " + milestone.getTitle());
+                            payment.setCreditAccountName(sidekiqAccountName);
+                            payment.setCreditAccountNumber(sidekiqAccountNumber);
+                            payment.setDebitAccountName(proposal.getAccountName());
+                            payment.setDebitAccountNumber(proposal.getAccountNumber());
+                            APIResponse paymentResponse=jobPaymentService.makePayment(payment);
 
-                            if (transferResponse.getCode().compareTo("00") == 0) {
+                            if (paymentResponse.isSuccess()) {
                                 //set milestone amount to the escrow
                                 HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                                 ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
@@ -955,10 +916,7 @@ public class JobContractService implements Serializable {
                                 //done
                             } else {
                                 status = 0;
-                                remark = transferResponse.getCode() + ": Payment Failed " + transferResponse.getMessage();
-                                logger.info("JOBSERVICE: Payment failed");
-                                logger.error(transferResponse.getMessage());
-                                logger.error(transferResponse.getCode());
+                                remark = paymentResponse.getMessage();
                             }
                         } else {
                             status = 0;
@@ -1065,6 +1023,126 @@ public class JobContractService implements Serializable {
         } catch (Exception ex) {
             ex.printStackTrace();
             return new APIResponse("Oops! An Error Occurred", false, null);
+        }
+    }
+
+    public APIResponse settleContractPaymentById(Principal principal, String contractReferenceId) throws JsonProcessingException {
+        //check contract available
+        JobContract contract = jobContractRepository.findByReferenceId(contractReferenceId).orElse(null);
+        if (contract == null) return new APIResponse("No Contract found with the Reference Id provided", false, null);
+
+        //check if payment made for the requested settlement
+        JobPayment paymentHistory = jobPaymentRepository.findByPaymentReference(contract.getTransferReferenceId()).orElse(null);
+        if (paymentHistory == null) return new APIResponse("Payment history not found for this Contract", false, null);
+
+        //check if contract is available
+        JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
+        if (proposal == null) return new APIResponse("Proposal not found for this Contract", false, null);
+
+        //check if contract is available
+        Job job = jobRepository.findById(contract.getJobId()).orElse(null);
+        if (job == null) return new APIResponse("Job not found for this Contract", false, null);
+
+        int depositedAmount = paymentHistory.getAmount();
+        int UBNCharges = 400;
+        int pepperestCharges = 100;
+        int freelancerCharges = (depositedAmount - pepperestCharges) - UBNCharges;
+        ArrayList<APIResponse> responseArrayList = new ArrayList<>();
+
+        //transfer from Escrow account to UBN commercial account
+        Payment UBNPayment = new Payment();
+        UBNPayment.setProposalId(contract.getProposalId());
+        UBNPayment.setAmount(UBNCharges);
+        UBNPayment.setNarration("Payment from Kula for " + job.getTitle());
+        UBNPayment.setDebitAccountName(sidekiqAccountName);
+        UBNPayment.setDebitAccountNumber(sidekiqAccountNumber);
+        UBNPayment.setCreditAccountName(UBNAccountName);
+        UBNPayment.setCreditAccountNumber(UBNAccountNumber);
+        APIResponse UBNTransferResponse = jobPaymentService.makePayment(UBNPayment);
+        if (UBNTransferResponse.isSuccess()) {
+            //transfer from Escrow account to Pepperest commercial account
+            Payment pepperestPayment = new Payment();
+            pepperestPayment.setProposalId(contract.getProposalId());
+            pepperestPayment.setAmount(pepperestCharges);
+            pepperestPayment.setNarration("Payment from Kula for " + job.getTitle());
+            pepperestPayment.setDebitAccountName(sidekiqAccountName);
+            pepperestPayment.setDebitAccountNumber(sidekiqAccountNumber);
+            pepperestPayment.setCreditAccountName(PepperestAccountName);
+            pepperestPayment.setCreditAccountNumber(PepperestAccountNumber);
+            APIResponse pepperestTransferResponse = jobPaymentService.makePayment(pepperestPayment);
+            if (pepperestTransferResponse.isSuccess()) {
+                responseArrayList.add(pepperestTransferResponse);
+                //transfer from Escrow account to freelancer account
+                Payment freelancerPayment = new Payment();
+                freelancerPayment.setProposalId(contract.getProposalId());
+                freelancerPayment.setAmount(freelancerCharges);
+                freelancerPayment.setNarration("Payment from Kula for " + job.getTitle());
+                freelancerPayment.setDebitAccountName(sidekiqAccountName);
+                freelancerPayment.setDebitAccountNumber(sidekiqAccountNumber);
+                freelancerPayment.setCreditAccountName(PepperestAccountName);
+                freelancerPayment.setCreditAccountNumber(PepperestAccountName);
+                APIResponse freelancerTransferResponse = jobPaymentService.makePayment(freelancerPayment);
+                if (freelancerTransferResponse.isSuccess()) {
+                    responseArrayList.add(freelancerTransferResponse);
+                    return new APIResponse("Request Successful", true, responseArrayList);
+                } else {
+                    return new APIResponse(freelancerTransferResponse.getMessage(), false, null);
+                }
+            } else {
+                return new APIResponse(pepperestTransferResponse.getMessage(), false, null);
+            }
+        } else {
+            return new APIResponse(UBNTransferResponse.getMessage(), false, null);
+        }
+    }
+
+    public APIResponse reverseContractPaymentById(Principal principal, String contractReferenceId) throws JsonProcessingException {
+        //check if contract exist
+        JobContract contract = jobContractRepository.findByReferenceId(contractReferenceId).orElse(null);
+        if (contract == null)
+            return new APIResponse("Contract not found with from Reference Id Provided", false, null);
+
+        //check if payment made for the requested reversal
+        JobPayment paymentHistory = jobPaymentRepository.findByPaymentReference(contract.getTransferReferenceId()).orElse(null);
+        if (paymentHistory == null)
+            return new APIResponse("Payment history not found for the Contract", false, null);
+
+        //check if proposal is available
+        JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
+        if (proposal == null)
+            return new APIResponse("Proposal not found for the Contract", false, null);
+
+        //check if job is available
+        Job job = jobRepository.findById(contract.getJobId()).orElse(null);
+        if (job == null)
+            return new APIResponse("Job not found for the Contract", false, null);
+
+        int depositedAmount = paymentHistory.getAmount();
+        Payment payment = new Payment();
+        payment.setProposalId(contract.getProposalId());
+        payment.setAmount(depositedAmount);
+        payment.setNarration("Reversal from Kula for " + job.getTitle());
+        payment.setDebitAccountName(sidekiqAccountName);
+        payment.setDebitAccountNumber(sidekiqAccountNumber);
+        payment.setCreditAccountName(proposal.getAccountName());
+        payment.setCreditAccountNumber(proposal.getAccountNumber());
+        //transfer back the charged amount to the Employer
+        APIResponse transferResponse = jobPaymentService.makePayment(payment);
+        if (transferResponse.isSuccess()) {
+            //deactivate contract when reversal is done
+            if (proposal.getWorkMethod() == "Overall") {
+                contract.setStatus(JobProposalStatus.IA);
+                contract.setLastModifiedDate(new Date());
+                jobContractRepository.save(contract);
+
+                proposal.setStatus(JobProposalStatus.IA);
+                proposal.setLastModifiedDate(new Date());
+                jobProposalRepository.save(proposal);
+            }
+            logger.info("JOBSERVICE: Payment successful");
+            return new APIResponse("Reversal Successful", true, transferResponse.getPayload());
+        } else {
+            return new APIResponse(transferResponse.getMessage(), false, null);
         }
     }
 }

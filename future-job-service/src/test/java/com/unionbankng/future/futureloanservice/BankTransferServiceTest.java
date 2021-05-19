@@ -1,6 +1,6 @@
 package com.unionbankng.future.futureloanservice;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
-import com.unionbankng.future.futureloanservice.entities.JobTransfer;
+import com.unionbankng.future.futureloanservice.entities.JobPayment;
 import com.unionbankng.future.futureloanservice.services.BankTransferService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class BankTransferServiceTest {
     @Test
     void transferUBNtoUBN() {
 
-        JobTransfer transfer=new JobTransfer();
+        JobPayment transfer=new JobPayment();
 
         transfer.setUserId(Long.valueOf(1));
         transfer.setJobId(Long.valueOf(1));

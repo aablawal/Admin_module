@@ -11,7 +11,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobTransfer {
+public class JobPayment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +51,7 @@ public class JobTransfer {
     @Temporal(TemporalType.DATE)
     Date createdAt;
 
-    public JobTransfer(JobTransfer transfer) {
+    public JobPayment(JobPayment transfer) {
         this.id = transfer.id;
         this.proposalId = transfer.proposalId;
         this.userId =  transfer.userId;

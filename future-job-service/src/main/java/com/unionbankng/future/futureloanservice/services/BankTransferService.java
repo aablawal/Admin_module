@@ -1,7 +1,7 @@
 package com.unionbankng.future.futureloanservice.services;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferRequest;
 import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferServiceGrpc;
-import com.unionbankng.future.futureloanservice.entities.JobTransfer;
+import com.unionbankng.future.futureloanservice.entities.JobPayment;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ public class BankTransferService {
     @GrpcClient("bankService")
     private  UBNFundsTransferServiceGrpc.UBNFundsTransferServiceBlockingStub ubnFundsTransferServiceBlockingStub;
 
-    public UBNFundsTransferResponse transferUBNtoUBN(JobTransfer transfer){
+    public UBNFundsTransferResponse transferUBNtoUBN(JobPayment transfer){
         UBNFundsTransferRequest request = UBNFundsTransferRequest.newBuilder().
         setAmount(transfer.getAmount()).
         setCreditAccountName(transfer.getCreditAccountName()).
