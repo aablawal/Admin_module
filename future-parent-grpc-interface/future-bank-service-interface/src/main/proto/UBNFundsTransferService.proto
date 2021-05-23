@@ -40,7 +40,6 @@ message UBNFundsTransferResponse {
   string sessionId = 4;
 }
 
-
 service UBNFundsTransferService {
     rpc transferFund(UBNFundsTransferRequest) returns (UBNFundsTransferResponse);
 }
