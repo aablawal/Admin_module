@@ -6,13 +6,17 @@ import lombok.Data;
 import java.util.ArrayList;
 
 @Data
-public class UBNBulkFundTransferRequest {
-	private String currency;
-	private	String initBranchCode;
-	private	String paymentReference;
-	private	String transactionDate;
-	private	String paymentTypeCode;
-	private	String externalSystemReference;
-	private ArrayList<String> batchItems;
-
+public class UBNBulkFundTransferBatchItem {
+	private String transactionId;
+	private String	accountNumber;
+	private String	accountType;
+	private String	accountName;
+	private String	accountBranchCode;
+	private String  accountBankCode;
+	private String	narration;
+	private String	instrumentNumber;
+	private String	amount;
+	private String	valueDate;
+	private String	crDrFlag;
+	private String	feeOrCharges;
 }

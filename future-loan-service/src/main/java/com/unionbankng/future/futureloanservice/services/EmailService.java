@@ -1,5 +1,4 @@
 package com.unionbankng.future.futureloanservice.services;
-import com.unionbankng.future.futureloanservice.enums.RecipientType;
 import com.unionbankng.future.futureloanservice.pojos.EmailAddress;
 import com.unionbankng.future.futureloanservice.pojos.EmailBody;
 import com.unionbankng.future.futureloanservice.pojos.EmailMessage;
@@ -31,7 +30,7 @@ public class EmailService {
     public void sendEmail(EmailMessage message) {
       EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{message.getBody()}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject(message.getSubject())
-                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(message.getRecipient()).displayName(message.getRecipient()).build())).build();
+                .recipients(Arrays.asList(EmailAddress.builder().email(message.getRecipient()).displayName(message.getRecipient()).build())).build();
 
        emailSender.sendEmail(emailBody);
     }
