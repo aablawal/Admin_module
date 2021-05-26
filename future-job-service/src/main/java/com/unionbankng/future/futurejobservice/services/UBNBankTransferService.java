@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BankTransferService {
+public class UBNBankTransferService {
 
     @GrpcClient("bankService")
     private  UBNFundsTransferServiceGrpc.UBNFundsTransferServiceBlockingStub ubnFundsTransferServiceBlockingStub;
-    private final JobPaymentResponseService jobPaymentResponseService;
+    private final UBNTransferResponseService jobPaymentResponseService;
     private final App app;
 
     public PaymentResponse transferUBNtoUBN(JobPayment transfer){

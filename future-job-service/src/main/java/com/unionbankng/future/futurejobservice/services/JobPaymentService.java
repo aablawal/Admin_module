@@ -2,7 +2,6 @@ package com.unionbankng.future.futurejobservice.services;
 
 import com.unionbankng.future.futurebankservice.grpc.UBNBulkFundTransferBatchItem;
 import com.unionbankng.future.futurebankservice.grpc.UBNBulkFundsTransferRequest;
-import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.*;
@@ -21,7 +20,7 @@ import java.util.*;
 public class JobPaymentService implements Serializable {
 
     private Logger logger = LoggerFactory.getLogger(JobPaymentService.class);
-    private final BankTransferService bankTransferService;
+    private final UBNBankTransferService bankTransferService;
     private final JobPaymentRepository jobPaymentRepository;
     private final JobBulkPaymentRepository jobBulkPaymentRepository;
     private final App app;

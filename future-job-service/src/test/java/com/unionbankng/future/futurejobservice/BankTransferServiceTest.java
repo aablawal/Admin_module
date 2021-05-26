@@ -1,7 +1,7 @@
 package com.unionbankng.future.futurejobservice;
 import com.unionbankng.future.futurejobservice.entities.JobPayment;
 import com.unionbankng.future.futurejobservice.pojos.PaymentResponse;
-import com.unionbankng.future.futurejobservice.services.BankTransferService;
+import com.unionbankng.future.futurejobservice.services.UBNBankTransferService;
 import lombok.RequiredArgsConstructor;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import java.util.Date;
 class BankTransferServiceTest {
 
 
-  private final  BankTransferService bankTransferService;
+  private final UBNBankTransferService bankTransferService;
 
     @Test
     void transferUBNtoUBN() {

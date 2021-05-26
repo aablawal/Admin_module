@@ -1,10 +1,8 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
-import com.unionbankng.future.futurejobservice.services.BankTransferService;
+import com.unionbankng.future.futurejobservice.services.UBNBankTransferService;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -13,11 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
-import javax.servlet.http.HttpServletResponse;
+
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,7 +23,7 @@ import java.util.List;
 public class JobContractController {
 
     private  final JobContractService jobContractService;
-    private final BankTransferService bankTransferService;
+    private final UBNBankTransferService bankTransferService;
     Logger logger = LoggerFactory.getLogger(JobContractController.class);
 
 

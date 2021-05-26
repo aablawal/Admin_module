@@ -6,7 +6,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class JobPaymentResponseService {
+public class UBNTransferResponseService {
 
     Map<String, String> responses=new HashMap<>();
     String getResponseMessage(String responseCode, String responseMessage){
