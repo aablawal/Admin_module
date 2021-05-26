@@ -201,8 +201,10 @@ public class JobContractService implements Serializable {
                 payment.setNarration("Transfer from Employer to Escrow account for job Contract");
                 payment.setCreditAccountName(escrowAccountName);
                 payment.setCreditAccountNumber(escrowAccountNumber);
+                payment.setCreditAccountType("GL");
                 payment.setDebitAccountName(proposal.getAccountName());
                 payment.setDebitAccountNumber(proposal.getAccountNumber());
+                payment.setDebitAccountType("CASA");
                 payment.setPaymentReference(contractReferenceId);
                 payment.setExecutedFor("Job:"+job.getId());
                 payment.setExecutedBy(currentUser.getUserUUID());
@@ -882,8 +884,10 @@ public class JobContractService implements Serializable {
                             payment.setNarration("Transfer from Employer to Escrow account for Milestone " + milestone.getTitle());
                             payment.setCreditAccountName(escrowAccountName);
                             payment.setCreditAccountNumber(escrowAccountNumber);
+                            payment.setCreditAccountType("GL");
                             payment.setDebitAccountName(proposal.getAccountName());
                             payment.setDebitAccountNumber(proposal.getAccountNumber());
+                            payment.setDebitAccountType("CASA");
                             payment.setPaymentReference(paymentReferenceId);
                             payment.setExecutedFor("Job:"+job.getId());
                             payment.setExecutedBy(currentUser.getUserUUID());
@@ -1100,7 +1104,7 @@ public class JobContractService implements Serializable {
                escrowAccount.setAmount(0);
 
 
-               //***1 Level***
+               //***Union Bank***
                JobBulkPayment UBNAccount = new JobBulkPayment();
                //###############
                escrowAccount.setAmount(UBNIncomeCharge);
@@ -1121,7 +1125,7 @@ public class JobContractService implements Serializable {
                bulkPaymentStack.add(UBNAccount);
 
 
-               //***2 Level***
+               //***Pepperest***
                JobBulkPayment pepperestAccount = new JobBulkPayment();
                //##############
                escrowAccount.setAmount(pepperestIncomeCharge);
@@ -1142,7 +1146,7 @@ public class JobContractService implements Serializable {
                bulkPaymentStack.add(pepperestAccount);
 
 
-               //***3 Level***
+               //***Freelancer***
                JobBulkPayment freelancerAccount = new JobBulkPayment();
                //##################
                escrowAccount.setAmount(freelancerIncomeAmount);
@@ -1255,8 +1259,10 @@ public class JobContractService implements Serializable {
                 payment.setNarration("Reversal from Kula for " + job.getTitle());
                 payment.setDebitAccountName(escrowAccountName);
                 payment.setDebitAccountNumber(escrowAccountNumber);
+                payment.setDebitAccountType("GL");
                 payment.setCreditAccountName(contract.getEmployerAccountName());
                 payment.setCreditAccountNumber(contract.getEmployerAccountNumber());
+                payment.setCreditAccountType("CASA");
                 payment.setPaymentReference(paymentReference);
                 payment.setExecutedBy(currentUser.getUserUUID());
                 //transfer back the charged amount to the Employer

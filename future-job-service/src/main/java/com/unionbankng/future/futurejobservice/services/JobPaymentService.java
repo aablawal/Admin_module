@@ -40,14 +40,14 @@ public class JobPaymentService implements Serializable {
       payment.setDebitAccountName(paymentRequest.getDebitAccountName());
       payment.setDebitAccountNumber(paymentRequest.getDebitAccountNumber());
       payment.setDebitAccountBranchCode("682");
-      payment.setDebitAccountType("GL");
+      payment.setDebitAccountType(paymentRequest.getDebitAccountType()!=null?paymentRequest.getDebitAccountType():"CASA");
       payment.setDebitNarration(paymentRequest.getNarration());
       //credit the employer account
       payment.setCreditAccountName(paymentRequest.getCreditAccountName());
       payment.setCreditAccountNumber(paymentRequest.getCreditAccountNumber());
       payment.setCreditAccountBankCode("032");
       payment.setCreditAccountBranchCode("682");
-      payment.setCreditAccountType("GL");
+      payment.setCreditAccountType(paymentRequest.getCreditAccountType()!=null?paymentRequest.getDebitAccountType():"CASA");
       payment.setCreditNarration(paymentRequest.getNarration());
 
       PaymentResponse transferResponse = bankTransferService.transferUBNtoUBN(payment);
