@@ -3,6 +3,7 @@ package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import com.unionbankng.future.futurejobservice.enums.JobType;
@@ -106,19 +107,21 @@ public class JobContractService implements Serializable {
     public Long getTotalJobCompletedByUser(Long userId) {
         return jobContractRepository.getTotalJobCompletedByUser(userId).orElse(0l);
     }
-
     public JobContract findJobContractByProposalAndJobId(Long proposalId, Long jobId) {
         return jobContractRepository.findContractByProposalAndJobId(proposalId, jobId);
     }
-
     public JobContractExtension findContractExtensionByProposalId(Long proposalId, Long userId) {
-        return jobContractExtensionRepository.findContractByProposalAndUserId(proposalId, userId);
+        return jobContractExtensionRepository.findExtensionByProposalAndUserId(proposalId, userId);
     }
-
+    public JobContractExtension findContractExtensionByContractReference(String contractReference) {
+        return jobContractExtensionRepository.findExtensionByContractReference(contractReference);
+    }
     public JobProjectSubmission findJobSubmittedByProposalId(Long proposalId, Long userId) {
         return jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposalId, userId);
     }
-
+    public JobProjectSubmission findJobSubmittedByContractReference(String contractReference) {
+        return jobProjectSubmissionRepository.findSubmittedProjectByContractReference(contractReference);
+    }
     public JobMilestone findContractMilestoneByProposalId(Long proposalId, Long userId) {
         return jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId, userId);
     }
@@ -131,8 +134,8 @@ public class JobContractService implements Serializable {
         return jobMilestoneRepository.findMilestoneByProposalAndJobId(proposalId, jobId);
     }
 
-    public Long findTotalSpentAmountByProposalId(Long proposalId, Long jobId) {
-        return jobMilestoneRepository.findTotalSpentAmountByProposalId(proposalId, jobId);
+    public Long findTotalSpentAmountByContractReference(String  contractReference) {
+        return jobMilestoneRepository.findTotalSpentAmountByProposalId(contractReference);
     }
 
     public List<JobMilestone> findAllContractMilestoneByProposalJobIdAndStatus(Long proposalId, Long jobId, String status) {
@@ -177,7 +180,7 @@ public class JobContractService implements Serializable {
             proposal.setStartDate(new Date());
             proposal.setEndDate(c.getTime());
 
-            if (contract.getWorkMethod() == "Milestone") {
+            if (contract.getWorkMethod().equals("Milestone")) {
                 status = 1;
                 //fire notification
                 if (job != null) {
@@ -326,6 +329,7 @@ public class JobContractService implements Serializable {
                     remark = "Job not found";
                 }
 
+                app.print(contract);
                 JobContract savedContract = jobContractRepository.save(contract);
                 proposal.setContractId(savedContract.getId());
                 jobProposalRepository.save(proposal);
@@ -354,7 +358,6 @@ public class JobContractService implements Serializable {
         try {
             extensionRequest.setStatus(JobStatus.PE);
             JobContractExtension extension = jobContractExtensionRepository.save(extensionRequest);
-
             if (extension != null) {
                 //fire notification
                 Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
@@ -390,29 +393,38 @@ public class JobContractService implements Serializable {
 
     public JobMilestone addNewMilestone(String userName, JobMilestone milestone) {
         try {
-            milestone.setStatus(JobStatus.PE);
-            JobMilestone newMilestone = jobMilestoneRepository.save(milestone);
-            if (newMilestone != null) {
-                //fire notification
+            JobContract contract=jobContractRepository.findById(milestone.getContractId()).orElse(null);
+            if(contract!=null) {
+                String milestoneReferenceId = app.makeUIID();
+                milestone.setStatus(JobStatus.PC);
+                milestone.setContractReference(contract.getContractReference());
+                milestone.setMilestoneReference(milestoneReferenceId);
 
-                Job currentJob = jobRepository.findById(newMilestone.getJobId()).orElse(null);
-                if (currentJob != null) {
-                    NotificationBody body = new NotificationBody();
-                    body.setBody(userName + " created new milestone on " + currentJob.getTitle() + " for your review and approval");
-                    body.setSubject("New Milestone");
-                    body.setActionType("REDIRECT");
-                    body.setAction("/my-job/contract/milestones/" + newMilestone.getJobId() + "/" + newMilestone.getProposalId());
-                    body.setTopic("'Job'");
-                    body.setChannel("S");
-                    body.setPriority("YES");
-                    body.setRecipient(newMilestone.getEmployerId());
-                    notificationSender.pushNotification(body);
+                JobMilestone newMilestone = jobMilestoneRepository.save(milestone);
+                if (newMilestone != null) {
+                    //fire notification
+                    Job currentJob = jobRepository.findById(newMilestone.getJobId()).orElse(null);
+                    if (currentJob != null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(userName + " created new milestone on " + currentJob.getTitle() + " for your review and approval");
+                        body.setSubject("New Milestone");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/my-job/contract/milestones/" + newMilestone.getJobId() + "/" + newMilestone.getProposalId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setPriority("YES");
+                        body.setRecipient(newMilestone.getEmployerId());
+                        notificationSender.pushNotification(body);
+                    }
+                    //end
+                    return newMilestone;
+                } else {
+                    logger.info("JOBSERVICE: Unable to add new milestone");
+                    return null;
                 }
-                //end
-                return newMilestone;
-            } else {
-                logger.info("JOBSERVICE: Unable to add new milestone");
-                return null;
+            }else{
+                logger.info("JOBSERVICE: Contract not found for the milestone");
+                return  null;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -430,7 +442,7 @@ public class JobContractService implements Serializable {
     public JobContractExtension approveContractExtension(String userName, JobContractExtension
             request) {
         try {
-            JobContractExtension extension = jobContractExtensionRepository.findContractByProposalAndJobId(request.getProposalId(), request.getJobId());
+            JobContractExtension extension = jobContractExtensionRepository.findExtensionByProposalAndJobId(request.getProposalId(), request.getJobId());
             ResponseEntity<String> response = null;
 
             if (extension != null) {
@@ -561,15 +573,8 @@ public class JobContractService implements Serializable {
             String attachments = null;
             ResponseEntity<String> response = null;
             String disputeReferenceId =app.makeUIID();
-            String transactionReferenceId = "";
 
-            JobContract contract = jobContractRepository.findById(request.getContractId()).orElse(null);
-            if (contract != null)
-                transactionReferenceId = contract.getContractReference();
-
-
-            logger.info("The trans id is:" + transactionReferenceId);
-            request.setStatus(JobStatus.PE);
+            request.setStatus(JobStatus.AC);
             request.setUserId(userId);
             request.setReferenceId(disputeReferenceId);
 
@@ -578,10 +583,10 @@ public class JobContractService implements Serializable {
             if (attachments != null)
                 request.attachment = attachments;
 
-            HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+            HttpEntity<String> entity = new HttpEntity<>(this.getHeaders());
             response = rest.exchange(baseURL + "/Dispute/reportDispute?appid=" + appId
-                    + "&referenceid=" + transactionReferenceId
-                    + "&dispute_referenceid=" + request.getReferenceId()
+                    + "&referenceid=" + request.getReferenceId()
+                    + "&dispute_referenceid=" + request.getContractReference()
                     + "&dispute_category=contract-" + request.getContractId().toString()
                     + "&dispute_description=" + request.getDescription(), HttpMethod.POST, entity, String.class);
             //done
@@ -656,8 +661,6 @@ public class JobContractService implements Serializable {
         try {
             String supporting_file_names = null;
             JobMilestone milestone = jobMilestoneRepository.findById(milestoneId).orElse(null);
-            request.setStatus(JobStatus.PE);
-
             if (supportingFiles != null)
                 supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId().toString());
 
@@ -685,6 +688,7 @@ public class JobContractService implements Serializable {
                     notificationSender.pushNotification(body);
                 }
                 //end
+                request.setStatus(JobStatus.PA);
                 return jobProjectSubmissionRepository.save(request);
             } else {
                 logger.info("JOBSERVICE: Milestone not found");
@@ -696,16 +700,14 @@ public class JobContractService implements Serializable {
             return null;
         }
     }
-
-
-    public JobContract endContract(Principal principal, Rate
+    public APIResponse endContract(Principal principal, Rate
             rating, Long jobId, Long proposalId, Long userId, int state) {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         return endContract(currentUser.getUserFullName(), rating, jobId, proposalId, userId, state);
     }
 
 
-    public JobContract endContract(String userName, Rate
+    public APIResponse endContract(String userName, Rate
             rating, Long jobId, Long proposalId, Long userId, int state) {
         try {
             Job job = jobRepository.findById(jobId).orElse(null);
@@ -718,119 +720,135 @@ public class JobContractService implements Serializable {
                 contract.setDescription(rating.getDescription());
                 contract.setFeedback(rating.getFeedback());
 
+
                 if (state == 1) {
-                    contract.setEndDate(new Date());
-                    contract.setIsSettled(true);
-                    contract.setSettlement(contract.getContractReference());
-                    contract.setStatus(JobStatus.CO);
-                    proposal.setStatus(JobStatus.CO);
+                    if (!contract.getStatus().equals(JobStatus.WP)) {
+                        contract.setEndDate(new Date());
+                        contract.setIsSettled(true);
+                        contract.setSettlement(contract.getContractReference());
+                        contract.setClearedAmount((contract.getAmount()));
 
-
-                    //start to release escrow amount to freelancer
-                    HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
-                            + "&referenceid=" + contract.getContractReference()
-                            + "&user_email=" + contract.getUserEmail()
-                            + "&reasons=Job Completed", HttpMethod.POST, entity, String.class);
-                    //done
-
-                    if (response.getStatusCode().is2xxSuccessful()) {
-
-                        if (rating != null) {
-                            Rate rate = jobRateRepository.findByUserId(proposal.getUserId());
-                            if (rate != null) {
-                                rate.setRate((rate.getRate() + rating.getRate()));
-                                rate.setFeedback(rating.getFeedback());
-                                rate.setDescription(rating.getDescription());
-                                rate.setLastModifiedDate(new Date());
-                                jobRateRepository.save(rate);
-                            } else {
-                                rating.setLastModifiedDate(new Date());
-                                rating.setUserId(proposal.getUserId());
-                                jobRateRepository.save(rating);
-                            }
+                        if (!contract.getStatus().equals(JobStatus.CO)) {
+                            contract.setStatus(JobStatus.PS);  //pending settlement
+                            proposal.setStatus(JobStatus.PS);
                         }
-                        if (job != null) {
-                            job.setStatus(JobStatus.CO);
-                            jobRepository.save(job);
+
+                        //start to release escrow amount to freelancer
+                        HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+                        ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
+                                + "&referenceid=" + contract.getContractReference()
+                                + "&user_email=" + contract.getUserEmail()
+                                + "&reasons=Job Completed", HttpMethod.POST, entity, String.class);
+                        //done
+
+                        if (response.getStatusCode().is2xxSuccessful()) {
+
+                            if (rating != null) {
+                                Rate rate = jobRateRepository.findByUserId(proposal.getUserId());
+                                if (rate != null) {
+                                    rate.setRate((rate.getRate() + rating.getRate()));
+                                    rate.setFeedback(rating.getFeedback());
+                                    rate.setDescription(rating.getDescription());
+                                    rate.setLastModifiedDate(new Date());
+                                    jobRateRepository.save(rate);
+                                } else {
+                                    rating.setLastModifiedDate(new Date());
+                                    rating.setUserId(proposal.getUserId());
+                                    jobRateRepository.save(rating);
+                                }
+                            }
+                            if (job != null) {
+                                if (!contract.getStatus().equals(JobStatus.CO)) {
+                                    job.setStatus(JobStatus.CO);
+                                    jobRepository.save(job);
+                                }
+                            }
+                            if (proposal != null) {
+                                if (!contract.getStatus().equals(JobStatus.CO)) {
+                                    proposal.setStatus(JobStatus.PS);
+                                    proposal.setEndDate(new Date());
+                                    jobProposalRepository.save(proposal);
+                                }
+                            }
+                            if (project != null) {
+                                if (!contract.getStatus().equals(JobStatus.CO)) {
+                                    project.setStatus(JobStatus.PS);
+                                    jobProjectSubmissionRepository.save(project);
+                                }
+                            }
+                            jobContractRepository.save(contract);
+                            //fire notification
+                            Job currentJob = jobRepository.findById(jobId).orElse(null);
+                            if (currentJob != null) {
+                                NotificationBody body = new NotificationBody();
+                                body.setBody(userName + " ended your contract and release the sum of " + proposal.getBidAmount() + " to your bank account");
+                                body.setSubject("Contract Ended");
+                                body.setActionType("REDIRECT");
+                                body.setAction("/job/ongoing/details/" + jobId);
+                                body.setTopic("'Job'");
+                                body.setChannel("S");
+                                body.setPriority("YES");
+                                body.setRecipient(proposal.getUserId());
+                                notificationSender.pushNotification(body);
+                            }
+                            //end
+                            return new APIResponse("Request Successful", true, contract);
+                        } else {
+                            logger.info("JOBSERV: Escrow transaction Failed");
+                            return new APIResponse("Escrow Transaction Failed", false, null);
+                        }
+                    } else {
+                        logger.info("JOBSERV: can't end ongoing contract");
+                        return new APIResponse("Unable to end ongoing contract", false, null);
+                    }
+                } else {
+
+                    if (!contract.getStatus().equals(JobStatus.CO) && !contract.getStatus().equals(JobStatus.PS)) {
+                        contract.setEndDate(new Date());
+                        contract.setIsSettled(false);
+                        contract.setFeedback(String.valueOf(state));
+                        contract.setSettlement("Contract ended without settlement");
+                        contract.setDescription("Employer ended the contract");
+                        contract.setStatus(JobStatus.RE);
+                        if (project != null) {
+                            project.setStatus(JobStatus.RE);
+                            jobProjectSubmissionRepository.save(project);
                         }
                         if (proposal != null) {
-                            proposal.setStatus(JobStatus.CO);
+                            proposal.setStatus(JobStatus.RE);
                             proposal.setEndDate(new Date());
                             jobProposalRepository.save(proposal);
-                        }
-                        if (project != null) {
-                            project.setStatus(JobStatus.CO);
-                            jobProjectSubmissionRepository.save(project);
                         }
                         jobContractRepository.save(contract);
                         //fire notification
                         Job currentJob = jobRepository.findById(jobId).orElse(null);
                         if (currentJob != null) {
                             NotificationBody body = new NotificationBody();
-                            body.setBody(userName + " ended your contract and release the sum of " + proposal.getBidAmount() + " to your bank account");
+                            body.setBody(userName + " ended your contract for " + currentJob.getTitle() + ", you are not find with it? you can raise dispute.");
                             body.setSubject("Contract Ended");
                             body.setActionType("REDIRECT");
-                            body.setAction("/job/ongoing/details/" + jobId);
+                            body.setAction("/job/details/" + jobId);
                             body.setTopic("'Job'");
                             body.setChannel("S");
-                            body.setPriority("YES");
                             body.setRecipient(proposal.getUserId());
                             notificationSender.pushNotification(body);
                         }
                         //end
-                        return contract;
+                        return new APIResponse("Request Successful", true, contract);
                     } else {
-                        logger.info("JOBSERV: Escrow transaction Failed");
-                        return null;
-                    }
-                } else {
-                    contract.setEndDate(new Date());
-                    contract.setIsSettled(false);
-                    contract.setFeedback(String.valueOf(state));
-                    contract.setSettlement("Contract ended without settlement");
-                    contract.setDescription("Employer ended the contract");
-                    contract.setStatus(JobStatus.RE);
 
-
-                    if (job != null) {
-                        job.setStatus(JobStatus.IA);
-                        jobRepository.save(job);
+                        return new APIResponse("Unable to Reject Completed Contract", false, null);
                     }
-                    if (project != null) {
-                        project.setStatus(JobStatus.RE);
-                        jobProjectSubmissionRepository.save(project);
-                    }
-                    if (proposal != null) {
-                        proposal.setStatus(JobStatus.RE);
-                        proposal.setEndDate(new Date());
-                        jobProposalRepository.save(proposal);
-                    }
-                    jobContractRepository.save(contract);
-                    //fire notification
-                    Job currentJob = jobRepository.findById(jobId).orElse(null);
-                    if (currentJob != null) {
-                        NotificationBody body = new NotificationBody();
-                        body.setBody(userName + " ended your contract for " + currentJob.getTitle() + ", you are not find with it? you can raise dispute.");
-                        body.setSubject("Contract Ended");
-                        body.setActionType("REDIRECT");
-                        body.setAction("/job/details/" + jobId);
-                        body.setTopic("'Job'");
-                        body.setChannel("S");
-                        body.setRecipient(proposal.getUserId());
-                        notificationSender.pushNotification(body);
-                    }
-                    //end
-                    return contract;
                 }
-            } else {
-                logger.info("JOBSERVICE: Contract not found");
-                return null;
+            }
+            else {
+
+                return new APIResponse("Contract not found", false, null);
             }
         } catch (Exception ex) {
             logger.info(ex.getMessage());
             ex.printStackTrace();
-            return null;
+            return new APIResponse(ex.getMessage(), false, null);
         }
     }
 
@@ -853,8 +871,9 @@ public class JobContractService implements Serializable {
             String remark;
 
             if (milestone != null) {
-                milestone.setStatus(newStatus);
-                if (newStatus == JobStatus.AC) {
+
+                if (newStatus.equals(JobStatus.AC)) {
+                    milestone.setStatus(JobStatus.AC);
                     milestone.setStartDate(new Date());
                     JobProposal proposal = jobProposalRepository.findById(milestone.getProposalId()).orElse(null);
                     Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
@@ -945,7 +964,39 @@ public class JobContractService implements Serializable {
                         remark = "Proposal not found";
                         logger.error("JOBSERVICE: Proposal not found");
                     }
-                } else {
+                }
+                else if(newStatus.equals(JobStatus.RE)) {
+
+                    milestone.setStatus(JobStatus.RE);
+                    milestone.setEndDate(new Date());
+                    JobMilestone savedMilestone = jobMilestoneRepository.save(milestone);
+
+                    if(savedMilestone!=null){
+
+                        JobProjectSubmission project=jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
+                        if(project!=null){
+                            project.setStatus(JobStatus.RE);
+                            jobProjectSubmissionRepository.save(project);
+                        }
+                    }
+                    //fire notification
+                    Job currentJob = jobRepository.findById(milestone.getJobId()).orElse(null);
+                    if (currentJob != null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(currentUser.getUserFullName() + " rejected the milestone you submitted for " + currentJob.getTitle() + ".");
+                        body.setSubject("Milestone Rejected");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/my-job/contract/milestones/" + milestone.getJobId() + "/" + milestone.getProposalId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setRecipient(milestone.getUserId());
+                        notificationSender.pushNotification(body);
+                    }
+                    //end
+                    return new APIResponse("success", true, savedMilestone);
+                }
+                else {
+                    app.print(milestone);
                     status = 0;
                     remark = "Milestone status mismatch";
                     logger.error("JOBSERVICE: Milestone status mismatch");
@@ -982,60 +1033,70 @@ public class JobContractService implements Serializable {
             return new APIResponse(ex.getMessage(), false, null);
         }
     }
-
-    public APIResponse approveCompletedMilestone
-            (Principal principal, Long milestoneId, String requestData) throws
-            JsonProcessingException {
-
+    public APIResponse approveCompletedMilestone(Principal principal,String milestoneReference) {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(requestData, JobProjectSubmission.class);
-        return approveCompletedMilestone(currentUser.getUserFullName(), milestoneId, request);
+        return approveCompletedMilestone(currentUser.getUserFullName(), milestoneReference);
     }
 
     public APIResponse approveCompletedMilestone
-            (String userName, Long
-                    milestoneId, JobProjectSubmission request) {
+            (String userName, String milestoneReference){
         try {
-            JobMilestone milestone = jobMilestoneRepository.findById(milestoneId).orElse(null);
-            JobContract contract = jobContractRepository.findContractByProposalAndJobId(milestone.getProposalId(), milestone.getJobId());
+            JobMilestone milestone = jobMilestoneRepository.findMilestoneByMilestoneReference(milestoneReference).orElse(null);
+            JobContract contract = jobContractRepository.findByContractReference(milestone.getContractReference()).orElse(null);
+            JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
 
-            if (milestone != null) {
-                milestone.setStatus(JobStatus.CO);
-                contract.setClearedAmount((contract.getClearedAmount() + milestone.getAmount().intValue()));
+            if(contract!=null) {
+                if (milestone != null) {
 
-                jobMilestoneRepository.save(milestone);
-                jobContractRepository.save(contract);
+                    if (project != null) {
+                        project.setStatus(JobStatus.PS);
+                        milestone.setStatus(JobStatus.PS);
+                        contract.setClearedAmount((contract.getClearedAmount() + milestone.getAmount().intValue()));
+                        contract.setLastModifiedDate(new Date());
 
-                //start to release escrow amount to freelancer
-                HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
-                        + "&referenceid=" + milestone.getMilestoneReference()
-                        + "&user_email=" + contract.getUserEmail()
-                        + "&reasons=Milestone Completed", HttpMethod.POST, entity, String.class);
-                //done
-                if (response.getStatusCode().is2xxSuccessful()) {
-                    //fire notification
-                    Job currentJob = jobRepository.findById(request.getJobId()).orElse(null);
-                    if (currentJob != null) {
-                        NotificationBody body = new NotificationBody();
-                        body.setBody(userName + " approved the milestone you submitted for " + currentJob.getTitle() + ", and the sum of " + milestone.getAmount().toString() + " has been released to your account");
-                        body.setSubject("Milestone Completed");
-                        body.setActionType("REDIRECT");
-                        body.setAction("/my-job/contract/milestones/" + request.getJobId() + "/" + request.getProposalId());
-                        body.setTopic("'Job'");
-                        body.setChannel("S");
-                        body.setRecipient(request.getUserId());
-                        notificationSender.pushNotification(body);
+                        jobProjectSubmissionRepository.save(project);
+                        jobMilestoneRepository.save(milestone);
+                        jobContractRepository.save(contract);
+
+                        //start to release escrow amount to freelancer
+                        HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+                        ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
+                                + "&referenceid=" + milestone.getMilestoneReference()
+                                + "&user_email=" + contract.getUserEmail()
+                                + "&reasons=Milestone Completed", HttpMethod.POST, entity, String.class);
+                        //done
+                        if (response.getStatusCode().is2xxSuccessful()) {
+                            //fire notification
+                            Job currentJob = jobRepository.findById(project.getJobId()).orElse(null);
+                            if (currentJob != null) {
+                                NotificationBody body = new NotificationBody();
+                                body.setBody(userName + " approved the milestone you submitted for " + currentJob.getTitle() + ", and the sum of " + milestone.getAmount().toString() + " has been released to your account");
+                                body.setSubject("Milestone Completed");
+                                body.setActionType("REDIRECT");
+                                body.setAction("/my-job/contract/milestones/" + project.getJobId() + "/" + project.getProposalId());
+                                body.setTopic("'Job'");
+                                body.setChannel("S");
+                                body.setRecipient(project.getUserId());
+                                notificationSender.pushNotification(body);
+                            }
+                            //end
+                            return new APIResponse("success", true, milestone);
+                        } else {
+                            logger.info("JOBSERVICE: Escrow transaction failed");
+                            return new APIResponse("Escrow transaction failed", false, null);
+                        }
+                    } else {
+                        logger.info("JOBSERVICE: Project request not found");
+                        return new APIResponse("Project request history not found", false, null);
                     }
-                    //end
-                    return new APIResponse("success", true, milestone);
                 } else {
-                    logger.info("JOBSERVICE: Escrow transaction failed");
-                    return new APIResponse("Escrow transaction failed", false, null);
+                    logger.info("JOBSERVICE: Milestone not found");
+                    return new APIResponse("Milestone not found", false, null);
                 }
-            } else {
-                logger.info("JOBSERVICE: Milestone request not found");
-                return new APIResponse("Milestone not found", false, null);
+            }
+            else {
+                logger.info("JOBSERVICE: Contract  not found");
+                return new APIResponse("Contract not found", false, null);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1043,22 +1104,25 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public APIResponse settleContractPaymentById(Principal principal, String contractReferenceId) throws JsonProcessingException {
+    public APIResponse settleContractPaymentById(Principal principal, String contractReferenceId) throws CloneNotSupportedException {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         JobContract contract;
         JobMilestone milestone;
-
+        app.print("Settling Contract Id: "+contractReferenceId);
         contract= jobContractRepository.findByContractReference(contractReferenceId).orElse(null);
         milestone= jobMilestoneRepository.findMilestoneByMilestoneReference(contractReferenceId).orElse(null);
         if (contract == null) {
             if (milestone == null)
-                return new APIResponse("Contract not found with from Reference Id Provided", false, null);
+                return new APIResponse("Contract not found from Reference Id Provided", false, null);
             else {
-                contract=jobContractRepository.findById(milestone.getContractId()).orElse(null);
+                contract=jobContractRepository.findByContractReference(milestone.getContractReference()).orElse(null);
             }
         }
 
-        if(contract.getStatus().equals(JobStatus.WP)) {
+        app.print(contract);
+        app.print(milestone);
+
+        if(contract.getStatus().equals(JobStatus.PS) || milestone.getStatus().equals(JobStatus.PS)) {
             //check if contract is available
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             if (proposal == null)
@@ -1069,19 +1133,25 @@ public class JobContractService implements Serializable {
                 return new APIResponse("No Job history found for this Contract", false, null);
 
 
+
+            app.print("#Contract");
+            app.print(contract);
+
+            app.print("#milestone");
+            app.print(milestone);
+
             int depositedAmount;
-            if(contract.getWorkMethod()=="Overall") {
+            if(contract.getWorkMethod().equals("Overall"))
                 depositedAmount = contract.getAmount();
-            }
-            else{
+            else
                 if(milestone==null)
                     return new APIResponse("No Milestone found with the reference provided", false, null);
                 else
                     depositedAmount= milestone.getAmount().intValue();
-            }
+
 
            if(depositedAmount>0) {
-               int UBNIncomeCharge = 400;
+               int UBNIncomeCharge = 200;
                int pepperestIncomeCharge = 100;
                int freelancerIncomeAmount = Math.round((depositedAmount - pepperestIncomeCharge) - UBNIncomeCharge);
 
@@ -1103,12 +1173,13 @@ public class JobContractService implements Serializable {
                escrowAccount.setTransactionId("1");
                escrowAccount.setAmount(0);
 
-
                //***Union Bank***
                JobBulkPayment UBNAccount = new JobBulkPayment();
                //###############
-               escrowAccount.setAmount(UBNIncomeCharge);
-               escrowAccount.setTransactionId("1");
+
+               JobBulkPayment escrowUBNAccountDebit = (JobBulkPayment)app.copy(escrowAccount);
+               escrowUBNAccountDebit.setAmount(UBNIncomeCharge);
+               escrowUBNAccountDebit.setTransactionId("1");
                //##############
                UBNAccount.setTransactionId("2");
                UBNAccount.setAccountName(UBNIncomeAccountName);
@@ -1121,40 +1192,41 @@ public class JobContractService implements Serializable {
                UBNAccount.setAccountType("GL");
                UBNAccount.setAmount(UBNIncomeCharge);
                //############# add to bulk transfer stack ###########
-               bulkPaymentStack.add(escrowAccount);
+               bulkPaymentStack.add(escrowUBNAccountDebit);
                bulkPaymentStack.add(UBNAccount);
 
 
                //***Pepperest***
                JobBulkPayment pepperestAccount = new JobBulkPayment();
                //##############
-               escrowAccount.setAmount(pepperestIncomeCharge);
-               escrowAccount.setTransactionId("3");
+               JobBulkPayment escrowPepperestAccountDebit= (JobBulkPayment)app.copy(escrowAccount);
+               escrowPepperestAccountDebit.setAmount(pepperestIncomeCharge);
+               escrowPepperestAccountDebit.setTransactionId("3");
                //#############
                pepperestAccount.setTransactionId("4");
-               pepperestAccount.setAccountName(UBNIncomeAccountName);
-               pepperestAccount.setAccountNumber(UBNIncomeAccountNumber);
+               pepperestAccount.setAccountName(PepperestIncomeAccountName);
+               pepperestAccount.setAccountNumber(PepperestIncomeAccountNumber);
                pepperestAccount.setNarration(narration);
                pepperestAccount.setExecutedBy(currentUser.getUserUUID());
                pepperestAccount.setExecutedFor("contract:" + contract.getContractReference());
                pepperestAccount.setPaymentReference(paymentReference);
                pepperestAccount.setCrDrFlag("C");
-               pepperestAccount.setAccountType("GL");
+               pepperestAccount.setAccountType("CASA");
                pepperestAccount.setAmount(pepperestIncomeCharge);
                //############# add to bulk transfer stack ###########
-               bulkPaymentStack.add(escrowAccount);
+               bulkPaymentStack.add(escrowPepperestAccountDebit);
                bulkPaymentStack.add(pepperestAccount);
-
 
                //***Freelancer***
                JobBulkPayment freelancerAccount = new JobBulkPayment();
                //##################
-               escrowAccount.setAmount(freelancerIncomeAmount);
-               escrowAccount.setTransactionId("5");//update escrow account information with the payment for UBN
+               JobBulkPayment escrowFreelancerAccountDebit = (JobBulkPayment)app.copy(escrowAccount);
+               escrowFreelancerAccountDebit.setAmount(freelancerIncomeAmount);
+               escrowFreelancerAccountDebit.setTransactionId("5");//update escrow account information with the payment for UBN
                //##################
                freelancerAccount.setTransactionId("6");
-               freelancerAccount.setAccountName(UBNIncomeAccountName);
-               freelancerAccount.setAccountNumber(UBNIncomeAccountNumber);
+               freelancerAccount.setAccountName(contract.getFreelancerAccountName());
+               freelancerAccount.setAccountNumber(contract.getFreelancerAccountNumber());
                freelancerAccount.setNarration(narration);
                freelancerAccount.setExecutedBy(currentUser.getUserUUID());
                freelancerAccount.setExecutedFor("contract:" + contract.getContractReference());
@@ -1163,16 +1235,14 @@ public class JobContractService implements Serializable {
                freelancerAccount.setAccountType("CASA");
                freelancerAccount.setAmount(freelancerIncomeAmount);
                //############# add to bulk transfer stack ###########
-               bulkPaymentStack.add(escrowAccount);
+               bulkPaymentStack.add(escrowFreelancerAccountDebit);
                bulkPaymentStack.add(freelancerAccount);
-
                app.print(bulkPaymentStack);
+
                APIResponse apiResponse = jobPaymentService.makeBulkPayment(bulkPaymentStack);
                if (apiResponse.isSuccess()) {
-
-
                    //update job
-                   if (contract.getWorkMethod() == "Overall") {
+                   if (contract.getWorkMethod().equals("Overall")) {
                        contract.setIsSettled(true);
                        contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
                        contract.setEndDate(new Date());
@@ -1181,9 +1251,26 @@ public class JobContractService implements Serializable {
                        proposal.setStatus(JobStatus.CO);
                        contract.setStatus(JobStatus.CO);
                        job.setStatus(JobStatus.CO);
+                       JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposal.getId(), proposal.getUserId());
+                       if(project!=null){
+                           project.setStatus(JobStatus.CO);
+                           jobProjectSubmissionRepository.save(project);
+                       }
+
                    }else{
                        contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
                        contract.setLastModifiedDate(new Date());
+                       if(milestone!=null) {
+                           milestone.setStatus(JobStatus.CO);
+                           milestone.setEndDate(new Date());
+
+                           JobProjectSubmission project=jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
+                           if(project!=null) {
+                               project.setStatus(JobStatus.CO);
+                               jobProjectSubmissionRepository.save(project);
+                           }
+                           jobMilestoneRepository.save(milestone);
+                       }
                    }
                    job.setLastModifiedDate(new Date());
 
@@ -1202,7 +1289,7 @@ public class JobContractService implements Serializable {
            }
 
         }else{
-            return new APIResponse("This Contract is not active, it might have  been settled already", false, null);
+            return new APIResponse("Contract not active, it might have  been settled already", false, null);
         }
     }
 
@@ -1212,18 +1299,17 @@ public class JobContractService implements Serializable {
         //check if contract exist
         JobContract contract;
         JobMilestone milestone;
-
         contract= jobContractRepository.findByContractReference(contractReferenceId).orElse(null);
         milestone= jobMilestoneRepository.findMilestoneByMilestoneReference(contractReferenceId).orElse(null);
         if (contract == null) {
             if (milestone == null)
-                return new APIResponse("Contract not found with from Reference Id Provided", false, null);
+                return new APIResponse("Contract not found from Reference Id Provided", false, null);
             else {
                 contract=jobContractRepository.findById(milestone.getContractId()).orElse(null);
             }
         }
 
-        if (contract.getStatus().equals(JobStatus.WP)) {
+        if (contract.getStatus().equals(JobStatus.PS) || milestone.getStatus().equals(JobStatus.PS)) {
             //check if proposal is available
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             if (proposal == null)
@@ -1237,7 +1323,7 @@ public class JobContractService implements Serializable {
 
             PaymentRequest payment = new PaymentRequest();
             int depositedAmount;
-            if(contract.getWorkMethod()=="Overall"){
+            if(contract.getWorkMethod().equals("Overall")){
                     depositedAmount=contract.getAmount();
                     payment.setExecutedFor("Contract:"+contractReferenceId);
             }else{
@@ -1276,6 +1362,7 @@ public class JobContractService implements Serializable {
                         milestone.setEndDate(new Date());
                     } else {
                         contract.setStatus(JobStatus.IA);
+                        proposal.setStatus(JobStatus.IA);
                         contract.setLastModifiedDate(new Date());
 
                     }

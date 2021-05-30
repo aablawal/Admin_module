@@ -12,18 +12,18 @@ public interface JobMilestoneRepository extends JpaRepository<JobMilestone,Long>
 
     Optional<JobMilestone> findMilestoneByMilestoneReference(String reference);
     Optional<JobMilestone> findMilestoneByContractReference(String reference);
-    @Query(value = "SELECT sum(amount) total FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId and  status not in('RE','IA')", nativeQuery = true)
-    Long findTotalSpentAmountByProposalId(Long proposalId, Long jobId);
+    @Query(value = "SELECT sum(amount) total FROM  job_milestones where contract_reference=:contractReference and  status in('CO','PS')", nativeQuery = true)
+    Long findTotalSpentAmountByProposalId(String contractReference);
 
-    @Query(value = "SELECT TOP(1) * FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId order by created_at desc", nativeQuery = true)
+    @Query(value = "SELECT TOP(1) * FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId order by id desc", nativeQuery = true)
     JobMilestone findMilestoneByProposalAndJobId(Long proposalId, Long jobId);
 
-    @Query(value = "SELECT TOP(1) * FROM  job_milestones where proposal_id=:proposalId and employer_id=:userId order by created_at desc", nativeQuery = true)
+    @Query(value = "SELECT TOP(1) * FROM  job_milestones where proposal_id=:proposalId and employer_id=:userId order by id desc", nativeQuery = true)
     JobMilestone findMilestoneByProposalAndUserId(Long proposalId, Long userId);
 
-    @Query(value = "SELECT * FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId and status=:status order by created_at desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId and status=:status order by id desc", nativeQuery = true)
     List<JobMilestone> findAllMilestonesByProposalJobAndStatus(Long proposalId, Long jobId, String status);
 
-    @Query(value = "SELECT * FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId order by created_at desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId order by id desc", nativeQuery = true)
     List<JobMilestone> findAllMilestonesByProposalAndJobId(Long proposalId, Long jobId);
 }

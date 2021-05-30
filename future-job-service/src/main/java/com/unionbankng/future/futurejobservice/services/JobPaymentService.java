@@ -39,19 +39,22 @@ public class JobPaymentService implements Serializable {
       payment.setDebitAccountName(paymentRequest.getDebitAccountName());
       payment.setDebitAccountNumber(paymentRequest.getDebitAccountNumber());
       payment.setDebitAccountBranchCode("682");
-      payment.setDebitAccountType(paymentRequest.getDebitAccountType()!=null?paymentRequest.getDebitAccountType():"CASA");
+      payment.setDebitAccountType(paymentRequest.getDebitAccountType());
       payment.setDebitNarration(paymentRequest.getNarration());
       //credit the employer account
       payment.setCreditAccountName(paymentRequest.getCreditAccountName());
       payment.setCreditAccountNumber(paymentRequest.getCreditAccountNumber());
       payment.setCreditAccountBankCode("032");
       payment.setCreditAccountBranchCode("682");
-      payment.setCreditAccountType(paymentRequest.getCreditAccountType()!=null?paymentRequest.getDebitAccountType():"CASA");
+      payment.setCreditAccountType(paymentRequest.getCreditAccountType());
       payment.setCreditNarration(paymentRequest.getNarration());
+
+      app.print(payment);
 
       PaymentResponse transferResponse = bankTransferService.transferUBNtoUBN(payment);
       if (transferResponse.getCode().compareTo("00") == 0) {
           //save the payment history
+          payment.setInitialPaymentReference(paymentRequest.getPaymentReference());
           payment.setPaymentReference(transferResponse.getReference());
           jobPaymentRepository.save(payment);
           logger.info("JOBSERVICE: Payment successful");
@@ -98,7 +101,12 @@ public class JobPaymentService implements Serializable {
         if (transferResponse.getCode().compareTo("00") == 0) {
 
             for(JobBulkPayment batchItem: bulkPaymentBatchItems){
+                batchItem.setInitialPaymentReference(referenceId);
                 batchItem.setPaymentReference(transferResponse.getReference());
+                batchItem.setAccountBranchCode("000");
+                batchItem.setAccountBankCode("032");
+                batchItem.setFeeOrCharges("false");
+                batchItem.setInstrumentNumber("");
             }
             jobBulkPaymentRepository.saveAll(bulkPaymentBatchItems);
             logger.info("JOBSERVICE: Payment successful");

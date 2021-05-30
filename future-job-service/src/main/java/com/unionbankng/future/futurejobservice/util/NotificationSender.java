@@ -12,7 +12,11 @@ public class NotificationSender {
     private final JmsTemplate jmsTemplate;
 
     public void pushNotification(NotificationBody notificationBody){
-        jmsTemplate.convertAndSend(EMAIL_DESTINATION,notificationBody);
+        try {
+            jmsTemplate.convertAndSend(EMAIL_DESTINATION, notificationBody);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
 }

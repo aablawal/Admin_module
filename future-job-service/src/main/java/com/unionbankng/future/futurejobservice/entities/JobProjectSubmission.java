@@ -28,6 +28,8 @@ public class JobProjectSubmission {
     @NotNull
     Long jobId;
     String link;
+    @NotNull
+    String contractReference;
     public String supportingFiles;
     @NotNull
     @Enumerated(EnumType.STRING)

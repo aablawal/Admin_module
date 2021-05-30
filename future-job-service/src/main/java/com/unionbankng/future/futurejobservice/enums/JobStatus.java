@@ -6,7 +6,9 @@ public enum JobStatus {
     WP,
     CO,
     PE,
+    PS, //pending settlement
     PA,
     RE,
-    PF
+    PF,
+    PC //Pending Confirmation
 }

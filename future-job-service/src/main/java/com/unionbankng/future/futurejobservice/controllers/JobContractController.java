@@ -2,6 +2,7 @@ package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
+import com.unionbankng.future.futurejobservice.pojos.ContractRequest;
 import com.unionbankng.future.futurejobservice.services.UBNBankTransferService;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +90,14 @@ public class JobContractController {
         else
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
+    @GetMapping("/v1/job/completed/{contractReference}")
+    public ResponseEntity<APIResponse> findJobSubmittedByContractReference(@Valid @PathVariable String contractReference){
+        JobProjectSubmission response= jobContractService.findJobSubmittedByContractReference(contractReference);
+        if(response!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, response));
+        else
+            return ResponseEntity.ok().body(new APIResponse("failed",false, null));
+    }
 
     @PostMapping(value="/v1/job/milestone/completed/submit/{id}", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> submitCompletedMilestone(@Valid @RequestParam(value = "data", required=true) String projectData, @PathVariable Long id,
@@ -109,15 +118,20 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
-    @PutMapping("/v1/job/contract/end/{jobId}/{proposalId}/{userId}")
-    public ResponseEntity<APIResponse> endContract(@RequestBody Rate rating, @PathVariable Long jobId, @PathVariable Long proposalId, @PathVariable Long userId, @RequestParam int state, @ApiIgnore Principal principal){
-        JobContract contract= jobContractService.endContract(principal, rating, jobId,proposalId,userId,state);
-        if(contract!=null)
-            return ResponseEntity.ok().body(new APIResponse("success",true, contract));
+    @GetMapping("/v1/job/contract/extension/{contractReference}")
+    public ResponseEntity<APIResponse> findContractExtensionByContractReference(@Valid @PathVariable String contractReference){
+        JobContractExtension response= jobContractService.findContractExtensionByContractReference(contractReference);
+        if(response!=null)
+            return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
+    @PutMapping("/v1/job/contract/end/{jobId}/{proposalId}/{userId}")
+    public ResponseEntity<APIResponse> endContract(@RequestBody Rate rating, @PathVariable Long jobId, @PathVariable Long proposalId, @PathVariable Long userId, @RequestParam int state, @ApiIgnore Principal principal) {
+        APIResponse response = jobContractService.endContract(principal, rating, jobId, proposalId, userId, state);
+        return ResponseEntity.ok().body(response);
+    }
     @GetMapping("/v1/job/contract/milestone/{proposalId}/{userId}")
     public ResponseEntity<APIResponse> findContractMilestoneByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long userId){
         JobMilestone response= jobContractService.findContractMilestoneByProposalId(proposalId,userId);
@@ -136,9 +150,9 @@ public class JobContractController {
             return ResponseEntity.ok().body(new APIResponse("failed",false, null));
     }
 
-    @GetMapping("/v1/job/contract/milestones/spent/amount/{proposalId}/{jobId}")
-    public ResponseEntity<APIResponse<Long>> findTotalMilestonesSpentAmountByProposalId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){
-        Long amount=jobContractService.findTotalSpentAmountByProposalId(proposalId,jobId);
+    @GetMapping("/v1/job/contract/milestones/spent/amount/{contractReference}")
+    public ResponseEntity<APIResponse<Long>> findTotalMilestonesSpentAmountByContractReference(@Valid @PathVariable String contractReference){
+        Long amount=jobContractService.findTotalSpentAmountByContractReference(contractReference);
         if(amount!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true,amount));
         else
@@ -161,14 +175,15 @@ public class JobContractController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PostMapping("/v1/job/milestone/completed/approval/{id}")
-    public ResponseEntity<APIResponse> approveCompletedMilestone(@Valid @RequestBody String request, @PathVariable Long id, @ApiIgnore Principal principal) throws JsonProcessingException {
-        APIResponse response= jobContractService.approveCompletedMilestone(principal, id,request);
+    @PostMapping("/v1/job/milestone/completed/approval/{milestoneReference}")
+    public ResponseEntity<APIResponse> approveCompletedMilestone(@PathVariable String milestoneReference,@ApiIgnore Principal principal) {
+        logger.info(milestoneReference);
+        APIResponse response= jobContractService.approveCompletedMilestone(principal, milestoneReference);
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/v1/job/contract/{proposalId}/{jobId}")
-    public ResponseEntity<APIResponse> findJobContractByProposalAndJobId(@Valid @PathVariable Long proposalId, @PathVariable Long jobId){
+    public ResponseEntity<APIResponse> findJobContractByProposalAndJobId(@PathVariable Long proposalId, @PathVariable Long jobId){
         JobContract response= jobContractService.findJobContractByProposalAndJobId(proposalId,jobId);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
@@ -177,7 +192,7 @@ public class JobContractController {
     }
 
     @GetMapping("/v1/job/contract/milestone/{milestoneId}")
-    public ResponseEntity<APIResponse> findMilestoneById(@Valid @PathVariable Long milestoneId){
+    public ResponseEntity<APIResponse> findMilestoneById(@PathVariable Long milestoneId){
         JobMilestone milestone= jobContractService.findMilestoneById(milestoneId);
         if(milestone!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, milestone));
@@ -203,14 +218,14 @@ public class JobContractController {
                 new APIResponse("success",true,jobContractService.getTotalJobCompletedByUser(id)));
     }
 
-    @PostMapping("/v1/job/contract/settle_payment/{referenceId}")
-    public ResponseEntity<APIResponse> settleContractPaymentById(@Valid @PathVariable String referenceId, Principal principal) throws JsonProcessingException {
-        return ResponseEntity.ok().body(jobContractService.settleContractPaymentById(principal, referenceId));
+    @PostMapping("/v1/job/contract/settlement")
+    public ResponseEntity<APIResponse> settleContractPaymentById(@Valid @RequestBody ContractRequest contractRequest, Principal principal) throws CloneNotSupportedException {
+        return ResponseEntity.ok().body(jobContractService.settleContractPaymentById(principal, contractRequest.getContractReference()));
     }
 
-    @PostMapping("/v1/job/contract/reverse_payment/{transactionId}")
-    public ResponseEntity<APIResponse> reverseContractPaymentById(@Valid @PathVariable String transactionId, Principal principal) throws JsonProcessingException {
-        return ResponseEntity.ok().body(jobContractService.reverseContractPaymentById(principal, transactionId));
+    @PostMapping("/v1/job/contract/reversal")
+    public ResponseEntity<APIResponse> reverseContractPaymentById(@Valid @RequestBody ContractRequest contractRequest, Principal principal) throws JsonProcessingException {
+        return ResponseEntity.ok().body(jobContractService.reverseContractPaymentById(principal, contractRequest.getContractReference()));
     }
 
 }

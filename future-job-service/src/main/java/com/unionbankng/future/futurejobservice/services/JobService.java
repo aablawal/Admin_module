@@ -6,6 +6,7 @@ import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.TeamMember;
 import com.unionbankng.future.futurejobservice.repositories.*;
+import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public class JobService {
     private final JobTeamRepository teamRepository;
     private final NotificationSender notificationSender;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
+    private final App app;
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
@@ -173,72 +175,45 @@ public class JobService {
     public Job closeJobById(Long id, int state){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
-            if(state==1)
-              job.setStatus(JobStatus.CO);
+            if (state == 1)
+                job.setStatus(JobStatus.CO);
             else
-              job.setStatus(JobStatus.IA);
+                job.setStatus(JobStatus.IA);
 
-            Page<JobProposal> proposals=jobProposalRepository.findAllByJobId(PageRequest.of(0,Integer.MAX_VALUE),id);
-            if(!proposals.isEmpty()){
-                proposals.forEach(jobProposal ->{
-                    if(state==1)
-                        jobProposal.setStatus(JobStatus.CO);
-                    else
-                        jobProposal.setStatus(JobStatus.IA);
-                    jobProposalRepository.save(jobProposal);
-                });
-            }
-            //fire notification
-            Job currentJob=jobRepository.findById(job.getId()).orElse(null);
-            if(currentJob!=null) {
-                NotificationBody body = new NotificationBody();
-                body.setBody("Your job for "+currentJob.getTitle()+" has been closed");
-                body.setSubject("Job Closed");
-                body.setActionType("REDIRECT");
-                body.setAction("/job/details/"+job.getId());
-                body.setTopic("'Job'");
-                body.setChannel("S");
-                body.setPriority("NORMAL");
-                body.setRecipient(job.getOid());
-                notificationSender.pushNotification(body);
-                logger.info("Notification fired");
-            }else{
-                logger.info("Unable to fire notifications");
-            }
-            return  jobRepository.save(job);
+            job.setLastModifiedDate(new Date());
+
+            NotificationBody body = new NotificationBody();
+            body.setBody("Your job for " + job.getTitle() + " has been closed");
+            body.setSubject("Job Closed");
+            body.setActionType("REDIRECT");
+            body.setAction("/job/details/" + job.getId());
+            body.setTopic("'Job'");
+            body.setChannel("S");
+            body.setPriority("NORMAL");
+            body.setRecipient(job.getOid());
+            notificationSender.pushNotification(body);
+            logger.info("Notification fired");
+            return jobRepository.save(job);
         }else{
             logger.info("JOBSERVICE: Job not found");
             return  null;
         }
     }
-
-    public Job openJobById(Long id){
-        Job job =jobRepository.findById(id).orElse(null);
-        if(job!=null) {
-            job.setStatus(JobStatus.AC);
-            return  jobRepository.save(job);
-        }else{
-            logger.info("JOBSERVICE: Job not found");
-            return  null;
-        }
-    }
-
 
     public Job repeatJobById(Long id){
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
-            job.setStatus(JobStatus.AC);
-            Page<JobProposal> proposals=jobProposalRepository.findAllByJobId(PageRequest.of(0,Integer.MAX_VALUE),id);
-            if(!proposals.isEmpty()){
-                proposals.forEach(jobProposal ->{
-                    jobProposalRepository.deleteById(jobProposal.id);
-                });
-            }
+
+            Job newJob =(Job)app.copy(job);
+            newJob.setStatus(JobStatus.AC);
+            newJob.setCreatedAt(new Date());
+            newJob.setId(null);
+
+            Job saveAsNewJob =jobRepository.save(newJob);
             //fire notification
-            Job currentJob=jobRepository.findById(job.getId()).orElse(null);
-            if(currentJob!=null) {
+            if(saveAsNewJob!=null) {
                 NotificationBody body = new NotificationBody();
-                body.setBody("Your job for "+currentJob.getTitle()+" has been Re-published");
+                body.setBody("Your job for "+newJob.getTitle()+" has been Re-published");
                 body.setSubject("Job Published");
                 body.setActionType("REDIRECT");
                 body.setAction("/job/details/"+job.getId());

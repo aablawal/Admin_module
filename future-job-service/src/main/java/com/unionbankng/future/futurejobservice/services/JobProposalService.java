@@ -8,6 +8,7 @@ import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
+import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JobProposalService  implements Serializable {
 
+    private final App app;
     private final AppService appService;
     private  final JobProposalRepository repository;
     private  final FileStoreService fileStoreService;
@@ -41,46 +43,53 @@ public class JobProposalService  implements Serializable {
         return applyJob(application, supporting_files);
     }
 
-    public JobProposal applyJob(JobProposal application, MultipartFile[] supporting_files){
+    public JobProposal applyJob(JobProposal application, MultipartFile[] supporting_files) {
         try {
             String supporting_file_names = null;
-              Job job = jobRepository.findById(application.jobId).orElse(null);
+            Job job = jobRepository.findById(application.jobId).orElse(null);
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
-            boolean isEdited=false;
-
-            if(application.id!=null) {
+            boolean isEdited = false;
+            if (application.getId()!= null)
                 isEdited = true;
+
+            if (isEdited) {
+                if (application.getStatus().equals(JobStatus.RE)) {
+                    application.setStatus(JobStatus.PE);
+                }
             }
-            if(!isEdited) {
-                application.status = JobStatus.PE;
+            else {
+                application.setStatus(JobStatus.PE);
             }
 
-            if (job.type == JobType.TEAMS_PROJECT && !isEdited) {
+
+
+            if (job.getType() == JobType.TEAMS_PROJECT && !isEdited) {
                 //calculate user founds
-                if(application.percentage==null) {
+                if (application.getPercentage() == null) {
                     int percentage = 10; //default percentage
-                    int bidAmount = (int) (job.getBudget() / 100) * percentage;
+                    int bidAmount = Math.round((job.getBudget() / 100) * percentage);
                     application.setBidAmount(Long.valueOf(bidAmount));
                     application.setPercentage(Long.valueOf(percentage));
                 }
             }
 
             //save files if not null
-            if (supporting_files!=null)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, application.userId.toString());
+            if (supporting_files != null)
+                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, "proposal");
             //cross verify if attached files processed
             if (supporting_file_names != null)
-                application.supportingFiles = supporting_file_names;
+                application.setSupportingFiles(supporting_file_names);
 
 
-            JobProposal proposal= repository.save(application);
-            if(proposal!=null) {
+            app.print(application);
+            JobProposal proposal = repository.save(application);
+            if (proposal != null) {
 
                 if (job != null) {
 
-                    if(!isEdited) {
+                    if (!isEdited) {
                         //fire notification
                         Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
                         if (currentJob != null) {
@@ -97,22 +106,21 @@ public class JobProposalService  implements Serializable {
                     }
                     //end
 
-                    return  proposal;
-                }else{
+                    return proposal;
+                } else {
                     logger.info("JOBSERVICE: Unable to save Job");
-                    return  null;
+                    return null;
                 }
-            }else{
+            } else {
                 logger.info("JOBSERVICE: Unable to save Proposal");
                 return null;
             }
 
-        }catch ( Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-
 
     public JobProposal updateJobStatus(Long proposalId, JobStatus status) {
         JobProposal proposal = repository.findById(proposalId).orElse(null);
@@ -127,8 +135,7 @@ public class JobProposalService  implements Serializable {
     public JobProposal cancelJobProposal(Long jobId, Long userId){
         JobProposal proposal=repository.findProposalByUserId(jobId,userId);
         if(proposal!=null) {
-            proposal.setStatus(JobStatus.IA);
-            repository.save(proposal);
+            repository.delete(proposal);
             //fire notification
             Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
             if(currentJob!=null) {
@@ -155,6 +162,7 @@ public class JobProposalService  implements Serializable {
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
             proposal.setStatus(JobStatus.RE);
+            proposal.setLastModifiedDate(new Date());
             repository.save(proposal);
             //fire notification
             Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
@@ -229,7 +237,7 @@ public class JobProposalService  implements Serializable {
         return proposalList;
     }
     public Model findAppliedJobsByUserId(Long userid, Pageable pageable, Model model) {
-        Page<JobProposal> paginatedData= repository.findByUserId(pageable, userid);
+        Page<JobProposal> paginatedData= repository.findProposalsByUserId(pageable, userid);
         Model proposalList = appService.getProposalCollection(paginatedData, model).addAttribute("currentPage", pageable.getPageNumber());
         return proposalList;
     }

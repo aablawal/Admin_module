@@ -29,6 +29,8 @@ public class JobContractDispute {
     @NotNull
     Long employerId;
     @NotNull
+    String contractReference;
+    @NotNull
     Long jobId;
     @Column(columnDefinition="TEXT")
     String description;

@@ -43,4 +43,11 @@
             <column name="reference_id" type="TEXT"/>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1622380830398-2">
+        <addColumn tableName="job_contract_disputes">
+            <column name="contract_reference" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -1,13 +1,8 @@
 package com.unionbankng.future.futurejobservice.util;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.uuid.Generators;
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +36,12 @@ public class App {
         catch (Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    public Object copy(Object obj){
+        Gson gson= new Gson();
+        String tmp = gson.toJson(obj);
+        return gson.fromJson(tmp,obj.getClass());
     }
 
     public String makeUIID() {

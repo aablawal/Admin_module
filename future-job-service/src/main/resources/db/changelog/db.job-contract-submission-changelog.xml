@@ -31,4 +31,11 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1622297599892-3">
+        <addColumn tableName="job_contract_submission">
+            <column name="contract_reference" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

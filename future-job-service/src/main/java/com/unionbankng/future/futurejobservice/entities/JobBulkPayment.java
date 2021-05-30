@@ -1,5 +1,7 @@
 package com.unionbankng.future.futurejobservice.entities;
 import lombok.*;
+import org.apache.commons.lang3.SerializationUtils;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;

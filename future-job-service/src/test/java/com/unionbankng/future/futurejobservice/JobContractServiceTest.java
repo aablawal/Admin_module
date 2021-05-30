@@ -121,22 +121,13 @@ class JobContractServiceTest {
         rate.setDescription("Very Good");
         rate.setFeedback("You have done a good job");
         rate.setUserId(1l);
-        JobContract contract=   jobContractService.endContract("Test User",rate,jobId,proposalId,userId,1);
-        Assert.assertEquals("NGN",contract.getCountry());
+        APIResponse response=   jobContractService.endContract("Test User",rate,jobId,proposalId,userId,1);
+        Assert.assertEquals(true,response.isSuccess());
     }
 
     @Test
     void approveCompletedMilestone() {
-        JobProjectSubmission request = new JobProjectSubmission();
-        request.setJobId(jobId);
-        request.setProposalId(proposalId);
-        request.setUserId(1l);
-        request.setEmployerId(1l);
-        request.setDescription("Test description");
-        request.setStatus(JobStatus.AC);
-        request.setLink("www.projectlink.com");
-        request.setCreatedAt(new Date());
-        APIResponse response= jobContractService.approveCompletedMilestone("Test User",milestoneId, request);
+        APIResponse response= jobContractService.approveCompletedMilestone("Test User","milestonerefrence goes here");
         Assert.assertEquals(true,response.isSuccess());
     }
 }

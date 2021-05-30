@@ -26,6 +26,8 @@ public class JobContractExtension {
     @NotNull
     Long jobId;
     @NotNull
+    String contractReference;
+    @NotNull
     Date date;
     @NotNull
     @Enumerated(EnumType.STRING)

@@ -33,4 +33,11 @@
     <changeSet author="ACER NITRO 5 (generated)" id="1608115546722-2">
         <addNotNullConstraint columnDataType="varchar(255)" columnName="status" tableName="job_contract_extension" validate="true"/>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1622297599892-2">
+        <addColumn tableName="job_contract_extension">
+            <column name="contract_reference" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
