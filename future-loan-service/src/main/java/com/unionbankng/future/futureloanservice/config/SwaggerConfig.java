@@ -24,7 +24,7 @@ public class SwaggerConfig {
      private ApiInfo metaData() {
         return new ApiInfoBuilder()
                  .title("Future Loan Service")
-                .description("Built by Rabiu Aliyu for loan collection and management")
+                .description("This service handles micro loan operations ")
                 .version("0.0.1")
                 .license("Apache License Version 2.0")
                 .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0\"")
