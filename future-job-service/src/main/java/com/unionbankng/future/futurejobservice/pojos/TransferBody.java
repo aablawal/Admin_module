@@ -11,19 +11,19 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TransferBody {
 
-    int amount;
-    String creditAccountName;
-    String creditAccountBankCode;
-    String creditAccountNumber;
-    String creditNarration;
-    String creditAccountBranchCode;
-    String debitAccountBranchCode;
-    String creditAccountType;
-    String currency;
-    String debitAccountName;
-    String debitAccountNumber;
-    String debitNarration;
-    String debitAccountType;
-    String initBranchCode;
-    String paymentReference;
+    private int amount;
+    private String creditAccountName;
+    private String creditAccountBankCode;
+    private String creditAccountNumber;
+    private String creditNarration;
+    private String creditAccountBranchCode;
+    private String debitAccountBranchCode;
+    private String creditAccountType;
+    private String currency;
+    private String debitAccountName;
+    private String debitAccountNumber;
+    private String debitNarration;
+    private String debitAccountType;
+    private String initBranchCode;
+    private  String paymentReference;
 }

@@ -2,6 +2,7 @@ package com.unionbankng.future.futurejobservice.entities;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_transfers")
@@ -11,42 +12,42 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobPayment {
+public class JobPayment  implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String  executedBy;
-    String  executedFor;
-    int amount;
+    private Long id;
+    private String  executedBy;
+    private  String  executedFor;
+    private int amount;
     @NotNull
-    String creditAccountName;
+    private String creditAccountName;
     @NotNull
-    String creditAccountBankCode;
+    private String creditAccountBankCode;
     @NotNull
-    String creditAccountNumber;
+    private String creditAccountNumber;
     @NotNull
-    String creditNarration;
+    private  String creditNarration;
     @NotNull
-    String creditAccountBranchCode;
+    private String creditAccountBranchCode;
     @NotNull
-    String debitAccountBranchCode;
-    String creditAccountType;
-    String currency;
+    private String debitAccountBranchCode;
+    private String creditAccountType;
+    private String currency;
     @NotNull
-    String debitAccountName;
+    private String debitAccountName;
     @NotNull
-    String debitAccountNumber;
-    String debitNarration;
-    String debitAccountType;
-    String initBranchCode;
-    String initialPaymentReference;
-    String paymentReference;
+    private String debitAccountNumber;
+    private  String debitNarration;
+    private String debitAccountType;
+    private String initBranchCode;
+    private String initialPaymentReference;
+    private  String paymentReference;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private Date createdAt;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 

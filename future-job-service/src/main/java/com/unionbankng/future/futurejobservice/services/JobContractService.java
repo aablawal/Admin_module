@@ -170,7 +170,7 @@ public class JobContractService implements Serializable {
 
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
-            c.add(Calendar.DATE, proposal.duration.intValue());
+            c.add(Calendar.DATE, proposal.getDuration().intValue());
             contract.setEndDate(c.getTime());
             contract.setStartDate(new Date());
             contract.setStatus(JobStatus.WP);
@@ -304,15 +304,14 @@ public class JobContractService implements Serializable {
                             teamMember.setImg(proposal.getImg());
                             teamMember.setFullName(proposal.getFullName());
                             teamMember.setEmail(proposal.getEmail());
-                            teamMember.setAmount(proposal.bidAmount);
-                            teamMember.setJobId(proposal.jobId);
+                            teamMember.setAmount(proposal.getBidAmount());
+                            teamMember.setJobId(proposal.getJobId());
                             teamMember.setUserId(proposal.getUserId());
-                            teamMember.setProposalId(proposal.id);
-                            teamMember.setEmployerId(proposal.employerId);
+                            teamMember.setProposalId(proposal.getId());
+                            teamMember.setEmployerId(proposal.getEmployerId());
                             teamMember.setStatus(JobStatus.AC);
-                            teamMember.setDescription(proposal.about);
+                            teamMember.setDescription(proposal.getAbout());
                             teamMember.setPercentage(Long.valueOf(10));
-                            teamMember.setAmount(proposal.bidAmount);
                             teamMember.setStartDate(new Date());
                             teamMember.setEndDate(c.getTime());
                             jobTeamDetailsRepository.save(teamMember);
@@ -470,7 +469,7 @@ public class JobContractService implements Serializable {
                 JobProposal proposal = proposalData.orElse(null);
                 if (proposal != null) {
                     proposal.setLastModifiedDate(new Date());
-                    proposal.setDuration((decodeDuration(proposal.duration, proposal.durationType) + getDifferenceDays(proposal.endDate, extension.getDate())));
+                    proposal.setDuration((decodeDuration(proposal.getDuration(), proposal.getDurationType()) + getDifferenceDays(proposal.getEndDate(), extension.getDate())));
                     proposal.setDurationType("D");
                     proposal.setEndDate(extension.getDate());
                 }
@@ -534,7 +533,7 @@ public class JobContractService implements Serializable {
                 supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId().toString());
 
             if (supporting_file_names != null)
-                request.supportingFiles = supporting_file_names;
+                request.setSupportingFiles(supporting_file_names);
 
             //fire notification
             Job currentJob = jobRepository.findById(request.getJobId()).orElse(null);
@@ -580,7 +579,7 @@ public class JobContractService implements Serializable {
             if (attachmentFiles != null)
                 attachments = this.fileStoreService.storeFiles(attachmentFiles, request.getProposalId().toString());
             if (attachments != null)
-                request.attachment = attachments;
+                request.setAttachment(attachments);
 
             HttpEntity<String> entity = new HttpEntity<>(this.getHeaders());
             response = rest.exchange(baseURL + "/Dispute/reportDispute?appid=" + appId
@@ -664,8 +663,8 @@ public class JobContractService implements Serializable {
                 supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId().toString());
 
             if (supporting_file_names != null) {
-                request.supportingFiles = supporting_file_names;
-                milestone.supportingFiles = supporting_file_names;
+                request.setSupportingFiles( supporting_file_names);
+                milestone.setSupportingFiles(supporting_file_names);
             }
 
             if (milestone != null) {
@@ -941,7 +940,7 @@ public class JobContractService implements Serializable {
                             contract.setLastModifiedDate(new Date());
                                                         Calendar c = Calendar.getInstance();
                             c.setTime(new Date());
-                            c.add(Calendar.DATE, proposal.duration.intValue());
+                            c.add(Calendar.DATE, proposal.getDuration().intValue());
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
 

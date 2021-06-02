@@ -3,6 +3,7 @@ import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -13,53 +14,53 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobMilestone {
+public class JobMilestone  implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @NotNull
-    Long proposalId;
+    private Long proposalId;
     @NotNull
-    Long userId;
+    private  Long userId;
     @NotNull
-    Long employerId;
+    private  Long employerId;
     @NotNull
-    Long contractId;
+    private  Long contractId;
     @NotNull
-    Long jobId;
+    private  Long jobId;
     @NotNull
-    Long amount;
+    private  Long amount;
     @Temporal(TemporalType.DATE)
-    Date startDate;
+    private   Date startDate;
     @NotNull
     @Temporal(TemporalType.DATE)
-    Date endDate;
+    private   Date endDate;
     @NotNull
     @Column(columnDefinition="TEXT")
-    String title;
-    public String supportingFiles;
+    private  String title;
+    private String supportingFiles;
     @NotNull
     @Column(columnDefinition="TEXT")
     @NotNull
-    String milestoneReference;
-    String contractReference;
-    String description;
-    String initialPaymentReferenceA;
-    String settlementPaymentReferenceA;
-    String reversalPaymentReferenceA;
-    String initialPaymentReferenceB;
-    String settlementPaymentReferenceB;
-    String reversalPaymentReferenceB;
+    private  String milestoneReference;
+    private  String contractReference;
+    private  String description;
+    private  String initialPaymentReferenceA;
+    private  String settlementPaymentReferenceA;
+    private  String reversalPaymentReferenceA;
+    private  String initialPaymentReferenceB;
+    private String settlementPaymentReferenceB;
+    private String reversalPaymentReferenceB;
     @NotNull
     @Enumerated(EnumType.STRING)
-    JobStatus status;
+    private JobStatus status;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private  Date createdAt;
 
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_bulk_transfers")
@@ -13,39 +14,39 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobBulkPayment {
+public class JobBulkPayment implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	String executedBy;
-	String executedFor;
+	private Long id;
+	private String executedBy;
+	private String executedFor;
 	@NotNull
-	String initialPaymentReference;
-	String paymentReference;
-	String transactionId;
+	private String initialPaymentReference;
+	private String paymentReference;
+	private String transactionId;
 	@NotNull
-	String accountNumber;
+	private String accountNumber;
 	@NotNull
-	String accountType;
+	private String accountType;
 	@NotNull
-	String accountName;
+	private String accountName;
 	@NotNull
-	String accountBranchCode;
+	private String accountBranchCode;
 	@NotNull
-	String accountBankCode;
-	String narration;
-	String instrumentNumber;
+	private String accountBankCode;
+	private String narration;
+	private String instrumentNumber;
 	@NotNull
 	int amount;
-	String valueDate;
-	String crDrFlag;
-	String feeOrCharges;
+	private String valueDate;
+	private String crDrFlag;
+	private String feeOrCharges;
 	@Temporal(TemporalType.DATE)
-	Date createdAt;
+	private Date createdAt;
 
 	@PrePersist
-	private void setCreatedAt() {
+	public void setCreatedAt() {
 		createdAt = new Date();
 	}
 }

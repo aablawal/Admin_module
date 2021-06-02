@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_teams")
@@ -13,24 +14,24 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobTeam {
+public class JobTeam implements Serializable {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @NotNull
-    Long jobId;
+    private Long jobId;
     @NotNull
-    String invitationId;
+    private String invitationId;
     @Column(columnDefinition="TEXT")
-    String selectedTeam;
+    private   String selectedTeam;
     @NotNull
-    JobStatus status;
+    private  JobStatus status;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private   Date createdAt;
 
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 }

@@ -18,62 +18,62 @@ public class Job implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
     @NotNull
     @Column(nullable=false)
-    public Long oid;
+    private Long oid;
     @NotNull
     @Column(columnDefinition ="TEXT", nullable=false)
-    public String title;
+    private String title;
     @NotNull
     @Column(columnDefinition ="TEXT", nullable=false)
-    public String goal;
+    private String goal;
     @NotNull
     @Column(columnDefinition ="TEXT", nullable=false)
-    public String description;
-    public String supportingFiles;
+    private String description;
+    private String supportingFiles;
     @NotNull
     @Column(nullable=false)
     @Enumerated(EnumType.STRING)
-    public JobType type;
+    private JobType type;
     @NotNull
     @Column(nullable=false)
-    public String categories;
-    public String invitationId;
-    public String duration;
+    private String categories;
+    private String invitationId;
+    private String duration;
     @NotNull
     @Column(nullable=false)
-    public Long budget;
-    public String team;
-    public String qualification;
-    public String skillsRequired;
-    public String assessment;
-    public String sampleProduct;
-    public boolean interview;
-    public String timeline;
-    public String paymentTerms;
-    public String teamExpertiseLevel;
-    public Long teamSize;
+    private Long budget;
+    private String team;
+    private String qualification;
+    private String skillsRequired;
+    private String assessment;
+    private String sampleProduct;
+    private boolean interview;
+    private String timeline;
+    private String paymentTerms;
+    private String teamExpertiseLevel;
+    private Long teamSize;
     @Column(name="nda_files", columnDefinition="TEXT")
-    public String ndaFiles;
+    private String ndaFiles;
     @NotNull
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
-    public JobStatus status;
+    private JobStatus status;
     @Temporal(TemporalType.DATE)
-    public Date publishDate;
+    private Date publishDate;
     @Temporal(TemporalType.DATE)
-    public Date lastModifiedDate;
+    private Date lastModifiedDate;
     @Temporal(TemporalType.DATE)
-    public Date createdAt;
+    private Date createdAt;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 
     @PreUpdate
-    private void lastModifiedDate() {
+    public void lastModifiedDate() {
         lastModifiedDate = new Date();
     }
 

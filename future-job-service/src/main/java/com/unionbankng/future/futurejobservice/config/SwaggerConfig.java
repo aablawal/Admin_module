@@ -23,7 +23,7 @@ public class SwaggerConfig {
     
      private ApiInfo metaData() {
         return new ApiInfoBuilder()
-                 .title("Future Job Service")
+                 .title("Job Service")
                 .description("This service handles job creations and freelancing as well as payment for jobs.")
                 .version("0.0.1")
                 .license("Apache License Version 2.0")

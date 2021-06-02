@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -15,43 +16,43 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobContractDispute {
+public class JobContractDispute implements Serializable  {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+    private  Long id;
     @NotNull
-    Long proposalId;
+    private  Long proposalId;
     @NotNull
-    Long contractId;
+    private  Long contractId;
     @NotNull
-    Long userId;
+    private  Long userId;
     @NotNull
-    Long employerId;
+    private  Long employerId;
     @NotNull
-    String contractReference;
+    private  String contractReference;
     @NotNull
-    Long jobId;
+    private  Long jobId;
     @Column(columnDefinition="TEXT")
-    String description;
+    private  String description;
     @Column(columnDefinition="TEXT")
-    String referenceId;
-    public String attachment;
+    private  String referenceId;
+    private String attachment;
     @NotNull
     @Enumerated(EnumType.STRING)
-    JobStatus status;
+    private JobStatus status;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private Date createdAt;
     @Temporal(TemporalType.DATE)
-    Date lastModifiedDate;
+    private  Date lastModifiedDate;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 
     @PreUpdate
-    private void setLastModifiedDate() {
+    public void setLastModifiedDate() {
         createdAt = new Date();
     }
 

@@ -24,7 +24,6 @@ import java.util.List;
 public class JobContractController {
 
     private  final JobContractService jobContractService;
-    private final UBNBankTransferService bankTransferService;
     Logger logger = LoggerFactory.getLogger(JobContractController.class);
 
 

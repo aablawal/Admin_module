@@ -3,6 +3,7 @@ import com.unionbankng.future.futurejobservice.enums.JobStatus;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_contracts")
@@ -12,72 +13,72 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobContract {
+public class JobContract implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    Long Id;
+    private  Long Id;
     @NotNull
-    Long proposalId;
+    private Long proposalId;
     @NotNull
-    Long jobId;
-    int appId;
+    private  Long jobId;
+    private int appId;
     @NotNull
-    String contractReference;
+    private String contractReference;
     @NotNull
-    String userEmail;
+    private String userEmail;
     @NotNull
-    int amount;
+    private int amount;
     @NotNull
-    int clearedAmount;
+    private int clearedAmount;
     @NotNull
-    String country;
-    String workMethod;
+    private String country;
+    private String workMethod;
     @NotNull
-    String currency;
-    String freelancerEmailAddress;
-    String employerEmailAddress;
-    Boolean isSettled;
-    String settlement;
-    JobStatus status;
-    Long rate;
-    String description;
+    private String currency;
+    private String freelancerEmailAddress;
+    private String employerEmailAddress;
+    private Boolean isSettled;
+    private  String settlement;
+    private  JobStatus status;
+    private  Long rate;
+    private  String description;
     @Column(columnDefinition="TEXT")
-    String feedback;
+    private String feedback;
     @NotNull
-    String employerAccountName;
+    private String employerAccountName;
     @NotNull
-    String employerAccountNumber;
+    private String employerAccountNumber;
     @NotNull
-    String freelancerAccountName;
+    private String freelancerAccountName;
     @NotNull
-    String freelancerAccountNumber;
-    String freelancerPhoneNumber;
-    String employerPhoneNumber;
+    private String freelancerAccountNumber;
+    private String freelancerPhoneNumber;
+    private String employerPhoneNumber;
     @NotNull
-    int peppfees;
-    String initialPaymentReferenceA;
-    String settlementPaymentReferenceA;
-    String reversalPaymentReferenceA;
-    String initialPaymentReferenceB;
-    String settlementPaymentReferenceB;
-    String reversalPaymentReferenceB;
+    private int peppfees;
+    private String initialPaymentReferenceA;
+    private String settlementPaymentReferenceA;
+    private String reversalPaymentReferenceA;
+    private String initialPaymentReferenceB;
+    private String settlementPaymentReferenceB;
+    private  String reversalPaymentReferenceB;
     @Temporal(TemporalType.DATE)
-    Date startDate;
+    private  Date startDate;
     @Temporal(TemporalType.DATE)
-    Date endDate;
+    private  Date endDate;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private  Date createdAt;
     @Temporal(TemporalType.DATE)
-    Date lastModifiedDate;
+    private   Date lastModifiedDate;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 
     @PreUpdate
-    private void lastModifiedDate() {
+    public void lastModifiedDate() {
         lastModifiedDate = new Date();
     }
 }

@@ -47,22 +47,22 @@ public class JobService {
 
             //save files if not null
             if (nda_files!=null)
-                nda_file_names = this.fileStoreService.storeFiles(nda_files, job.oid.toString());
+                nda_file_names = this.fileStoreService.storeFiles(nda_files, job.getOid().toString());
             if (supporting_files!=null)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, job.oid.toString());
+                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, job.getOid().toString());
 
             //cross verify if attached files processed
             if (nda_file_names != null)
-                job.ndaFiles = nda_file_names;
+                job.setNdaFiles(nda_file_names);
             if (supporting_file_names != null)
-                job.supportingFiles = supporting_file_names;
+                job.setSupportingFiles(supporting_file_names);
 
             Job savedJob=jobRepository.save(job);
             if(savedJob!=null) {
-                if (savedJob.type == JobType.TEAMS_PROJECT) {
+                if (savedJob.getType() == JobType.TEAMS_PROJECT) {
                     JobTeam team = new ObjectMapper().readValue(teamData, JobTeam.class);
                     team.setStatus(JobStatus.AC);
-                    team.setJobId(savedJob.id);
+                    team.setJobId(savedJob.getId());
                     if (team.getSelectedTeam() != null) {
                         for (String teamMemberData : team.getSelectedTeam().split("~")) {
                             logger.info(teamMemberData);
@@ -85,9 +85,9 @@ public class JobService {
 
                                     JobProposal proposal = new JobProposal();
                                     proposal.setUserId(teamMember.getId());
-                                    proposal.setJobId(savedJob.id);
+                                    proposal.setJobId(savedJob.getId());
                                     proposal.setStatus(JobStatus.PE);
-                                    proposal.setEmployerId(savedJob.oid);
+                                    proposal.setEmployerId(savedJob.getOid());
                                     proposal.setDurationType("D");
                                     proposal.setDuration(Long.valueOf(7));
                                     proposal.setEndDate(c.getTime());
@@ -111,14 +111,14 @@ public class JobService {
                                     if (savedProposal != null) {
 
                                         JobTeamDetails teamMemberDetails = new JobTeamDetails();
-                                        teamMemberDetails.setJobId(savedJob.id);
-                                        teamMemberDetails.setEmployerId(savedJob.oid);
+                                        teamMemberDetails.setJobId(savedJob.getId());
+                                        teamMemberDetails.setEmployerId(savedJob.getOid());
                                         teamMemberDetails.setUserId(teamMember.getId());
                                         teamMemberDetails.setFullName(teamMember.getFullName());
                                         teamMemberDetails.setEmail(teamMember.getEmail());
                                         teamMemberDetails.setImg(teamMember.getImg());
                                         teamMemberDetails.setStatus(JobStatus.PF);
-                                        teamMemberDetails.setProposalId(savedProposal.id);
+                                        teamMemberDetails.setProposalId(savedProposal.getId());
                                         teamMemberDetails.setAmount(Long.valueOf(money));
                                         teamMemberDetails.setPercentage(Long.valueOf(percentage));
                                         teamRepository.save(team);

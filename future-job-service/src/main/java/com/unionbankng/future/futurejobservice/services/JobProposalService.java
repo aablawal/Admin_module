@@ -46,7 +46,7 @@ public class JobProposalService  implements Serializable {
     public JobProposal applyJob(JobProposal application, MultipartFile[] supporting_files) {
         try {
             String supporting_file_names = null;
-            Job job = jobRepository.findById(application.jobId).orElse(null);
+            Job job = jobRepository.findById(application.getJobId()).orElse(null);
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
