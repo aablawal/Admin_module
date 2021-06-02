@@ -799,6 +799,8 @@ public class JobContractService implements Serializable {
                             logger.info("JOBSERV: Cant end ongoing contract");
                             return new APIResponse("Unable to end ongoing contract, end ongoing milestones first", false, null);
 
+
+
                         } else {
                             //end contract
                             contract.setStatus(JobStatus.CO);
