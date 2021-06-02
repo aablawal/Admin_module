@@ -220,8 +220,9 @@ public class JobContractController {
 
     @PostMapping("/v1/job/contract/settlement")
     public ResponseEntity<APIResponse> settleContractPaymentById(@Valid @RequestBody ContractRequest contractRequest, Principal principal) throws CloneNotSupportedException {
-        return ResponseEntity.ok().body(jobContractService.settleContractPaymentById(principal, contractRequest.getContractReference()));
+        return ResponseEntity.ok().body(jobContractService.settleContractById(principal, contractRequest.getContractReference()));
     }
+
 
     @PostMapping("/v1/job/contract/reversal")
     public ResponseEntity<APIResponse> reverseContractPaymentById(@Valid @RequestBody ContractRequest contractRequest, Principal principal) throws JsonProcessingException {

@@ -290,7 +290,6 @@ public class JobContractService implements Serializable {
                 }
             }
             if (status == 1) {
-                Optional<Job> jobData = jobRepository.findById(contract.getJobId());
                 if (job != null) {
                     job.setStatus(JobStatus.WP);
                     job.setLastModifiedDate(new Date());
@@ -702,14 +701,8 @@ public class JobContractService implements Serializable {
     }
     public APIResponse endContract(Principal principal, Rate
             rating, Long jobId, Long proposalId, Long userId, int state) {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return endContract(currentUser.getUserFullName(), rating, jobId, proposalId, userId, state);
-    }
-
-
-    public APIResponse endContract(String userName, Rate
-            rating, Long jobId, Long proposalId, Long userId, int state) {
         try {
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             Job job = jobRepository.findById(jobId).orElse(null);
             JobProposal proposal = jobProposalRepository.findProposalByUserId(jobId, userId);
             JobContract contract = jobContractRepository.findContractByProposalAndJobId(proposalId, jobId);
@@ -722,127 +715,180 @@ public class JobContractService implements Serializable {
 
 
                 if (state == 1) {
-                    if (!contract.getStatus().equals(JobStatus.WP)) {
-                        contract.setEndDate(new Date());
-                        contract.setIsSettled(true);
-                        contract.setSettlement(contract.getContractReference());
-                        contract.setClearedAmount((contract.getAmount()));
+                    if (contract.getWorkMethod().equals("Overall")) {
+                        if (contract.getStatus().equals(JobStatus.WP)) {
+                            contract.setEndDate(new Date());
+                            contract.setIsSettled(true);
+                            contract.setSettlement(contract.getContractReference());
+                            contract.setClearedAmount((contract.getAmount()));
 
-                        if (!contract.getStatus().equals(JobStatus.CO)) {
-                            contract.setStatus(JobStatus.PS);  //pending settlement
-                            proposal.setStatus(JobStatus.PS);
-                        }
+                            //start to release escrow amount to freelancer
+                            HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+                            ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
+                                    + "&referenceid=" + contract.getContractReference()
+                                    + "&user_email=" + contract.getUserEmail()
+                                    + "&reasons=Job Completed", HttpMethod.POST, entity, String.class);
+                            //done
 
-                        //start to release escrow amount to freelancer
-                        HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                        ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
-                                + "&referenceid=" + contract.getContractReference()
-                                + "&user_email=" + contract.getUserEmail()
-                                + "&reasons=Job Completed", HttpMethod.POST, entity, String.class);
-                        //done
+                            if (response.getStatusCode().is2xxSuccessful()) {
+                                APIResponse settlementResponse = this.settleContractById(principal, contract.getContractReference());
+                                if (settlementResponse.isSuccess()) {
+                                    //complete contract
+                                    contract.setStatus(JobStatus.CO);
+                                    contract.setEndDate(new Date());
+                                    jobContractRepository.save(contract);
 
-                        if (response.getStatusCode().is2xxSuccessful()) {
+                                    if (job != null) {
+                                        job.setStatus(JobStatus.CO);
+                                        jobRepository.save(job);
+                                    }
+                                    if (proposal != null) {
+                                        proposal.setStatus(JobStatus.CO);
+                                        proposal.setEndDate(new Date());
+                                        jobProposalRepository.save(proposal);
+                                    }
+                                    if (project != null) {
+                                        project.setStatus(JobStatus.CO);
+                                        jobProjectSubmissionRepository.save(project);
+                                    }
 
-                            if (rating != null) {
-                                Rate rate = jobRateRepository.findByUserId(proposal.getUserId());
-                                if (rate != null) {
-                                    rate.setRate((rate.getRate() + rating.getRate()));
-                                    rate.setFeedback(rating.getFeedback());
-                                    rate.setDescription(rating.getDescription());
-                                    rate.setLastModifiedDate(new Date());
-                                    jobRateRepository.save(rate);
-                                } else {
-                                    rating.setLastModifiedDate(new Date());
-                                    rating.setUserId(proposal.getUserId());
-                                    jobRateRepository.save(rating);
+                                    if (rating != null) {
+                                        Rate rate = jobRateRepository.findByUserId(proposal.getUserId());
+                                        if (rate != null) {
+                                            rate.setRate((rate.getRate() + rating.getRate()));
+                                            rate.setFeedback(rating.getFeedback());
+                                            rate.setDescription(rating.getDescription());
+                                            rate.setLastModifiedDate(new Date());
+                                            jobRateRepository.save(rate);
+                                        } else {
+                                            rating.setLastModifiedDate(new Date());
+                                            rating.setUserId(proposal.getUserId());
+                                            jobRateRepository.save(rating);
+                                        }
+                                    }
+                                    //fire notification
+                                    Job currentJob = jobRepository.findById(jobId).orElse(null);
+                                    if (currentJob != null) {
+                                        NotificationBody body = new NotificationBody();
+                                        body.setBody(currentUser.getUserFullName() + " ended your contract and release the sum of " + proposal.getBidAmount() + " to your bank account");
+                                        body.setSubject("Contract Ended");
+                                        body.setActionType("REDIRECT");
+                                        body.setAction("/job/ongoing/details/" + jobId);
+                                        body.setTopic("'Job'");
+                                        body.setChannel("S");
+                                        body.setPriority("YES");
+                                        body.setRecipient(proposal.getUserId());
+                                        notificationSender.pushNotification(body);
+                                    }
+
                                 }
+                                return settlementResponse;
+                                //end
+                            } else {
+                                logger.info("JOBSERV: Escrow transaction Failed");
+                                return new APIResponse("Escrow Transaction Failed", false, null);
                             }
+                        } else {
+                            logger.info("JOBSERV: Unable to end inActive contract");
+                            return new APIResponse("Unable to end inActive contract", false, null);
+                        }
+                    } else {
+                        //check if not ongoing milestone and complete the contract
+                        List<JobMilestone> activeMilestones = jobMilestoneRepository.findOngoingMilestonesByContractReference(contract.getContractReference());
+                        if (!activeMilestones.isEmpty()) {
+                            logger.info("JOBSERV: Cant end ongoing contract");
+                            return new APIResponse("Unable to end ongoing contract, end ongoing milestones first", false, null);
+                        } else {
+                            //end contract
+                            contract.setStatus(JobStatus.CO);
+                            contract.setEndDate(new Date());
+                            jobContractRepository.save(contract);
+
                             if (job != null) {
-                                if (!contract.getStatus().equals(JobStatus.CO)) {
-                                    job.setStatus(JobStatus.CO);
-                                    jobRepository.save(job);
-                                }
+                                job.setStatus(JobStatus.CO);
+                                jobRepository.save(job);
                             }
                             if (proposal != null) {
-                                if (!contract.getStatus().equals(JobStatus.CO)) {
-                                    proposal.setStatus(JobStatus.PS);
-                                    proposal.setEndDate(new Date());
-                                    jobProposalRepository.save(proposal);
-                                }
+                                proposal.setStatus(JobStatus.CO);
+                                proposal.setEndDate(new Date());
+                                jobProposalRepository.save(proposal);
                             }
                             if (project != null) {
-                                if (!contract.getStatus().equals(JobStatus.CO)) {
-                                    project.setStatus(JobStatus.PS);
-                                    jobProjectSubmissionRepository.save(project);
-                                }
+                                project.setStatus(JobStatus.CO);
+                                jobProjectSubmissionRepository.save(project);
+                            }
+                            return new APIResponse("Request Successful", true, contract);
+                        }
+                    }
+                } else {
+
+                    if (contract.getWorkMethod().equals("Overall")) {
+                        if (!contract.getStatus().equals(JobStatus.CO) && !contract.getStatus().equals(JobStatus.WP)) {
+                            contract.setEndDate(new Date());
+                            contract.setIsSettled(false);
+                            contract.setFeedback(String.valueOf(state));
+                            contract.setSettlement("Contract ended without settlement");
+                            contract.setDescription("Employer ended the contract");
+                            contract.setStatus(JobStatus.RE);
+                            if (project != null) {
+                                project.setStatus(JobStatus.RE);
+                                jobProjectSubmissionRepository.save(project);
+                            }
+                            if (proposal != null) {
+                                proposal.setStatus(JobStatus.RE);
+                                proposal.setEndDate(new Date());
+                                jobProposalRepository.save(proposal);
                             }
                             jobContractRepository.save(contract);
                             //fire notification
                             Job currentJob = jobRepository.findById(jobId).orElse(null);
                             if (currentJob != null) {
                                 NotificationBody body = new NotificationBody();
-                                body.setBody(userName + " ended your contract and release the sum of " + proposal.getBidAmount() + " to your bank account");
+                                body.setBody(currentUser.getUserFullName() + " ended your contract for " + currentJob.getTitle() + ", you are not find with it? you can raise dispute.");
                                 body.setSubject("Contract Ended");
                                 body.setActionType("REDIRECT");
-                                body.setAction("/job/ongoing/details/" + jobId);
+                                body.setAction("/job/details/" + jobId);
                                 body.setTopic("'Job'");
                                 body.setChannel("S");
-                                body.setPriority("YES");
                                 body.setRecipient(proposal.getUserId());
                                 notificationSender.pushNotification(body);
                             }
                             //end
                             return new APIResponse("Request Successful", true, contract);
                         } else {
-                            logger.info("JOBSERV: Escrow transaction Failed");
-                            return new APIResponse("Escrow Transaction Failed", false, null);
+                            return new APIResponse("Unable end ongoing Contract with settlement", false, null);
                         }
                     } else {
-                        logger.info("JOBSERV: can't end ongoing contract");
-                        return new APIResponse("Unable to end ongoing contract", false, null);
-                    }
-                } else {
+                        //check if not ongoing milestone and complete the contract
+                        List<JobMilestone> activeMilestones = jobMilestoneRepository.findOngoingMilestonesByContractReference(contract.getContractReference());
+                        if (!activeMilestones.isEmpty()) {
+                            logger.info("JOBSERV: Cant reject contract that has ongoing milestones");
+                            return new APIResponse("Unable to end contract that has unsettled milestones", false, null);
+                        } else {
+                            //end contract
+                            contract.setStatus(JobStatus.CO);
+                            contract.setEndDate(new Date());
+                            jobContractRepository.save(contract);
 
-                    if (!contract.getStatus().equals(JobStatus.CO) && !contract.getStatus().equals(JobStatus.PS)) {
-                        contract.setEndDate(new Date());
-                        contract.setIsSettled(false);
-                        contract.setFeedback(String.valueOf(state));
-                        contract.setSettlement("Contract ended without settlement");
-                        contract.setDescription("Employer ended the contract");
-                        contract.setStatus(JobStatus.RE);
-                        if (project != null) {
-                            project.setStatus(JobStatus.RE);
-                            jobProjectSubmissionRepository.save(project);
+                            if (job != null) {
+                                job.setStatus(JobStatus.CO);
+                                jobRepository.save(job);
+                            }
+                            if (proposal != null) {
+                                proposal.setStatus(JobStatus.CO);
+                                proposal.setEndDate(new Date());
+                                jobProposalRepository.save(proposal);
+                            }
+                            if (project != null) {
+                                project.setStatus(JobStatus.CO);
+                                jobProjectSubmissionRepository.save(project);
+                            }
+                            return new APIResponse("Request Successful", true, contract);
                         }
-                        if (proposal != null) {
-                            proposal.setStatus(JobStatus.RE);
-                            proposal.setEndDate(new Date());
-                            jobProposalRepository.save(proposal);
-                        }
-                        jobContractRepository.save(contract);
-                        //fire notification
-                        Job currentJob = jobRepository.findById(jobId).orElse(null);
-                        if (currentJob != null) {
-                            NotificationBody body = new NotificationBody();
-                            body.setBody(userName + " ended your contract for " + currentJob.getTitle() + ", you are not find with it? you can raise dispute.");
-                            body.setSubject("Contract Ended");
-                            body.setActionType("REDIRECT");
-                            body.setAction("/job/details/" + jobId);
-                            body.setTopic("'Job'");
-                            body.setChannel("S");
-                            body.setRecipient(proposal.getUserId());
-                            notificationSender.pushNotification(body);
-                        }
-                        //end
-                        return new APIResponse("Request Successful", true, contract);
-                    } else {
-
-                        return new APIResponse("Unable to Reject Completed Contract", false, null);
                     }
                 }
             }
             else {
-
                 return new APIResponse("Contract not found", false, null);
             }
         } catch (Exception ex) {
@@ -889,6 +935,8 @@ public class JobContractService implements Serializable {
                             milestone.setContractId(contract.getId());
                             milestone.setContractReference(contract.getContractReference());
 
+                            contract.setStatus(JobStatus.WP);
+                            contract.setLastModifiedDate(new Date());
                             contract.setInitialPaymentReferenceA(paymentReferenceId);
                             contract.setLastModifiedDate(new Date());
                                                         Calendar c = Calendar.getInstance();
@@ -1033,14 +1081,11 @@ public class JobContractService implements Serializable {
             return new APIResponse(ex.getMessage(), false, null);
         }
     }
-    public APIResponse approveCompletedMilestone(Principal principal,String milestoneReference) {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return approveCompletedMilestone(currentUser.getUserFullName(), milestoneReference);
-    }
 
     public APIResponse approveCompletedMilestone
-            (String userName, String milestoneReference){
+            (Principal principal, String milestoneReference){
         try {
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             JobMilestone milestone = jobMilestoneRepository.findMilestoneByMilestoneReference(milestoneReference).orElse(null);
             JobContract contract = jobContractRepository.findByContractReference(milestone.getContractReference()).orElse(null);
             JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
@@ -1049,14 +1094,8 @@ public class JobContractService implements Serializable {
                 if (milestone != null) {
 
                     if (project != null) {
-                        project.setStatus(JobStatus.PS);
-                        milestone.setStatus(JobStatus.PS);
                         contract.setClearedAmount((contract.getClearedAmount() + milestone.getAmount().intValue()));
                         contract.setLastModifiedDate(new Date());
-
-                        jobProjectSubmissionRepository.save(project);
-                        jobMilestoneRepository.save(milestone);
-                        jobContractRepository.save(contract);
 
                         //start to release escrow amount to freelancer
                         HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
@@ -1066,21 +1105,37 @@ public class JobContractService implements Serializable {
                                 + "&reasons=Milestone Completed", HttpMethod.POST, entity, String.class);
                         //done
                         if (response.getStatusCode().is2xxSuccessful()) {
-                            //fire notification
-                            Job currentJob = jobRepository.findById(project.getJobId()).orElse(null);
-                            if (currentJob != null) {
-                                NotificationBody body = new NotificationBody();
-                                body.setBody(userName + " approved the milestone you submitted for " + currentJob.getTitle() + ", and the sum of " + milestone.getAmount().toString() + " has been released to your account");
-                                body.setSubject("Milestone Completed");
-                                body.setActionType("REDIRECT");
-                                body.setAction("/my-job/contract/milestones/" + project.getJobId() + "/" + project.getProposalId());
-                                body.setTopic("'Job'");
-                                body.setChannel("S");
-                                body.setRecipient(project.getUserId());
-                                notificationSender.pushNotification(body);
+
+                            APIResponse settlementResponse=this.settleContractById(principal,milestone.getMilestoneReference());
+                            if(settlementResponse.isSuccess()) {
+                                //end milestone
+                                milestone.setStatus(JobStatus.CO);
+                                milestone.setEndDate(new Date());
+                                jobMilestoneRepository.save(milestone);
+                                //complete project
+                                project.setStatus(JobStatus.CO);
+                                jobProjectSubmissionRepository.save(project);
+
+                                contract.setLastModifiedDate(new Date());
+                                jobContractRepository.save(contract);
+
+                                //fire notification
+                                Job currentJob = jobRepository.findById(project.getJobId()).orElse(null);
+                                if (currentJob != null) {
+                                    NotificationBody body = new NotificationBody();
+                                    body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for " + currentJob.getTitle() + ", and the sum of " + milestone.getAmount().toString() + " has been released to your account");
+                                    body.setSubject("Milestone Completed");
+                                    body.setActionType("REDIRECT");
+                                    body.setAction("/my-job/contract/milestones/" + project.getJobId() + "/" + project.getProposalId());
+                                    body.setTopic("'Job'");
+                                    body.setChannel("S");
+                                    body.setRecipient(project.getUserId());
+                                    notificationSender.pushNotification(body);
+                                }
+
                             }
-                            //end
-                            return new APIResponse("success", true, milestone);
+                            return settlementResponse;
+
                         } else {
                             logger.info("JOBSERVICE: Escrow transaction failed");
                             return new APIResponse("Escrow transaction failed", false, null);
@@ -1104,7 +1159,7 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public APIResponse settleContractPaymentById(Principal principal, String contractReferenceId) throws CloneNotSupportedException {
+    public APIResponse settleContractById(Principal principal, String contractReferenceId) throws CloneNotSupportedException {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         JobContract contract;
         JobMilestone milestone;
@@ -1118,11 +1173,10 @@ public class JobContractService implements Serializable {
                 contract=jobContractRepository.findByContractReference(milestone.getContractReference()).orElse(null);
             }
         }
-
         app.print(contract);
         app.print(milestone);
 
-        if(contract.getStatus().equals(JobStatus.PS) || milestone.getStatus().equals(JobStatus.PS)) {
+        if(contract.getStatus().equals(JobStatus.WP) || (milestone!=null && milestone.getStatus().equals(JobStatus.WP))){
             //check if contract is available
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             if (proposal == null)
@@ -1131,8 +1185,6 @@ public class JobContractService implements Serializable {
             Job job = jobRepository.findById(contract.getJobId()).orElse(null);
             if (job == null)
                 return new APIResponse("No Job history found for this Contract", false, null);
-
-
 
             app.print("#Contract");
             app.print(contract);
@@ -1309,7 +1361,7 @@ public class JobContractService implements Serializable {
             }
         }
 
-        if (contract.getStatus().equals(JobStatus.PS) || milestone.getStatus().equals(JobStatus.PS)) {
+        if (contract.getStatus().equals(JobStatus.WP) || (milestone!=null && milestone.getStatus().equals(JobStatus.WP))) {
             //check if proposal is available
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             if (proposal == null)

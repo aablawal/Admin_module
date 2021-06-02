@@ -15,6 +15,9 @@ public interface JobMilestoneRepository extends JpaRepository<JobMilestone,Long>
     @Query(value = "SELECT sum(amount) total FROM  job_milestones where contract_reference=:contractReference and  status in('CO','PS')", nativeQuery = true)
     Long findTotalSpentAmountByProposalId(String contractReference);
 
+    @Query(value = "SELECT  * FROM  job_milestones where contract_reference=:contractReference and status in('WP','PA') order by id desc", nativeQuery = true)
+    List<JobMilestone> findOngoingMilestonesByContractReference(String contractReference);
+
     @Query(value = "SELECT TOP(1) * FROM  job_milestones where proposal_id=:proposalId and job_id=:jobId order by id desc", nativeQuery = true)
     JobMilestone findMilestoneByProposalAndJobId(Long proposalId, Long jobId);
 

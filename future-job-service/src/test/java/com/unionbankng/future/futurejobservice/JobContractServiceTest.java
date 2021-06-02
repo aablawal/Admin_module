@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.security.Principal;
 import java.util.Date;
 
 class JobContractServiceTest {
@@ -115,19 +116,19 @@ class JobContractServiceTest {
     }
 
     @Test
-    void endContract() {
+    void endContract(Principal principal) {
         Rate rate=new Rate();
         rate.setRate(5l);
         rate.setDescription("Very Good");
         rate.setFeedback("You have done a good job");
         rate.setUserId(1l);
-        APIResponse response=   jobContractService.endContract("Test User",rate,jobId,proposalId,userId,1);
+        APIResponse response=   jobContractService.endContract(principal,rate,jobId,proposalId,userId,1);
         Assert.assertEquals(true,response.isSuccess());
     }
 
     @Test
-    void approveCompletedMilestone() {
-        APIResponse response= jobContractService.approveCompletedMilestone("Test User","milestonerefrence goes here");
+    void approveCompletedMilestone(Principal principal) {
+        APIResponse response= jobContractService.approveCompletedMilestone(principal,"milestonerefrence goes here");
         Assert.assertEquals(true,response.isSuccess());
     }
 }
