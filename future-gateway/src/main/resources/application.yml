@@ -44,6 +44,9 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://localhost:8083
+    loan-service:
+      path: /loanserv/**
+      url: http://localhost:8090
 
 ---
 spring:
@@ -70,6 +73,9 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
+    loan-service:
+      path: /loanserv/**
+      url: http://future-laon-service
 
 ---
 spring:
@@ -96,3 +102,6 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
+    loan-service:
+      path: /loanserv/**
+      url: http://future-laon-service

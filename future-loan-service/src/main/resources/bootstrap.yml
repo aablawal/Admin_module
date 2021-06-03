@@ -8,7 +8,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
 server:
-  port: 8087
+  port: 8090
   error:
     include-message: always
 management:
