@@ -75,7 +75,7 @@ zuul:
       url: http://future-messaging-service
     loan-service:
       path: /loanserv/**
-      url: http://future-laon-service
+      url: http://future-loan-service
 
 ---
 spring:
@@ -104,4 +104,4 @@ zuul:
       url: http://future-messaging-service
     loan-service:
       path: /loanserv/**
-      url: http://future-laon-service
+      url: http://future-loan-service
