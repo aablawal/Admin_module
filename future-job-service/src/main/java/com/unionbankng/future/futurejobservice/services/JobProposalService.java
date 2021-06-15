@@ -3,7 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
@@ -55,12 +55,12 @@ public class JobProposalService  implements Serializable {
                 isEdited = true;
 
             if (isEdited) {
-                if (application.getStatus().equals(JobStatus.RE)) {
-                    application.setStatus(JobStatus.PE);
+                if (application.getStatus().equals(Status.RE)) {
+                    application.setStatus(Status.PE);
                 }
             }
             else {
-                application.setStatus(JobStatus.PE);
+                application.setStatus(Status.PE);
             }
 
 
@@ -122,7 +122,7 @@ public class JobProposalService  implements Serializable {
         }
     }
 
-    public JobProposal updateJobStatus(Long proposalId, JobStatus status) {
+    public JobProposal updateJobStatus(Long proposalId, Status status) {
         JobProposal proposal = repository.findById(proposalId).orElse(null);
         if (proposal != null) {
             proposal.setStatus(status);
@@ -161,7 +161,7 @@ public class JobProposalService  implements Serializable {
     public JobProposal declineJobProposal(Long proposalId){
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
-            proposal.setStatus(JobStatus.RE);
+            proposal.setStatus(Status.RE);
             proposal.setLastModifiedDate(new Date());
             repository.save(proposal);
             //fire notification

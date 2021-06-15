@@ -1,7 +1,8 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.*;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.ConfigReference;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.TeamMember;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +29,7 @@ public class JobService {
 
     private final  AppService appService;
     private  final JobRepository jobRepository;
+    private  final  ConfigService configService;
     private  final JobProposalRepository jobProposalRepository;
     private  final FileStoreService fileStoreService;
     private final JobTeamRepository teamRepository;
@@ -43,7 +44,7 @@ public class JobService {
             String supporting_file_names = null;
             String nda_file_names=null;
             Job job = new ObjectMapper().readValue(jobData, Job.class);
-            job.setStatus(JobStatus.AC);
+            job.setStatus(Status.AC);
 
             //save files if not null
             if (nda_files!=null)
@@ -59,9 +60,10 @@ public class JobService {
 
             Job savedJob=jobRepository.save(job);
             if(savedJob!=null) {
+
                 if (savedJob.getType() == JobType.TEAMS_PROJECT) {
                     JobTeam team = new ObjectMapper().readValue(teamData, JobTeam.class);
-                    team.setStatus(JobStatus.AC);
+                    team.setStatus(Status.AC);
                     team.setJobId(savedJob.getId());
                     if (team.getSelectedTeam() != null) {
                         for (String teamMemberData : team.getSelectedTeam().split("~")) {
@@ -86,7 +88,7 @@ public class JobService {
                                     JobProposal proposal = new JobProposal();
                                     proposal.setUserId(teamMember.getId());
                                     proposal.setJobId(savedJob.getId());
-                                    proposal.setStatus(JobStatus.PE);
+                                    proposal.setStatus(Status.PE);
                                     proposal.setEmployerId(savedJob.getOid());
                                     proposal.setDurationType("D");
                                     proposal.setDuration(Long.valueOf(7));
@@ -117,7 +119,7 @@ public class JobService {
                                         teamMemberDetails.setFullName(teamMember.getFullName());
                                         teamMemberDetails.setEmail(teamMember.getEmail());
                                         teamMemberDetails.setImg(teamMember.getImg());
-                                        teamMemberDetails.setStatus(JobStatus.PF);
+                                        teamMemberDetails.setStatus(Status.PF);
                                         teamMemberDetails.setProposalId(savedProposal.getId());
                                         teamMemberDetails.setAmount(Long.valueOf(money));
                                         teamMemberDetails.setPercentage(Long.valueOf(percentage));
@@ -159,6 +161,18 @@ public class JobService {
                     logger.info("Unable to fire notifications");
                 }
                 //end
+
+                try {
+                    //update configurations table
+                    Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS);
+                    if (existingConfig != null)
+                        configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
+                    else
+                        configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(1));
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
                 return savedJob;
 
             }else {
@@ -176,9 +190,9 @@ public class JobService {
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             if (state == 1)
-                job.setStatus(JobStatus.CO);
+                job.setStatus(Status.CO);
             else
-                job.setStatus(JobStatus.IA);
+                job.setStatus(Status.IA);
 
             job.setLastModifiedDate(new Date());
 
@@ -205,13 +219,25 @@ public class JobService {
         if(job!=null) {
 
             Job newJob =(Job)app.copy(job);
-            newJob.setStatus(JobStatus.AC);
+            newJob.setStatus(Status.AC);
             newJob.setCreatedAt(new Date());
             newJob.setId(null);
 
             Job saveAsNewJob =jobRepository.save(newJob);
             //fire notification
             if(saveAsNewJob!=null) {
+
+                try {
+                    //update configurations table
+                    Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS);
+                    if (existingConfig != null)
+                        configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
+                    else
+                        configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(1));
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
                 NotificationBody body = new NotificationBody();
                 body.setBody("Your job for "+newJob.getTitle()+" has been Re-published");
                 body.setSubject("Job Published");
@@ -231,6 +257,16 @@ public class JobService {
         }
     }
     public void  deleteJobById(Long id) {
+        try {
+            //update configurations table
+            Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS);
+            if (existingConfig != null)
+                configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(Integer.parseInt(existingConfig.getValue()) -1));
+            else
+                configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(0));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
         jobRepository.deleteById(id);
     }
     public Model findJobById(Long id, Model model) {

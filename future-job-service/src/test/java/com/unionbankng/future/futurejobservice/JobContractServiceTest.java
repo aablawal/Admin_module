@@ -1,8 +1,7 @@
 package com.unionbankng.future.futurejobservice;
 
 import com.unionbankng.future.futurejobservice.entities.*;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import org.junit.Assert;
@@ -31,7 +30,7 @@ class JobContractServiceTest {
         milestone.setProposalId(proposalId);
         milestone.setTitle("New Milestone");
         milestone.setDescription("I will design the first Logo");
-        milestone.setStatus(JobStatus.PA);
+        milestone.setStatus(Status.PA);
         milestone.setAmount(1l);
         milestone.setEndDate(new Date());
         milestone.setStartDate(new Date());
@@ -47,7 +46,7 @@ class JobContractServiceTest {
         extensionRequest.setProposalId(proposalId);
         extensionRequest.setEmployerId(userId);
         extensionRequest.setJobId(jobId);
-        extensionRequest.setStatus(JobStatus.AC);
+        extensionRequest.setStatus(Status.AC);
         extensionRequest.setReason("Unable to make it");
         JobContractExtension savedRequest=jobContractService.requestContractExtension("Test User", extensionRequest);
         Assert.assertEquals(jobId,savedRequest.getJobId());
@@ -59,7 +58,7 @@ class JobContractServiceTest {
         extensionRequest.setProposalId(proposalId);
         extensionRequest.setEmployerId(userId);
         extensionRequest.setJobId(jobId);
-        extensionRequest.setStatus(JobStatus.AC);
+        extensionRequest.setStatus(Status.AC);
         extensionRequest.setReason("Unable to make it");
         JobContractExtension savedRequest=jobContractService.approveContractExtension("Test User", extensionRequest);
         Assert.assertEquals(jobId,savedRequest.getJobId());
@@ -73,7 +72,7 @@ class JobContractServiceTest {
         request.setUserId(1l);
         request.setEmployerId(1l);
         request.setDescription("Test description");
-        request.setStatus(JobStatus.AC);
+        request.setStatus(Status.AC);
         request.setLink("www.projectlink.com");
         request.setCreatedAt(new Date());
         JobProjectSubmission savedRequest= jobContractService.submitJob("Test User",request, null);
@@ -108,7 +107,7 @@ class JobContractServiceTest {
         request.setUserId(1l);
         request.setEmployerId(1l);
         request.setDescription("Test description");
-        request.setStatus(JobStatus.PE);
+        request.setStatus(Status.PE);
         request.setLink("www.projectlink.com");
         request.setCreatedAt(new Date());
         JobProjectSubmission savedMilestone= jobContractService.submitCompletedMilestone("Test User", milestoneId,request,null);

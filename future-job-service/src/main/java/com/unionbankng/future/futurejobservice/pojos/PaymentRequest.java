@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 public class PaymentRequest {
 
-    protected int amount;
+    protected double amount;
     protected Long proposalId;
     protected String paymentReference;
     protected String debitAccountName;
@@ -19,4 +19,5 @@ public class PaymentRequest {
     protected String narration;
     protected String executedBy;
     protected String executedFor;
+    protected String contractReference;
 }

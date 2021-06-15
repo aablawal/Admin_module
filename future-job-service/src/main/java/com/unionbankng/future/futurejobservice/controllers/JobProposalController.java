@@ -3,7 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
@@ -84,7 +84,7 @@ public class JobProposalController {
 
     public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status) {
         return ResponseEntity.ok().body(
-                new APIResponse("success", true, service.updateJobStatus(id, JobStatus.valueOf(status))));
+                new APIResponse("success", true, service.updateJobStatus(id, Status.valueOf(status))));
     }
 
     @PostMapping("/v1/job/proposal/approve")

@@ -77,9 +77,9 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-loan-service --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context MarcusProdAKSClust"
-                    sh "kubectl set image deployment/future-loan-service future-loan-service=${ACR_LOGINSERVER}/future-loan-service --namespace sidekiq"
-                    sh "kubectl rollout restart deployment/future-loan-service --namespace sidekiq"
+                    sh "kubectl config use-context UBNKula"
+                    sh "kubectl set image deployment/future-loan-service future-loan-service=${ACR_LOGINSERVER}/future-loan-service --namespace kula"
+                    sh "kubectl rollout restart deployment/future-loan-service --namespace kula"
                   }
                 }
             

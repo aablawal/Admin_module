@@ -36,9 +36,9 @@ public class AppController {
         ArrayList<JobBulkPayment> bulkPayments=new ArrayList<>();
         JobBulkPayment bank1= new JobBulkPayment();
         bank1.setTransactionId("1");
-        bank1.setAccountNumber("0055982543");
-        bank1.setAccountType("CASA");
-        bank1.setAccountName("DEDICATED NEFT O A");
+        bank1.setAccountNumber("210210071");
+        bank1.setAccountType("GL");
+        bank1.setAccountName("CPC CASH DEPOSIT ACCOUNT IMPLEMENT");
         bank1.setNarration("My first testing");
         bank1.setAmount(11);
         bank1.setCrDrFlag("D");
@@ -47,18 +47,17 @@ public class AppController {
         bank1.setPaymentReference("Testiksjdjskdjksjd");
         bulkPayments.add(bank1);
 
-
         JobBulkPayment bank2= new JobBulkPayment();
         bank2.setTransactionId("2");
-        bank2.setAccountNumber("0095788138");
-        bank2.setAccountType("CASA");
-        bank2.setAccountName("UNKNOWN USER");
+        bank2.setAccountNumber("315200043");
+        bank2.setAccountType("GL");
+        bank2.setAccountName("WESTERN UNION-COMMISSION");
         bank2.setNarration("My first testing");
         bank2.setAmount(11);
         bank2.setCrDrFlag("C");
         bank2.setExecutedBy("Test User");
         bank2.setExecutedFor("Test Something");
-        bank2.setPaymentReference("Testiksjdjskdjksjd");
+        bank2.setPaymentReference("tolustest");
         bulkPayments.add(bank2);
         APIResponse response=jobPaymentService.makeBulkPayment(bulkPayments);
         return ResponseEntity.ok().body(response);
@@ -82,7 +81,9 @@ public class AppController {
         payment.setDebitAccountNumber("315200043");
         payment.setExecutedBy("Test User");
         payment.setExecutedFor("Test");
-        payment.setPaymentReference("skdjuw9jskdjiwuei");
+        payment.setDebitAccountType("GL");
+        payment.setCreditAccountType("GL");
+        payment.setPaymentReference("skdjkasjdksjkadj");
         APIResponse response= jobPaymentService.makePayment(payment);
         return ResponseEntity.ok().body(response);
 

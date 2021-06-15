@@ -14,4 +14,5 @@
     <include file="db/changelog/db.job-ratings-changelog.xml"/>
     <include file="db/changelog/db.job-categories-changelog.xml"/>
     <include file="db/changelog/db.chat-files-changelog.xml"/>
+    <include file="db/changelog/db.configs-changelog.xml"/>
 </databaseChangeLog>

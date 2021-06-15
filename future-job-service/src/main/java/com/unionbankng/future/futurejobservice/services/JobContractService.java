@@ -3,9 +3,9 @@ package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.Gson;
 import com.unionbankng.future.futurejobservice.entities.*;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.ConfigReference;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
@@ -42,6 +42,8 @@ public class JobContractService implements Serializable {
     private String escrowAccountNumber="250990140";
     private String UBNIncomeAccountName = "Marcus Securities Settlement"; //GL
     private String UBNIncomeAccountNumber = "250990144";
+    private String VATAccountName = "M36 SMS CHARGES"; //GL
+    private String VATAccountNumber = "420993008";
     private String PepperestIncomeAccountName = "DEDICATED NEFT O A"; //CASA
     private String PepperestIncomeAccountNumber = "0055982543";
 
@@ -52,6 +54,7 @@ public class JobContractService implements Serializable {
     private RestTemplate rest;
     private final JobRepository jobRepository;
     private final JobContractRepository jobContractRepository;
+    private final ConfigService configService;
     private final JobContractExtensionRepository jobContractExtensionRepository;
     private final JobProposalRepository jobProposalRepository;
     private final JobProjectSubmissionRepository jobProjectSubmissionRepository;
@@ -173,9 +176,9 @@ public class JobContractService implements Serializable {
             c.add(Calendar.DATE, proposal.getDuration().intValue());
             contract.setEndDate(c.getTime());
             contract.setStartDate(new Date());
-            contract.setStatus(JobStatus.WP);
-            proposal.setStatus(JobStatus.WP);
-            job.setStatus(JobStatus.WP);
+            contract.setStatus(Status.WP);
+            proposal.setStatus(Status.WP);
+            job.setStatus(Status.WP);
             proposal.setLastModifiedDate(new Date());
             proposal.setStartDate(new Date());
             proposal.setEndDate(c.getTime());
@@ -208,8 +211,9 @@ public class JobContractService implements Serializable {
                 payment.setDebitAccountName(proposal.getAccountName());
                 payment.setDebitAccountNumber(proposal.getAccountNumber());
                 payment.setDebitAccountType("CASA");
-                payment.setPaymentReference(contractReferenceId);
-                payment.setExecutedFor("Job:"+job.getId());
+                payment.setPaymentReference(paymentReferenceId);
+                payment.setExecutedFor(contractReferenceId);
+                payment.setContractReference(contractReferenceId);
                 payment.setExecutedBy(currentUser.getUserUUID());
 
                 APIResponse paymentResponse=jobPaymentService.makePayment(payment);
@@ -291,7 +295,7 @@ public class JobContractService implements Serializable {
             }
             if (status == 1) {
                 if (job != null) {
-                    job.setStatus(JobStatus.WP);
+                    job.setStatus(Status.WP);
                     job.setLastModifiedDate(new Date());
                     jobRepository.save(job);
 
@@ -309,7 +313,7 @@ public class JobContractService implements Serializable {
                             teamMember.setUserId(proposal.getUserId());
                             teamMember.setProposalId(proposal.getId());
                             teamMember.setEmployerId(proposal.getEmployerId());
-                            teamMember.setStatus(JobStatus.AC);
+                            teamMember.setStatus(Status.AC);
                             teamMember.setDescription(proposal.getAbout());
                             teamMember.setPercentage(Long.valueOf(10));
                             teamMember.setStartDate(new Date());
@@ -318,7 +322,7 @@ public class JobContractService implements Serializable {
                         } else {
                             existingMember.setStartDate(new Date());
                             existingMember.setEndDate(c.getTime());
-                            existingMember.setStatus(JobStatus.AC);
+                            existingMember.setStatus(Status.AC);
                             jobTeamDetailsRepository.save(existingMember);
                         }
                     }
@@ -354,7 +358,7 @@ public class JobContractService implements Serializable {
 
     public JobContractExtension requestContractExtension(String userName, JobContractExtension extensionRequest) {
         try {
-            extensionRequest.setStatus(JobStatus.PE);
+            extensionRequest.setStatus(Status.PE);
             JobContractExtension extension = jobContractExtensionRepository.save(extensionRequest);
             if (extension != null) {
                 //fire notification
@@ -394,7 +398,7 @@ public class JobContractService implements Serializable {
             JobContract contract=jobContractRepository.findById(milestone.getContractId()).orElse(null);
             if(contract!=null) {
                 String milestoneReferenceId = app.makeUIID();
-                milestone.setStatus(JobStatus.PC);
+                milestone.setStatus(Status.PC);
                 milestone.setContractReference(contract.getContractReference());
                 milestone.setMilestoneReference(milestoneReferenceId);
 
@@ -476,7 +480,7 @@ public class JobContractService implements Serializable {
 
                 if (response != null) {
                     if (response.getStatusCode().is2xxSuccessful()) {
-                        extension.setStatus(JobStatus.AC);
+                        extension.setStatus(Status.AC);
                         jobContractExtensionRepository.save(extension);
 
                         //fire notification
@@ -527,7 +531,7 @@ public class JobContractService implements Serializable {
             request, MultipartFile[] supportingFiles) {
         try {
             String supporting_file_names = null;
-            request.setStatus(JobStatus.PE);
+            request.setStatus(Status.PE);
 
             if (supportingFiles != null)
                 supporting_file_names = this.fileStoreService.storeFiles(supportingFiles, request.getProposalId().toString());
@@ -572,7 +576,7 @@ public class JobContractService implements Serializable {
             ResponseEntity<String> response = null;
             String disputeReferenceId =app.makeUIID();
 
-            request.setStatus(JobStatus.AC);
+            request.setStatus(Status.AC);
             request.setUserId(userId);
             request.setReferenceId(disputeReferenceId);
 
@@ -627,7 +631,7 @@ public class JobContractService implements Serializable {
             requestId) {
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
         if (request != null) {
-            request.setStatus(JobStatus.RE);
+            request.setStatus(Status.RE);
             jobProjectSubmissionRepository.save(request);
             //fire notification
             NotificationBody body = new NotificationBody();
@@ -668,7 +672,7 @@ public class JobContractService implements Serializable {
             }
 
             if (milestone != null) {
-                milestone.setStatus(JobStatus.PA);
+                milestone.setStatus(Status.PA);
                 jobMilestoneRepository.save(milestone);
 
                 //fire notification
@@ -686,7 +690,7 @@ public class JobContractService implements Serializable {
                     notificationSender.pushNotification(body);
                 }
                 //end
-                request.setStatus(JobStatus.PA);
+                request.setStatus(Status.PA);
                 return jobProjectSubmissionRepository.save(request);
             } else {
                 logger.info("JOBSERVICE: Milestone not found");
@@ -715,7 +719,7 @@ public class JobContractService implements Serializable {
 
                 if (state == 1) {
                     if (contract.getWorkMethod().equals("Overall")) {
-                        if (contract.getStatus().equals(JobStatus.WP)) {
+                        if (contract.getStatus().equals(Status.WP)) {
                             contract.setEndDate(new Date());
                             contract.setIsSettled(true);
                             contract.setSettlement(contract.getContractReference());
@@ -733,21 +737,21 @@ public class JobContractService implements Serializable {
                                 APIResponse settlementResponse = this.settleContractById(principal, contract.getContractReference());
                                 if (settlementResponse.isSuccess()) {
                                     //complete contract
-                                    contract.setStatus(JobStatus.CO);
+                                    contract.setStatus(Status.CO);
                                     contract.setEndDate(new Date());
                                     jobContractRepository.save(contract);
 
                                     if (job != null) {
-                                        job.setStatus(JobStatus.CO);
+                                        job.setStatus(Status.CO);
                                         jobRepository.save(job);
                                     }
                                     if (proposal != null) {
-                                        proposal.setStatus(JobStatus.CO);
+                                        proposal.setStatus(Status.CO);
                                         proposal.setEndDate(new Date());
                                         jobProposalRepository.save(proposal);
                                     }
                                     if (project != null) {
-                                        project.setStatus(JobStatus.CO);
+                                        project.setStatus(Status.CO);
                                         jobProjectSubmissionRepository.save(project);
                                     }
 
@@ -799,21 +803,21 @@ public class JobContractService implements Serializable {
                             return new APIResponse("Unable to end ongoing contract, end ongoing milestones first", false, null);
                         } else {
                             //end contract
-                            contract.setStatus(JobStatus.CO);
+                            contract.setStatus(Status.CO);
                             contract.setEndDate(new Date());
                             jobContractRepository.save(contract);
 
                             if (job != null) {
-                                job.setStatus(JobStatus.CO);
+                                job.setStatus(Status.CO);
                                 jobRepository.save(job);
                             }
                             if (proposal != null) {
-                                proposal.setStatus(JobStatus.CO);
+                                proposal.setStatus(Status.CO);
                                 proposal.setEndDate(new Date());
                                 jobProposalRepository.save(proposal);
                             }
                             if (project != null) {
-                                project.setStatus(JobStatus.CO);
+                                project.setStatus(Status.CO);
                                 jobProjectSubmissionRepository.save(project);
                             }
                             return new APIResponse("Request Successful", true, contract);
@@ -822,19 +826,19 @@ public class JobContractService implements Serializable {
                 } else {
 
                     if (contract.getWorkMethod().equals("Overall")) {
-                        if (!contract.getStatus().equals(JobStatus.CO) && !contract.getStatus().equals(JobStatus.WP)) {
+                        if (!contract.getStatus().equals(Status.CO) && !contract.getStatus().equals(Status.WP)) {
                             contract.setEndDate(new Date());
                             contract.setIsSettled(false);
                             contract.setFeedback(String.valueOf(state));
                             contract.setSettlement("Contract ended without settlement");
                             contract.setDescription("Employer ended the contract");
-                            contract.setStatus(JobStatus.RE);
+                            contract.setStatus(Status.RE);
                             if (project != null) {
-                                project.setStatus(JobStatus.RE);
+                                project.setStatus(Status.RE);
                                 jobProjectSubmissionRepository.save(project);
                             }
                             if (proposal != null) {
-                                proposal.setStatus(JobStatus.RE);
+                                proposal.setStatus(Status.RE);
                                 proposal.setEndDate(new Date());
                                 jobProposalRepository.save(proposal);
                             }
@@ -865,21 +869,21 @@ public class JobContractService implements Serializable {
                             return new APIResponse("Unable to end contract that has unsettled milestones", false, null);
                         } else {
                             //end contract
-                            contract.setStatus(JobStatus.CO);
+                            contract.setStatus(Status.CO);
                             contract.setEndDate(new Date());
                             jobContractRepository.save(contract);
 
                             if (job != null) {
-                                job.setStatus(JobStatus.CO);
+                                job.setStatus(Status.CO);
                                 jobRepository.save(job);
                             }
                             if (proposal != null) {
-                                proposal.setStatus(JobStatus.CO);
+                                proposal.setStatus(Status.CO);
                                 proposal.setEndDate(new Date());
                                 jobProposalRepository.save(proposal);
                             }
                             if (project != null) {
-                                project.setStatus(JobStatus.CO);
+                                project.setStatus(Status.CO);
                                 jobProjectSubmissionRepository.save(project);
                             }
                             return new APIResponse("Request Successful", true, contract);
@@ -902,12 +906,12 @@ public class JobContractService implements Serializable {
                                                     principal, Long milestoneId, String newStatus) {
 
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return modifyMilestoneState(currentUser, milestoneId, JobStatus.valueOf(newStatus));
+        return modifyMilestoneState(currentUser, milestoneId, Status.valueOf(newStatus));
 
     }
 
     public APIResponse modifyMilestoneState(JwtUserDetail
-                                                    currentUser, Long milestoneId, JobStatus
+                                                    currentUser, Long milestoneId, Status
                                                     newStatus) {
 
         try {
@@ -917,24 +921,24 @@ public class JobContractService implements Serializable {
 
             if (milestone != null) {
 
-                if (newStatus.equals(JobStatus.AC)) {
-                    milestone.setStatus(JobStatus.AC);
+                if (newStatus.equals(Status.AC)) {
+                    milestone.setStatus(Status.AC);
                     milestone.setStartDate(new Date());
                     JobProposal proposal = jobProposalRepository.findById(milestone.getProposalId()).orElse(null);
                     Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
                     if (proposal != null) {
-                        proposal.setStatus(JobStatus.WP);
+                        proposal.setStatus(Status.WP);
                         //send milestone amount to escrow
                         JobContract contract = jobContractRepository.findById(proposal.getContractId()).orElse(null);
                         if (contract != null) {
 
                             String paymentReferenceId = app.makeUIID();
                             milestone.setInitialPaymentReferenceA(paymentReferenceId);
-                            milestone.setStatus(JobStatus.WP);
+                            milestone.setStatus(Status.WP);
                             milestone.setContractId(contract.getId());
                             milestone.setContractReference(contract.getContractReference());
 
-                            contract.setStatus(JobStatus.WP);
+                            contract.setStatus(Status.WP);
                             contract.setLastModifiedDate(new Date());
                             contract.setInitialPaymentReferenceA(paymentReferenceId);
                             contract.setLastModifiedDate(new Date());
@@ -955,7 +959,8 @@ public class JobContractService implements Serializable {
                             payment.setDebitAccountNumber(proposal.getAccountNumber());
                             payment.setDebitAccountType("CASA");
                             payment.setPaymentReference(paymentReferenceId);
-                            payment.setExecutedFor("Job:"+job.getId());
+                            payment.setExecutedFor(contract.getContractReference());
+                            payment.setContractReference(contract.getContractReference());
                             payment.setExecutedBy(currentUser.getUserUUID());
 
                             APIResponse paymentResponse=jobPaymentService.makePayment(payment);
@@ -1012,9 +1017,9 @@ public class JobContractService implements Serializable {
                         logger.error("JOBSERVICE: Proposal not found");
                     }
                 }
-                else if(newStatus.equals(JobStatus.RE)) {
+                else if(newStatus.equals(Status.RE)) {
 
-                    milestone.setStatus(JobStatus.RE);
+                    milestone.setStatus(Status.RE);
                     milestone.setEndDate(new Date());
                     JobMilestone savedMilestone = jobMilestoneRepository.save(milestone);
 
@@ -1022,7 +1027,7 @@ public class JobContractService implements Serializable {
 
                         JobProjectSubmission project=jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
                         if(project!=null){
-                            project.setStatus(JobStatus.RE);
+                            project.setStatus(Status.RE);
                             jobProjectSubmissionRepository.save(project);
                         }
                     }
@@ -1108,11 +1113,11 @@ public class JobContractService implements Serializable {
                             APIResponse settlementResponse=this.settleContractById(principal,milestone.getMilestoneReference());
                             if(settlementResponse.isSuccess()) {
                                 //end milestone
-                                milestone.setStatus(JobStatus.CO);
+                                milestone.setStatus(Status.CO);
                                 milestone.setEndDate(new Date());
                                 jobMilestoneRepository.save(milestone);
                                 //complete project
-                                project.setStatus(JobStatus.CO);
+                                project.setStatus(Status.CO);
                                 jobProjectSubmissionRepository.save(project);
 
                                 contract.setLastModifiedDate(new Date());
@@ -1159,188 +1164,297 @@ public class JobContractService implements Serializable {
     }
 
     public APIResponse settleContractById(Principal principal, String contractReferenceId) throws CloneNotSupportedException {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        JobContract contract;
-        JobMilestone milestone;
-        app.print("Settling Contract Id: "+contractReferenceId);
-        contract= jobContractRepository.findByContractReference(contractReferenceId).orElse(null);
-        milestone= jobMilestoneRepository.findMilestoneByMilestoneReference(contractReferenceId).orElse(null);
-        if (contract == null) {
-            if (milestone == null)
-                return new APIResponse("Contract not found from Reference Id Provided", false, null);
-            else {
-                contract=jobContractRepository.findByContractReference(milestone.getContractReference()).orElse(null);
+        try {
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JobContract contract;
+            JobMilestone milestone;
+            app.print("Settling Contract Id: " + contractReferenceId);
+            contract = jobContractRepository.findByContractReference(contractReferenceId).orElse(null);
+            milestone = jobMilestoneRepository.findMilestoneByMilestoneReference(contractReferenceId).orElse(null);
+            if (contract == null) {
+                if (milestone == null) {
+                    return new APIResponse("Contract not found from Reference Id Provided", false, null);
+                } else {
+                    contract = jobContractRepository.findByContractReference(milestone.getContractReference()).orElse(null);
+                }
             }
-        }
-        app.print(contract);
-        app.print(milestone);
-
-        if(contract.getStatus().equals(JobStatus.WP) || (milestone!=null && milestone.getStatus().equals(JobStatus.WP))){
-            //check if contract is available
-            JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
-            if (proposal == null)
-                return new APIResponse("No Proposal found for this Contract", false, null);
-            //check if job is available
-            Job job = jobRepository.findById(contract.getJobId()).orElse(null);
-            if (job == null)
-                return new APIResponse("No Job history found for this Contract", false, null);
-
-            app.print("#Contract");
             app.print(contract);
-
-            app.print("#milestone");
             app.print(milestone);
 
-            int depositedAmount;
-            if(contract.getWorkMethod().equals("Overall"))
-                depositedAmount = contract.getAmount();
-            else
-                if(milestone==null)
-                    return new APIResponse("No Milestone found with the reference provided", false, null);
-                else
-                    depositedAmount= milestone.getAmount().intValue();
+            if(contract!=null) {
+
+                if (contract.getStatus().equals(Status.WP) || (milestone != null && milestone.getStatus().equals(Status.WP))) {
+                    //check if contract is available
+                    JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
+                    if (proposal == null)
+                        return new APIResponse("No Proposal found for this Contract", false, null);
+                    //check if job is available
+                    Job job = jobRepository.findById(contract.getJobId()).orElse(null);
+                    if (job == null)
+                        return new APIResponse("No Job history found for this Contract", false, null);
+
+                    app.print("#Contract");
+                    app.print(contract);
+
+                    app.print("#milestone");
+                    app.print(milestone);
+
+                    double depositedAmount;
+                    if (contract.getWorkMethod().equals("Overall"))
+                        depositedAmount = contract.getAmount();
+                    else if (milestone == null)
+                        return new APIResponse("No Milestone found with the reference provided", false, null);
+                    else
+                        depositedAmount = milestone.getAmount().intValue();
 
 
-           if(depositedAmount>0) {
-               int UBNIncomeCharge = 200;
-               int pepperestIncomeCharge = 100;
-               int freelancerIncomeAmount = Math.round((depositedAmount - pepperestIncomeCharge) - UBNIncomeCharge);
+                    if (depositedAmount > 0) {
+
+                        double VATRate = 0;
+                        double UBNIncomeRate=0;
+                        double VATCharge = 0;
+                        double UBNIncomeCharge = 0;
+                        double pepperestIncomeCharge = 0;
+                        double freelancerIncomeAmount=0;
+                        int TOTAL_JOBS_COMPLETED = 0;
+
+                        //###########################
+                        // CALCULATE VAT AND CHARGES BASE ON CONFIGS
+                        //###########################
+                        try {
+                            List<Config> configs = configService.getConfigs();
+                            app.print(configs);
+                            if (!configs.isEmpty()) {
+                                for (Config currentConfig : configs) {
+                                    if (currentConfig.getReference()==ConfigReference.VAT_RATE)
+                                        VATRate = Double.valueOf(currentConfig.getValue());
+                                    if (currentConfig.getReference()==ConfigReference.UBN_INCOME)
+                                        UBNIncomeRate = Double.valueOf(currentConfig.getValue());
+                                    if (currentConfig.getReference().equals(ConfigReference.TOTAL_JOBS_COMPLETED))
+                                        TOTAL_JOBS_COMPLETED = Integer.valueOf(currentConfig.getValue());
+                                }
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            return new APIResponse("Unable to extract job service configurations", false, null);
+                        }
+                        app.print(VATRate);
+                        app.print(TOTAL_JOBS_COMPLETED);
+                        //###########################
 
 
-               ArrayList<JobBulkPayment> bulkPaymentStack = new ArrayList<>();
-               String paymentReference = app.makeUIID();
-               String narration = "Settlement from Kula for " + job.getTitle();
+                        UBNIncomeCharge=(UBNIncomeRate * depositedAmount) / 100;
 
-               //Bulk transfers for settlement
-               JobBulkPayment escrowAccount = new JobBulkPayment();
-               escrowAccount.setAccountNumber(escrowAccountNumber);
-               escrowAccount.setAccountName(escrowAccountName);
-               escrowAccount.setNarration(narration);
-               escrowAccount.setExecutedBy(currentUser.getUserUUID());
-               escrowAccount.setExecutedFor("Contract:" + contract.getContractReference());
-               escrowAccount.setPaymentReference(paymentReference);
-               escrowAccount.setCrDrFlag("D");
-               escrowAccount.setAccountType("GL");
-               escrowAccount.setTransactionId("1");
-               escrowAccount.setAmount(0);
-
-               //***Union Bank***
-               JobBulkPayment UBNAccount = new JobBulkPayment();
-               //###############
-
-               JobBulkPayment escrowUBNAccountDebit = (JobBulkPayment)app.copy(escrowAccount);
-               escrowUBNAccountDebit.setAmount(UBNIncomeCharge);
-               escrowUBNAccountDebit.setTransactionId("1");
-               //##############
-               UBNAccount.setTransactionId("2");
-               UBNAccount.setAccountName(UBNIncomeAccountName);
-               UBNAccount.setAccountNumber(UBNIncomeAccountNumber);
-               UBNAccount.setNarration(narration);
-               UBNAccount.setExecutedBy(currentUser.getUserUUID());
-               UBNAccount.setExecutedFor("contract:" + contract.getContractReference());
-               UBNAccount.setPaymentReference(paymentReference);
-               UBNAccount.setCrDrFlag("C");
-               UBNAccount.setAccountType("GL");
-               UBNAccount.setAmount(UBNIncomeCharge);
-               //############# add to bulk transfer stack ###########
-               bulkPaymentStack.add(escrowUBNAccountDebit);
-               bulkPaymentStack.add(UBNAccount);
+                        if (TOTAL_JOBS_COMPLETED < 100000) {
+                            pepperestIncomeCharge = 100;
+                        } else if (TOTAL_JOBS_COMPLETED >= 100000 && TOTAL_JOBS_COMPLETED < 200000) {
+                            pepperestIncomeCharge = 50;
+                            UBNIncomeCharge = UBNIncomeCharge + 50;
+                        } else if (TOTAL_JOBS_COMPLETED >= 200000 && TOTAL_JOBS_COMPLETED < 300000) {
+                            pepperestIncomeCharge = 40;
+                            UBNIncomeCharge = UBNIncomeCharge + 60;
+                        } else {
+                            pepperestIncomeCharge = 30;
+                            UBNIncomeCharge = UBNIncomeCharge + 70;
+                        }
+                        VATCharge = (VATRate * UBNIncomeCharge) / 100;
+                        freelancerIncomeAmount = (depositedAmount - pepperestIncomeCharge) - UBNIncomeCharge;
+                        UBNIncomeCharge = UBNIncomeCharge - VATCharge;
 
 
-               //***Pepperest***
-               JobBulkPayment pepperestAccount = new JobBulkPayment();
-               //##############
-               JobBulkPayment escrowPepperestAccountDebit= (JobBulkPayment)app.copy(escrowAccount);
-               escrowPepperestAccountDebit.setAmount(pepperestIncomeCharge);
-               escrowPepperestAccountDebit.setTransactionId("3");
-               //#############
-               pepperestAccount.setTransactionId("4");
-               pepperestAccount.setAccountName(PepperestIncomeAccountName);
-               pepperestAccount.setAccountNumber(PepperestIncomeAccountNumber);
-               pepperestAccount.setNarration(narration);
-               pepperestAccount.setExecutedBy(currentUser.getUserUUID());
-               pepperestAccount.setExecutedFor("contract:" + contract.getContractReference());
-               pepperestAccount.setPaymentReference(paymentReference);
-               pepperestAccount.setCrDrFlag("C");
-               pepperestAccount.setAccountType("CASA");
-               pepperestAccount.setAmount(pepperestIncomeCharge);
-               //############# add to bulk transfer stack ###########
-               bulkPaymentStack.add(escrowPepperestAccountDebit);
-               bulkPaymentStack.add(pepperestAccount);
+                        app.print("VAT is "+VATCharge);
+                        app.print("UBN Income  is "+UBNIncomeCharge);
+                        app.print("Freelancer charge is "+freelancerIncomeAmount);
 
-               //***Freelancer***
-               JobBulkPayment freelancerAccount = new JobBulkPayment();
-               //##################
-               JobBulkPayment escrowFreelancerAccountDebit = (JobBulkPayment)app.copy(escrowAccount);
-               escrowFreelancerAccountDebit.setAmount(freelancerIncomeAmount);
-               escrowFreelancerAccountDebit.setTransactionId("5");//update escrow account information with the payment for UBN
-               //##################
-               freelancerAccount.setTransactionId("6");
-               freelancerAccount.setAccountName(contract.getFreelancerAccountName());
-               freelancerAccount.setAccountNumber(contract.getFreelancerAccountNumber());
-               freelancerAccount.setNarration(narration);
-               freelancerAccount.setExecutedBy(currentUser.getUserUUID());
-               freelancerAccount.setExecutedFor("contract:" + contract.getContractReference());
-               freelancerAccount.setPaymentReference(paymentReference);
-               freelancerAccount.setCrDrFlag("C");
-               freelancerAccount.setAccountType("CASA");
-               freelancerAccount.setAmount(freelancerIncomeAmount);
-               //############# add to bulk transfer stack ###########
-               bulkPaymentStack.add(escrowFreelancerAccountDebit);
-               bulkPaymentStack.add(freelancerAccount);
-               app.print(bulkPaymentStack);
 
-               APIResponse apiResponse = jobPaymentService.makeBulkPayment(bulkPaymentStack);
-               if (apiResponse.isSuccess()) {
-                   //update job
-                   if (contract.getWorkMethod().equals("Overall")) {
-                       contract.setIsSettled(true);
-                       contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
-                       contract.setEndDate(new Date());
-                       contract.setLastModifiedDate(new Date());
-                       proposal.setEndDate(new Date());
-                       proposal.setStatus(JobStatus.CO);
-                       contract.setStatus(JobStatus.CO);
-                       job.setStatus(JobStatus.CO);
-                       JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposal.getId(), proposal.getUserId());
-                       if(project!=null){
-                           project.setStatus(JobStatus.CO);
-                           jobProjectSubmissionRepository.save(project);
-                       }
+                        ArrayList<JobBulkPayment> bulkPaymentStack = new ArrayList<>();
+                        String paymentReference = app.makeUIID();
+                        String narration = "Settlement from Kula for " + job.getTitle();
 
-                   }else{
-                       contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
-                       contract.setLastModifiedDate(new Date());
-                       if(milestone!=null) {
-                           milestone.setStatus(JobStatus.CO);
-                           milestone.setEndDate(new Date());
+                        //Bulk transfers for settlement
+                        JobBulkPayment escrowAccount = new JobBulkPayment();
+                        escrowAccount.setAccountNumber(escrowAccountNumber);
+                        escrowAccount.setAccountName(escrowAccountName);
+                        escrowAccount.setNarration(narration);
+                        escrowAccount.setExecutedBy(currentUser.getUserUUID());
+                        escrowAccount.setExecutedFor(contract.getContractReference());
+                        escrowAccount.setContractReference(contract.getContractReference());
+                        escrowAccount.setPaymentReference(paymentReference);
+                        escrowAccount.setCrDrFlag("D");
+                        escrowAccount.setAccountType("GL");
+                        escrowAccount.setTransactionId("1");
+                        escrowAccount.setAmount(0);
 
-                           JobProjectSubmission project=jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
-                           if(project!=null) {
-                               project.setStatus(JobStatus.CO);
-                               jobProjectSubmissionRepository.save(project);
-                           }
-                           jobMilestoneRepository.save(milestone);
-                       }
-                   }
-                   job.setLastModifiedDate(new Date());
+                        //***Union Bank***
+                        JobBulkPayment UBNAccount = new JobBulkPayment();
+                        //###############
 
-                   jobRepository.save(job);
-                   jobProposalRepository.save(proposal);
-                   jobContractRepository.save(contract);
+                        JobBulkPayment escrowUBNAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
+                        escrowUBNAccountDebit.setAmount(UBNIncomeCharge);
+                        escrowUBNAccountDebit.setTransactionId("1");
+                        escrowUBNAccountDebit.setRemark("Debited by Kula to UBN Income account for " + job.getTitle());
+                        //##############
+                        UBNAccount.setTransactionId("2");
+                        UBNAccount.setAccountName(UBNIncomeAccountName);
+                        UBNAccount.setAccountNumber(UBNIncomeAccountNumber);
+                        UBNAccount.setNarration(narration);
+                        UBNAccount.setExecutedBy(currentUser.getUserUUID());
+                        UBNAccount.setRemark("Credit from Kula to UBN Income account for " + job.getTitle());
+                        UBNAccount.setExecutedFor(contract.getContractReference());
+                        UBNAccount.setContractReference(contract.getContractReference());
+                        UBNAccount.setPaymentReference(paymentReference);
+                        UBNAccount.setCrDrFlag("C");
+                        UBNAccount.setAccountType("GL");
+                        UBNAccount.setAmount(UBNIncomeCharge);
+                        //############# add to bulk transfer stack ###########
+                        bulkPaymentStack.add(escrowUBNAccountDebit);
+                        bulkPaymentStack.add(UBNAccount);
 
-                   return new APIResponse("Request Successful", true, apiResponse.getPayload());
-               } else {
-                   return apiResponse;
-               }
+                        if (VATCharge > 0) {
+                            //***Union Bank***
+                            JobBulkPayment VATAccount = new JobBulkPayment();
+                            //###############
+                            JobBulkPayment escrowVATAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
+                            escrowVATAccountDebit.setAmount(VATCharge);
+                            escrowVATAccountDebit.setTransactionId("3");
+                            escrowVATAccountDebit.setRemark("Debited by Kula to VAT account for " + job.getTitle());
+                            //##############
+                            VATAccount.setTransactionId("4");
+                            VATAccount.setAccountName(VATAccountName);
+                            VATAccount.setAccountNumber(VATAccountNumber);
+                            VATAccount.setNarration(narration);
+                            VATAccount.setExecutedBy(currentUser.getUserUUID());
+                            VATAccount.setRemark("Credit from Kula to VAT account for " + job.getTitle());
+                            VATAccount.setExecutedFor(contract.getContractReference());
+                            VATAccount.setContractReference(contract.getContractReference());
+                            VATAccount.setPaymentReference(paymentReference);
+                            VATAccount.setCrDrFlag("C");
+                            VATAccount.setAccountType("GL");
+                            VATAccount.setAmount(VATCharge);
+                            //############# add to bulk transfer stack ###########
+                            bulkPaymentStack.add(escrowVATAccountDebit);
+                            bulkPaymentStack.add(VATAccount);
+                        }
 
-           }
-           else{
-               return new APIResponse("Contract amount can't be ZERO", false, null);
-           }
 
-        }else{
-            return new APIResponse("Contract not active, it might have  been settled already", false, null);
+                        //***Pepperest***
+                        JobBulkPayment pepperestAccount = new JobBulkPayment();
+                        //##############
+                        JobBulkPayment escrowPepperestAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
+                        escrowPepperestAccountDebit.setAmount(pepperestIncomeCharge);
+                        escrowPepperestAccountDebit.setTransactionId("5");
+                        escrowPepperestAccountDebit.setRemark("Debited  by Kula for to Pepperest account for " + job.getTitle());
+                        //#############
+                        pepperestAccount.setTransactionId("6");
+                        pepperestAccount.setAccountName(PepperestIncomeAccountName);
+                        pepperestAccount.setAccountNumber(PepperestIncomeAccountNumber);
+                        pepperestAccount.setNarration(narration);
+                        pepperestAccount.setExecutedBy(currentUser.getUserUUID());
+                        pepperestAccount.setRemark("Credit from Kula to Pepperest account for " + job.getTitle());
+                        pepperestAccount.setExecutedFor(contract.getContractReference());
+                        pepperestAccount.setContractReference(contract.getContractReference());
+                        pepperestAccount.setPaymentReference(paymentReference);
+                        pepperestAccount.setCrDrFlag("C");
+                        pepperestAccount.setAccountType("CASA");
+                        pepperestAccount.setAmount(pepperestIncomeCharge);
+                        //############# add to bulk transfer stack ###########
+                        bulkPaymentStack.add(escrowPepperestAccountDebit);
+                        bulkPaymentStack.add(pepperestAccount);
+
+                        //***Freelancer***
+                        JobBulkPayment freelancerAccount = new JobBulkPayment();
+                        //##################
+                        JobBulkPayment escrowFreelancerAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
+                        escrowFreelancerAccountDebit.setAmount(freelancerIncomeAmount);
+                        escrowFreelancerAccountDebit.setTransactionId("7");
+                        escrowFreelancerAccountDebit.setRemark("Debited by Kula to Freelancer account for " + job.getTitle());
+                        //update escrow account information with the payment for UBN
+                        //##################
+                        freelancerAccount.setTransactionId("8");
+                        freelancerAccount.setAccountName(contract.getFreelancerAccountName());
+                        freelancerAccount.setAccountNumber(contract.getFreelancerAccountNumber());
+                        freelancerAccount.setNarration(narration);
+                        freelancerAccount.setExecutedBy(currentUser.getUserUUID());
+                        freelancerAccount.setRemark("Credit from Kula to Freelancer account for " + job.getTitle());
+                        freelancerAccount.setExecutedFor(contract.getContractReference());
+                        freelancerAccount.setContractReference(contract.getContractReference());
+                        freelancerAccount.setPaymentReference(paymentReference);
+                        freelancerAccount.setCrDrFlag("C");
+                        freelancerAccount.setAccountType("CASA");
+                        freelancerAccount.setAmount(freelancerIncomeAmount);
+                        //############# add to bulk transfer stack ###########
+                        bulkPaymentStack.add(escrowFreelancerAccountDebit);
+                        bulkPaymentStack.add(freelancerAccount);
+                        app.print(bulkPaymentStack);
+
+                        APIResponse apiResponse = jobPaymentService.makeBulkPayment(bulkPaymentStack);
+                        if (apiResponse.isSuccess()) {
+                            //update job
+                            if (contract.getWorkMethod().equals("Overall")) {
+                                contract.setIsSettled(true);
+                                contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
+                                contract.setEndDate(new Date());
+                                contract.setLastModifiedDate(new Date());
+                                proposal.setEndDate(new Date());
+                                proposal.setStatus(Status.CO);
+                                contract.setStatus(Status.CO);
+                                job.setStatus(Status.CO);
+                                JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposal.getId(), proposal.getUserId());
+                                if (project != null) {
+                                    project.setStatus(Status.CO);
+                                    jobProjectSubmissionRepository.save(project);
+                                }
+
+                            } else {
+                                contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
+                                contract.setLastModifiedDate(new Date());
+                                if (milestone != null) {
+                                    milestone.setStatus(Status.CO);
+                                    milestone.setEndDate(new Date());
+
+                                    JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
+                                    if (project != null) {
+                                        project.setStatus(Status.CO);
+                                        jobProjectSubmissionRepository.save(project);
+                                    }
+                                    jobMilestoneRepository.save(milestone);
+                                }
+                            }
+                            job.setLastModifiedDate(new Date());
+
+                            jobRepository.save(job);
+                            jobProposalRepository.save(proposal);
+                            jobContractRepository.save(contract);
+
+                            try {
+                                //update configurations table
+                                Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS_COMPLETED);
+                                if (existingConfig != null)
+                                    configService.updateConfig(ConfigReference.TOTAL_JOBS_COMPLETED, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
+                                else
+                                    configService.updateConfig(ConfigReference.TOTAL_JOBS_COMPLETED, String.valueOf(1));
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            //respond
+                            return new APIResponse("Request Successful", true, apiResponse.getPayload());
+                        } else {
+                            return apiResponse;
+                        }
+
+                    } else {
+                        return new APIResponse("Contract amount can't be ZERO", false, null);
+                    }
+
+                } else {
+                    return new APIResponse("Contract not active, it might have  been settled already", false, null);
+                }
+            }else{
+                return new APIResponse("Contract not found", false, null);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new APIResponse("Oops! Unable to settle contract", false, null);
         }
     }
 
@@ -1360,7 +1474,7 @@ public class JobContractService implements Serializable {
             }
         }
 
-        if (contract.getStatus().equals(JobStatus.WP) || (milestone!=null && milestone.getStatus().equals(JobStatus.WP))) {
+        if (contract.getStatus().equals(Status.WP) || (milestone!=null && milestone.getStatus().equals(Status.WP))) {
             //check if proposal is available
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             if (proposal == null)
@@ -1373,7 +1487,7 @@ public class JobContractService implements Serializable {
 
 
             PaymentRequest payment = new PaymentRequest();
-            int depositedAmount;
+            double depositedAmount;
             if(contract.getWorkMethod().equals("Overall")){
                     depositedAmount=contract.getAmount();
                     payment.setExecutedFor("Contract:"+contractReferenceId);
@@ -1409,13 +1523,24 @@ public class JobContractService implements Serializable {
                     contract.setReversalPaymentReferenceB(transferResponse.getPayload().toString());
                     if (milestone != null) {
                         milestone.setReversalPaymentReferenceB(transferResponse.getPayload().toString());
-                        milestone.setStatus(JobStatus.IA);
+                        milestone.setStatus(Status.IA);
                         milestone.setEndDate(new Date());
                     } else {
-                        contract.setStatus(JobStatus.IA);
-                        proposal.setStatus(JobStatus.IA);
+                        contract.setStatus(Status.IA);
+                        proposal.setStatus(Status.IA);
                         contract.setLastModifiedDate(new Date());
 
+                    }
+
+                    try {
+                        //update configurations table
+                        Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS_REJECTED);
+                        if (existingConfig != null)
+                            configService.updateConfig(ConfigReference.TOTAL_JOBS_REJECTED, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
+                        else
+                            configService.updateConfig(ConfigReference.TOTAL_JOBS_REJECTED, String.valueOf(1));
+                    }catch (Exception ex){
+                        ex.printStackTrace();
                     }
                     jobMilestoneRepository.save(milestone);
                     jobContractRepository.save(contract);

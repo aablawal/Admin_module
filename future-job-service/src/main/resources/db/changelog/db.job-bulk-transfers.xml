@@ -25,7 +25,7 @@
             <column name="account_type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount" type="int">
+            <column name="amount" type="double">
                 <constraints nullable="false"/>
             </column>
             <column name="cr_dr_flag" type="varchar(255)"/>
@@ -42,5 +42,17 @@
             <column name="transaction_id" type="varchar(255)"/>
             <column name="value_date" type="varchar(255)"/>
         </createTable>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1623169071247-3">
+        <addColumn tableName="job_bulk_transfers">
+            <column name="contract_reference" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1623169071247-4">
+        <addColumn tableName="job_bulk_transfers">
+            <column name="remark" type="TEXT"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

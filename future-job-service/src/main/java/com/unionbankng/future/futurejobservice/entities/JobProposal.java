@@ -1,6 +1,6 @@
 package com.unionbankng.future.futurejobservice.entities;
 
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -58,7 +58,7 @@ public class JobProposal implements Serializable {
     private String branchCode;
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
-    private JobStatus status;
+    private Status status;
     @Temporal(TemporalType.DATE)
     private Date startDate;
     @Temporal(TemporalType.DATE)

@@ -30,7 +30,7 @@
             <column name="prepared_currency" type="varchar(255)"/>
             <column name="previous_work_links" type="varchar (max)"/>
             <column name="social_media_links" type="varchar (max)"/>
-            <column name="status" type="varchar(3)">
+            <column name="status" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="supporting_files" type="varchar(255)"/>

@@ -1,6 +1,6 @@
 package com.unionbankng.future.futurejobservice.entities;
 
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 
 import javax.persistence.*;
@@ -40,7 +40,7 @@ public class JobContractDispute implements Serializable  {
     private String attachment;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private JobStatus status;
+    private Status status;
     @Temporal(TemporalType.DATE)
     private Date createdAt;
     @Temporal(TemporalType.DATE)

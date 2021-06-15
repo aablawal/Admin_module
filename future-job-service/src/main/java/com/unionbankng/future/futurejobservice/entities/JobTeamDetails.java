@@ -1,5 +1,5 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -40,7 +40,7 @@ public class JobTeamDetails  implements Serializable {
     private String description;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private JobStatus status;
+    private Status status;
     @NotNull
     @Temporal(TemporalType.DATE)
     private  Date createdAt;

@@ -1,5 +1,5 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -28,9 +28,9 @@ public class JobContract implements Serializable {
     @NotNull
     private String userEmail;
     @NotNull
-    private int amount;
+    private double amount;
     @NotNull
-    private int clearedAmount;
+    private double clearedAmount;
     @NotNull
     private String country;
     private String workMethod;
@@ -40,7 +40,8 @@ public class JobContract implements Serializable {
     private String employerEmailAddress;
     private Boolean isSettled;
     private  String settlement;
-    private  JobStatus status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     private  Long rate;
     private  String description;
     @Column(columnDefinition="TEXT")

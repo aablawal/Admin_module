@@ -19,7 +19,9 @@ public class JobPayment  implements Serializable {
     private Long id;
     private String  executedBy;
     private  String  executedFor;
-    private int amount;
+    @NotNull
+    private String contractReference;
+    private double amount;
     @NotNull
     private String creditAccountName;
     @NotNull

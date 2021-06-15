@@ -22,6 +22,10 @@ public class JobBulkPayment implements Serializable {
 	private String executedBy;
 	private String executedFor;
 	@NotNull
+	private String contractReference;
+	@Column(columnDefinition="TEXT")
+	private String remark;
+	@NotNull
 	private String initialPaymentReference;
 	private String paymentReference;
 	private String transactionId;
@@ -35,10 +39,11 @@ public class JobBulkPayment implements Serializable {
 	private String accountBranchCode;
 	@NotNull
 	private String accountBankCode;
+	@Column(columnDefinition="TEXT")
 	private String narration;
 	private String instrumentNumber;
 	@NotNull
-	int amount;
+	double amount;
 	private String valueDate;
 	private String crDrFlag;
 	private String feeOrCharges;

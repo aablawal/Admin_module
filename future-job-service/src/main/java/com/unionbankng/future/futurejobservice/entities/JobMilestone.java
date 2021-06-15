@@ -1,5 +1,5 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -54,7 +54,7 @@ public class JobMilestone  implements Serializable {
     private String reversalPaymentReferenceB;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private JobStatus status;
+    private Status status;
     @Temporal(TemporalType.DATE)
     private  Date createdAt;
 

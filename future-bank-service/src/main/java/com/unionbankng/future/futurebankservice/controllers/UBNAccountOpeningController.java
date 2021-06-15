@@ -7,6 +7,7 @@ import com.unionbankng.future.futurebankservice.enums.RecipientType;
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.CustomerBankAccountService;
 import com.unionbankng.future.futurebankservice.services.UBNNewAccountOpeningAPIServiceHandler;
+import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.EmailSender;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class UBNAccountOpeningController {
 
     Logger logger = LoggerFactory.getLogger(UBNAccountOpeningController.class);
 
+    private final App app;
     private final UBNNewAccountOpeningAPIServiceHandler ubnNewAccountOpeningAPIServiceHandler;
     private final CustomerBankAccountService customerBankAccountService;
     private final MessageSource messageSource;
@@ -225,14 +227,12 @@ public class UBNAccountOpeningController {
     @GetMapping("/v1/ubn_account_opening/get_account_types")
     public ResponseEntity<APIResponse<UBNAccountTypeResponse>> getUBNAccountTypes() throws IOException {
 
+        app.print("I am called");
         //determine existing or non existing customer
         Response<UBNAccountTypeResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getUBNAccountTypes();
-
+        app.print(responseResponse);
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
-
-        //update customer details with account number
-
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
 

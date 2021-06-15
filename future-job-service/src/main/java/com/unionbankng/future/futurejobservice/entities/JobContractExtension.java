@@ -1,5 +1,5 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -32,7 +32,7 @@ public class JobContractExtension implements Serializable {
     private  Date date;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private  JobStatus status;
+    private Status status;
     @Column(columnDefinition="TEXT")
     private  String reason;
     @Temporal(TemporalType.DATE)

@@ -33,7 +33,7 @@ public class JobPaymentService implements Serializable {
       payment.setCurrency("NGN");
       payment.setPaymentReference(paymentRequest.getPaymentReference());
       payment.setExecutedBy(paymentRequest.getExecutedBy());
-      payment.setExecutedFor(paymentRequest.getExecutedFor());
+      payment.setExecutedFor(paymentRequest.getContractReference());
       payment.setInitBranchCode("682");
       //debit the escrow amount
       payment.setDebitAccountName(paymentRequest.getDebitAccountName());
@@ -56,6 +56,7 @@ public class JobPaymentService implements Serializable {
           //save the payment history
           payment.setInitialPaymentReference(paymentRequest.getPaymentReference());
           payment.setPaymentReference(transferResponse.getReference());
+          payment.setContractReference(paymentRequest.getContractReference());
           jobPaymentRepository.save(payment);
           logger.info("JOBSERVICE: Payment successful");
           return new APIResponse("Payment Successful", true, transferResponse.getReference());

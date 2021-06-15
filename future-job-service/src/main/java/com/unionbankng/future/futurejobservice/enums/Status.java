@@ -1,6 +1,6 @@
 package com.unionbankng.future.futurejobservice.enums;
 
-public enum JobStatus {
+public enum Status {
     AC,
     IA,
     WP,

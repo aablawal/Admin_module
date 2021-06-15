@@ -10,10 +10,10 @@
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="job_contractsPK"/>
             </column>
-            <column name="amount" type="int">
+            <column name="amount" type="double">
                 <constraints nullable="false"/>
             </column>
-            <column name="cleared_amount" type="int">
+            <column name="cleared_amount" type="double">
                 <constraints nullable="false"/>
             </column>
             <column name="app_id" type="int">
@@ -94,7 +94,7 @@
     </changeSet>
     <changeSet author="ACER NITRO 5 (generated)" id="1608302038848-4">
         <addColumn tableName="job_contracts">
-            <column name="status" type="int"/>
+            <column name="status" type="varchar(255)"/>
         </addColumn>
     </changeSet>
     <changeSet author="aliyura (generated)" id="1622037021971-28">
