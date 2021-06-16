@@ -78,7 +78,7 @@ pipeline {
 					
                   } else {
                     sh "kubectl config use-context ubnkula"
-                    sh "kubectl set image deployment/future-job-service future-job-service=${ACR_LOGINSERVER}/future-job-service --namespace kula"
+                    sh "kubectl set image deployment/future-job-service future-job-service=${ACR_PROD_LOGINSERVER}/future-job-service --namespace kula"
                     sh "kubectl rollout restart deployment/future-job-service --namespace kula"
                   }
                 }
@@ -108,7 +108,7 @@ def build(ENVIRONMENT) {
     withCredentials([usernamePassword(credentialsId: 'acr-prod-credentials', usernameVariable: 'ACR_USERNAME', passwordVariable: 'ACR_PASSWORD')]) {
      
      	withMaven( maven: 'maven-3.6.3' ) {
-     		withEnv(["FUTURE_ENV=production","ACR_SERVER=${ACR_LOGINSERVER}"]){
+     		withEnv(["FUTURE_ENV=production","ACR_SERVER=${ACR_PROD_LOGINSERVER}"]){
      			sh 'cd future-job-service && mvn clean compile jib:build'
      		}
 
