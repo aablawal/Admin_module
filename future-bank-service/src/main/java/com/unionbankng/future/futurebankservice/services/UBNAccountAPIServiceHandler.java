@@ -2,7 +2,10 @@ package com.unionbankng.future.futurebankservice.services;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.retrofitservices.UBNAccountAPIService;
+import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.UnsafeOkHttpClient;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +21,10 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Map;
 
+
 @RefreshScope
 @Service
+@RequiredArgsConstructor
 public class UBNAccountAPIServiceHandler {
 
     Logger logger = LoggerFactory.getLogger(UBNAccountAPIServiceHandler.class);
@@ -31,6 +36,7 @@ public class UBNAccountAPIServiceHandler {
     private Map<String, String> credentials;
 
     private UBNAccountAPIService ubnAccountAPIService;
+    private final App app;
 
     OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
 
@@ -110,18 +116,23 @@ public class UBNAccountAPIServiceHandler {
     }
 
     public Response<UBNFundTransferResponse> transferFundsUBN(UBNFundTransferRequest request) throws IOException {
-
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
-
         logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
         logger.info("access token is : {}",response.getAccess_token());
-
         return ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
+    }
 
+    public Response<UBNBulkFundTransferResponse> transferBulkFundsUBN(UBNBulkFundTransferRequest request) throws IOException {
+        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        logger.info("Auth token response is : {}",response);
+        if(response == null)
+            return null;
+        logger.info("access token is : {}",response.getAccess_token());
+        Response<UBNBulkFundTransferResponse> response1= ubnAccountAPIService.bulkFundsTransferUBN(response.getAccess_token(),request).execute();
+        app.print(response1.code());
+        return  response1;
     }
 
     public Response<UbnEnquiryResponse> accountEnquiry(UbnCustomerEnquiry request) throws IOException {

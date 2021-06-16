@@ -3,6 +3,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_categories")
@@ -12,20 +13,20 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobCategory {
+public class JobCategory implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+    private  Long id;
     @NotNull
-    String  title;
+    private String  title;
     @Column(columnDefinition="TEXT")
-    String description;
+    private String description;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private Date createdAt;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 }

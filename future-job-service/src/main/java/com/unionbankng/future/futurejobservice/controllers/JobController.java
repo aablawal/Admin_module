@@ -27,16 +27,10 @@ import java.security.Principal;
 @RequestMapping(path = "api")
 public class JobController {
 
-    @ModelAttribute
-    public void setResponseHeader(HttpServletResponse response){
-        response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
-    }
     private final JobService service;
     private final NotificationSender notificationSender;
     private final UserService userService;
     private final JobRepository jobRepository;
-    Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
     public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
@@ -61,14 +55,6 @@ public class JobController {
             return ResponseEntity.ok().body(new APIResponse("Unable to close the job",false,null));
     }
 
-    @PutMapping("/v1/job/open")
-    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id){
-        Job job=service.openJobById(id);
-        if(job!=null)
-            return ResponseEntity.ok().body(new APIResponse("Job opened successful",true,job));
-        else
-            return ResponseEntity.ok().body(new APIResponse("Unable to open the job",false,null));
-    }
 
     @PutMapping("/v1/job/repeat")
     public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id){
@@ -128,10 +114,4 @@ public class JobController {
                 new APIResponse("success",true,service.getJobs(PageRequest.of(page,size), model)));
     }
 
-    @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse<String>> test(@ApiIgnore Principal principal){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return ResponseEntity.ok().body(
-                new APIResponse("success",true, jwtUserDetail));
-    }
 }

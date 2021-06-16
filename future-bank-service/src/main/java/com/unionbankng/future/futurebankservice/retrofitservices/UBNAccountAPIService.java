@@ -30,6 +30,9 @@ public interface UBNAccountAPIService {
     @POST("ubnmiserv/secured/fundstransfer")
     Call<UBNFundTransferResponse> fundsTransferUBN(@Query("access_token") String accessToken, @Body UBNFundTransferRequest request);
 
+    @POST("ubnmiserv/secured/cbamultipleposting")
+    Call<UBNBulkFundTransferResponse> bulkFundsTransferUBN(@Query("access_token") String accessToken, @Body UBNBulkFundTransferRequest request);
+
     @POST("ubnmiserv/secured/cbaaccountenquiry")
     Call<UbnEnquiryResponse> accountEnquiry(@Query("access_token") String accessToken, @Body UbnCustomerEnquiry request);
 

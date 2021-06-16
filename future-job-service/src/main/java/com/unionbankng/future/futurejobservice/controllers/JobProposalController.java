@@ -3,7 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
-import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import com.unionbankng.future.futurejobservice.services.JobProposalService;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.*;
@@ -34,13 +33,6 @@ public class JobProposalController {
     private final JobProposalService service;
     private final UserService userService;
     Logger logger = LoggerFactory.getLogger(JobProposalController.class);
-
-
-    @ModelAttribute
-    public void setResponseHeader(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT");
-    }
 
     @PostMapping(value = "/v1/job/apply", consumes = "multipart/form-data")
     public ResponseEntity<APIResponse> applyJob(@Valid @RequestParam(value = "data", required = true) String proposalData,
@@ -92,7 +84,7 @@ public class JobProposalController {
 
     public ResponseEntity<APIResponse> updateProposalStatusById(@RequestParam Long id, @RequestParam String status) {
         return ResponseEntity.ok().body(
-                new APIResponse("success", true, service.updateJobProposalStatus(id, JobProposalStatus.valueOf(status))));
+                new APIResponse("success", true, service.updateJobStatus(id, Status.valueOf(status))));
     }
 
     @PostMapping("/v1/job/proposal/approve")

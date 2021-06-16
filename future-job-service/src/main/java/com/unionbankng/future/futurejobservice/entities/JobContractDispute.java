@@ -1,11 +1,11 @@
 package com.unionbankng.future.futurejobservice.entities;
 
-import com.unionbankng.future.futurejobservice.enums.JobContractDisputeStatus;
-import com.unionbankng.future.futurejobservice.enums.JobMilestoneStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -16,55 +16,43 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobContractDispute {
+public class JobContractDispute implements Serializable  {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+    private  Long id;
     @NotNull
-    Long proposalId;
+    private  Long proposalId;
     @NotNull
-    Long contractId;
+    private  Long contractId;
     @NotNull
-    Long userId;
+    private  Long userId;
     @NotNull
-    Long employerId;
+    private  Long employerId;
     @NotNull
-    Long jobId;
+    private  String contractReference;
+    @NotNull
+    private  Long jobId;
     @Column(columnDefinition="TEXT")
-    String description;
+    private  String description;
     @Column(columnDefinition="TEXT")
-    String referenceId;
-    public String attachment;
+    private  String referenceId;
+    private String attachment;
     @NotNull
     @Enumerated(EnumType.STRING)
-    JobContractDisputeStatus status;
+    private Status status;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private Date createdAt;
     @Temporal(TemporalType.DATE)
-    Date lastModifiedDate;
-
-    public JobContractDispute(JobContractDispute request) {
-        this.id = request.id;
-        this.proposalId = request.proposalId;
-        this.userId = request.userId;
-        this.employerId = request.employerId;
-        this.jobId = request.jobId;
-        this.referenceId=request.referenceId;
-        this.description=request.description;
-        this.attachment=request.attachment;
-        this.status=request.status;
-        this.createdAt = new Date();
-        this.lastModifiedDate=new Date();
-    }
+    private  Date lastModifiedDate;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 
     @PreUpdate
-    private void setLastModifiedDate() {
+    public void setLastModifiedDate() {
         createdAt = new Date();
     }
 

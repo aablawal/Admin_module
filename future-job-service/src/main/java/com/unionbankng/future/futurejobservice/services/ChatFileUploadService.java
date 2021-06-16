@@ -60,5 +60,4 @@ public class ChatFileUploadService {
             return new APIResponse("Unable to upload file", false, null);
         }
     }
-
 }

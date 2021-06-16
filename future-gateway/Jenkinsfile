@@ -67,9 +67,9 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-gateway --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context MarcusProdAKSClust"
-                    sh "kubectl set image deployment/future-gateway future-gateway=${ACR_LOGINSERVER}/future-gateway --namespace sidekiq"
-                    sh "kubectl rollout restart deployment/future-gateway --namespace sidekiq"
+                    sh "kubectl config use-context UBNKula"
+                    sh "kubectl set image deployment/future-gateway future-gateway=${ACR_LOGINSERVER}/future-gateway --namespace kula"
+                    sh "kubectl rollout restart deployment/future-gateway --namespace kula"
                   }
                 }
             

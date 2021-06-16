@@ -14,12 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping(path = "api")
 public class JobCategoryController {
 
-    @ModelAttribute
-    public void setResponseHeader(HttpServletResponse response){
-        response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
-    }
-
     private final JobCategoryService jobCategoryService;
     Logger logger = LoggerFactory.getLogger(JobCategoryController.class);
 

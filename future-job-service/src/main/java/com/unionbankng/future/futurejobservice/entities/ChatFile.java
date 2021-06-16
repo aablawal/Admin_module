@@ -4,7 +4,6 @@ import com.unionbankng.future.futurejobservice.enums.ChatFileUploadStatus;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,20 +18,20 @@ public class ChatFile implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    public Long id;
-    public String fileId;
+    private Long id;
+    private String fileId;
     @Column(columnDefinition ="TEXT", nullable=false)
-    public String link;
+    private String link;
     @Column(columnDefinition ="TEXT", nullable=false)
-    public String name;
-    public String type;
-    public Long size;
-    public ChatFileUploadStatus status;
+    private String name;
+    private String type;
+    private Long size;
+    private ChatFileUploadStatus status;
     @Temporal(TemporalType.DATE)
-    public Date createdAt;
+    private Date createdAt;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 }

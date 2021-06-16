@@ -8,12 +8,11 @@
     <include file="db/changelog/db.job-contract-dispute-changelog.xml"/>
     <include file="db/changelog/db.job-milestones-changelog.xml"/>
     <include file="db/changelog/db.job-transfers-changelog.xml"/>
+    <include file="db/changelog/db.job-bulk-transfers.xml"/>
     <include file="db/changelog/db.job-team-details-changelog.xml"/>
     <include file="db/changelog/db.job-teams-changelog.xml"/>
     <include file="db/changelog/db.job-ratings-changelog.xml"/>
     <include file="db/changelog/db.job-categories-changelog.xml"/>
     <include file="db/changelog/db.chat-files-changelog.xml"/>
-<!--    <changeSet id="1561040019818-1" author="chris">-->
-<!--        <sqlFile dbms="h2,mssql" path="db/migrations/migration-1.sql" />-->
-<!--    </changeSet>-->
+    <include file="db/changelog/db.configs-changelog.xml"/>
 </databaseChangeLog>

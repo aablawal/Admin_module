@@ -1,8 +1,9 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobMilestoneStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -13,57 +14,53 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobMilestone {
+public class JobMilestone  implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @NotNull
-    Long proposalId;
+    private Long proposalId;
     @NotNull
-    Long userId;
+    private  Long userId;
     @NotNull
-    Long employerId;
+    private  Long employerId;
     @NotNull
-    Long jobId;
+    private  Long contractId;
     @NotNull
-    Long amount;
+    private  Long jobId;
+    @NotNull
+    private  Long amount;
     @Temporal(TemporalType.DATE)
-    Date startDate;
+    private   Date startDate;
     @NotNull
     @Temporal(TemporalType.DATE)
-    Date endDate;
+    private   Date endDate;
     @NotNull
     @Column(columnDefinition="TEXT")
-    String title;
-    public String supportingFiles;
+    private  String title;
+    private String supportingFiles;
     @NotNull
     @Column(columnDefinition="TEXT")
-    String description;
+    @NotNull
+    private  String milestoneReference;
+    private  String contractReference;
+    private  String description;
+    private  String initialPaymentReferenceA;
+    private  String settlementPaymentReferenceA;
+    private  String reversalPaymentReferenceA;
+    private  String initialPaymentReferenceB;
+    private String settlementPaymentReferenceB;
+    private String reversalPaymentReferenceB;
     @NotNull
     @Enumerated(EnumType.STRING)
-    JobMilestoneStatus status;
+    private Status status;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private  Date createdAt;
 
-    public JobMilestone(JobMilestone request) {
-        this.id = request.id;
-        this.proposalId = request.proposalId;
-        this.userId = request.userId;
-        this.employerId = request.employerId;
-        this.jobId = request.jobId;
-        this.title = request.title;
-        this.amount=request.getAmount();
-        this.description=request.description;
-        this.supportingFiles=request.supportingFiles;
-        this.startDate=request.startDate;
-        this.endDate=request.endDate;
-        this.status=request.status;
-        this.createdAt = new Date();
-    }
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 

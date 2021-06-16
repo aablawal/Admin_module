@@ -1,10 +1,8 @@
 package com.unionbankng.future.futurejobservice.services;
 
 import com.unionbankng.future.futurejobservice.entities.JobCategory;
-import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.repositories.JobCategoryRepository;
-import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
