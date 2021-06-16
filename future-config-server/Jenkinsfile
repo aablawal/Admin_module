@@ -69,7 +69,7 @@ pipeline {
 					
                   } else {
                     sh "kubectl config use-context ubnkula"
-                    sh "kubectl set image deployment/future-config-server config-server=${KULA_ACR_PROD_LOGINSERVER}/future-config-server --namespace kula"
+                    sh "kubectl set image deployment/future-config-server future-config-server=${KULA_ACR_PROD_LOGINSERVER}/future-config-server --namespace kula"
 					sh "kubectl rollout restart deployment/future-config-server --namespace kula"
                   }
                 }
