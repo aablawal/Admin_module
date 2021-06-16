@@ -68,6 +68,7 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-config-server --namespace sidekiq"
 					
                   } else {
+                    sh "az aks get-credentials --resource-group Kula-RG --name UBNKula  --subscription cfda3d2d-75c3-4919-8042-363602a34c0a"
                     sh "kubectl config use-context ubnkula"
                     sh "kubectl set image deployment/future-config-server config-server=${ACR_LOGINSERVER}/future-config-server --namespace kula"
 					sh "kubectl rollout restart deployment/future-config-server --namespace kula"
