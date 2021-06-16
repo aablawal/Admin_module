@@ -72,14 +72,14 @@ pipeline {
             script {
                   if (GLOBAL_ENVIRONMENT == 'staging') {
                     
-                    sh "kubectl config use-context marcus-developement-cluster"
-					sh "kubectl set image deployment/future-job-service future-job-service=${ACR_LOGINSERVER}/future-job-service --namespace project-future"
-					sh "kubectl rollout restart deployment/future-job-service --namespace project-future"
+                    sh "kubectl config use-context aks-dv-cluster-dev"
+					sh "kubectl set image deployment/future-job-service future-job-service=${ACR_LOGINSERVER}/future-job-service --namespace sidekiq"
+					sh "kubectl rollout restart deployment/future-job-service --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context MarcusProdAKSClust"
-                    sh "kubectl set image deployment/future-job-service future-job-service=${ACR_LOGINSERVER}/future-job-service --namespace project-future"
-                    sh "kubectl rollout restart deployment/future-job-service --namespace project-future"
+                    sh "kubectl config use-context ubnkula"
+                    sh "kubectl set image deployment/future-job-service future-job-service=${ACR_LOGINSERVER}/future-job-service --namespace kula"
+                    sh "kubectl rollout restart deployment/future-job-service --namespace kula"
                   }
                 }
             

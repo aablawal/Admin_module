@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    active: ${FUTURE_ENV}
+  application:
+    name: future-utility-service
+server:
+  port: 8085
+grpc:
+  server:
+    port: 9090
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+---
+spring:
+  config:
+    activate:
+      on-profile: development
+    import: optional:configserver:http://localhost:8082
+  cloud:
+    config:
+      label: develop
+      profile: development
+---
+spring:
+  config:
+    activate:
+      on-profile: staging
+    import: optional:configserver:http://future-config-server
+  cloud:
+    config:
+      label: staging
+      profile: staging
+---
+spring:
+  config:
+    activate:
+      on-profile: master
+    import: optional:configserver:http://future-config-server
+  cloud:
+    config:
+      label: master
+      profile: master

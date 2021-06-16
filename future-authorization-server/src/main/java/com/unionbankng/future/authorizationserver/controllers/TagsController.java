@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +28,11 @@ public class TagsController {
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,tags));
 
+    }
+    @GetMapping("/v1/tags/find_by_id")
+    public ResponseEntity<APIResponse<Optional<Tag>>> getTagById(@RequestParam Long id) {
+        Optional<Tag> tag = tagService.findById(id);
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,tag));
     }
 
     @GetMapping("/v1/tags/find_by_type")

@@ -41,6 +41,40 @@ message UBNFundsTransferResponse {
 }
 
 
+message UBNBulkFundsTransferRequest {
+  string currency=1;
+  string initBranchCode=2;
+  string paymentReference=3;
+  string transactionDate=4;
+  string paymentTypeCode=5;
+  string externalSystemReference=6;
+  repeated UBNBulkFundTransferBatchItem batchItems=7;
+}
+
+message UBNBulkFundsTransferResponse {
+  string code = 1;
+  string message = 2;
+  string reference = 3;
+  string batchId = 4;
+  string cbaBatchNo = 5;
+}
+
+message UBNBulkFundTransferBatchItem {
+  string transactionId=1;
+  string accountNumber=2;
+  string accountType=3;
+  string accountName=4;
+  string accountBranchCode=5;
+  string accountBankCode=6;
+  string narration=7;
+  string instrumentNumber=8;
+  string amount=9;
+  string valueDate=10;
+  string crDrFlag=11;
+  string feeOrCharges=12;
+}
+
 service UBNFundsTransferService {
     rpc transferFund(UBNFundsTransferRequest) returns (UBNFundsTransferResponse);
+    rpc transferBulkFund(UBNBulkFundsTransferRequest) returns (UBNBulkFundsTransferResponse);
 }

@@ -1,24 +1,24 @@
 package com.unionbankng.future.learn.controllers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.learn.entities.Course;
 import com.unionbankng.future.learn.pojo.APIResponse;
 import com.unionbankng.future.learn.pojo.CreateCourseRequest;
+import com.unionbankng.future.learn.services.CourseBulkUploadService;
 import com.unionbankng.future.learn.services.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
-
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,23 +26,24 @@ import java.io.IOException;
 public class CoursesController {
 
     private final CourseService courseService;
+    private final CourseBulkUploadService courseBulkUploadService;
 
 
     @GetMapping("/v1/courses/get_where_iam_instructor")
-    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByInstructor(@ApiIgnore OAuth2Authentication authentication
+    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByInstructor(@ApiIgnore Principal principal
     , @RequestParam int page, @RequestParam int size){
 
-        Page<Course> courses = courseService.findAllWhereIamInstructor(authentication, PageRequest.of(page,size));
+        Page<Course> courses = courseService.findAllWhereIamInstructor(principal, PageRequest.of(page,size));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
     }
 
     @GetMapping("/v1/courses/get_where_iam_creator")
-    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByCreator(@ApiIgnore OAuth2Authentication authentication
+    public ResponseEntity<APIResponse<Page<Course>>> getCoursesByCreator(@ApiIgnore Principal principal
             , @RequestParam int page, @RequestParam int size){
 
-        Page<Course> courses = courseService.findAllWhereIamCreator(authentication, PageRequest.of(page,size));
+        Page<Course> courses = courseService.findAllWhereIamCreator(principal, PageRequest.of(page,size));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
@@ -61,21 +62,35 @@ public class CoursesController {
     public ResponseEntity<APIResponse<Page<Course>>> getAllCourses(@RequestParam int page, @RequestParam int size){
 
         Page<Course> courses = courseService.findAllByIsPublished(true,PageRequest.of(page,size));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,courses));
+    }
 
+    @GetMapping("/v1/courses_by_category")
+    public ResponseEntity<APIResponse<Page<Course>>> getAllCoursesByCategory(@RequestParam Long id, @RequestParam int page, @RequestParam int size){
+        Page<Course> courses = courseService.findAllByCategory(id,PageRequest.of(page,size));
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,courses));
     }
 
 
-
     @PostMapping("/v1/courses/create_course")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@RequestBody CreateCourseRequest request,
-                                                               @ApiIgnore OAuth2Authentication authentication){
+                                                               @ApiIgnore Principal principal){
 
-        Course course = courseService.createCourse(request,authentication);
-
+        Course course = courseService.createCourse(request,principal);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,course));
+    }
+
+    @PostMapping(value = "/v1/courses/create_course_from_file", consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> createCourseFromFileAPI(@RequestParam(value = "courseFile") MultipartFile courseFile, @ApiIgnore Principal principal) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(courseBulkUploadService.uploadBulkCourseFiles(principal,courseFile));
+    }
+
+    @PostMapping(value = "/v1/courses/create_course_from_url", consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse> createCourseFromURL(@RequestParam(value = "course") String course, @RequestParam(value = "lectures") String lectures,  @ApiIgnore Principal principal) throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.createEmbeddedCourse(course,lectures,principal));
     }
 
     @PostMapping(value = "/v1/courses/{courseId}/upload_course_img",consumes = { "multipart/form-data" })
@@ -90,12 +105,33 @@ public class CoursesController {
 
     @PostMapping("/v1/courses/publish/{courseId}")
     public ResponseEntity<APIResponse<Course>> createCourseAPI(@PathVariable Long courseId,
-                                                               @ApiIgnore OAuth2Authentication authentication){
-
-        courseService.publishCourse(courseId,authentication);
+                                                               @ApiIgnore Principal principal){
+        courseService.publishCourse(courseId,principal);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,"Course publish successful"));
+    }
+
+
+    @PutMapping("/v1/courses/update_course/{courseId}")
+    public ResponseEntity<APIResponse<Course>> updateCourseAPI(@PathVariable Long courseId,@RequestBody CreateCourseRequest request,
+                                                               @ApiIgnore Principal principal){
+        Course course = courseService.updateCourse(courseId,request,principal);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,course));
+    }
+
+    @DeleteMapping("/v1/courses/delete_course/{courseId}")
+    public ResponseEntity<APIResponse<Boolean>> deleteCourseById(@PathVariable Long courseId){
+        Boolean state = courseService.deleteCourseById(courseId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new APIResponse("Request successful",true,state));
+    }
+
+    @GetMapping("/v1/total/course/created/by/{uuid}")
+    public ResponseEntity<APIResponse<Long>> getTotalCourseCreatedByUser(@PathVariable String  uuid){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,courseService.getTotalCourseCreatedByUserUUID(uuid)));
     }
 
 

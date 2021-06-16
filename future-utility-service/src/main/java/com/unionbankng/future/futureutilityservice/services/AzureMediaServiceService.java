@@ -13,8 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -94,6 +97,13 @@ public class AzureMediaServiceService{
         }finally {
             cleanup(manager,resourceGroup,accountName,adaptiveEncodeTransform.name(),jobName,inputAssetName);
         }
+    }
+
+    public StreamingLocatorResponse uploadAndGetStreamingLocatorFromURL(String url) throws IOException {
+
+        String fileName="stream-"+UUID.randomUUID().toString();
+        byte[] bytes = new URL(url).openStream().readAllBytes();
+        return uploadAndGetStreamingLocator(bytes,fileName);
     }
 
 
@@ -185,6 +195,7 @@ public class AzureMediaServiceService{
 
         return asset;
     }
+
 
     private Asset createAsset(MediaManager manager, String resourceGroup, String accountName,
                                      String assetName) {

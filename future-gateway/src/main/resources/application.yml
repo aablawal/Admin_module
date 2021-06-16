@@ -9,16 +9,14 @@ spring:
       max-request-size: 100MB
 server:
   port: 8080
-eureka:
-  client:
-    register-with-eureka: true
-
 zuul:
   host:
     connect-timeout-millis: 120000
     socket-timeout-millis: 120000
+
 ribbon:
   ReadTimeout: 120000
+  ConnectTimeout: 120000
 
 ---
 
@@ -46,6 +44,9 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://localhost:8083
+    loan-service:
+      path: /loanserv/**
+      url: http://localhost:8090
 
 ---
 spring:
@@ -72,6 +73,9 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
+    loan-service:
+      path: /loanserv/**
+      url: http://future-loan-service
 
 ---
 spring:
@@ -98,3 +102,6 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
+    loan-service:
+      path: /loanserv/**
+      url: http://future-loan-service

@@ -27,7 +27,7 @@ public class UserCourseProgress implements Serializable {
     private Long courseId;
     @Column(nullable = false)
     private String userUUID;
-    @OneToMany
+    @ManyToMany
     private List<Lecture> lecturesTaken = new ArrayList<>();
     @Column(nullable = false)
     private Integer currentLectureId;

@@ -8,8 +8,9 @@ import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -37,9 +38,9 @@ public class CourseQuestionService {
         return courseQuestionRepository.countAllByLectureId(lectureId);
     }
 
-    public CourseQuestion publishCourseQuestion(PublishCourseQuestionRequest request, OAuth2Authentication authentication) {
+    public CourseQuestion publishCourseQuestion(PublishCourseQuestionRequest request, Principal principal) {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         return publishCourseQuestion(request,jwtUserDetail.getUserUUID(),jwtUserDetail.getUserFullName());
     }

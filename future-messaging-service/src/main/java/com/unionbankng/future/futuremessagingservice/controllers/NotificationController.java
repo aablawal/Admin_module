@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -27,7 +25,7 @@ public class NotificationController {
 
 
     @PutMapping(value = "/v1/update/user/mid/{id}")
-    public ResponseEntity<APIResponse<MessagingToken>> updateUserMID(@Valid @PathVariable Long id, @RequestParam String mid, @ApiIgnore OAuth2Authentication auth)  throws IOException {
+    public ResponseEntity<APIResponse<MessagingToken>> updateUserMID(@Valid @PathVariable Long id, @RequestParam String mid) {
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.updateUserMID(id,mid)));
     }
     @PostMapping(value = "/v1/push/notification/{id}")
@@ -52,22 +50,22 @@ public class NotificationController {
     }
 
     @GetMapping(value = "/v1/notifications/list/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getAllNotifications(@Valid @PathVariable Long id, @RequestParam int limit, @RequestParam int from){
+    public ResponseEntity<APIResponse<List<Notification>>> getAllNotifications(@Valid @PathVariable Long id, @RequestParam int limit, @RequestParam int from){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findAllNotifications(id,from,limit)));
     }
 
     @GetMapping(value = "/v1/notifications/top/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getTopNotifications(@Valid @PathVariable Long id,  @RequestParam int limit){
+    public ResponseEntity<APIResponse<List<Notification>>> getTopNotifications(@Valid @PathVariable Long id,  @RequestParam int limit){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findTopNotifications(id,limit)));
     }
 
     @GetMapping(value = "/v1/notifications/status/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getAllNotificationsByStatus(@Valid @PathVariable Long id, @RequestParam String type){
+    public ResponseEntity<APIResponse<List<Notification>>> getAllNotificationsByStatus(@Valid @PathVariable Long id, @RequestParam String type){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findAllNotificationsByStatus(id,type)));
     }
 
     @GetMapping(value = "/v1/notifications/priority/{id}")
-    public ResponseEntity<APIResponse<List<Object>>> getAllNotificationsByPriority(@Valid @PathVariable Long id, @RequestParam String type){
+    public ResponseEntity<APIResponse<List<Notification>>> getAllNotificationsByPriority(@Valid @PathVariable Long id, @RequestParam String type){
         return ResponseEntity.ok().body(new APIResponse<>("Success",true,notificationService.findTopNotificationsByPriority(id,type)));
     }
 }

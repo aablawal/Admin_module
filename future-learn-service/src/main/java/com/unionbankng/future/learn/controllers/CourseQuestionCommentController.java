@@ -11,9 +11,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,9 +38,9 @@ public class CourseQuestionCommentController {
 
     @PostMapping(value = "/v1/course_question_comment/post_question_comment")
     public ResponseEntity<APIResponse<CourseQuestionComment>> AddCommentToQuestion(@RequestBody AddCourseQuestionCommentRequest request
-    , @ApiIgnore OAuth2Authentication authentication) {
+    , @ApiIgnore Principal principal) {
 
-        CourseQuestionComment courseQuestionComment = courseQuestionCommentService.addCommentToQuestion(request,authentication);
+        CourseQuestionComment courseQuestionComment = courseQuestionCommentService.addCommentToQuestion(request,principal);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true, courseQuestionComment));
     }

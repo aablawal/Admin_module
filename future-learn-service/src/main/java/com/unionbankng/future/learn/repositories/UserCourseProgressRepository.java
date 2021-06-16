@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface UserCourseProgressRepository extends JpaRepository<UserCourseProgress,Long> {
 
     Optional<UserCourseProgress>findByCourseIdAndUserUUID(Long courseId,String userUUID);
-
+    Boolean existsByCourseIdAndUserUUID (Long courseId,String userUUID);
 }

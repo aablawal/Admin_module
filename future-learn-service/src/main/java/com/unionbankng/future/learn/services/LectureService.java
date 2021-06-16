@@ -4,7 +4,10 @@ import com.unionbankng.future.futureutilityservice.grpcserver.StreamLinksRespons
 import com.unionbankng.future.learn.entities.Lecture;
 import com.unionbankng.future.learn.entities.Question;
 import com.unionbankng.future.learn.enums.LectureType;
-import com.unionbankng.future.learn.pojo.*;
+import com.unionbankng.future.learn.pojo.APIResponse;
+import com.unionbankng.future.learn.pojo.CreateLectureRequest;
+import com.unionbankng.future.learn.pojo.JwtUserDetail;
+import com.unionbankng.future.learn.pojo.StreamingLocatorResponse;
 import com.unionbankng.future.learn.repositories.LectureRepository;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import liquibase.util.file.FilenameUtils;
@@ -13,14 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -52,8 +54,8 @@ public class LectureService {
         return lectureRepository.findAllByCourseId(courseId);
     }
 
-    public Page<Lecture> findAllWhereIamCreator(OAuth2Authentication authentication, Pageable pageable){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+    public Page<Lecture> findAllWhereIamCreator(Principal principal, Pageable pageable){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         return findAllByCreatorUUID(jwtUserDetail.getUserUUID(),pageable);
     }
 
@@ -61,18 +63,31 @@ public class LectureService {
         return lectureRepository.findAllByCreatorUUID(creatorUUID,pageable);
     }
 
-    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,OAuth2Authentication authentication) throws IOException {
+    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,Principal principal) throws IOException {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         if(request.getType().equals(LectureType.VIDEO)) {
-            return createVideoLecture(file, request,jwtUserDetail.getUserUUID(),details.getTokenValue());
+            return createVideoLecture(file, request,jwtUserDetail.getUserUUID(),JWTUserDetailsExtractor.getAccessTokenString(principal));
         }else{
 
             return createQuizLecture(request,jwtUserDetail.getUserUUID());
 
         }
+
+    }
+
+    public void deleteLecture(Long lectureId)  {
+
+        Lecture lecture = findById(lectureId).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecture Not Found")
+        );
+
+        if(lecture.getType().equals(LectureType.VIDEO))
+            futureStreamingService.deleteOutputAsset(lecture.getOutputAssetName());
+
+
+        lectureRepository.delete(lecture);
 
     }
 

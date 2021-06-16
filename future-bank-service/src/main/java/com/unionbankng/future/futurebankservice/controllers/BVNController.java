@@ -25,10 +25,7 @@ public class BVNController {
 
     @PostMapping("/v1/bvn/get_bvn_details")
     public ResponseEntity<APIResponse<ValidateBvnResponse>> getCustomerBVNDetails(@RequestParam String bvn) throws IOException {
-
         return bvnValidationService.getCustomerBVNDetails(bvn);
-
-
     }
 
     @PostMapping("/v1/bvn/verify_bvn")

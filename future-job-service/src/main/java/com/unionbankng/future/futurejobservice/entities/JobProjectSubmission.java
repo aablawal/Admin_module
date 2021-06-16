@@ -1,10 +1,11 @@
 package com.unionbankng.future.futurejobservice.entities;
 
-import com.unionbankng.future.futurejobservice.enums.JobSubmissionStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_contract_submission")
@@ -14,44 +15,33 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobProjectSubmission {
+public class JobProjectSubmission  implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    Long id;
+    private  Long id;
     @NotNull
-    Long proposalId;
+    private  Long proposalId;
     @NotNull
-    Long userId;
+    private  Long userId;
     @NotNull
-    Long employerId;
+    private  Long employerId;
     @NotNull
-    Long jobId;
-    String link;
-    public String supportingFiles;
+    private Long jobId;
+    private  String link;
+    @NotNull
+    private  String contractReference;
+    private String supportingFiles;
     @NotNull
     @Enumerated(EnumType.STRING)
-    JobSubmissionStatus status;
+    private Status status;
     @Column(columnDefinition="TEXT")
-    String description;
+    private  String description;
     @Temporal(TemporalType.DATE)
-    Date createdAt;
-
-    public JobProjectSubmission(JobProjectSubmission request) {
-        this.id = request.id;
-        this.proposalId = request.proposalId;
-        this.userId = request.userId;
-        this.employerId = request.employerId;
-        this.jobId = request.jobId;
-        this.link = request.link;
-        this.description = request.description;
-        this.supportingFiles=request.supportingFiles;
-        this.status=request.status;
-        this.createdAt = request.createdAt;
-    }
+    private  Date createdAt;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 
