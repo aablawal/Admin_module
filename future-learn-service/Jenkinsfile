@@ -77,7 +77,7 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-learn-service --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context UBNKula"
+                    sh "kubectl config use-context ubnkula"
                     sh "kubectl set image deployment/future-learn-service future-learn-service=${ACR_LOGINSERVER}/future-learn-service --namespace kula"
                     sh "kubectl rollout restart deployment/future-learn-service --namespace kula"
                   }

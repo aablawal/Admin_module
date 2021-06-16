@@ -74,7 +74,7 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-messaging-service --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context UBNKula"
+                    sh "kubectl config use-context ubnkula"
                     sh "kubectl set image deployment/future-messaging-service future-messaging-service=${ACR_LOGINSERVER}/future-messaging-service --namespace kula"
                     sh "kubectl rollout restart deployment/future-messaging-service --namespace kula"
                   }

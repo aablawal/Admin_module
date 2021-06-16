@@ -77,7 +77,7 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-bank-service --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context UBNKula"
+                    sh "kubectl config use-context ubnkula"
                     sh "kubectl set image deployment/future-bank-service future-bank-service=${ACR_LOGINSERVER}/future-bank-service --namespace kula"
                     sh "kubectl rollout restart deployment/future-bank-service --namespace kula"
                   }
