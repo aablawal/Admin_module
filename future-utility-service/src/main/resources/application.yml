@@ -38,7 +38,7 @@ spring:
 spring:
   config:
     activate:
-      on-profile: master
+      on-profile: production
     import: optional:configserver:http://future-config-server
   cloud:
     config:
