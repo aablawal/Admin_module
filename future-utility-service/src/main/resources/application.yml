@@ -43,4 +43,4 @@ spring:
   cloud:
     config:
       label: master
-      profile: master
+      profile: production
