@@ -32,27 +32,20 @@ import java.util.concurrent.TimeUnit;
 public class JobContractService implements Serializable {
 
     @Value("${sidekiq.escrow.appId}")
-    private int appId;
+    private  String  appId;
     @Value("${sidekiq.escrow.token}")
-    private String token;
-    @Value("${sidekiq.escrow.accountName}")
-    private String escrowAccountName; //GL
-    @Value("${sidekiq.escrow.accountNumber}")
-    private String escrowAccountNumber;
-    @Value("${sidekiq.kula.accountName}")
-    private String UBNIncomeAccountName;//GL
-    @Value("${sidekiq.kula.accountNumber}")
-    private String UBNIncomeAccountNumber;
-    @Value("${sidekiq.vat.accountName}")
-    private String VATAccountName; //GL
-    @Value("${sidekiq.vat.accountNumber}")
-    private String VATAccountNumber;
-    @Value("${sidekiq.pepperest.accountName}")
-    private String PepperestIncomeAccountName; //CASA
-    @Value("${sidekiq.pepperest.accountNumber}")
-    private String PepperestIncomeAccountNumber;
-    private String baseURL = "https://pepperest.com/EscrowService/api/Escrow";
-    private Logger logger = LoggerFactory.getLogger(JobContractService.class);
+    private  String token;
+    private  String escrowAccountName; //GL
+    private  String escrowAccountNumber;
+    private  String kulaIncomeAccountName;//GL
+    private  String kulaIncomeAccountNumber;
+    private  String VATAccountName; //GL
+    private  String VATAccountNumber;
+    private  String pepperestIncomeAccountName; //CASA
+    private  String pepperestIncomeAccountNumber;
+    private  String baseURL = "https://pepperest.com/EscrowService/api/Escrow";
+    private  Logger logger = LoggerFactory.getLogger(JobContractService.class);
+
 
     @Autowired
     private RestTemplate rest;
@@ -71,6 +64,7 @@ public class JobContractService implements Serializable {
     private final JobPaymentRepository jobPaymentRepository;
     private final NotificationSender notificationSender;
     private final App app;
+
 
 
     public HttpHeaders getHeaders() {
@@ -170,7 +164,7 @@ public class JobContractService implements Serializable {
             contract.setPeppfees(0); //set peprest charges to zero
             contract.setContractReference(contractReferenceId);
             contract.setInitialPaymentReferenceA(paymentReferenceId);
-            contract.setAppId(appId);
+            contract.setAppId(Integer.valueOf(appId));
 
             int status = 0;
             String remark = null;
@@ -204,6 +198,30 @@ public class JobContractService implements Serializable {
                 }
                 //end
             } else {
+
+                try {
+                    //get configurations
+                    List<Config> configs = configService.getConfigs();
+                    app.print(configs);
+                    if (!configs.isEmpty()) {
+                        for (Config currentConfig : configs) {
+                            //#getting escrow account
+                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
+                                this.escrowAccountName = currentConfig.getValue();
+                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
+                                this.escrowAccountNumber = currentConfig.getValue();
+                        }
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return new APIResponse("Unable to extract job service configurations", false, null);
+                }
+
+                app.print("###ESCROW ACCOUNT");
+                app.print(this.escrowAccountName);
+                app.print(this.escrowAccountNumber);
+
                 //transfer the amount to Sidekiq main account
                 PaymentRequest payment = new PaymentRequest();
                 payment.setProposalId(contract.getProposalId());
@@ -959,6 +977,30 @@ public class JobContractService implements Serializable {
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
 
+                            try {
+                                //get configurations
+                                List<Config> configs = configService.getConfigs();
+                                app.print(configs);
+                                if (!configs.isEmpty()) {
+                                    for (Config currentConfig : configs) {
+                                        //#getting escrow account
+                                        if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
+                                            this.escrowAccountName = currentConfig.getValue();
+                                        if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
+                                            this.escrowAccountNumber = currentConfig.getValue();
+                                    }
+                                }
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                return new APIResponse("Unable to extract job service configurations", false, null);
+                            }
+
+                            app.print("###ESCROW ACCOUNT");
+                            app.print(this.escrowAccountName);
+                            app.print(this.escrowAccountNumber);
+
+
                             PaymentRequest payment = new PaymentRequest();
                             payment.setProposalId(contract.getProposalId());
                             payment.setAmount(Integer.parseInt(milestone.getAmount().toString()));
@@ -1222,9 +1264,9 @@ public class JobContractService implements Serializable {
                     if (depositedAmount > 0) {
 
                         double VATRate = 0;
-                        double UBNIncomeRate=0;
+                        double kulaIncomeRate=0;
                         double VATCharge = 0;
-                        double UBNIncomeCharge = 0;
+                        double kulaIncomeCharge = 0;
                         double pepperestIncomeCharge = 0;
                         double freelancerIncomeAmount=0;
                         int TOTAL_JOBS_COMPLETED = 0;
@@ -1233,16 +1275,42 @@ public class JobContractService implements Serializable {
                         // CALCULATE VAT AND CHARGES BASE ON CONFIGS
                         //###########################
                         try {
+                            //get configurations
                             List<Config> configs = configService.getConfigs();
                             app.print(configs);
                             if (!configs.isEmpty()) {
                                 for (Config currentConfig : configs) {
+                                    //getting configs
                                     if (currentConfig.getReference()==ConfigReference.VAT_RATE)
                                         VATRate = Double.valueOf(currentConfig.getValue());
-                                    if (currentConfig.getReference()==ConfigReference.UBN_INCOME)
-                                        UBNIncomeRate = Double.valueOf(currentConfig.getValue());
+                                    if (currentConfig.getReference()==ConfigReference.KULA_INCOME)
+                                        kulaIncomeRate = Double.valueOf(currentConfig.getValue());
                                     if (currentConfig.getReference().equals(ConfigReference.TOTAL_JOBS_COMPLETED))
                                         TOTAL_JOBS_COMPLETED = Integer.valueOf(currentConfig.getValue());
+
+                                    //#getting escrow account
+                                    if(currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
+                                        this.escrowAccountName=currentConfig.getValue();
+                                    if(currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
+                                        this.escrowAccountNumber=currentConfig.getValue();
+
+                                    //#getting kula income account
+                                    if(currentConfig.getReference().equals(ConfigReference.KULA_INCOME_ACCOUNT_NAME))
+                                        this.kulaIncomeAccountName =currentConfig.getValue();
+                                    if(currentConfig.getReference().equals(ConfigReference.KULA_INCOME_ACCOUNT_NUMBER))
+                                        this.kulaIncomeAccountNumber=currentConfig.getValue();
+
+                                    //#getting vat income account
+                                    if(currentConfig.getReference().equals(ConfigReference.VAT_INCOME_ACCOUNT_NAME))
+                                        this.VATAccountName  =currentConfig.getValue();
+                                    if(currentConfig.getReference().equals(ConfigReference.VAT_INCOME_ACCOUNT_NUMBER))
+                                        this.VATAccountNumber =currentConfig.getValue();
+
+                                    //#getting vat income account
+                                    if(currentConfig.getReference().equals(ConfigReference.PEPPEREST_INCOME_ACCOUNT_NAME))
+                                        this.pepperestIncomeAccountName  =currentConfig.getValue();
+                                    if(currentConfig.getReference().equals(ConfigReference.PEPPEREST_INCOME_ACCOUNT_NUMBER))
+                                        this.pepperestIncomeAccountNumber =currentConfig.getValue();
                                 }
                             }
                         } catch (Exception ex) {
@@ -1254,29 +1322,40 @@ public class JobContractService implements Serializable {
                         //###########################
 
 
-                        UBNIncomeCharge=(UBNIncomeRate * depositedAmount) / 100;
+                        kulaIncomeCharge=(kulaIncomeRate * depositedAmount) / 100;
 
                         if (TOTAL_JOBS_COMPLETED < 100000) {
                             pepperestIncomeCharge = 100;
                         } else if (TOTAL_JOBS_COMPLETED >= 100000 && TOTAL_JOBS_COMPLETED < 200000) {
                             pepperestIncomeCharge = 50;
-                            UBNIncomeCharge = UBNIncomeCharge + 50;
+                            kulaIncomeCharge = kulaIncomeCharge + 50;
                         } else if (TOTAL_JOBS_COMPLETED >= 200000 && TOTAL_JOBS_COMPLETED < 300000) {
                             pepperestIncomeCharge = 40;
-                            UBNIncomeCharge = UBNIncomeCharge + 60;
+                            kulaIncomeCharge = kulaIncomeCharge + 60;
                         } else {
                             pepperestIncomeCharge = 30;
-                            UBNIncomeCharge = UBNIncomeCharge + 70;
+                            kulaIncomeCharge = kulaIncomeCharge + 70;
                         }
-                        VATCharge = (VATRate * UBNIncomeCharge) / 100;
-                        freelancerIncomeAmount = (depositedAmount - pepperestIncomeCharge) - UBNIncomeCharge;
-                        UBNIncomeCharge = UBNIncomeCharge - VATCharge;
+                        VATCharge = (VATRate * kulaIncomeCharge) / 100;
+                        freelancerIncomeAmount = (depositedAmount - pepperestIncomeCharge) - kulaIncomeCharge;
+                        kulaIncomeCharge = kulaIncomeCharge - VATCharge;
 
 
                         app.print("VAT is "+VATCharge);
-                        app.print("UBN Income  is "+UBNIncomeCharge);
+                        app.print("kula Income  is "+kulaIncomeCharge);
                         app.print("Freelancer charge is "+freelancerIncomeAmount);
-
+                        app.print("###ESCROW ACCOUNT");
+                        app.print(this.escrowAccountName);
+                        app.print(this.escrowAccountNumber);
+                        app.print("###KULA INCOME ACCOUNT");
+                        app.print(this.kulaIncomeAccountName);
+                        app.print(this.kulaIncomeAccountNumber);
+                        app.print("###PEPPEREST INCOME ACCOUNT");
+                        app.print(this.pepperestIncomeAccountName);
+                        app.print(this.pepperestIncomeAccountNumber);
+                        app.print("###VAT INCOME ACCOUNT");
+                        app.print(this.VATAccountName);
+                        app.print(this.VATAccountNumber);
 
                         ArrayList<JobBulkPayment> bulkPaymentStack = new ArrayList<>();
                         String paymentReference = app.makeUIID();
@@ -1297,29 +1376,29 @@ public class JobContractService implements Serializable {
                         escrowAccount.setAmount(0);
 
                         //***Union Bank***
-                        JobBulkPayment UBNAccount = new JobBulkPayment();
+                        JobBulkPayment kulaAccount = new JobBulkPayment();
                         //###############
 
-                        JobBulkPayment escrowUBNAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
-                        escrowUBNAccountDebit.setAmount(UBNIncomeCharge);
-                        escrowUBNAccountDebit.setTransactionId("1");
-                        escrowUBNAccountDebit.setRemark("Debited by Kula to UBN Income account for " + job.getTitle());
+                        JobBulkPayment escrowkulaAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
+                        escrowkulaAccountDebit.setAmount(kulaIncomeCharge);
+                        escrowkulaAccountDebit.setTransactionId("1");
+                        escrowkulaAccountDebit.setRemark("Debited by Kula to kula Income account for " + job.getTitle());
                         //##############
-                        UBNAccount.setTransactionId("2");
-                        UBNAccount.setAccountName(UBNIncomeAccountName);
-                        UBNAccount.setAccountNumber(UBNIncomeAccountNumber);
-                        UBNAccount.setNarration(narration);
-                        UBNAccount.setExecutedBy(currentUser.getUserUUID());
-                        UBNAccount.setRemark("Credit from Kula to UBN Income account for " + job.getTitle());
-                        UBNAccount.setExecutedFor(contract.getContractReference());
-                        UBNAccount.setContractReference(contract.getContractReference());
-                        UBNAccount.setPaymentReference(paymentReference);
-                        UBNAccount.setCrDrFlag("C");
-                        UBNAccount.setAccountType("GL");
-                        UBNAccount.setAmount(UBNIncomeCharge);
+                        kulaAccount.setTransactionId("2");
+                        kulaAccount.setAccountName(kulaIncomeAccountName);
+                        kulaAccount.setAccountNumber(kulaIncomeAccountNumber);
+                        kulaAccount.setNarration(narration);
+                        kulaAccount.setExecutedBy(currentUser.getUserUUID());
+                        kulaAccount.setRemark("Credit from Kula to kula Income account for " + job.getTitle());
+                        kulaAccount.setExecutedFor(contract.getContractReference());
+                        kulaAccount.setContractReference(contract.getContractReference());
+                        kulaAccount.setPaymentReference(paymentReference);
+                        kulaAccount.setCrDrFlag("C");
+                        kulaAccount.setAccountType("GL");
+                        kulaAccount.setAmount(kulaIncomeCharge);
                         //############# add to bulk transfer stack ###########
-                        bulkPaymentStack.add(escrowUBNAccountDebit);
-                        bulkPaymentStack.add(UBNAccount);
+                        bulkPaymentStack.add(escrowkulaAccountDebit);
+                        bulkPaymentStack.add(kulaAccount);
 
                         if (VATCharge > 0) {
                             //***Union Bank***
@@ -1357,8 +1436,8 @@ public class JobContractService implements Serializable {
                         escrowPepperestAccountDebit.setRemark("Debited  by Kula for to Pepperest account for " + job.getTitle());
                         //#############
                         pepperestAccount.setTransactionId("6");
-                        pepperestAccount.setAccountName(PepperestIncomeAccountName);
-                        pepperestAccount.setAccountNumber(PepperestIncomeAccountNumber);
+                        pepperestAccount.setAccountName(pepperestIncomeAccountName);
+                        pepperestAccount.setAccountNumber(pepperestIncomeAccountNumber);
                         pepperestAccount.setNarration(narration);
                         pepperestAccount.setExecutedBy(currentUser.getUserUUID());
                         pepperestAccount.setRemark("Credit from Kula to Pepperest account for " + job.getTitle());
@@ -1379,7 +1458,7 @@ public class JobContractService implements Serializable {
                         escrowFreelancerAccountDebit.setAmount(freelancerIncomeAmount);
                         escrowFreelancerAccountDebit.setTransactionId("7");
                         escrowFreelancerAccountDebit.setRemark("Debited by Kula to Freelancer account for " + job.getTitle());
-                        //update escrow account information with the payment for UBN
+                        //update escrow account information with the payment for kula
                         //##################
                         freelancerAccount.setTransactionId("8");
                         freelancerAccount.setAccountName(contract.getFreelancerAccountName());
@@ -1503,7 +1582,6 @@ public class JobContractService implements Serializable {
                     depositedAmount=contract.getAmount();
                     payment.setExecutedFor("Contract:"+contractReferenceId);
             }else{
-
                  if(milestone==null)
                     return new APIResponse("No Milestone found with the reference provided", false, null);
                 else {
@@ -1513,6 +1591,30 @@ public class JobContractService implements Serializable {
             }
 
             if(depositedAmount>0) {
+
+                try {
+                    //get configurations
+                    List<Config> configs = configService.getConfigs();
+                    app.print(configs);
+                    if (!configs.isEmpty()) {
+                        for (Config currentConfig : configs) {
+                            //#getting escrow account
+                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
+                                this.escrowAccountName = currentConfig.getValue();
+                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
+                                this.escrowAccountNumber = currentConfig.getValue();
+                        }
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return new APIResponse("Unable to extract job service configurations", false, null);
+                }
+
+                app.print("###ESCROW ACCOUNT");
+                app.print(this.escrowAccountName);
+                app.print(this.escrowAccountNumber);
+
 
                 String paymentReference = app.makeUIID();
                 //reverse payment to employer
