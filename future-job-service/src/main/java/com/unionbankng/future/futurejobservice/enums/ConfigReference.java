@@ -4,6 +4,7 @@ public enum ConfigReference {
 
     VAT_RATE,
     KULA_INCOME,
+    UBN_INCOME,
     TOTAL_JOBS,
     TOTAL_JOBS_COMPLETED,
     TOTAL_JOBS_REJECTED,
