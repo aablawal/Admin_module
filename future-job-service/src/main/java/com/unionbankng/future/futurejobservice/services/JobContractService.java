@@ -7,10 +7,7 @@ import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.pojos.APIResponse;
-import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
-import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.pojos.PaymentRequest;
+import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
@@ -358,26 +355,33 @@ public class JobContractService implements Serializable {
 
     public JobContractExtension requestContractExtension(String userName, JobContractExtension extensionRequest) {
         try {
-            extensionRequest.setStatus(Status.PE);
-            JobContractExtension extension = jobContractExtensionRepository.save(extensionRequest);
-            if (extension != null) {
-                //fire notification
-                Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
-                if (currentJob != null) {
-                    NotificationBody body = new NotificationBody();
-                    body.setBody(userName + " want you to help extend delivery date for " + currentJob.getTitle() + " to " + extension.getDate().toString());
-                    body.setSubject("Contract Extension");
-                    body.setActionType("REDIRECT");
-                    body.setAction("/job/ongoing/details/" + extension.getJobId());
-                    body.setTopic("'Job'");
-                    body.setChannel("S");
-                    body.setRecipient(extension.getEmployerId());
-                    notificationSender.pushNotification(body);
+            JobContract contract= jobContractRepository.findContractByProposalAndJobId(extensionRequest.getProposalId(), extensionRequest.getJobId());
+            if(contract!=null) {
+                extensionRequest.setStatus(Status.PA);
+                extensionRequest.setContractReference(contract.getContractReference());
+                JobContractExtension extension = jobContractExtensionRepository.save(extensionRequest);
+                if (extension != null) {
+                    //fire notification
+                    Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
+                    if (currentJob != null) {
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(userName + " want you to help extend delivery date for " + currentJob.getTitle() + " to " + extension.getDate().toString());
+                        body.setSubject("Contract Extension");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/job/ongoing/details/" + extension.getJobId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setRecipient(extension.getEmployerId());
+                        notificationSender.pushNotification(body);
+                    }
+                    //end
+                    return extension;
+                } else {
+                    logger.info("JOBSERVICE: Unable to submit the contract extension");
+                    return null;
                 }
-                //end
-                return extension;
-            } else {
-                logger.info("JOBSERVICE: Unable to submit the contract extension");
+            }else{
+                logger.info("JOBSERVICE: Contract not found");
                 return null;
             }
         } catch (Exception e) {
@@ -460,7 +464,7 @@ public class JobContractService implements Serializable {
                             + "&referenceid=" + contract.getContractReference()
                             + "&user_email=" + contract.getUserEmail()
                             + "&reasons=" + extension.getReason()
-                            + "&new_date" + extension.getDate().toString()
+                            + "&new_date=" + extension.getDate().toString()
                             + "&action=" + "accept", HttpMethod.POST, entity, String.class);
                     //done
                     if (response.getStatusCode().is2xxSuccessful())
@@ -627,11 +631,12 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobProjectSubmission rejectJob(Principal principal, Long jobId, Long
+    public JobProjectSubmission rejectJob(Principal principal, RejectionRequest rejectionRequest, Long jobId, Long
             requestId) {
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
         if (request != null) {
             request.setStatus(Status.RE);
+            request.setRemark(rejectionRequest.getReason());
             jobProjectSubmissionRepository.save(request);
             //fire notification
             NotificationBody body = new NotificationBody();

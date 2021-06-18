@@ -3,6 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.ContractRequest;
+import com.unionbankng.future.futurejobservice.pojos.RejectionRequest;
 import com.unionbankng.future.futurejobservice.services.UBNBankTransferService;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import lombok.RequiredArgsConstructor;
@@ -72,8 +73,8 @@ public class JobContractController {
 
 
     @PutMapping("/v1/job/completed/rejection/{jobId}/{requestId}")
-    public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId, @ApiIgnore Principal principal){
-        JobProjectSubmission request= jobContractService.rejectJob(principal, jobId,requestId);
+    public ResponseEntity<APIResponse> rejectJobDone(@PathVariable Long jobId, @PathVariable Long requestId, @RequestBody RejectionRequest request, @ApiIgnore Principal principal){
+        JobProjectSubmission rejectionRequest= jobContractService.rejectJob(principal, request,jobId,requestId);
 
         if(request!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, request));
@@ -118,7 +119,7 @@ public class JobContractController {
     }
 
     @GetMapping("/v1/job/contract/extension/{contractReference}")
-    public ResponseEntity<APIResponse> findContractExtensionByContractReference(@Valid @PathVariable String contractReference){
+    public ResponseEntity<APIResponse> findContractExtensionByContractReference(@PathVariable String contractReference){
         JobContractExtension response= jobContractService.findContractExtensionByContractReference(contractReference);
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));

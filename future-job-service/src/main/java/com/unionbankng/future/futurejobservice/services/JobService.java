@@ -305,6 +305,12 @@ public class JobService {
         return jobList;
     }
 
+    public Model searchJobs(JobType type, String question, Pageable pageable, Model model) {
+        Page<Job> paginatedData= jobRepository.findBySearch(pageable, question,type.name());
+        Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
+        return jobList;
+    }
+
     public Long getTotalJobPostedByUserId(Long userId){
         return  jobRepository.getTotalJobPostedByUserId(userId).orElse(0l);
     }

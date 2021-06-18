@@ -37,6 +37,8 @@ public class JobProjectSubmission  implements Serializable {
     private Status status;
     @Column(columnDefinition="TEXT")
     private  String description;
+    @Column(columnDefinition="TEXT")
+    private  String remark;
     @Temporal(TemporalType.DATE)
     private  Date createdAt;
 
