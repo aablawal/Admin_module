@@ -35,15 +35,22 @@ public class JobContractService implements Serializable {
     private int appId;
     @Value("${sidekiq.escrow.token}")
     private String token;
-    private String escrowAccountName="M36 FLOAT ACCOUNT ( WITH CURRENCY RESTRICTION AS - ALL)"; //GL
-    private String escrowAccountNumber="250990140";
-    private String UBNIncomeAccountName = "Marcus Securities Settlement"; //GL
-    private String UBNIncomeAccountNumber = "250990144";
-    private String VATAccountName = "M36 SMS CHARGES"; //GL
-    private String VATAccountNumber = "420993008";
-    private String PepperestIncomeAccountName = "DEDICATED NEFT O A"; //CASA
-    private String PepperestIncomeAccountNumber = "0055982543";
-
+    @Value("${sidekiq.escrow.accountName}")
+    private String escrowAccountName; //GL
+    @Value("${sidekiq.escrow.accountNumber}")
+    private String escrowAccountNumber;
+    @Value("${sidekiq.kula.accountName}")
+    private String UBNIncomeAccountName;//GL
+    @Value("${sidekiq.kula.accountNumber}")
+    private String UBNIncomeAccountNumber;
+    @Value("${sidekiq.vat.accountName}")
+    private String VATAccountName; //GL
+    @Value("${sidekiq.vat.accountNumber}")
+    private String VATAccountNumber;
+    @Value("${sidekiq.pepperest.accountName}")
+    private String PepperestIncomeAccountName; //CASA
+    @Value("${sidekiq.pepperest.accountNumber}")
+    private String PepperestIncomeAccountNumber;
     private String baseURL = "https://pepperest.com/EscrowService/api/Escrow";
     private Logger logger = LoggerFactory.getLogger(JobContractService.class);
 
