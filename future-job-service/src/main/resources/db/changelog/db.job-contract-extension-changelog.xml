@@ -40,4 +40,9 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1624004288736-2">
+        <addColumn tableName="job_contract_submission">
+            <column name="remark" type="TEXT"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

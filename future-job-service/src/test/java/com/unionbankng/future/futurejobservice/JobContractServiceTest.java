@@ -3,6 +3,7 @@ package com.unionbankng.future.futurejobservice;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
+import com.unionbankng.future.futurejobservice.pojos.RejectionRequest;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -95,7 +96,9 @@ class JobContractServiceTest {
 
     @Test
     void rejectJob() {
-        JobProjectSubmission contract=  jobContractService.rejectJob(null,jobId,requestId);
+        RejectionRequest rejectionRequest = new RejectionRequest();
+        rejectionRequest.setReason("Test Reason");
+        JobProjectSubmission contract=  jobContractService.rejectJob(null,rejectionRequest,jobId,requestId);
         Assert.assertEquals(jobId,contract.getJobId());
     }
 

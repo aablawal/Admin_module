@@ -5,6 +5,7 @@ import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
+import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.security.Principal;
 @RequestMapping(path = "api")
 public class JobController {
 
+    private final App app;
     private final JobService service;
     private final NotificationSender notificationSender;
     private final UserService userService;
@@ -103,9 +105,15 @@ public class JobController {
                 new APIResponse("success",true,service.findJobsByOwnerIdAndStatus(oid,status,PageRequest.of(page,size), model)));
     }
     @GetMapping("/v1/jobs/type/{type}")
-    public ResponseEntity<APIResponse<Model>> getJobsByOwnerId(@PathVariable String type,@RequestParam int page, @RequestParam int size, Model model){
+    public ResponseEntity<APIResponse<Model>> getJobsByType(@PathVariable String type,@RequestParam int page, @RequestParam int size, Model model){
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobsByType(JobType.valueOf(type.toUpperCase()),PageRequest.of(page,size), model)));
+    }
+    @GetMapping("/v1/jobs/search/{type}")
+    public ResponseEntity<APIResponse<Model>> searchJobs(@RequestParam String q, @PathVariable String type, @RequestParam int page, @RequestParam int size, Model model){
+        app.print(app);
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.searchJobs(JobType.valueOf(type.toUpperCase()),q,PageRequest.of(page,size), model)));
     }
 
     @GetMapping("/v1/jobs")
