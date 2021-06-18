@@ -578,11 +578,10 @@ public class JobContractService implements Serializable {
         try {
             String attachments = null;
             ResponseEntity<String> response = null;
-            String disputeReferenceId =app.makeUIID();
-
             request.setStatus(Status.AC);
             request.setUserId(userId);
-            request.setReferenceId(disputeReferenceId);
+
+            app.print(request);
 
             if (attachmentFiles != null)
                 attachments = this.fileStoreService.storeFiles(attachmentFiles, request.getProposalId().toString());
