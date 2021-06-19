@@ -34,7 +34,7 @@ public class UnionSMSProvider implements SMSProvider {
         UBNSmsRequest request = new UBNSmsRequest();
         request.setAccountNo(UBNConfigurationProperties.SMS_GL);
         request.setMessage(sms.getMessage());
-        request.setSource("M36");
+        request.setSource("Kula");
         request.setMobileNo(sms.getRecipient());
 
         logger.info("sending sms : {}", sms.getRecipient());
