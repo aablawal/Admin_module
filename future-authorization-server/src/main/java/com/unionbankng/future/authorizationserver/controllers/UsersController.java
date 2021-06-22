@@ -48,11 +48,14 @@ public class UsersController {
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
+
     @GetMapping("/v1/users/search")
     public ResponseEntity<APIResponse> getUsersBySearch(@RequestParam String  q) {
         List<User> user = userService.findUsersBySearch(q).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
+
+
     @GetMapping("/v1/users")
     public ResponseEntity<APIResponse> getUsers(@RequestParam int  page,  @RequestParam int size) {
         Page<User> userPage = userService.findUsers(PageRequest.of(page,size));
@@ -63,7 +66,6 @@ public class UsersController {
     }
 
 
-
     @GetMapping("/v1/users/get_details_with_token")
     public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore Principal principal) {
         System.out.println(principal);
@@ -72,7 +74,6 @@ public class UsersController {
 
         UserByTokenResponse userByTokenResponse = new UserByTokenResponse();
         BeanUtils.copyProperties(user, userByTokenResponse);
-
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,userByTokenResponse));
     }
