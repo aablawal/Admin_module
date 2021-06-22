@@ -8,6 +8,7 @@ import com.unionbankng.future.authorizationserver.pojos.TokenConfirm;
 import com.unionbankng.future.authorizationserver.services.RegistrationService;
 import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.services.UserService;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,6 +29,7 @@ public class RegistrationController {
     private final UserService userService;
     private final UserConfirmationTokenService userConfirmationTokenService;
     private final RegistrationService registrationService;
+    private final App app;
 
 
     @PostMapping("/v1/registration/register")
@@ -37,6 +39,8 @@ public class RegistrationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     new APIResponse(messageSource.getMessage("username.exist", null, LocaleContextHolder.getLocale()),false,null));
 
+
+        app.print(request);
         if(request.getAuthProvider().equals(AuthProvider.GOOGLE))
             return registrationService.googleRegistration(request);
 

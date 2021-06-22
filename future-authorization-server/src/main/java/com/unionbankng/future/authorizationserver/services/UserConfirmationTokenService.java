@@ -67,20 +67,15 @@ public class UserConfirmationTokenService {
         TokenConfirm tokenConfirm = new TokenConfirm();
 
         String userEmail = memcachedHelperService.getValueByKey(token);
-
         if (userEmail == null) {
             tokenConfirm.setSuccess(false);
             return tokenConfirm;
         }
 
         User user = userService.findByEmail(userEmail).orElse(null);
-
-
         if (user == null) {
-
             tokenConfirm.setSuccess(false);
             return tokenConfirm;
-
         }
 
         //enable keycloak user
@@ -95,7 +90,4 @@ public class UserConfirmationTokenService {
 
         return tokenConfirm;
     }
-
-
-
 }
