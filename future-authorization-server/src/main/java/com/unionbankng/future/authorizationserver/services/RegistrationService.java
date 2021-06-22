@@ -57,7 +57,6 @@ public class RegistrationService {
 
 
         Response response = createUserOnKeycloak(request);
-
         logger.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
 
         if(response.getStatus() != 201)
@@ -76,11 +75,9 @@ public class RegistrationService {
 
 
         user = userService.save(user);
-
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();
         profileService.save(profile);
-
         //send confirmation email
         userConfirmationTokenService.sendConfirmationToken(user);
 
