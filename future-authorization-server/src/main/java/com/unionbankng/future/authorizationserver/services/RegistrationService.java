@@ -9,6 +9,7 @@ import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -40,6 +41,7 @@ public class RegistrationService {
     private final ProfileService profileService;
     private  final GoogleOauthProvider googleOauthProvider;
     private final RealmResource keycloakRealmResource;
+    private final App app;
 
     private PasswordValidator passwordValidator  = PasswordValidator.
             buildValidator(false, true, true, 6, 40);
@@ -130,7 +132,6 @@ public class RegistrationService {
                     new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()),false,null));
 
         Response response = createUserOnKeycloak(request);
-
         logger.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
 
         if(response.getStatus() != 201)
