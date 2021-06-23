@@ -49,7 +49,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/login","/oauth/token", "/oauth/authorize/**","/api/v1/registration/**",
+        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/login","/oauth/token", "/oauth/authorize/**","/api/v1/registration/**","/api/v1/email/test",
 				"/api/v1/security/**","/api/v1/tags/find_by_type","/api/v1/tags/find_by_id","/api/v1/user_interest/add_for_user","/api/v1/tags/find_by_type_likely_name","/api/v1/tags/create").permitAll()
 				.and().requestMatchers().antMatchers("/api/**")
 				.and().authorizeRequests()

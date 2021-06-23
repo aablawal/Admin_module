@@ -29,6 +29,8 @@ public class UnionEmailProvider implements EmailProvider {
         Client client = UBNConfigurationProperties.ignoreSSLClient();
         WebTarget target = client.target(UBNConfigurationProperties.EMAIL_URL);
 
+
+        logger.info("URL:"+UBNConfigurationProperties.EMAIL_URL);
         logger.info("sending email : {}", emailBody.getSubject());
 
         target = target.queryParam("access_token", UBNConfigurationProperties.getAccountAccessToken());
@@ -37,12 +39,11 @@ public class UnionEmailProvider implements EmailProvider {
 
         Response response = invocationBuilder.post(Entity.entity(emailBody, MediaType.APPLICATION_JSON));
 
-
         if(response.getStatus() != 200){
-            logger.info("sending sms failed : {}", emailBody.getSubject());
+            logger.info("sending email failed : {}", emailBody.getSubject());
             throw new HttpClientErrorException(HttpStatus.resolve(response.getStatus()));
         }
 
-        logger.info("sending sms success : {}", emailBody.getSubject());
+        logger.info("sending email success : {}", emailBody.getSubject());
     }
 }

@@ -59,6 +59,7 @@ public class UserConfirmationTokenService {
                 .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(user.getEmail()).displayName(user.toString()).build())).build();
 
         emailSender.sendEmail(emailBody);
+        logger.info("Message Queued successfully");
     }
 
     public TokenConfirm confirmUserAccountByToken(String token) {
