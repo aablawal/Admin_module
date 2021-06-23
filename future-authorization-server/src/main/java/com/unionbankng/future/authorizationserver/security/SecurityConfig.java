@@ -1,5 +1,6 @@
 package com.unionbankng.future.authorizationserver.security;
 
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.security.authentication.BearerAuthenticationReader;
 import net.devh.boot.grpc.server.security.authentication.CompositeGrpcAuthenticationReader;
@@ -42,6 +43,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
+    private final App app;
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
@@ -74,7 +78,9 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     public Keycloak keycloak(KeycloakSpringBootProperties props) {
 
+        app.print("################Connecting to KeyCloack");
         System.out.println(props.getAuthServerUrl());
+        app.print(props);
 
         Keycloak keycloak = KeycloakBuilder.builder() //
                 .serverUrl(props.getAuthServerUrl()) //
