@@ -38,17 +38,16 @@ pipeline {
                 }
     }
     }
-      stage('Test') {
-                steps {
-                     if (GLOBAL_ENVIRONMENT == 'staging') {
-                        echo 'Testing..'
-                        withMaven( maven: 'maven-3.6.3' ) {
-                                sh 'cd future-job-service && mvn test'
-                        }
-                     }
-
-                }
-            }
+//       stage('Test') {
+//                 steps {
+//                         echo 'Testing..'
+//                         withMaven( maven: 'maven-3.6.3' ) {
+//                                 sh 'cd future-job-service && mvn test'
+//                         }
+//
+//
+//                 }
+//             }
 
         stage('Build') {
 
