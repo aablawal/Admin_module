@@ -446,7 +446,7 @@ public class UBNAccountOpeningController {
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
                 dataResponseResponse.body().getData().getAccountName(),dataResponseResponse.body().getData().getAccountNumber(),dataResponseResponse.body().getData().getAccountType()}
                 , LocaleContextHolder.getLocale())
-        ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Bank Account Created")
+        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Bank Account Created")
                 .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
                         .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
 

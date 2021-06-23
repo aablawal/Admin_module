@@ -65,7 +65,7 @@ public class SecurityService {
 
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,
                 Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
-        ).sender(EmailAddress.builder().displayName("SideKick Team").email(emailSenderAddress).build()).subject("Reset Your Sidekick Password")
+        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Reset Your Kula Password")
                 .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).
                         email(user.getEmail()).displayName(user.toString()).build())).build();
 
