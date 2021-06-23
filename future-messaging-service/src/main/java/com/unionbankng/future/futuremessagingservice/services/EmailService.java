@@ -20,7 +20,6 @@ public class EmailService {
     private String emailSenderAddress;
 
     private final Logger logger = LoggerFactory.getLogger(EmailService.class);
-    private final MessageSource messageSource;
     private final EmailSender emailSender;
 
 
