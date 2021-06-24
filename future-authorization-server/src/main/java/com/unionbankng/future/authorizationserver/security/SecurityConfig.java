@@ -15,7 +15,6 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
@@ -45,14 +44,7 @@ import java.util.List;
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     private final App app;
-    @Value("${keycloak.admin}")
-    private String keycloakAdmin;
-    @Value("${keycloak.admin-cli}")
-    private String adminCLI;
-    @Value("${keycloak.admin-username}")
-    private String adminUsername;
-    @Value("${keycloak.admin-password}")
-    private String adminPassword;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -92,13 +84,10 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
         Keycloak keycloak = KeycloakBuilder.builder() //
                 .serverUrl(props.getAuthServerUrl()) //
-                .realm(keycloakAdmin) //
-                .grantType(OAuth2Constants.PASSWORD) //
-                .clientId(adminCLI)
-                .username(adminUsername)
-                .password(adminPassword)
-//                .clientId(props.getResource()) //
-//                .clientSecret((String) props.getCredentials().get("secret")) //
+                .realm(props.getRealm()) //
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS) //
+                .clientId(props.getResource()) //
+                .clientSecret((String) props.getCredentials().get("secret")) //
                 .build();
         return keycloak;
     }
