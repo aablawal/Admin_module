@@ -31,6 +31,7 @@ public class UnionEmailProvider implements EmailProvider {
 
 
         logger.info("URL:"+UBNConfigurationProperties.EMAIL_URL);
+        logger.info("Token:"+ UBNConfigurationProperties.getAccountAccessToken());
         logger.info("sending email : {}", emailBody.getSubject());
 
         target = target.queryParam("access_token", UBNConfigurationProperties.getAccountAccessToken());
