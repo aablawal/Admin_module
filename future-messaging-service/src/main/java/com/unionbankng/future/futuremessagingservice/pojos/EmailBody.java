@@ -13,10 +13,8 @@ public @Data class EmailBody implements Serializable {
 
     protected List<EmailAttachment> attachments;
     protected String body;
-    protected String footer;
     protected List<EmailAddress> recipients;
     protected EmailAddress sender;
     protected String subject;
-
-
+    protected  String status;
 }

@@ -37,6 +37,7 @@ public class EmailListener {
         EmailProvider emailProvider = new UnionEmailProvider();
 
         try {
+            emailBody.setStatus("PENDING");
             emailProvider.send(processEmailTemplate(emailBody));
             logger.info("Email sent out");
         } catch (Exception e) {
