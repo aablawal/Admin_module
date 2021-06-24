@@ -44,7 +44,7 @@ public class UnionEmailProvider implements EmailProvider {
                 .accept(MediaType.APPLICATION_JSON);
 
         Response response = invocationBuilder.post(Entity.entity(emailBody, MediaType.APPLICATION_JSON));
-        app.print(response);
+        app.print("Response Status: "+response.getStatus());
         if(response.getStatus() != 200){
             logger.info("sending email failed : {}", emailBody.getSubject());
             throw new HttpClientErrorException(HttpStatus.resolve(response.getStatus()));
