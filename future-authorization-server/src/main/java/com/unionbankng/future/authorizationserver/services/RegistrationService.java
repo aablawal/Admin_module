@@ -113,6 +113,8 @@ public class RegistrationService {
         // Get realm
         UsersResource usersResource = keycloakRealmResource.users();
 
+        app.print(userRepresentation.getClientConsents());
+
         return usersResource.create(userRepresentation);
 
     }

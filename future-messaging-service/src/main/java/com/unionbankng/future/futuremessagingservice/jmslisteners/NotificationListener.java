@@ -15,7 +15,7 @@ import org.thymeleaf.TemplateEngine;
 @RequiredArgsConstructor
 public class NotificationListener {
 
-    private static final String QUEUE_NAME = "futurenotificationqueue";
+    private static final String QUEUE_NAME = "kulanotificationqueue";
     private final NotificationService notificationService;
     private final Logger logger = LoggerFactory.getLogger(NotificationListener.class);
     private final TemplateEngine templateEngine;

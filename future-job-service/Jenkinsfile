@@ -40,10 +40,11 @@ pipeline {
     }
 //       stage('Test') {
 //                 steps {
-//                     echo 'Testing..'
-//                     withMaven( maven: 'maven-3.6.3' ) {
-//                     		sh 'cd future-job-service && mvn test'
-//                     }
+//                         echo 'Testing..'
+//                         withMaven( maven: 'maven-3.6.3' ) {
+//                                 sh 'cd future-job-service && mvn test'
+//                         }
+//
 //
 //                 }
 //             }

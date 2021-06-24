@@ -73,4 +73,18 @@ public class RegistrationController {
                 new APIResponse("Link sent successfully",true,null));
 
     }
+
+    @PostMapping("/v1/email/test")
+    public ResponseEntity<APIResponse> test(){
+
+        User user = userService.findByEmail("net.rabiualiyu@gmail.com").orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        //send confirmation email
+        userConfirmationTokenService.sendConfirmationToken(user);
+
+        app.print("Sent");
+
+        return ResponseEntity.ok().body(
+                new APIResponse("Link sent successfully",true,null));
+
+    }
 }

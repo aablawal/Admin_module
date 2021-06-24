@@ -93,10 +93,8 @@ public class UBNConfigurationProperties {
 
         Response response = invocationBuilder.post(Entity.entity(new UbnResponse(), MediaType.APPLICATION_JSON));
 
-
         if (response.getStatus() == 200)
             return response.readEntity(UbnResponse.class).getAccess_token();
-
 
 
         return null;

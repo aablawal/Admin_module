@@ -38,15 +38,16 @@ pipeline {
                 }
     }
     }
-      stage('Test') {
-                steps {
-                    echo 'Testing..'
-                    withMaven( maven: 'maven-3.6.3' ) {
-                    		sh 'cd future-payment-service && mvn test'
-                    }
-
-                }
-            }
+//       stage('Test') {
+//                 steps {
+//                         echo 'Testing..'
+//                         withMaven( maven: 'maven-3.6.3' ) {
+//                                 sh 'cd future-payment-service && mvn test'
+//                         }
+//
+//
+//                 }
+//             }
 
         stage('Build') {
 

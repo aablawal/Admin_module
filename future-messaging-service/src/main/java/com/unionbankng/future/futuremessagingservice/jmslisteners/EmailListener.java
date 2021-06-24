@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
 import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionEmailProvider;
+import com.unionbankng.future.futuremessagingservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,23 +21,24 @@ import java.util.Calendar;
 @RequiredArgsConstructor
 public class EmailListener {
 
-    private static final String QUEUE_NAME = "futureemailqueue";
-
+    private static final String QUEUE_NAME = "kulaemailqueue";
     private final Logger logger = LoggerFactory.getLogger(EmailListener.class);
-
     private final TemplateEngine templateEngine;
-
     private final ObjectMapper mapper;
+    private final App app;
 
 
     @JmsListener(destination = QUEUE_NAME, containerFactory = "jmsListenerContainerFactory")
     public void receiveMessage(String json) throws JsonProcessingException {
 
         EmailBody emailBody = mapper.readValue(json, EmailBody.class);
+        app.print(emailBody);
         logger.info("Received message: {}", emailBody.getSubject());
         EmailProvider emailProvider = new UnionEmailProvider();
+
         try {
             emailProvider.send(processEmailTemplate(emailBody));
+            logger.info("Email sent out");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,6 +59,7 @@ public class EmailListener {
 
         final String htmlContent = templateEngine.process("mail/html/system-email.html", ctx);
         emailBody.setBody(htmlContent);
+        logger.info("Arranged email template ");
 
         return emailBody;
     }
