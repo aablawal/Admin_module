@@ -20,9 +20,6 @@ public class UnionEmailProvider implements EmailProvider {
 
     private final Logger logger = LoggerFactory.getLogger(EmailProvider.class);
 
-    @Autowired
-    private  App app;
-
     @Override
     public void init() {
 
@@ -44,7 +41,6 @@ public class UnionEmailProvider implements EmailProvider {
                 .accept(MediaType.APPLICATION_JSON);
 
         Response response = invocationBuilder.post(Entity.entity(emailBody, MediaType.APPLICATION_JSON));
-        app.print("Response Status: "+response.getStatus());
         if(response.getStatus() != 200){
             logger.info("sending email failed : {}", emailBody.getSubject());
             throw new HttpClientErrorException(HttpStatus.resolve(response.getStatus()));
