@@ -21,7 +21,7 @@ import java.util.Calendar;
 @RequiredArgsConstructor
 public class EmailListener {
 
-    private static final String QUEUE_NAME = "emailqueue";
+    private static final String QUEUE_NAME = "kulaemailqueue";
     private final Logger logger = LoggerFactory.getLogger(EmailListener.class);
     private final TemplateEngine templateEngine;
     private final ObjectMapper mapper;

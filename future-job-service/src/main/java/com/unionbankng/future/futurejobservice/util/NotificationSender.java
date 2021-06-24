@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationSender {
 
-    private static final String EMAIL_DESTINATION = "pushnotificationqueue";
+    private static final String EMAIL_DESTINATION = "kulanotificationqueue";
     private final JmsTemplate jmsTemplate;
 
     public void pushNotification(NotificationBody notificationBody){

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EmailSender {
 
-    private static final String EMAIL_DESTINATION = "emailqueue";
+    private static final String EMAIL_DESTINATION = "kulaemailqueue";
     private final JmsTemplate jmsTemplate;
 
     public void sendEmail(EmailBody emailBody){
