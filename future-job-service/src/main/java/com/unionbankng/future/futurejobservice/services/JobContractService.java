@@ -35,6 +35,8 @@ public class JobContractService implements Serializable {
     private  String  appId;
     @Value("${sidekiq.escrow.token}")
     private  String token;
+    @Value("${sidekiq.escrow.baseUrl}")
+    private  String baseURL;
     private  String escrowAccountName; //GL
     private  String escrowAccountNumber;
     private  String kulaIncomeAccountName;//GL
@@ -43,7 +45,6 @@ public class JobContractService implements Serializable {
     private  String VATAccountNumber;
     private  String pepperestIncomeAccountName; //CASA
     private  String pepperestIncomeAccountNumber;
-    private  String baseURL = "https://pepperest.com/EscrowService/api/Escrow";
     private  Logger logger = LoggerFactory.getLogger(JobContractService.class);
 
 
@@ -61,7 +62,6 @@ public class JobContractService implements Serializable {
     private final JobPaymentService jobPaymentService;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
     private final JobContractDisputeRepository jobContractDisputeRepository;
-    private final JobPaymentRepository jobPaymentRepository;
     private final NotificationSender notificationSender;
     private final App app;
 
@@ -254,6 +254,9 @@ public class JobContractService implements Serializable {
                         notificationSender.pushNotification(body);
                     }
 
+                    app.print("###################################");
+                    app.print("Escrow URL: "+baseURL);
+                    app.print("Escrow Token: "+token);
                     HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                     ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
                             + "&referenceid=" + contract.getContractReference()
@@ -278,6 +281,8 @@ public class JobContractService implements Serializable {
                     if (response.getStatusCode().is2xxSuccessful()) {
                         status = 1;
                         remark = "success";
+
+                        app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
 
                         //fire notifications
                         NotificationBody body1 = new NotificationBody();
@@ -483,6 +488,9 @@ public class JobContractService implements Serializable {
                     contract.setEndDate(extension.getDate());
                     contract.setLastModifiedDate(new Date());
 
+                    app.print("###################################");
+                    app.print("Escrow URL: "+baseURL);
+                    app.print("Escrow Token: "+token);
                     //start to extend escrow live
                     HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                     response = rest.exchange(baseURL + "/Transaction/reqExtension?appid=" + appId
@@ -492,8 +500,10 @@ public class JobContractService implements Serializable {
                             + "&new_date=" + extension.getDate().toString()
                             + "&action=" + "accept", HttpMethod.POST, entity, String.class);
                     //done
-                    if (response.getStatusCode().is2xxSuccessful())
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
                         jobContractRepository.save(contract);
+                    }
                     else
                         logger.info("JOBSERVICE: Escrow transaction failed");
                 }
@@ -613,6 +623,9 @@ public class JobContractService implements Serializable {
             if (attachments != null)
                 request.setAttachment(attachments);
 
+            app.print("###################################");
+            app.print("Escrow URL: "+baseURL);
+            app.print("Escrow Token: "+token);
             HttpEntity<String> entity = new HttpEntity<>(this.getHeaders());
             response = rest.exchange(baseURL + "/Dispute/reportDispute?appid=" + appId
                     + "&referenceid=" + request.getReferenceId()
@@ -754,6 +767,9 @@ public class JobContractService implements Serializable {
                             contract.setSettlement(contract.getContractReference());
                             contract.setClearedAmount((contract.getAmount()));
 
+                            app.print("###################################");
+                            app.print("Escrow URL: "+baseURL);
+                            app.print("Escrow Token: "+token);
                             //start to release escrow amount to freelancer
                             HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                             ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
@@ -1018,8 +1034,14 @@ public class JobContractService implements Serializable {
 
                             APIResponse paymentResponse=jobPaymentService.makePayment(payment);
                             if (paymentResponse.isSuccess()) {
+
                                 milestone.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
                                 contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
+
+                                app.print("###################################");
+                                app.print("Escrow URL: "+baseURL);
+                                app.print("Escrow Token: "+token);
+
                                 //set milestone amount to the escrow
                                 HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                                 ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
@@ -1154,6 +1176,9 @@ public class JobContractService implements Serializable {
                         contract.setClearedAmount((contract.getClearedAmount() + milestone.getAmount().intValue()));
                         contract.setLastModifiedDate(new Date());
 
+                        app.print("###################################");
+                        app.print("Escrow URL: "+baseURL);
+                        app.print("Escrow Token: "+token);
                         //start to release escrow amount to freelancer
                         HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
                         ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
