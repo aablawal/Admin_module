@@ -47,12 +47,15 @@ public class UserConfirmationTokenService {
 
     public void sendConfirmationToken(User user) {
 
+        logger.info("=============================");
         logger.debug("generating token for {}", user.toString());
         String token = UUID.randomUUID().toString();
         memcachedHelperService.save(token, user.getEmail(), tokenExpiryInMinute * 60);
 
         String generatedURL = String.format("%s?token=%s", confirmationTokenURL, token);
         logger.info("Sending confirmation to {}", user.toString());
+        logger.info("Activation Link:"+generatedURL);
+
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{generatedURL,
                 Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
@@ -65,8 +68,9 @@ public class UserConfirmationTokenService {
     public TokenConfirm confirmUserAccountByToken(String token) {
 
         logger.info("=============================");
-        TokenConfirm tokenConfirm = new TokenConfirm();
+        logger.info("Token: "+token);
 
+        TokenConfirm tokenConfirm = new TokenConfirm();
         String userEmail = memcachedHelperService.getValueByKey(token);
         if (userEmail == null) {
             tokenConfirm.setSuccess(false);
