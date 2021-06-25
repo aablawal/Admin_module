@@ -4,6 +4,7 @@ import com.unionbankng.future.futurebankservice.pojos.APIResponse;
 import com.unionbankng.future.futurebankservice.pojos.SidekiqBVNValidationResponse;
 import com.unionbankng.future.futurebankservice.pojos.ValidateBvnRequest;
 import com.unionbankng.future.futurebankservice.pojos.ValidateBvnResponse;
+import com.unionbankng.future.futurebankservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.io.IOException;
 public class BvnValidationService {
 
     Logger logger = LoggerFactory.getLogger(BvnValidationService.class);
+    private final App app;
 
 
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
@@ -31,6 +33,9 @@ public class BvnValidationService {
 
         Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
+        app.print(response);
+        logger.info("status: "+response.isSuccessful());
+        logger.info("message: "+response.message());
         if (!response.isSuccessful())
             return ResponseEntity.status(response.code()).body(new APIResponse<>("An error occured", false, null));
 
@@ -47,15 +52,18 @@ public class BvnValidationService {
 
         Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
+        app.print(response);
+        logger.info("status: "+response.isSuccessful());
+          logger.info("message: "+response.message());
 
 
         if (!response.isSuccessful())
-            return ResponseEntity.status(response.code()).body(new APIResponse<>("Network Error", true, null));
+            return ResponseEntity.status(response.code()).body(new APIResponse<>(response.message(), true, null));
 
         logger.info("Bvn date of birth is :{}",response.body().getDateOfBirth());
 
         if (!response.body().getDateOfBirth().trim().equalsIgnoreCase(dob.trim()))
-            return ResponseEntity.badRequest().body(new APIResponse<>("Validation failed", true, null));
+            return ResponseEntity.badRequest().body(new APIResponse<>("Date of Birth Mismatch", true, null));
 
 
 
