@@ -46,7 +46,7 @@ public class UBNAccountAPIServiceHandler {
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ubnBaseURL)
                 .build();
-
+            logger.info("URL:"+ubnBaseURL);
         ubnAccountAPIService= retrofit.create(UBNAccountAPIService.class);
 
     }
@@ -75,7 +75,6 @@ public class UBNAccountAPIServiceHandler {
         UBNAuthServerTokenResponse response = getUBNAuthServerToken();
 
         logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
 
