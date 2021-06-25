@@ -72,27 +72,25 @@ public class UserConfirmationTokenService {
 
         TokenConfirm tokenConfirm = new TokenConfirm();
         String userEmail = memcachedHelperService.getValueByKey(token);
-        if (userEmail == null) {
-            tokenConfirm.setSuccess(false);
-            return tokenConfirm;
+        if (userEmail != null) {
+            User user = userService.findByEmail(userEmail).orElse(null);
+            if (user!= null) {
+                tokenConfirm.setSuccess(false);
+                keycloakService.enableKeyCloakUser(user.getUuid());
+                user.setIsEnabled(true);
+                userService.save(user);
+
+                memcachedHelperService.clear(token);
+                tokenConfirm.setSuccess(true);
+                tokenConfirm.setUserId(user.getId());
+                return tokenConfirm;
+            }else{
+                logger.info("User not found from the token");
+                return  null;
+            }
+        }else{
+            logger.info("User not found from the email got from the token");
+            return  null;
         }
-
-        User user = userService.findByEmail(userEmail).orElse(null);
-        if (user == null) {
-            tokenConfirm.setSuccess(false);
-            return tokenConfirm;
-        }
-
-        //enable keycloak user
-        keycloakService.enableKeyCloakUser(user.getUuid());
-
-        user.setIsEnabled(true);
-        userService.save(user);
-
-        memcachedHelperService.clear(token);
-        tokenConfirm.setSuccess(true);
-        tokenConfirm.setUserId(user.getId());
-
-        return tokenConfirm;
     }
 }
