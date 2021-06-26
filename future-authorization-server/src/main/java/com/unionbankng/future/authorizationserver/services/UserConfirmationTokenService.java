@@ -56,8 +56,7 @@ public class UserConfirmationTokenService {
         logger.info("Sending confirmation to {}", user.toString());
         logger.info("Activation Link:"+generatedURL);
 
-        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{generatedURL,
-                Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
+        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{generatedURL}, LocaleContextHolder.getLocale())
         ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
                 .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(user.getEmail()).displayName(user.toString()).build())).build();
 
