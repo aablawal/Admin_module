@@ -17,6 +17,7 @@ public interface UBNAccountAPIService {
 
     @POST("ubnmiserv/account/validate/bvn68")
     Call<ValidateBvnResponse> validateBVN(@Query("access_token") String accessToken, @Body ValidateBvnRequest request);
+  //BVNValidationService/verifyBVN
 
     @POST("ubnmiserv/secured/openaccount")
     Call<UBNCreateAccountResponse> openAccount(@Query("access_token") String accessToken, @Body UBNCreateAccountNewCustomerRequest request);
