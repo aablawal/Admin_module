@@ -296,9 +296,13 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         logger.info("access token is : {}",response.getAccess_token());
 
         app.print("#################################Account Opening initaited");
+        app.print("Request is:");
+        app.print(request);
         String authorization = String.format("Bearer %s",response.getAccess_token());
         Response<UBNCreateAccountNewCustomerResponse> responseData=ubnAccountAPIService.createUBNNewCustomerAccount(
                 authorization,"01",request).execute();
+
+        app.print("Response is:");
         app.print(responseData.message());
         app.print(responseData.body());
         app.print(responseData.isSuccessful());
