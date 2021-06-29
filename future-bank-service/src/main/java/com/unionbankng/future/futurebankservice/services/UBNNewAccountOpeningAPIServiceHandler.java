@@ -83,6 +83,9 @@ public class UBNNewAccountOpeningAPIServiceHandler {
     public Response<AccountProductTypeResponse> getAccountProductTypes(AccountProductTypeRequest request) throws IOException {
 
         app.print("Getting account types... ");
+        app.print("Request:");
+        app.print(request);
+
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
         logger.info("Auth token response is : {}",response);
@@ -94,6 +97,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         Response<AccountProductTypeResponse>  responseResponse= ubnAccountAPIService.getProductTypes(authorization,"01",request).execute();
+        app.print(responseResponse);
         app.print(responseResponse.body());
         app.print(responseResponse.code());
         return  responseResponse;
