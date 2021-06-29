@@ -63,6 +63,7 @@ public class UBNAccountOpeningController {
     @PostMapping("/v1/ubn_account_opening/get_account_product_types")
     public ResponseEntity<APIResponse<AccountProductTypeResponse>> getAccountProductTypes(@RequestBody AccountProductTypeRequest request) throws IOException {
 
+        app.print("#########Getting product account types");
         //determine existing or non existing customer
         Response<AccountProductTypeResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getAccountProductTypes(request);
 
