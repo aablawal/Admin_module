@@ -100,7 +100,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         app.print(responseResponse);
         app.print(responseResponse.body());
         app.print(responseResponse.code());
-        app.print(responseResponse.headers());
+        app.print(responseResponse.headers().get("ChannelCode"));
         return  responseResponse;
     }
 
