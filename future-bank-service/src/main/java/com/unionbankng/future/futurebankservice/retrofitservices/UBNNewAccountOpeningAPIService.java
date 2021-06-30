@@ -46,7 +46,7 @@ public interface UBNNewAccountOpeningAPIService {
     @GET("account-opening/account/customer/type")
     Call<UBNCustomerTypeRequest> getCustomerTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
-    @GET("account-opening/account/type")
+    @GET("account-service/account/type")
     Call<UBNAccountTypeResponse> getUBNAccountTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
 
