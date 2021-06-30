@@ -432,29 +432,37 @@ public class UBNAccountOpeningController {
             return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
                     "this account number, no new account was created", true, dataResponseResponse.body()));
 
-        CustomerBankAccount customerBankAccount = new CustomerBankAccount();
-        customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
-        customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
-        customerBankAccount.setBranchCode(request.getBranchCode());
-        customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
-        customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
-        customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
-        customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
+        app.print("Response Code: "+dataResponseResponse.isSuccessful());
+        app.print(dataResponseResponse.body().getData());
 
-        customerBankAccountService.save(customerBankAccount);
+        if(dataResponseResponse.isSuccessful()) {
+            app.print("Account Created Successfully");
+            CustomerBankAccount customerBankAccount = new CustomerBankAccount();
+            customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
+            customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
+            customerBankAccount.setBranchCode(request.getBranchCode());
+            customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
+            customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
+            customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
+            customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
 
-        logger.info("Sending confirmation to {}", jwtUserDetail.getUserFullName());
-        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
-                dataResponseResponse.body().getData().getAccountName(),dataResponseResponse.body().getData().getAccountNumber(),dataResponseResponse.body().getData().getAccountType()}
-                , LocaleContextHolder.getLocale())
-        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Bank Account Created")
-                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
-                        .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
+            customerBankAccountService.save(customerBankAccount);
 
-        emailSender.sendEmail(emailBody);
 
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
+            logger.info("Sending confirmation to {}", jwtUserDetail.getUserFullName());
+            EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
+                            dataResponseResponse.body().getData().getAccountName(), dataResponseResponse.body().getData().getAccountNumber(), dataResponseResponse.body().getData().getAccountType()}
+                    , LocaleContextHolder.getLocale())
+            ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Bank Account Created")
+                    .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
+                            .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
 
+            emailSender.sendEmail(emailBody);
+
+            return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
+        }else{
+            return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
+        }
     }
 
 }
