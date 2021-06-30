@@ -15,7 +15,7 @@ public interface UBNNewAccountOpeningAPIService {
     @GET("account-opening/account/id-card/type")
     Call<AccountIdTypesResponse> getSupportedIdCardTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
-    @POST("account-opening/account/product")
+    @POST("account-service/account/product")
     Call<AccountProductTypeResponse> getProductTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
                                                  @Body AccountProductTypeRequest request);
 
@@ -46,7 +46,7 @@ public interface UBNNewAccountOpeningAPIService {
     @GET("account-opening/account/customer/type")
     Call<UBNCustomerTypeRequest> getCustomerTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
-    @GET("account-service/account/type")
+    @GET("account-opening/account/type")
     Call<UBNAccountTypeResponse> getUBNAccountTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
 
