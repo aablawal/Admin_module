@@ -302,7 +302,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         logger.info("access token is : {}",response.getAccess_token());
 
-        app.print("#################################Account Opening initaited");
+        app.print("#################################Account Opening initiated");
         app.print("Request is:");
         app.print(request);
         String authorization = String.format("Bearer %s",response.getAccess_token());
