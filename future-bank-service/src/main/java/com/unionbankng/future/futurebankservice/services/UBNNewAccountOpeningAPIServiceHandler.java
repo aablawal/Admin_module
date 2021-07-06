@@ -307,6 +307,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         String authorization = String.format("Bearer %s",response.getAccess_token());
         request.setAnnualIncome("600000");
         request.setSourceOfIncome("work");
+        request.setProductCode("SA_040");
+
         app.print("Request is:");
         app.print(request);
         Response<UBNCreateAccountNewCustomerResponse> responseData=ubnAccountAPIService.createUBNNewCustomerAccount(
