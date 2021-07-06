@@ -79,7 +79,7 @@ public class UBNAccountAPIServiceHandler {
 
         logger.info("access token is : {}",response.getAccess_token());
 
-        return ubnAccountAPIService.validateBVN(response.getAccess_token(),request).execute();
+        return ubnAccountAPIService.validateBVN(response.getAccess_token(),"01",request).execute();
 
     }
 
@@ -93,7 +93,7 @@ public class UBNAccountAPIServiceHandler {
 
         logger.info("access token is : {}",response.getAccess_token());
 
-        return ubnAccountAPIService.verifyBVN(response.getAccess_token(),request).execute();
+        return ubnAccountAPIService.verifyBVN(response.getAccess_token(),"01",request).execute();
 
     }
 
