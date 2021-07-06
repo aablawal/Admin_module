@@ -1,9 +1,6 @@
 package com.unionbankng.future.futurebankservice.services;
 
-import com.unionbankng.future.futurebankservice.pojos.APIResponse;
-import com.unionbankng.future.futurebankservice.pojos.SidekiqBVNValidationResponse;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnRequest;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnResponse;
+import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -30,50 +27,50 @@ public class BvnValidationService {
         ValidateBvnRequest request = new ValidateBvnRequest();
         request.setBvn(bvn);
 
-
         Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
         app.print(response);
         logger.info("status: "+response.isSuccessful());
         logger.info("message: "+response.message());
         if (!response.isSuccessful())
-            return ResponseEntity.status(response.code()).body(new APIResponse<>("An error occured", false, null));
+            return ResponseEntity.status(response.code()).body(new APIResponse<>(response.message(), false, null));
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, response.body()));
     }
 
-    /*
-    dob format 25-Dec-94
-     */
-    public ResponseEntity<APIResponse<SidekiqBVNValidationResponse>> verifyCustomerBVN(String bvn,String dob) throws IOException {
+
+    public ResponseEntity<APIResponse<ValidateBvnResponse>> validateCustomerBVN(String bvn,String dob) throws IOException {
 
         ValidateBvnRequest request = new ValidateBvnRequest();
         request.setBvn(bvn);
-
-        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
-
+        Response response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
         app.print(response);
         logger.info("status: "+response.isSuccessful());
+        logger.info("message: "+response.message());
+
+        if (response.isSuccessful()) {
+              ResponseEntity<APIResponse<ValidateBvnResponse>> bvnDetails=this.getCustomerBVNDetails(bvn);
+            return bvnDetails;
+        }else{
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, null));
+        }
+    }
+
+    public ResponseEntity<APIResponse<ValidateBvnResponse>> verifyCustomerBVN(String bvn,String otp) throws IOException {
+
+        VerifyBvnRequest request = new VerifyBvnRequest();
+        request.setBvn(bvn);
+        request.setOtp(otp);
+        Response response = ubnAccountAPIServiceHandler.verifyCustomerBVN(request);
+
+          app.print(response);
+          logger.info("status: "+response.isSuccessful());
           logger.info("message: "+response.message());
-
-
-        if (!response.isSuccessful())
-            return ResponseEntity.status(response.code()).body(new APIResponse<>(response.message(), true, null));
-
-        logger.info("Bvn date of birth is :{}",response.body().getDateOfBirth());
-
-        if (!response.body().getDateOfBirth().trim().equalsIgnoreCase(dob.trim()))
-            return ResponseEntity.badRequest().body(new APIResponse<>("Date of Birth Mismatch", true, null));
-
-
-
-        SidekiqBVNValidationResponse sidekiqBVNValidationResponse = new SidekiqBVNValidationResponse();
-        sidekiqBVNValidationResponse.setFirstName(response.body().getFirstName());
-        sidekiqBVNValidationResponse.setLastName(response.body().getLastName());
-        sidekiqBVNValidationResponse.setDob(response.body().getDateOfBirth());
-        sidekiqBVNValidationResponse.setPhoneNumber(response.body().getPhoneNumber());
-
-        return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, sidekiqBVNValidationResponse));
-
+        if (response.isSuccessful()) {
+            ResponseEntity<APIResponse<ValidateBvnResponse>> bvnDetails=this.getCustomerBVNDetails(bvn);
+            return bvnDetails;
+        }else{
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, null));
+        }
     }
 }

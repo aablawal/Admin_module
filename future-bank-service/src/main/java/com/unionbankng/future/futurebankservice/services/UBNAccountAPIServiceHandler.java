@@ -84,6 +84,22 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
+    public Response verifyCustomerBVN(VerifyBvnRequest request) throws IOException {
+
+        UBNAuthServerTokenResponse response = getUBNAuthServerToken();
+
+        logger.info("Auth token response is : {}",response);
+        if(response == null)
+            return null;
+
+        logger.info("access token is : {}",response.getAccess_token());
+
+        return ubnAccountAPIService.verifyBVN(response.getAccess_token(),request).execute();
+
+    }
+
+
+
     public Response<UBNCreateAccountResponse> openAccountForNewCustomer(UBNCreateAccountNewCustomerRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();

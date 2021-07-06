@@ -4,8 +4,7 @@ package com.unionbankng.future.futurebankservice.pojos;
 import lombok.Data;
 
 @Data
-public class ValidateBvnRequest {
+public class VerifyBvnRequest {
 	private String bvn;
-	private String accountTier;
-	private String dob;
+	private String otp;
 }

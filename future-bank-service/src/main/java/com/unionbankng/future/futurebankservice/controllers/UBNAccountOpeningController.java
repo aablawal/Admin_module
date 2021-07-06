@@ -416,13 +416,13 @@ public class UBNAccountOpeningController {
         app.print(responseResponse.body());
         app.print(responseResponse.message());
 
-        if (responseResponse.isSuccessful() && responseResponse.body().getStatusCode().equals("00") && responseResponse.code()==200) {
+        if (responseResponse.isSuccessful() && responseResponse.body().getStatusCode().equals("00") && responseResponse.code() == 200) {
             app.print("Account Created Successfully");
 
             Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
                     .getUBNAccountDetails(request.getCustomerRecordId());
 
-            if (dataResponseResponse.isSuccessful() && dataResponseResponse.body().getStatusCode().equals("00") && dataResponseResponse.code()==200) {
+            if (dataResponseResponse.isSuccessful() && dataResponseResponse.body().getStatusCode().equals("00") && dataResponseResponse.code() == 200) {
 
                 if (!dataResponseResponse.isSuccessful())
                     return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
@@ -438,8 +438,9 @@ public class UBNAccountOpeningController {
                 app.print(dataResponseResponse.body());
                 app.print("Data Get Response Code: " + dataResponseResponse.isSuccessful());
 
+                if (dataResponseResponse.body().getData().getAccountNumber() != null) {
 
-                try {
+
                     CustomerBankAccount customerBankAccount = new CustomerBankAccount();
                     customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
                     customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
@@ -461,14 +462,13 @@ public class UBNAccountOpeningController {
                     emailSender.sendEmail(emailBody);
 
                     return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
-                } catch (Exception ex) {
-                    app.print("Error while saving created account");
-                    ex.printStackTrace();
-                    return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(ex.getMessage(), false, null));
+                } else {
+                    app.print(dataResponseResponse.message());
+                    return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
                 }
-            }else{
-                return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
-
+            } else {
+                app.print(dataResponseResponse.message());
+                return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
             }
 
         } else {

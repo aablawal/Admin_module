@@ -1,17 +1,11 @@
 package com.unionbankng.future.futurebankservice.controllers;
 
 import com.unionbankng.future.futurebankservice.pojos.APIResponse;
-import com.unionbankng.future.futurebankservice.pojos.SidekiqBVNValidationResponse;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnRequest;
 import com.unionbankng.future.futurebankservice.pojos.ValidateBvnResponse;
 import com.unionbankng.future.futurebankservice.services.BvnValidationService;
-import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import retrofit2.Response;
 
 import java.io.IOException;
 
@@ -28,10 +22,13 @@ public class BVNController {
         return bvnValidationService.getCustomerBVNDetails(bvn);
     }
 
+    @PostMapping("/v1/bvn/validate_bvn")
+    public ResponseEntity<APIResponse<ValidateBvnResponse>> validateCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
+       return bvnValidationService.validateCustomerBVN(bvn,dob);
+    }
+
     @PostMapping("/v1/bvn/verify_bvn")
-    public ResponseEntity<APIResponse<SidekiqBVNValidationResponse>> verifyCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
-
-       return bvnValidationService.verifyCustomerBVN(bvn,dob);
-
+    public ResponseEntity<APIResponse<ValidateBvnResponse>> verifyCustomerBVN(@RequestParam String bvn, @RequestParam String otp) throws IOException {
+        return bvnValidationService.verifyCustomerBVN(bvn,otp);
     }
 }

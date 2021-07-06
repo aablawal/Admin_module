@@ -52,30 +52,7 @@ public class BVNTest extends AbstractTest {
 
     }
 
-    @Test
-    public void verifyCustomerBvnWrongDOBTest() throws IOException {
 
-        ValidateBvnRequest validateBvnRequest = new ValidateBvnRequest();
-        validateBvnRequest.setBvn("22234197239");
-
-        ResponseEntity<APIResponse<SidekiqBVNValidationResponse>> response = bvnValidationService.verifyCustomerBVN("22234197239","12 JUNE 2010");
-
-        assertEquals(400,response.getStatusCodeValue());
-
-    }
-
-    @Test
-    public void verifyCustomerBvnSuccessTest() throws IOException {
-
-        ValidateBvnRequest validateBvnRequest = new ValidateBvnRequest();
-        validateBvnRequest.setBvn("22234197239");
-
-        ResponseEntity<APIResponse<SidekiqBVNValidationResponse>> response = bvnValidationService.verifyCustomerBVN("22234197239","25-Dec-94");
-
-        assertEquals(200,response.getStatusCodeValue());
-        assertEquals(Boolean.TRUE,response.getBody().isSuccess());
-
-    }
 
 
 }
