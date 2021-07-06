@@ -41,13 +41,11 @@ public class UBNAccountAPIServiceHandler {
 
     @PostConstruct
     public void init() {
-
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ubnBaseURL)
                 .build();
             logger.info("URL:"+ubnBaseURL);
         ubnAccountAPIService= retrofit.create(UBNAccountAPIService.class);
-
     }
 
 
@@ -55,7 +53,6 @@ public class UBNAccountAPIServiceHandler {
 
         Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
-
         return  responseCall.execute().body();
 
     }
@@ -64,7 +61,6 @@ public class UBNAccountAPIServiceHandler {
 
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
-
         return  responseCall.execute().body();
 
     }
@@ -78,8 +74,8 @@ public class UBNAccountAPIServiceHandler {
             return null;
 
         logger.info("access token is : {}",response.getAccess_token());
-
-        return ubnAccountAPIService.validateBVN(response.getAccess_token(),"01",request).execute();
+        String authorization = String.format("Bearer %s",response.getAccess_token());
+        return ubnAccountAPIService.validateBVN(authorization,"01",request).execute();
 
     }
 
@@ -93,7 +89,8 @@ public class UBNAccountAPIServiceHandler {
 
         logger.info("access token is : {}",response.getAccess_token());
 
-        return ubnAccountAPIService.verifyBVN(response.getAccess_token(),"01",request).execute();
+        String authorization = String.format("Bearer %s",response.getAccess_token());
+        return ubnAccountAPIService.verifyBVN(authorization,"01",request).execute();
 
     }
 
@@ -178,9 +175,5 @@ public class UBNAccountAPIServiceHandler {
         return ubnAccountAPIService.accountStatement(response.getAccess_token(),request).execute();
 
     }
-
-
-
-
 
 }

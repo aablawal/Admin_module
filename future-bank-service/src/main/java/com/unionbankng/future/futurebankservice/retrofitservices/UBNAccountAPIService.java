@@ -21,6 +21,7 @@ public interface UBNAccountAPIService {
     @POST("account-service/account/validate/otp")
     Call<BVNVerificationResponse> verifyBVN(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Body VerifyBvnRequest request);
 
+
     @POST("ubnmiserv/secured/openaccount")
     Call<UBNCreateAccountResponse> openAccount(@Query("access_token") String accessToken, @Body UBNCreateAccountNewCustomerRequest request);
 
