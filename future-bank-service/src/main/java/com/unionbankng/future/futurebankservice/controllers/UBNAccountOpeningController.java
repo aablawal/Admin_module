@@ -401,7 +401,7 @@ public class UBNAccountOpeningController {
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         //create ubn account
-        UBNAccountCreationRequest ubnAccountCreationRequest = new  UBNAccountCreationRequest();
+        UBNAccountCreationRequest ubnAccountCreationRequest = new UBNAccountCreationRequest();
         ubnAccountCreationRequest.setCustomerRecordId(request.getCustomerRecordId());
         ubnAccountCreationRequest.setCustomerType(request.getCustomerType());
         ubnAccountCreationRequest.setIntroducerTag(request.getIntroducerTag());
@@ -410,69 +410,68 @@ public class UBNAccountOpeningController {
         app.print("Request:");
         app.print(ubnAccountCreationRequest);
 
-        Response<UBNCompleteAccountPaymentResponse> responseResponse=ubnNewAccountOpeningAPIServiceHandler .completeUBNAccountCreation(ubnAccountCreationRequest);
+        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(ubnAccountCreationRequest);
         app.print("Response:");
         app.print(responseResponse.body());
         app.print(responseResponse.message());
 
-       if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
-           return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
-
-
-        Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
-                .getUBNAccountDetails(request.getCustomerRecordId());
-
-        if(!dataResponseResponse.isSuccessful())
-            return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
-
-
-        if(!dataResponseResponse.body().getStatusCode().equals("00"))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse<>("An error occurred", false, dataResponseResponse.body()));
-
-
-        if(customerBankAccountService.existsByAccountNumber(dataResponseResponse.body().getData().getAccountNumber()))
-            return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
-                    "this account number, no new account was created", true, dataResponseResponse.body()));
-
-        app.print("Response Code: "+dataResponseResponse.isSuccessful());
-        app.print(dataResponseResponse.body().getData());
-
-
-
-        if(dataResponseResponse.isSuccessful() && dataResponseResponse.body().getStatusCode().equals("00")) {
+        if (responseResponse.isSuccessful() && responseResponse.body().getStatusCode().equals("00") && responseResponse.code()==200) {
             app.print("Account Created Successfully");
-            try {
-                CustomerBankAccount customerBankAccount = new CustomerBankAccount();
-                customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
-                customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
-                customerBankAccount.setBranchCode(request.getBranchCode());
-                customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
-                customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
-                customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
-                customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
 
-                customerBankAccountService.save(customerBankAccount);
-            }catch (Exception ex){
-                app.print("Error while saving created account");
-                ex.printStackTrace();
+            Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
+                    .getUBNAccountDetails(request.getCustomerRecordId());
+
+            if (dataResponseResponse.isSuccessful() && dataResponseResponse.body().getStatusCode().equals("00") && dataResponseResponse.code()==200) {
+
+                if (!dataResponseResponse.isSuccessful())
+                    return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
+
+                if (!dataResponseResponse.body().getStatusCode().equals("00"))
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse<>(dataResponseResponse.body().getStatusMessage(), false, dataResponseResponse.body()));
+
+                if (customerBankAccountService.existsByAccountNumber(dataResponseResponse.body().getData().getAccountNumber()))
+                    return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
+                            "this account number, no new account was created", true, dataResponseResponse.body()));
+
+                app.print("Response:");
+                app.print(dataResponseResponse.body());
+                app.print("Data Get Response Code: " + dataResponseResponse.isSuccessful());
+
+
+                try {
+                    CustomerBankAccount customerBankAccount = new CustomerBankAccount();
+                    customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
+                    customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
+                    customerBankAccount.setBranchCode(request.getBranchCode());
+                    customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
+                    customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
+                    customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
+                    customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
+                    customerBankAccountService.save(customerBankAccount);
+
+                    app.print("Sending confirmation");
+                    app.print(jwtUserDetail.getUserFullName());
+                    EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
+                                    dataResponseResponse.body().getData().getAccountName(), dataResponseResponse.body().getData().getAccountNumber(), dataResponseResponse.body().getData().getAccountType()}
+                            , LocaleContextHolder.getLocale())
+                    ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Bank Account Created")
+                            .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
+                                    .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
+                    emailSender.sendEmail(emailBody);
+
+                    return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
+                } catch (Exception ex) {
+                    app.print("Error while saving created account");
+                    ex.printStackTrace();
+                    return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(ex.getMessage(), false, null));
+                }
+            }else{
+                return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
+
             }
 
-
-            app.print("Sending confirmation");
-            app.print(jwtUserDetail.getUserFullName());
-            EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
-                            dataResponseResponse.body().getData().getAccountName(), dataResponseResponse.body().getData().getAccountNumber(), dataResponseResponse.body().getData().getAccountType()}
-                    , LocaleContextHolder.getLocale())
-            ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Bank Account Created")
-                    .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
-                            .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
-
-            emailSender.sendEmail(emailBody);
-
-            return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
-        }else{
-            return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
+        } else {
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
         }
     }
-
 }
