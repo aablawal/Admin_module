@@ -24,34 +24,6 @@ public class BVNTest extends AbstractTest {
     BvnValidationService bvnValidationService;
 
 
-    @Test
-    public void testValidateWrongBVN() throws IOException {
-
-        ValidateBvnRequest validateBvnRequest = new ValidateBvnRequest();
-        validateBvnRequest.setBvn("11111111111");
-
-        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(validateBvnRequest);
-
-        assertEquals(200,response.code());
-        assertEquals("01",response.body().getResponseCode());
-
-
-    }
-
-    @Test
-    public void testBVNValidationSuccess() throws IOException {
-
-        ValidateBvnRequest validateBvnRequest = new ValidateBvnRequest();
-        validateBvnRequest.setBvn("22234197239");
-
-        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(validateBvnRequest);
-
-        assertEquals(200,response.code());
-        assertEquals("00",response.body().getResponseCode());
-
-
-    }
-
 
 
 

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import retrofit2.Response;
 
 import java.io.IOException;
@@ -18,28 +17,10 @@ public class BvnValidationService {
 
     Logger logger = LoggerFactory.getLogger(BvnValidationService.class);
     private final App app;
-
-
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
 
-    public ResponseEntity<APIResponse<ValidateBvnResponse>> getCustomerBVNDetails(String bvn) throws IOException {
 
-        ValidateBvnRequest request = new ValidateBvnRequest();
-        request.setBvn(bvn);
-
-        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
-
-        app.print(response);
-        logger.info("status: "+response.isSuccessful());
-        logger.info("message: "+response.message());
-        if (!response.isSuccessful())
-            return ResponseEntity.status(response.code()).body(new APIResponse<>(response.message(), false, null));
-
-        return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, response.body()));
-    }
-
-
-    public ResponseEntity<APIResponse<ValidateBvnResponse>> validateCustomerBVN(String bvn,String dob) throws IOException {
+    public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
 
         ValidateBvnRequest request = new ValidateBvnRequest();
         request.setBvn(bvn);
@@ -50,7 +31,7 @@ public class BvnValidationService {
         app.print("Request:");
         app.print(request);
 
-        Response response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
+        Response<BVNValidationResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
         logger.info("status: "+response.isSuccessful());
         logger.info("message: "+response.message());
@@ -58,14 +39,13 @@ public class BvnValidationService {
         app.print(response);
 
         if (response.isSuccessful()) {
-              ResponseEntity<APIResponse<ValidateBvnResponse>> bvnDetails=this.getCustomerBVNDetails(bvn);
-            return bvnDetails;
+            return  ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         }else{
-            return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, null));
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), false, null));
         }
     }
 
-    public ResponseEntity<APIResponse<ValidateBvnResponse>> verifyCustomerBVN(String bvn,String otp) throws IOException {
+    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(String bvn,String otp) throws IOException {
 
         VerifyBvnRequest request = new VerifyBvnRequest();
         request.setBvn(bvn);
@@ -74,17 +54,16 @@ public class BvnValidationService {
         app.print("###Verifying customer BVN");
         app.print("Request:");
         app.print(request);
-        Response response = ubnAccountAPIServiceHandler.verifyCustomerBVN(request);
+        Response<BVNVerificationResponse> response = ubnAccountAPIServiceHandler.verifyCustomerBVN(request);
 
         logger.info("status: " + response.isSuccessful());
         logger.info("message: " + response.message());
         app.print("Response:");
         app.print(response);
         if (response.isSuccessful()) {
-            ResponseEntity<APIResponse<ValidateBvnResponse>> bvnDetails = this.getCustomerBVNDetails(bvn);
-            return bvnDetails;
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
-            return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, null));
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), false, null));
         }
     }
 }

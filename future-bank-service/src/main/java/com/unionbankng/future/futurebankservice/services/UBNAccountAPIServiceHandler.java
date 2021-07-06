@@ -4,7 +4,6 @@ import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.retrofitservices.UBNAccountAPIService;
 import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.UnsafeOkHttpClient;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -70,7 +69,7 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
-    public Response<ValidateBvnResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
+    public Response<BVNValidationResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAuthServerToken();
 
@@ -84,7 +83,7 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
-    public Response verifyCustomerBVN(VerifyBvnRequest request) throws IOException {
+    public Response<BVNVerificationResponse> verifyCustomerBVN(VerifyBvnRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAuthServerToken();
 
