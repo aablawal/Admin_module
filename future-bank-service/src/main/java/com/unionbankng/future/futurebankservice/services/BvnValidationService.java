@@ -43,10 +43,19 @@ public class BvnValidationService {
 
         ValidateBvnRequest request = new ValidateBvnRequest();
         request.setBvn(bvn);
+        request.setAccountTier("SA_040");
+        request.setDob(dob);
+
+        app.print("###Validating customer BVN");
+        app.print("Request:");
+        app.print(request);
+
         Response response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
-        app.print(response);
+
         logger.info("status: "+response.isSuccessful());
         logger.info("message: "+response.message());
+        app.print("Response:");
+        app.print(response);
 
         if (response.isSuccessful()) {
               ResponseEntity<APIResponse<ValidateBvnResponse>> bvnDetails=this.getCustomerBVNDetails(bvn);
@@ -61,15 +70,20 @@ public class BvnValidationService {
         VerifyBvnRequest request = new VerifyBvnRequest();
         request.setBvn(bvn);
         request.setOtp(otp);
+
+        app.print("###Verifying customer BVN");
+        app.print("Request:");
+        app.print(request);
         Response response = ubnAccountAPIServiceHandler.verifyCustomerBVN(request);
 
-          app.print(response);
-          logger.info("status: "+response.isSuccessful());
-          logger.info("message: "+response.message());
+        logger.info("status: " + response.isSuccessful());
+        logger.info("message: " + response.message());
+        app.print("Response:");
+        app.print(response);
         if (response.isSuccessful()) {
-            ResponseEntity<APIResponse<ValidateBvnResponse>> bvnDetails=this.getCustomerBVNDetails(bvn);
+            ResponseEntity<APIResponse<ValidateBvnResponse>> bvnDetails = this.getCustomerBVNDetails(bvn);
             return bvnDetails;
-        }else{
+        } else {
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, null));
         }
     }
