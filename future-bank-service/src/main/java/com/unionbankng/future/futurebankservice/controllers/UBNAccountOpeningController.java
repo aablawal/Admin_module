@@ -440,7 +440,6 @@ public class UBNAccountOpeningController {
 
                 if (dataResponseResponse.body().getData().getAccountNumber() != null) {
 
-
                     CustomerBankAccount customerBankAccount = new CustomerBankAccount();
                     customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
                     customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
