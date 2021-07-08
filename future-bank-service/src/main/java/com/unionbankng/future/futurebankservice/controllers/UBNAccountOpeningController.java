@@ -328,7 +328,7 @@ public class UBNAccountOpeningController {
         Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.submitDocumentsForAccount(recordId,bvn);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Unable to upload Document", false, null));
 
         //update customer account with status upload complete
 
