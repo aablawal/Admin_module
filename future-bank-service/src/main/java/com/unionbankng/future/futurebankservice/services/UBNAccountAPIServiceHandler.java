@@ -128,11 +128,19 @@ public class UBNAccountAPIServiceHandler {
 
     public Response<UBNFundTransferResponse> transferFundsUBN(UBNFundTransferRequest request) throws IOException {
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        app.print("############Funds Transfer Started");
         logger.info("Auth token response is : {}",response);
         if(response == null)
             return null;
         logger.info("access token is : {}",response.getAccess_token());
-        return ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
+        app.print("Request:");
+        app.print(request);
+        Response<UBNFundTransferResponse> responseResponse=  ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
+        app.print("Response:");
+        app.print(responseResponse.body());
+        app.print(responseResponse.code());
+        app.print(responseResponse.body().getCode());
+        return  responseResponse;
     }
 
     public Response<UBNBulkFundTransferResponse> transferBulkFundsUBN(UBNBulkFundTransferRequest request) throws IOException {
@@ -141,9 +149,14 @@ public class UBNAccountAPIServiceHandler {
         if(response == null)
             return null;
         logger.info("access token is : {}",response.getAccess_token());
-        Response<UBNBulkFundTransferResponse> response1= ubnAccountAPIService.bulkFundsTransferUBN(response.getAccess_token(),request).execute();
-        app.print(response1.code());
-        return  response1;
+        app.print("Request:");
+        app.print(request);
+        Response<UBNBulkFundTransferResponse> responseResponse= ubnAccountAPIService.bulkFundsTransferUBN(response.getAccess_token(),request).execute();
+        app.print("Response:");
+        app.print(responseResponse.body());
+        app.print(responseResponse.code());
+        app.print(responseResponse.body().getCode());
+        return  responseResponse;
     }
 
     public Response<UbnEnquiryResponse> accountEnquiry(UbnCustomerEnquiry request) throws IOException {
