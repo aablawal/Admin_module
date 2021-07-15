@@ -1,16 +1,22 @@
 package com.unionbankng.future.futuremessagingservice.services;
+import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.futuremessagingservice.entities.MessagingToken;
 import com.unionbankng.future.futuremessagingservice.entities.Notification;
 import com.unionbankng.future.futuremessagingservice.enums.NotificationStatus;
-import com.unionbankng.future.futuremessagingservice.pojos.EmailMessage;
 import com.unionbankng.future.futuremessagingservice.pojos.NotificationBody;
 import com.unionbankng.future.futuremessagingservice.repositories.MessagingTokenRepository;
 import com.unionbankng.future.futuremessagingservice.repositories.NotificationRepository;
+import com.unionbankng.future.futuremessagingservice.util.App;
+import com.unionbankng.future.futuremessagingservice.util.EmailSender;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailAddress;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -32,9 +38,13 @@ public class NotificationService {
     private String token;
     @Value("${google.sidekiq.push_notification_server_key}")
     private String serverKey;
+    @Value("${email.sender}")
+    private String emailSenderAddress;
     private String baseURL="https://fcm.googleapis.com/fcm/send";
     @Autowired
     private RestTemplate rest;
+    private final EmailSender emailSender;
+    private final App app;
 
 
     public HttpHeaders getHeaders(){
@@ -62,6 +72,7 @@ public class NotificationService {
 
     public Notification pushNotification(Long userId, NotificationBody notificationBody){
          MessagingToken recipient= messagingTokenRepository.findTokenByUserId(notificationBody.getRecipient());
+
         if(recipient !=null) {
             try {
 
@@ -101,6 +112,13 @@ public class NotificationService {
 
                     if(notificationBody.getPriority().equals("Yes")){
                          //send an email for priority notifications
+                        app.print(notificationBody.getAttachment());
+                        EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
+                        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
+                                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email("net.rabiualiyu@gmail.com").displayName("Rabiu Aliyu").build())).build();
+
+                        emailSender.sendEmail(emailBody);
+                        logger.info("Message Queued successfully");
                     }
 
                     HttpEntity<Object> requestEntity = new HttpEntity<Object>(pushNotification, this.getHeaders());

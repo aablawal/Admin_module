@@ -32,7 +32,6 @@ public class EmailListener {
     public void receiveMessage(String json) throws JsonProcessingException {
 
         EmailBody emailBody = mapper.readValue(json, EmailBody.class);
-        emailBody.setStatus("PENDING");
         app.print(emailBody);
         logger.info("Received message: {}", emailBody.getSubject());
         EmailProvider emailProvider = new UnionEmailProvider();

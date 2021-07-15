@@ -1,6 +1,6 @@
 package com.unionbankng.future.futuremessagingservice.pojos;
 
-import com.unionbankng.future.futuremessagingservice.enums.RecipientType;
+import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,8 +10,8 @@ import java.io.Serializable;
 public @Data class EmailAddress implements Serializable {
 
     private static final long serialVersionUID = -295422703255886286L;
-    private String displayName;
-    private String email;
-    private RecipientType recipientType;
+    protected String displayName;
+    protected String email;
+    protected RecipientType recipientType;
 
 }
