@@ -75,6 +75,9 @@ public class NotificationService {
 
         if(recipient !=null) {
             try {
+                app.print("Pushing notification to:");
+                app.print(notificationBody);
+                app.print("App Token:"+recipient.getToken());
 
                 if(notificationBody.getActionType()==null)
                     notificationBody.setActionType("REDIRECT");
