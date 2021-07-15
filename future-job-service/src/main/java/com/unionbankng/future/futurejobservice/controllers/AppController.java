@@ -35,8 +35,7 @@ public class AppController {
               return ResponseEntity.ok().body(new APIResponse("Test goes here", true, null));
     }
     @PostMapping("/v1/notification/test")
-    public ResponseEntity<APIResponse<String>> testNotificationService(Principal principal){
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public ResponseEntity<APIResponse<String>> testNotificationService(){
         NotificationBody body = new NotificationBody();
         body.setBody("Testing notification");
         body.setSubject("Test");
@@ -47,7 +46,7 @@ public class AppController {
         body.setPriority("YES");
         body.setRecipientEmail("net.rabiualiyu@gmail.com");
         body.setRecipientName("Rabiu Abdul Aliyu");
-        body.setRecipient(currentUser.getUserId());
+        body.setRecipient(1l);
         notificationSender.pushNotification(body);
         return ResponseEntity.ok().body(new APIResponse("Notification Fired", true, body));
     }
