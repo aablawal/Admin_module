@@ -118,7 +118,7 @@ public class NotificationService {
 
                 }
 
-                if(notificationBody.getPriority().equals("Yes")){
+                if(notificationBody.getPriority().equals("YES")){
                     //send an email for priority notifications
                     app.print("Sending Notification to Email.....");
                     app.print(notificationBody.getAttachment());
