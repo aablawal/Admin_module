@@ -38,7 +38,7 @@ public interface UBNAccountAPIService {
     Call<UBNBulkFundTransferResponse> bulkFundsTransferUBN(@Query("access_token") String accessToken, @Body UBNBulkFundTransferRequest request);
 
     @POST("ubnmiserv/secured/cbacustomeraccountenquiry")
-    Call<UbnEnquiryResponse> accountEnquiry(@Query("access_token") String accessToken, @Body UbnCustomerEnquiry request);
+    Call<UbnCustomerAccountEnquiryResponse> accountEnquiry(@Query("access_token") String accessToken, @Body UbnCustomerEnquiryRequest request);
 
 
     @POST("ubnmiserv/secured/accountNumber")

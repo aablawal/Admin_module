@@ -159,7 +159,7 @@ public class UBNAccountAPIServiceHandler {
         return  responseResponse;
     }
 
-    public Response<UbnEnquiryResponse> accountEnquiry(UbnCustomerEnquiry request) throws IOException {
+    public Response<UbnCustomerAccountEnquiryResponse> accountEnquiry(UbnCustomerEnquiryRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
