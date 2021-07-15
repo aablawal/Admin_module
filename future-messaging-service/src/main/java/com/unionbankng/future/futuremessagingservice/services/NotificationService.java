@@ -30,7 +30,6 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private  final MessagingTokenRepository messagingTokenRepository;
-    private final EmailService emailService;
 
     @Value("${google.sidekiq.push_notification_api_key}")
     private String token;

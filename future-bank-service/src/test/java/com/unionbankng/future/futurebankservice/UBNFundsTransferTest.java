@@ -1,9 +1,6 @@
 package com.unionbankng.future.futurebankservice;
 
-import com.unionbankng.future.futurebankservice.pojos.UBNFundTransferRequest;
-import com.unionbankng.future.futurebankservice.pojos.UBNFundTransferResponse;
-import com.unionbankng.future.futurebankservice.pojos.UbnCustomerEnquiryRequest;
-import com.unionbankng.future.futurebankservice.pojos.UbnAccountEnquiryResponse;
+import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHandler;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -65,13 +62,13 @@ public class UBNFundsTransferTest extends AbstractTest {
         request.setAccountType("CASA");
 
 
-        Response<UbnAccountEnquiryResponse> transferResponseResponse = ubnAccountAPIServiceHandler.accountEnquiry(request);
+        Response<UbnCustomerAccountEnquiryResponse> transferResponseResponse = ubnAccountAPIServiceHandler.accountEnquiry(request);
 
 
         assertEquals(200,transferResponseResponse.code());
 
         logger.info(transferResponseResponse.body().toString());
-        assertEquals("00",transferResponseResponse.body().getCode());
+        assertEquals("00",transferResponseResponse.body().getAccount().getCode());
 
     }
 }
