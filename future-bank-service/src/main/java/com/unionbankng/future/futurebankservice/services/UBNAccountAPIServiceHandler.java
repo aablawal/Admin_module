@@ -169,6 +169,7 @@ public class UBNAccountAPIServiceHandler {
             return null;
 
         logger.info("access token is : {}",response.getAccess_token());
+        app.print(request);
 
         return ubnAccountAPIService.accountEnquiry(response.getAccess_token(),request).execute();
 
