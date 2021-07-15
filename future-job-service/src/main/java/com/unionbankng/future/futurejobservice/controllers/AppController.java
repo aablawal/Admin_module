@@ -47,6 +47,9 @@ public class AppController {
         body.setRecipientEmail("net.rabiualiyu@gmail.com");
         body.setRecipientName("Rabiu Abdul Aliyu");
         body.setRecipient(1l);
+        app.print("Initializing Notifications...");
+        app.print(body);
+
         notificationSender.pushNotification(body);
         return ResponseEntity.ok().body(new APIResponse("Notification Fired", true, body));
     }
