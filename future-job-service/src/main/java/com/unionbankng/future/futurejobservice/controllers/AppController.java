@@ -35,7 +35,7 @@ public class AppController {
               return ResponseEntity.ok().body(new APIResponse("Test goes here", true, null));
     }
     @PostMapping("/v1/notification/test")
-    public ResponseEntity<APIResponse<String>> testNotificationService(){
+    public ResponseEntity<APIResponse<String>> testNotificationService(Principal principal){
         NotificationBody body = new NotificationBody();
         body.setBody("Testing notification");
         body.setSubject("Test");
@@ -47,9 +47,6 @@ public class AppController {
         body.setRecipientEmail("net.rabiualiyu@gmail.com");
         body.setRecipientName("Rabiu Abdul Aliyu");
         body.setRecipient(1l);
-        app.print("Initializing Notifications...");
-        app.print(body);
-
         notificationSender.pushNotification(body);
         return ResponseEntity.ok().body(new APIResponse("Notification Fired", true, body));
     }

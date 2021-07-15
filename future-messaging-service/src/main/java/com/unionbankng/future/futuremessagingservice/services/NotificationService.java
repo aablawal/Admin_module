@@ -124,7 +124,7 @@ public class NotificationService {
                     app.print(notificationBody.getAttachment());
                     EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
                     ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
-                            .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email("net.rabiualiyu@gmail.com").displayName("Rabiu Aliyu").build())).build();
+                            .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(notificationBody.getRecipientEmail()).displayName(notificationBody.getRecipientName()).build())).build();
 
                     emailSender.sendEmail(emailBody);
                     logger.info("Message Queued successfully");
@@ -146,8 +146,8 @@ public class NotificationService {
             app.print(notificationBody.getAttachment());
             EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
             ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
-                    .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email("net.rabiualiyu@gmail.com").displayName("Rabiu Aliyu").build())).build();
-
+                    .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(notificationBody.getRecipientEmail()).displayName(notificationBody.getRecipientName()).build())).build();
+            
             emailSender.sendEmail(emailBody);
             logger.info("Message Queued successfully");
             logger.info("Recipient not found");

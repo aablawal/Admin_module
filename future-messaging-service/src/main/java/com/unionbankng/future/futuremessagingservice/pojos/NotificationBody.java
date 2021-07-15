@@ -13,6 +13,8 @@ class NotificationBody implements Serializable {
     protected String body;
     protected String subject;
     protected Long recipient;
+    protected String recipientEmail;
+    protected String recipientName;
     protected String attachment;
     protected String action;
     protected String channel;

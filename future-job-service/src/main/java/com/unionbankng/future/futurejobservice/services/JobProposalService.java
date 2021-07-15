@@ -6,6 +6,7 @@ import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
+import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.util.App;
@@ -31,11 +32,13 @@ public class JobProposalService  implements Serializable {
 
     private final App app;
     private final AppService appService;
+    private final UserService userService;
     private  final JobProposalRepository repository;
     private  final FileStoreService fileStoreService;
     private final JobRepository jobRepository;
     private Logger logger = LoggerFactory.getLogger(JobProposalService.class);
     private final NotificationSender notificationSender;
+
 
 
     public JobProposal applyJob(Principal principal, String applicationData, MultipartFile[] supporting_files)throws JsonProcessingException {
@@ -92,7 +95,8 @@ public class JobProposalService  implements Serializable {
                     if (!isEdited) {
                         //fire notification
                         Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
-                        if (currentJob != null) {
+                        User employer =userService.getUserById(proposal.getEmployerId());
+                        if (currentJob != null && employer!=null ) {
                             NotificationBody body = new NotificationBody();
                             body.setBody("You have new proposal for " + currentJob.getTitle());
                             body.setSubject("New Proposal");
@@ -101,6 +105,8 @@ public class JobProposalService  implements Serializable {
                             body.setTopic("'Job'");
                             body.setChannel("S");
                             body.setRecipient(proposal.getEmployerId());
+                            body.setRecipientEmail(employer.getEmail());
+                            body.setRecipientName(employer.getFullName());
                             notificationSender.pushNotification(body);
                         }
                     }
@@ -138,15 +144,19 @@ public class JobProposalService  implements Serializable {
             repository.delete(proposal);
             //fire notification
             Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
-            if(currentJob!=null) {
+            User user =userService.getUserById(proposal.getUserId());
+            if(currentJob!=null && user!=null) {
                 NotificationBody body = new NotificationBody();
                 body.setBody("Your proposal for  "+currentJob.getTitle()+" has been canceled");
                 body.setSubject("Proposal Canceled");
                 body.setActionType("REDIRECT");
                 body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
                 body.setTopic("'Job'");
+                body.setPriority("YES");
                 body.setChannel("S");
                 body.setRecipient(proposal.getUserId());
+                body.setRecipientEmail(user.getEmail());
+                body.setRecipientName(user.getFullName());
                 notificationSender.pushNotification(body);
             }
             //end
@@ -166,7 +176,9 @@ public class JobProposalService  implements Serializable {
             repository.save(proposal);
             //fire notification
             Job currentJob=jobRepository.findById(proposal.getJobId()).orElse(null);
-            if(currentJob!=null) {
+            User user =userService.getUserById(proposal.getUserId());
+
+            if(currentJob!=null && user!=null) {
                 NotificationBody body = new NotificationBody();
                 body.setBody("Your proposal for  "+currentJob.getTitle()+" has been rejected");
                 body.setSubject("Proposal Rejected");
@@ -174,7 +186,10 @@ public class JobProposalService  implements Serializable {
                 body.setAction("/my-jobs/proposal/preview/"+proposal.getId());
                 body.setTopic("'Job'");
                 body.setChannel("S");
+                body.setPriority("YES");
                 body.setRecipient(proposal.getUserId());
+                body.setRecipientEmail(user.getEmail());
+                body.setRecipientName(user.getFullName());
                 notificationSender.pushNotification(body);
             }
             //end
@@ -193,8 +208,11 @@ public class JobProposalService  implements Serializable {
             proposal.setPercentage(Long.valueOf(percentage));
             proposal.setBidAmount(Long.valueOf(bidAmount));
             repository.save(proposal);
+
+            User user =userService.getUserById(proposal.getUserId());
+
             //fire notification
-            if(currentJob!=null) {
+            if(currentJob!=null && user!=null) {
                 NotificationBody body = new NotificationBody();
                 body.setBody("The responsibility  for  "+currentJob.getTitle()+" has been changed to "+percentage+"% now and amount to NGN "+bidAmount+'.');
                 body.setSubject("Responsibility Change");
@@ -203,6 +221,8 @@ public class JobProposalService  implements Serializable {
                 body.setTopic("'Job'");
                 body.setChannel("S");
                 body.setRecipient(proposal.getUserId());
+                body.setRecipientEmail(user.getEmail());
+                body.setRecipientName(user.getFullName());
                 notificationSender.pushNotification(body);
             }
             //end
