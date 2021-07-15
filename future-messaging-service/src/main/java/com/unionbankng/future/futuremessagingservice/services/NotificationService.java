@@ -112,6 +112,7 @@ public class NotificationService {
 
                     if(notificationBody.getPriority().equals("Yes")){
                          //send an email for priority notifications
+                        app.print("Sending Notification to Email.....");
                         app.print(notificationBody.getAttachment());
                         EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
                         ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
@@ -129,6 +130,16 @@ public class NotificationService {
                     }
 
                 }else{
+                    app.print("Notification permission not granted");
+                    app.print("Sending Notification to Email.....");
+                    app.print(notificationBody.getAttachment());
+                    EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
+                    ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
+                            .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email("net.rabiualiyu@gmail.com").displayName("Rabiu Aliyu").build())).build();
+
+                    emailSender.sendEmail(emailBody);
+                    logger.info("Message Queued successfully");
+                    logger.info("Recipient not found");
                     logger.info("No permission token to fire push notification");
                 }
                 return notificationRepository.save(traditionalNotification);
@@ -140,6 +151,16 @@ public class NotificationService {
             }
         }
         else{
+            //send an email for priority notifications
+            app.print("InApp notification token not fund");
+            app.print("Sending Notification to Email.....");
+            app.print(notificationBody.getAttachment());
+            EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
+            ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
+                    .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email("net.rabiualiyu@gmail.com").displayName("Rabiu Aliyu").build())).build();
+
+            emailSender.sendEmail(emailBody);
+            logger.info("Message Queued successfully");
             logger.info("Recipient not found");
             return  null;
         }
