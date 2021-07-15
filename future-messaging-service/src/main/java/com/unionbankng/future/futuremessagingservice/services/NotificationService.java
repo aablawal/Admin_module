@@ -109,19 +109,6 @@ public class NotificationService {
                     pushNotification.put("notification", pushBody);
                     pushNotification.put("to", recipient.getToken());
 
-
-                    if(notificationBody.getPriority().equals("Yes")){
-                         //send an email for priority notifications
-                        app.print("Sending Notification to Email.....");
-                        app.print(notificationBody.getAttachment());
-                        EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
-                        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
-                                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email("net.rabiualiyu@gmail.com").displayName("Rabiu Aliyu").build())).build();
-
-                        emailSender.sendEmail(emailBody);
-                        logger.info("Message Queued successfully");
-                    }
-
                     HttpEntity<Object> requestEntity = new HttpEntity<Object>(pushNotification, this.getHeaders());
                     ResponseEntity<String> response = rest.exchange(baseURL, HttpMethod.POST, requestEntity, String.class);
                     if (!response.getStatusCode().is2xxSuccessful()) {
@@ -129,8 +116,10 @@ public class NotificationService {
                         logger.error(response.getBody());
                     }
 
-                }else{
-                    app.print("Notification permission not granted");
+                }
+
+                if(notificationBody.getPriority().equals("Yes")){
+                    //send an email for priority notifications
                     app.print("Sending Notification to Email.....");
                     app.print(notificationBody.getAttachment());
                     EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
@@ -139,8 +128,8 @@ public class NotificationService {
 
                     emailSender.sendEmail(emailBody);
                     logger.info("Message Queued successfully");
-                    logger.info("Recipient not found");
-                    logger.info("No permission token to fire push notification");
+                }else{
+                    app.print("Notification not a Priority one");
                 }
                 return notificationRepository.save(traditionalNotification);
 
