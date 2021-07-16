@@ -226,6 +226,9 @@ public class JobContractService implements Serializable {
                 app.print(this.escrowAccountName);
                 app.print(this.escrowAccountNumber);
 
+                app.print("Contract Details:");
+                app.print(contract);
+
                 //transfer the amount to Sidekiq main account
                 PaymentRequest payment = new PaymentRequest();
                 payment.setProposalId(contract.getProposalId());
@@ -234,8 +237,8 @@ public class JobContractService implements Serializable {
                 payment.setCreditAccountName(escrowAccountName);
                 payment.setCreditAccountNumber(escrowAccountNumber);
                 payment.setCreditAccountType("GL");
-                payment.setDebitAccountName(proposal.getAccountName());
-                payment.setDebitAccountNumber(proposal.getAccountNumber());
+                payment.setDebitAccountName(contract.getEmployerAccountName());
+                payment.setDebitAccountNumber(contract.getEmployerAccountNumber());
                 payment.setDebitAccountType("CASA");
                 payment.setPaymentReference(paymentReferenceId);
                 payment.setExecutedFor(contractReferenceId);
