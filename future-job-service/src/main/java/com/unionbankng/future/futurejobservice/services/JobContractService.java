@@ -1072,8 +1072,8 @@ public class JobContractService implements Serializable {
                             payment.setCreditAccountName(escrowAccountName);
                             payment.setCreditAccountNumber(escrowAccountNumber);
                             payment.setCreditAccountType("GL");
-                            payment.setDebitAccountName(proposal.getAccountName());
-                            payment.setDebitAccountNumber(proposal.getAccountNumber());
+                            payment.setDebitAccountName(contract.getEmployerAccountName());
+                            payment.setDebitAccountNumber(contract.getEmployerAccountNumber());
                             payment.setDebitAccountType("CASA");
                             payment.setPaymentReference(paymentReferenceId);
                             payment.setExecutedFor(contract.getContractReference());
