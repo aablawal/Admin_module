@@ -40,30 +40,6 @@ class JobContractServiceTest {
         Assert.assertEquals(jobId,savedRequest.getJobId());
     }
 
-    @Test
-    void requestContractExtension(){
-        JobContractExtension extensionRequest = new JobContractExtension();
-        extensionRequest.setUserId(userId);
-        extensionRequest.setProposalId(proposalId);
-        extensionRequest.setEmployerId(userId);
-        extensionRequest.setJobId(jobId);
-        extensionRequest.setStatus(Status.AC);
-        extensionRequest.setReason("Unable to make it");
-        JobContractExtension savedRequest=jobContractService.requestContractExtension("Test User", extensionRequest);
-        Assert.assertEquals(jobId,savedRequest.getJobId());
-    }
-    @Test
-    void approveContractExtension() {
-        JobContractExtension extensionRequest = new JobContractExtension();
-        extensionRequest.setUserId(userId);
-        extensionRequest.setProposalId(proposalId);
-        extensionRequest.setEmployerId(userId);
-        extensionRequest.setJobId(jobId);
-        extensionRequest.setStatus(Status.AC);
-        extensionRequest.setReason("Unable to make it");
-        JobContractExtension savedRequest=jobContractService.approveContractExtension("Test User", extensionRequest);
-        Assert.assertEquals(jobId,savedRequest.getJobId());
-    }
 
     @Test
     void submitJob() {

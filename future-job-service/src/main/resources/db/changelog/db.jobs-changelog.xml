@@ -82,4 +82,9 @@
             <column name="team_size" type="bigint"/>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1625052436571-3">
+        <addColumn tableName="jobs">
+            <column name="terms" type="bit"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

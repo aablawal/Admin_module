@@ -27,7 +27,7 @@ public class NotificationListener {
         NotificationBody notificationBody = mapper.readValue(json, NotificationBody.class);
         logger.info("Notification message Received: {}", notificationBody.getSubject());
         try {
-            notificationService.pushNotification(Long.valueOf(0),notificationBody);
+            notificationService.pushNotification(notificationBody.getRecipient(),notificationBody);
         } catch (Exception e) {
             e.printStackTrace();
         }

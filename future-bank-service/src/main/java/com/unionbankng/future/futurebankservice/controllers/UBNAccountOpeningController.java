@@ -33,8 +33,6 @@ import java.util.Arrays;
 @RequestMapping(path = "api")
 public class UBNAccountOpeningController {
 
-    Logger logger = LoggerFactory.getLogger(UBNAccountOpeningController.class);
-
     private final App app;
     private final UBNNewAccountOpeningAPIServiceHandler ubnNewAccountOpeningAPIServiceHandler;
     private final CustomerBankAccountService customerBankAccountService;
@@ -51,7 +49,7 @@ public class UBNAccountOpeningController {
         Response<AccountIdTypesResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getSupportedIdTypesForAccount();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -63,11 +61,12 @@ public class UBNAccountOpeningController {
     @PostMapping("/v1/ubn_account_opening/get_account_product_types")
     public ResponseEntity<APIResponse<AccountProductTypeResponse>> getAccountProductTypes(@RequestBody AccountProductTypeRequest request) throws IOException {
 
+        app.print("#########Getting product account types");
         //determine existing or non existing customer
         Response<AccountProductTypeResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getAccountProductTypes(request);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -83,7 +82,7 @@ public class UBNAccountOpeningController {
         Response<ProductDetailsResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getAccountProductDetails(productCode);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -99,7 +98,7 @@ public class UBNAccountOpeningController {
         Response<UBNCountryResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getCountriesForAccount();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -116,7 +115,7 @@ public class UBNAccountOpeningController {
         Response<UBNCustomerTypeRequest> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getSourceOfFund();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -134,7 +133,7 @@ public class UBNAccountOpeningController {
         Response<UBNStateByCountryResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getStatesByCountryForAccount(countryCode);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -151,7 +150,7 @@ public class UBNAccountOpeningController {
         Response<UBNCitiesResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getCitiesByCountryAndStateForAccount(countryCode,stateCode);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -167,7 +166,7 @@ public class UBNAccountOpeningController {
         Response<UBNBranchesResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getUBNBranches();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -183,7 +182,7 @@ public class UBNAccountOpeningController {
         Response<AccountProductTypeResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getUBNGenders();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -199,7 +198,7 @@ public class UBNAccountOpeningController {
         Response<AccountProductTypeResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getMaritalStatus();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -215,7 +214,7 @@ public class UBNAccountOpeningController {
         Response<UBNCustomerTypeRequest> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getCustomerTypes();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -232,7 +231,7 @@ public class UBNAccountOpeningController {
         Response<UBNAccountTypeResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getUBNAccountTypes();
         app.print(responseResponse);
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
 
@@ -245,7 +244,7 @@ public class UBNAccountOpeningController {
         Response<UBNCustomerSegmentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getCustomersSegment();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -262,7 +261,7 @@ public class UBNAccountOpeningController {
         Response<UBNCreateAccountNewCustomerResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.createUBNNewCustomerAccount(request);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true,responseResponse.body()));
@@ -276,7 +275,7 @@ public class UBNAccountOpeningController {
         Response<AccountProductTypeResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getDocumentTypes(productCode);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -293,7 +292,7 @@ public class UBNAccountOpeningController {
                 .getUBNAccountDetails(recordId);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
 
@@ -305,13 +304,13 @@ public class UBNAccountOpeningController {
     public ResponseEntity<APIResponse<UBNGenericResponse>> uploadDocumentForAccount(@PathVariable Integer type,
                                                                                             @PathVariable Long recordId, @RequestPart("file") MultipartFile file) throws IOException {
 
-        logger.info("file size is {}",file.getSize());
-        logger.info("file name is {}",file.getOriginalFilename());
+        app.print("file size is {}"+file.getSize());
+        app.print("file name is {}"+file.getOriginalFilename());
         //determine existing or non existing customer
         Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.uploadDocumentForAccount(recordId,type,file);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer account with status upload complete
 
@@ -329,7 +328,7 @@ public class UBNAccountOpeningController {
         Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.submitDocumentsForAccount(recordId,bvn);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Unable to upload Document", false, null));
 
         //update customer account with status upload complete
 
@@ -347,7 +346,7 @@ public class UBNAccountOpeningController {
         Response<UBNAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.accountPaymentUBN1(customerId,isReactivated,request);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -365,7 +364,7 @@ public class UBNAccountOpeningController {
         Response<UBNAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.accountPaymentUBN2(customerId,oldAccount,request);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -385,7 +384,7 @@ public class UBNAccountOpeningController {
         Response<UBNGenericResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.confirmUBNPaymentStatus(customerId);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
 
         //update customer details with account number
 
@@ -402,58 +401,71 @@ public class UBNAccountOpeningController {
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
 
         //create ubn account
-        UBNAccountCreationRequest ubnAccountCreationRequest = new  UBNAccountCreationRequest();
+        UBNAccountCreationRequest ubnAccountCreationRequest = new UBNAccountCreationRequest();
         ubnAccountCreationRequest.setCustomerRecordId(request.getCustomerRecordId());
         ubnAccountCreationRequest.setCustomerType(request.getCustomerType());
         ubnAccountCreationRequest.setIntroducerTag(request.getIntroducerTag());
 
-        logger.info("UBN account create request  is :{}",ubnAccountCreationRequest);
+        app.print("ACCOUNT OPENING");
+        app.print("################Completing account opening.......");
+        app.print("Request:");
+        app.print(ubnAccountCreationRequest);
 
-        ubnNewAccountOpeningAPIServiceHandler
-                .completeUBNAccountCreation(ubnAccountCreationRequest);
+        Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(ubnAccountCreationRequest);
+        app.print("Response:");
+        app.print(responseResponse.body());
+        app.print(responseResponse.message());
 
-//        if(responseResponse.code() == 200 && !responseResponse.body().getStatusCode().equals("00"))
-//            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
+        if (request.getCustomerRecordId() != null) {
+            Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
+                    .getUBNAccountDetails(request.getCustomerRecordId());
 
-        Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
-                .getUBNAccountDetails(request.getCustomerRecordId());
+            app.print("Response:");
+            app.print(dataResponseResponse.body());
+            app.print("Data Get Response Code: " + dataResponseResponse.isSuccessful());
 
-        if(!dataResponseResponse.isSuccessful())
-            return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(dataResponseResponse.message(), false, null));
+            if (!dataResponseResponse.isSuccessful())
+                return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
+
+            if (!dataResponseResponse.body().getStatusCode().equals("00"))
+                return ResponseEntity.ok().body(new APIResponse<>(dataResponseResponse.body().getStatusMessage(), false, dataResponseResponse.body()));
+
+            if (customerBankAccountService.existsByAccountNumber(dataResponseResponse.body().getData().getAccountNumber()))
+                return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
+                        "this account number, no new account was created", true, dataResponseResponse.body()));
 
 
-        if(!dataResponseResponse.body().getStatusCode().equals("00"))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse<>("An error occurred", false, dataResponseResponse.body()));
+            if (dataResponseResponse.body().getData().getAccountNumber() != null) {
 
-        logger.info("Response  is :{}",dataResponseResponse);
+                CustomerBankAccount customerBankAccount = new CustomerBankAccount();
+                customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
+                customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
+                customerBankAccount.setBranchCode(request.getBranchCode());
+                customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
+                customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
+                customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
+                customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
+                customerBankAccountService.save(customerBankAccount);
 
-        if(customerBankAccountService.existsByAccountNumber(dataResponseResponse.body().getData().getAccountNumber()))
-            return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
-                    "this account number, no new account was created", true, dataResponseResponse.body()));
+                app.print("Sending confirmation");
+                app.print(jwtUserDetail.getUserFullName());
+                EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
+                                dataResponseResponse.body().getData().getAccountName(), dataResponseResponse.body().getData().getAccountNumber(), dataResponseResponse.body().getData().getAccountType()}
+                        , LocaleContextHolder.getLocale())
+                ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Bank Account Created")
+                        .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
+                                .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
+                emailSender.sendEmail(emailBody);
 
-        CustomerBankAccount customerBankAccount = new CustomerBankAccount();
-        customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
-        customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
-        customerBankAccount.setBranchCode(request.getBranchCode());
-        customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
-        customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
-        customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
-        customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
+                return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
 
-        customerBankAccountService.save(customerBankAccount);
-
-        logger.info("Sending confirmation to {}", jwtUserDetail.getUserFullName());
-        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("new.bank.account.message", new String[]{jwtUserDetail.getUserFullName(),
-                dataResponseResponse.body().getData().getAccountName(),dataResponseResponse.body().getData().getAccountNumber(),dataResponseResponse.body().getData().getAccountType()}
-                , LocaleContextHolder.getLocale())
-        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Bank Account Created")
-                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
-                        .email(jwtUserDetail.getUserEmail()).displayName(jwtUserDetail.getUserFullName()).build())).build();
-
-        emailSender.sendEmail(emailBody);
-
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
-
+            } else {
+                app.print(dataResponseResponse.message());
+                return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
+            }
+        } else {
+            app.print(responseResponse.message());
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
+        }
     }
-
 }

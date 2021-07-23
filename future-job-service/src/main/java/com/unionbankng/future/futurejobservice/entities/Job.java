@@ -64,6 +64,7 @@ public class Job implements Serializable {
     private Date publishDate;
     @Temporal(TemporalType.DATE)
     private Date lastModifiedDate;
+    private Boolean terms;
     @Temporal(TemporalType.DATE)
     private Date createdAt;
 

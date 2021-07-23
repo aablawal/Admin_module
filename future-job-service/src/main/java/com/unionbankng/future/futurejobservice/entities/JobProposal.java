@@ -65,6 +65,7 @@ public class JobProposal implements Serializable {
     private Date endDate;
     @Temporal(TemporalType.DATE)
     private Date lastModifiedDate;
+    private Boolean terms;
     @Temporal(TemporalType.DATE)
     private Date createdAt;
 

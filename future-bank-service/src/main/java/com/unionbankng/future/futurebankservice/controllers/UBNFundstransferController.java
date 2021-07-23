@@ -50,18 +50,22 @@ public class UBNFundstransferController {
     }
 
     @PostMapping("/v1/ubn/account_inquiry")
-    public ResponseEntity<APIResponse<UbnEnquiryResponse>> accountEnquiry(@RequestBody UbnCustomerEnquiry request) throws IOException {
+    public ResponseEntity<APIResponse<UbnAccountEnquiryResponse>> accountEnquiry(@RequestBody UbnCustomerEnquiryRequest request) throws IOException {
 
+        app.print("##########Starting Account Enquiry...");
+        app.print("Request:");
+        app.print(request);
         //determine existing or non existing customer
-        Response<UbnEnquiryResponse> responseResponse = ubnAccountAPIServiceHandler.accountEnquiry(request);
+        Response<UbnCustomerAccountEnquiryResponse> responseResponse = ubnAccountAPIServiceHandler.accountEnquiry(request);
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
 
         //update customer details with account number
+        app.print("Response:");
+        app.print(responseResponse.body());
 
-
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body().getAccount()));
 
     }
 

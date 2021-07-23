@@ -2,13 +2,18 @@ package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.entities.JobBulkPayment;
+import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
+import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.PaymentRequest;
 import com.unionbankng.future.futurejobservice.services.JobPaymentService;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
+import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 
 @RestController
@@ -17,6 +22,7 @@ import java.util.ArrayList;
 public class AppController {
 
     private final JobPaymentService jobPaymentService;
+    private final NotificationSender notificationSender;
     private final App app;
 
     @GetMapping("/v1/ping")
@@ -24,10 +30,25 @@ public class AppController {
         app.print("Pinging....");
         return ResponseEntity.ok().body( new APIResponse("Service is Up", true, "Live"));
     }
-
     @PostMapping("/v1/test")
     public ResponseEntity<APIResponse<String>> testService(){
-        return ResponseEntity.ok().body(new APIResponse("Nothing to test", true, "Test  result goes here"));
+              return ResponseEntity.ok().body(new APIResponse("Test goes here", true, null));
+    }
+    @PostMapping("/v1/notification/test")
+    public ResponseEntity<APIResponse<String>> testNotificationService(Principal principal){
+        NotificationBody body = new NotificationBody();
+        body.setBody("Testing notification");
+        body.setSubject("Test");
+        body.setActionType("REDIRECT");
+        body.setAction("https://example.com");
+        body.setTopic("Job");
+        body.setChannel("S");
+        body.setPriority("YES");
+        body.setRecipientEmail("net.rabiualiyu@gmail.com");
+        body.setRecipientName("Rabiu Abdul Aliyu");
+        body.setRecipient(1l);
+        notificationSender.pushNotification(body);
+        return ResponseEntity.ok().body(new APIResponse("Notification Fired", true, body));
     }
 
     @PostMapping("/v1/bulk/bank_transfer/test")

@@ -3,7 +3,7 @@ package com.unionbankng.future.futurebankservice.pojos;
 import lombok.Data;
 
 @Data
-public class UbnEnquiryResponse {
+public class UbnAccountEnquiryResponse {
 
 	 private String code;
 	 private String message;

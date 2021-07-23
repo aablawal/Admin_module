@@ -2,6 +2,7 @@ package com.unionbankng.future.futurebankservice.services;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.retrofitservices.UBNNewAccountOpeningAPIService;
+import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.UnsafeOkHttpClient;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -9,6 +10,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
     private Map<String, String> credentials;
 
     private UBNNewAccountOpeningAPIService ubnAccountAPIService;
-
+    @Autowired
+    private  App app;
     OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
 
     @PostConstruct
@@ -79,6 +82,10 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<AccountProductTypeResponse> getAccountProductTypes(AccountProductTypeRequest request) throws IOException {
 
+        app.print("Getting account types... ");
+        app.print("Request:");
+        app.print(request);
+
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
         logger.info("Auth token response is : {}",response);
@@ -89,8 +96,11 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
-        return ubnAccountAPIService.getProductTypes(authorization,"01",request).execute();
-
+        Response<AccountProductTypeResponse>  responseResponse= ubnAccountAPIService.getProductTypes(authorization,"01",request).execute();
+        app.print(responseResponse);
+        app.print(responseResponse.body());
+        app.print(responseResponse.code());
+        return  responseResponse;
     }
 
     public Response<ProductDetailsResponse> getAccountProductDetails(String productCode) throws IOException {
@@ -292,10 +302,25 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         logger.info("access token is : {}",response.getAccess_token());
 
+        app.print("#################################Account Opening initiated");
+
         String authorization = String.format("Bearer %s",response.getAccess_token());
-        return ubnAccountAPIService.createUBNNewCustomerAccount(
+        request.setAnnualIncome("600000");
+        request.setSourceOfIncome("work");
+        request.setProductCode("SA_040");
+
+        app.print("Request is:");
+        app.print(request);
+        Response<UBNCreateAccountNewCustomerResponse> responseData=ubnAccountAPIService.createUBNNewCustomerAccount(
                 authorization,"01",request).execute();
 
+        app.print("Response is:");
+        app.print(responseData.message());
+        app.print(responseData.body());
+        app.print(responseData.isSuccessful());
+
+        app.print("Done");
+        return  responseData;
     }
 
 

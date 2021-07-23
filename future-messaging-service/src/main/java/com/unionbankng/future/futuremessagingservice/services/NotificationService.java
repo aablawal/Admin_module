@@ -1,11 +1,15 @@
 package com.unionbankng.future.futuremessagingservice.services;
+import com.unionbankng.future.futuremessagingservice.enums.RecipientType;
 import com.unionbankng.future.futuremessagingservice.entities.MessagingToken;
 import com.unionbankng.future.futuremessagingservice.entities.Notification;
 import com.unionbankng.future.futuremessagingservice.enums.NotificationStatus;
-import com.unionbankng.future.futuremessagingservice.pojos.EmailMessage;
 import com.unionbankng.future.futuremessagingservice.pojos.NotificationBody;
 import com.unionbankng.future.futuremessagingservice.repositories.MessagingTokenRepository;
 import com.unionbankng.future.futuremessagingservice.repositories.NotificationRepository;
+import com.unionbankng.future.futuremessagingservice.util.App;
+import com.unionbankng.future.futuremessagingservice.util.EmailSender;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailAddress;
+import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,15 +30,18 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private  final MessagingTokenRepository messagingTokenRepository;
-    private final EmailService emailService;
 
     @Value("${google.sidekiq.push_notification_api_key}")
     private String token;
     @Value("${google.sidekiq.push_notification_server_key}")
     private String serverKey;
+    @Value("${email.sender}")
+    private String emailSenderAddress;
     private String baseURL="https://fcm.googleapis.com/fcm/send";
     @Autowired
     private RestTemplate rest;
+    private final EmailSender emailSender;
+    private final App app;
 
 
     public HttpHeaders getHeaders(){
@@ -62,8 +69,12 @@ public class NotificationService {
 
     public Notification pushNotification(Long userId, NotificationBody notificationBody){
          MessagingToken recipient= messagingTokenRepository.findTokenByUserId(notificationBody.getRecipient());
+
         if(recipient !=null) {
             try {
+                app.print("Pushing notification to:");
+                app.print(notificationBody);
+                app.print("App Token:"+recipient.getToken());
 
                 if(notificationBody.getActionType()==null)
                     notificationBody.setActionType("REDIRECT");
@@ -98,11 +109,6 @@ public class NotificationService {
                     pushNotification.put("notification", pushBody);
                     pushNotification.put("to", recipient.getToken());
 
-
-                    if(notificationBody.getPriority().equals("Yes")){
-                         //send an email for priority notifications
-                    }
-
                     HttpEntity<Object> requestEntity = new HttpEntity<Object>(pushNotification, this.getHeaders());
                     ResponseEntity<String> response = rest.exchange(baseURL, HttpMethod.POST, requestEntity, String.class);
                     if (!response.getStatusCode().is2xxSuccessful()) {
@@ -110,8 +116,20 @@ public class NotificationService {
                         logger.error(response.getBody());
                     }
 
+                }
+
+                if(notificationBody.getPriority().equals("YES")){
+                    //send an email for priority notifications
+                    app.print("Sending Notification to Email.....");
+                    app.print(notificationBody.getAttachment());
+                    EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
+                    ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
+                            .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(notificationBody.getRecipientEmail()).displayName(notificationBody.getRecipientName()).build())).build();
+
+                    emailSender.sendEmail(emailBody);
+                    logger.info("Message Queued successfully");
                 }else{
-                    logger.info("No permission token to fire push notification");
+                    app.print("Notification not a Priority one");
                 }
                 return notificationRepository.save(traditionalNotification);
 
@@ -122,6 +140,16 @@ public class NotificationService {
             }
         }
         else{
+            //send an email for priority notifications
+            app.print("InApp notification token not fund");
+            app.print("Sending Notification to Email.....");
+            app.print(notificationBody.getAttachment());
+            EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
+            ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
+                    .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(notificationBody.getRecipientEmail()).displayName(notificationBody.getRecipientName()).build())).build();
+            
+            emailSender.sendEmail(emailBody);
+            logger.info("Message Queued successfully");
             logger.info("Recipient not found");
             return  null;
         }

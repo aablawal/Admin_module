@@ -4,10 +4,12 @@ import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.TeamMember;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -39,8 +42,9 @@ public class JobService {
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
-    public Job addJob( String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
+    public Job addJob(Principal principal, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
         try {
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             String supporting_file_names = null;
             String nda_file_names=null;
             Job job = new ObjectMapper().readValue(jobData, Job.class);
@@ -127,13 +131,16 @@ public class JobService {
                                         jobTeamDetailsRepository.save(teamMemberDetails);
 
                                         NotificationBody body = new NotificationBody();
-                                        body.setBody("Dear " + teamMemberDetails.getFullName() + ", you have been invited to work on " + savedJob.getTitle() + ".");
+                                        body.setBody("Hello! " + teamMemberDetails.getFullName() + ", you have been invited to work on " + savedJob.getTitle() + ".");
                                         body.setSubject("Job Invitation");
                                         body.setActionType("REDIRECT");
                                         body.setAction("/job/details/" + savedJob.getId());
                                         body.setTopic("'Job'");
                                         body.setChannel("S");
+                                        body.setPriority("YES");
                                         body.setRecipient(teamMemberDetails.getId());
+                                        body.setRecipientEmail(teamMemberDetails.getFullName());
+                                        body.setRecipientName(teamMemberDetails.getEmail());
                                         notificationSender.pushNotification(body);
                                         logger.info("Notification fired");
 
@@ -147,6 +154,7 @@ public class JobService {
                 //fire notification
                 Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
                 if (currentJob != null) {
+
                     NotificationBody body = new NotificationBody();
                     body.setBody("Your job for " + currentJob.getTitle() + " has been published");
                     body.setSubject("Job Published");
@@ -154,7 +162,10 @@ public class JobService {
                     body.setAction("/job/details/" + savedJob.getId());
                     body.setTopic("'Job'");
                     body.setChannel("S");
+                    body.setPriority("YES");
                     body.setRecipient(savedJob.getOid());
+                    body.setRecipientEmail(currentUser.getUserFullName());
+                    body.setRecipientName(currentUser.getUserFullName());
                     notificationSender.pushNotification(body);
                     logger.info("Notification fired");
                 } else {
@@ -186,7 +197,8 @@ public class JobService {
     }
 
 
-    public Job closeJobById(Long id, int state){
+    public Job closeJobById(Principal principal, Long id, int state){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             if (state == 1)
@@ -205,6 +217,8 @@ public class JobService {
             body.setChannel("S");
             body.setPriority("NORMAL");
             body.setRecipient(job.getOid());
+            body.setRecipientEmail(currentUser.getUserFullName());
+            body.setRecipientName(currentUser.getUserFullName());
             notificationSender.pushNotification(body);
             logger.info("Notification fired");
             return jobRepository.save(job);
@@ -214,7 +228,8 @@ public class JobService {
         }
     }
 
-    public Job repeatJobById(Long id){
+    public Job repeatJobById(Principal principal, Long id){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
 
@@ -247,6 +262,8 @@ public class JobService {
                 body.setChannel("S");
                 body.setPriority("NORMAL");
                 body.setRecipient(job.getOid());
+                body.setRecipientEmail(currentUser.getUserFullName());
+                body.setRecipientName(currentUser.getUserFullName());
                 notificationSender.pushNotification(body);
             }
             //end

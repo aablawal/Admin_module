@@ -1,15 +1,12 @@
 package com.unionbankng.future.futurebankservice.services;
 
-import com.unionbankng.future.futurebankservice.pojos.APIResponse;
-import com.unionbankng.future.futurebankservice.pojos.SidekiqBVNValidationResponse;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnRequest;
-import com.unionbankng.future.futurebankservice.pojos.ValidateBvnResponse;
+import com.unionbankng.future.futurebankservice.pojos.*;
+import com.unionbankng.future.futurebankservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import retrofit2.Response;
 
 import java.io.IOException;
@@ -19,53 +16,54 @@ import java.io.IOException;
 public class BvnValidationService {
 
     Logger logger = LoggerFactory.getLogger(BvnValidationService.class);
-
-
+    private final App app;
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
 
-    public ResponseEntity<APIResponse<ValidateBvnResponse>> getCustomerBVNDetails(String bvn) throws IOException {
+
+    public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
 
         ValidateBvnRequest request = new ValidateBvnRequest();
         request.setBvn(bvn);
+        request.setAccountTier("SA_040");
+        request.setDob(dob);
 
+        app.print("###Validating customer BVN");
+        app.print("Request:");
+        app.print(request);
 
-        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
+        Response<BVNValidationResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
-        if (!response.isSuccessful())
-            return ResponseEntity.status(response.code()).body(new APIResponse<>("An error occured", false, null));
+        logger.info("status: "+response.isSuccessful());
+        logger.info("message: "+response.message());
+        app.print("Response:");
+        app.print(response);
 
-        return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, response.body()));
+        if (response.isSuccessful()) {
+            return  ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
+        }else{
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), false, null));
+        }
     }
 
-    /*
-    dob format 25-Dec-94
-     */
-    public ResponseEntity<APIResponse<SidekiqBVNValidationResponse>> verifyCustomerBVN(String bvn,String dob) throws IOException {
+    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(String bvn,String otp) throws IOException {
 
-        ValidateBvnRequest request = new ValidateBvnRequest();
+        VerifyBvnRequest request = new VerifyBvnRequest();
         request.setBvn(bvn);
+        request.setOtp(otp);
 
-        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
+        app.print("###Verifying customer BVN");
+        app.print("Request:");
+        app.print(request);
+        Response<BVNVerificationResponse> response = ubnAccountAPIServiceHandler.verifyCustomerBVN(request);
 
-
-
-        if (!response.isSuccessful())
-            return ResponseEntity.status(response.code()).body(new APIResponse<>("Network Error", true, null));
-
-        logger.info("Bvn date of birth is :{}",response.body().getDateOfBirth());
-
-        if (!response.body().getDateOfBirth().trim().equalsIgnoreCase(dob.trim()))
-            return ResponseEntity.badRequest().body(new APIResponse<>("Validation failed", true, null));
-
-
-
-        SidekiqBVNValidationResponse sidekiqBVNValidationResponse = new SidekiqBVNValidationResponse();
-        sidekiqBVNValidationResponse.setFirstName(response.body().getFirstName());
-        sidekiqBVNValidationResponse.setLastName(response.body().getLastName());
-        sidekiqBVNValidationResponse.setDob(response.body().getDateOfBirth());
-        sidekiqBVNValidationResponse.setPhoneNumber(response.body().getPhoneNumber());
-
-        return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, sidekiqBVNValidationResponse));
-
+        logger.info("status: " + response.isSuccessful());
+        logger.info("message: " + response.message());
+        app.print("Response:");
+        app.print(response);
+        if (response.isSuccessful()) {
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
+        } else {
+            return ResponseEntity.ok().body(new APIResponse<>(response.message(), false, null));
+        }
     }
 }

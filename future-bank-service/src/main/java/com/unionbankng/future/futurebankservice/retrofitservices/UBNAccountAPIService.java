@@ -15,8 +15,12 @@ public interface UBNAccountAPIService {
                                                   @Query("client_secret") String clientSecret,@Query("grant_type") String grantType,
                                                   @Query("client_id") String clientId);
 
-    @POST("BVNValidationService/verifyBVN")
-    Call<ValidateBvnResponse> validateBVN(@Query("access_token") String accessToken, @Body ValidateBvnRequest request);
+    @POST("account-service/account/validate/bvn")
+    Call<BVNValidationResponse> validateBVN(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Body ValidateBvnRequest request);
+
+    @POST("account-service/account/validate/otp")
+    Call<BVNVerificationResponse> verifyBVN(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Body VerifyBvnRequest request);
+
 
     @POST("ubnmiserv/secured/openaccount")
     Call<UBNCreateAccountResponse> openAccount(@Query("access_token") String accessToken, @Body UBNCreateAccountNewCustomerRequest request);
@@ -33,8 +37,8 @@ public interface UBNAccountAPIService {
     @POST("ubnmiserv/secured/cbamultipleposting")
     Call<UBNBulkFundTransferResponse> bulkFundsTransferUBN(@Query("access_token") String accessToken, @Body UBNBulkFundTransferRequest request);
 
-    @POST("ubnmiserv/secured/cbaaccountenquiry")
-    Call<UbnEnquiryResponse> accountEnquiry(@Query("access_token") String accessToken, @Body UbnCustomerEnquiry request);
+    @POST("ubnmiserv/secured/cbacustomeraccountenquiry")
+    Call<UbnCustomerAccountEnquiryResponse> accountEnquiry(@Query("access_token") String accessToken, @Body UbnCustomerEnquiryRequest request);
 
 
     @POST("ubnmiserv/secured/accountNumber")
