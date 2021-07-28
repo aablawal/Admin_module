@@ -49,11 +49,9 @@ public class UBNAccountOpeningController {
         Response<AccountIdTypesResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.getSupportedIdTypesForAccount();
 
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getStatusMessage(), false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Request Failed", false, null));
 
         //update customer details with account number
-
-
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
 
     }
