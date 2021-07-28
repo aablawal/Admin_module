@@ -426,7 +426,7 @@ public class UBNAccountOpeningController {
                 return ResponseEntity.status(dataResponseResponse.code()).body(new APIResponse<>("Request Failed", false, null));
 
             if (!dataResponseResponse.body().getStatusCode().equals("00"))
-                return ResponseEntity.ok().body(new APIResponse<>(dataResponseResponse.body().getStatusMessage(), false, dataResponseResponse.body()));
+                return ResponseEntity.ok().body(new APIResponse<>("Request Failed", false, dataResponseResponse.body()));
 
             if (customerBankAccountService.existsByAccountNumber(dataResponseResponse.body().getData().getAccountNumber()))
                 return ResponseEntity.ok().body(new APIResponse<>("We noticed you already have an account with " +
