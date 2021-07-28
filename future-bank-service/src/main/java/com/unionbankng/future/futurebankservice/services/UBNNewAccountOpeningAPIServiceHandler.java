@@ -56,10 +56,20 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
 
+        app.print("############## GENERATING UBN TOKEN");
+        app.print("Request:");
+        app.print(credentials);
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
 
-        return  responseCall.execute().body();
+        Response<UBNAuthServerTokenResponse> response =  responseCall.execute();
+
+
+        app.print("Response");
+        app.print(response);
+        app.print(response.body());
+
+        return  response.body();
 
     }
 
