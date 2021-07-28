@@ -41,7 +41,7 @@ public class UBNConfigurationProperties {
     }
 
 
-    @Value("${unionbankng.credentials}")
+    @Value("#{${unionbankng.credentials}}")
     public void setCredentials(Map<String, String> credentials) {
         CLIENT_SECRET = credentials.get("clientSecret");
         CLIENT_ID = credentials.get("clientId");
