@@ -28,6 +28,7 @@ public class UnionEmailProvider implements EmailProvider {
     @Override
     public void send(EmailBody emailBody) throws Exception {
 
+
         Client client = UBNConfigurationProperties.ignoreSSLClient();
         WebTarget target = client.target(UBNConfigurationProperties.EMAIL_URL);
 
