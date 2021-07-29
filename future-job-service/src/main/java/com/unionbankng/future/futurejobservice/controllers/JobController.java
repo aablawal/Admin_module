@@ -105,6 +105,11 @@ public class JobController {
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobsByType(JobType.valueOf(type.toUpperCase()),PageRequest.of(page,size), model)));
     }
+    @GetMapping("/v1/jobs/type/{type}")
+    public ResponseEntity<APIResponse<Model>> getJobsByType(@PathVariable String type,@RequestParam String  category, @RequestParam int page, @RequestParam int size, Model model){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.findJobsByTypeAndCategory(JobType.valueOf(type.toUpperCase()),category,PageRequest.of(page,size), model)));
+    }
     @GetMapping("/v1/jobs/search/{type}")
     public ResponseEntity<APIResponse<Model>> searchJobs(@RequestParam String q, @PathVariable String type, @RequestParam int page, @RequestParam int size, Model model){
         app.print(app);
