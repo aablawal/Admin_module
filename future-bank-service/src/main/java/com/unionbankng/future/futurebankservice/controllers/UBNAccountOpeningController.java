@@ -404,8 +404,9 @@ public class UBNAccountOpeningController {
         ubnAccountCreationRequest.setCustomerType(request.getCustomerType());
         ubnAccountCreationRequest.setIntroducerTag(request.getIntroducerTag());
 
+
+        app.print("################ COMPLETING ACCOUNT OPENING.......");
         app.print("ACCOUNT OPENING");
-        app.print("################Completing account opening.......");
         app.print("Request:");
         app.print(ubnAccountCreationRequest);
 
