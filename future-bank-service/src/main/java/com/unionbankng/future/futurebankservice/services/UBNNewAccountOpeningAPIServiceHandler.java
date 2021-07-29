@@ -56,8 +56,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
 
-        app.print("############## GENERATING UBN TOKEN");
-        app.print("Request:");
+        app.print("Credentials:");
         app.print(credentials);
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
@@ -461,11 +460,19 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         logger.info("access token is : {}",response.getAccess_token());
 
+        app.print("@ACCOUNT OPENING");
+        app.print("Request:");
+        app.print(request);
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
-        return ubnAccountAPIService.completeUBNAccountCreation(
+        Response<UBNCompleteAccountPaymentResponse> ubnResponse= ubnAccountAPIService.completeUBNAccountCreation(
                 authorization,"01",request).execute();
+        app.print("Response:");
+        app.print(ubnResponse.body());
+        app.print(ubnResponse.errorBody());
+        app.print(ubnResponse.code());
 
+        return  ubnResponse;
     }
 
     public Response<UBNAccountDataResponse> getUBNAccountDetails(Long accountId) throws IOException {
