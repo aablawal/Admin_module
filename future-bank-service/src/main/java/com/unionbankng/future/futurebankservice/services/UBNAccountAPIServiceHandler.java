@@ -113,7 +113,7 @@ public class UBNAccountAPIServiceHandler {
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getAccountsByMobileNumber(
-                authorization,"01",request.getMobileNumber()).execute();
+                authorization,"01",request).execute();
 
     }
 
