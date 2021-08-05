@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -31,7 +32,6 @@ public class CustomerBankAccountController {
     private final App app;
     private final CustomerBankAccountService customerBankAccountService;
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
-    private final UBNNewAccountOpeningAPIServiceHandler ubnNewAccountOpeningAPIServiceHandler;
 
 
     @GetMapping("/v1/customer_bank_accounts")
@@ -44,8 +44,10 @@ public class CustomerBankAccountController {
     }
 
     @GetMapping("/v1/ubn_account/get_accounts_by_mobile_number")
-    public ResponseEntity<APIResponse<UBNGetAccountsResponse>> getAccountsByMobileNumber(@RequestBody UBNGetAccountsRequest request) throws IOException {
+    public ResponseEntity<APIResponse<UBNGetAccountsResponse>> getAccountsByMobileNumber(@RequestParam String number) throws IOException {
 
+        UBNGetAccountsRequest request = new UBNGetAccountsRequest();
+        request.setMobileNumber(number);
         Response<UBNGetAccountsResponse> responseResponse = ubnAccountAPIServiceHandler.getAccountsByMobileNumber(request);
         if(!responseResponse.isSuccessful())
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Request Failed", false, null));
