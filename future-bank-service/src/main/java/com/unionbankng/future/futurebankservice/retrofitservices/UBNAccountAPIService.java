@@ -46,5 +46,5 @@ public interface UBNAccountAPIService {
 
 
     @POST("ubnmiserv/secured/getaccountsbymobilenumber")
-    Call<UBNGetAccountsResponse> getAccountsByMobileNumber(@Query("access_token") String token, @Body UBNGetAccountsRequest request );
+    Call<UBNGetAccountsResponse> getAccountsByMobileNumber(@Query("access_token") String accessToken, @Body UBNGetAccountsRequest request );
 }
