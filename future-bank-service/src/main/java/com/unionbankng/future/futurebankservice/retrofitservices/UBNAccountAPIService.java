@@ -46,6 +46,5 @@ public interface UBNAccountAPIService {
 
 
     @GET("ubnmiserv/secured/getaccountsbymobilenumber")
-    Call<UBNGetAccountsResponse> getAccountsByMobileNumber(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
-                                                           @Body UBNGetAccountsRequest request);
+    Call<UBNGetAccountsResponse> getAccountsByMobileNumber(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Query("mobileNumber") String mobileNumber);
 }
