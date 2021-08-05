@@ -45,5 +45,7 @@ public interface UBNAccountAPIService {
     Call<UBNAccountStatementResponse> accountStatement(@Query("access_token") String accessToken, @Body UBNAccountStatementRequest request);
 
 
-
+    @GET("ubnmiserv/secured/getaccountsbymobilenumber")
+    Call<UBNGetAccountsResponse> getAccountsByMobileNumber(@Header("Authorization") String token, @Header("ChannelCode") String channelCode,
+                                                           @Body UBNGetAccountsRequest request);
 }
