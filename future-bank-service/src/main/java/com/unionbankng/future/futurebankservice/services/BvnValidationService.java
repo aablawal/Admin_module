@@ -41,7 +41,7 @@ public class BvnValidationService {
         if (response.isSuccessful()) {
             return  ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         }else{
-            return ResponseEntity.ok().body(new APIResponse<>(response.message(), false, null));
+            return ResponseEntity.ok().body(new APIResponse<>(response.body().getStatusMessage(), false, null));
         }
     }
 
@@ -60,10 +60,10 @@ public class BvnValidationService {
         logger.info("message: " + response.message());
         app.print("Response:");
         app.print(response);
-        if (response.isSuccessful()) {
+        if (response.isSuccessful() && response.body().getData()!=null) {
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
-            return ResponseEntity.ok().body(new APIResponse<>(response.message(), false, null));
+            return ResponseEntity.ok().body(new APIResponse<>(response.body().getStatusMessage(), false, null));
         }
     }
 }
