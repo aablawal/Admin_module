@@ -464,15 +464,20 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         app.print("Request:");
         app.print(request);
 
-        String authorization = String.format("Bearer %s",response.getAccess_token());
-        Response<UBNCompleteAccountPaymentResponse> ubnResponse= ubnAccountAPIService.completeUBNAccountCreation(
-                authorization,"01",request).execute();
-        app.print("Response:");
-        app.print(ubnResponse.body());
-        app.print(ubnResponse.errorBody());
-        app.print(ubnResponse.code());
+        try {
+            String authorization = String.format("Bearer %s", response.getAccess_token());
+            Response<UBNCompleteAccountPaymentResponse> ubnResponse = ubnAccountAPIService.completeUBNAccountCreation(authorization, "01", request).execute();
+            app.print("Response:");
+            app.print(ubnResponse.body());
+            app.print(ubnResponse.body().getStatusMessage());
+            return  ubnResponse;
+        }
+        catch ( Exception ex){
+            app.print("Failed:");
+            ex.printStackTrace();
+            return  null;
+        }
 
-        return  ubnResponse;
     }
 
     public Response<UBNAccountDataResponse> getUBNAccountDetails(Long accountId) throws IOException {

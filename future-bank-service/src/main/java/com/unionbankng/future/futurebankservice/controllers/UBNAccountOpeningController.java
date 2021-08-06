@@ -459,7 +459,7 @@ public class UBNAccountOpeningController {
                 return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, dataResponseResponse.body()));
 
             } else {
-                app.print(dataResponseResponse.message());
+                app.print(dataResponseResponse.body().getStatusMessage());
                 return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Request Failed", false, null));
             }
         } else {

@@ -96,10 +96,4 @@ public interface UBNNewAccountOpeningAPIService {
 
     @GET("account-service/account/source")
     Call<UBNCustomerTypeRequest> getSourceOfFund(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
-
-
-
-
-
-
 }

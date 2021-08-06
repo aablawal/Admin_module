@@ -41,7 +41,7 @@ public class UBNConfigurationProperties {
     }
 
 
-    @Value("#{${unionbankng.credentials}}")
+    @Value("#{${email.sms.credentials}}")
     public void setCredentials(Map<String, String> credentials) {
         CLIENT_SECRET = credentials.get("clientSecret");
         CLIENT_ID = credentials.get("clientId");
@@ -54,8 +54,7 @@ public class UBNConfigurationProperties {
 
 
         SSLContext sslcontext = SSLContext.getInstance("TLS");
-        sslcontext.init(null, new TrustManager[]{new X509TrustManager()
-        {
+        sslcontext.init(null, new TrustManager[]{new X509TrustManager() {
             public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
             public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException{}
             public X509Certificate[] getAcceptedIssuers()
@@ -66,15 +65,12 @@ public class UBNConfigurationProperties {
         }}, new java.security.SecureRandom());
 
 
-        HostnameVerifier allowAll = new HostnameVerifier()
-        {
+        HostnameVerifier allowAll = new HostnameVerifier(){
             @Override
             public boolean verify(String hostname, SSLSession session) {
                 return true;
             }
-
         };
-
         return ClientBuilder.newBuilder().sslContext(sslcontext).hostnameVerifier(allowAll).build();
 
     }

@@ -3,10 +3,12 @@ package com.unionbankng.future.futurebankservice.controllers;
 import com.unionbankng.future.futurebankservice.pojos.APIResponse;
 import com.unionbankng.future.futurebankservice.pojos.BVNValidationResponse;
 import com.unionbankng.future.futurebankservice.pojos.BVNVerificationResponse;
+import com.unionbankng.future.futurebankservice.pojos.UBNCustomerSegmentResponse;
 import com.unionbankng.future.futurebankservice.services.BvnValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import retrofit2.Response;
 
 import java.io.IOException;
 
@@ -27,4 +29,5 @@ public class BVNController {
     public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestParam String bvn, @RequestParam String otp) throws IOException {
         return bvnValidationService.verifyCustomerBVN(bvn,otp);
     }
+
 }
