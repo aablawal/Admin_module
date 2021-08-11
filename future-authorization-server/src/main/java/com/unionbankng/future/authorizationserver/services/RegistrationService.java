@@ -49,6 +49,7 @@ public class RegistrationService {
     public ResponseEntity register(RegistrationRequest request){
 
 
+        app.print("####REGISTER WITH KULA FORM");
         if (userService.existsByEmail(request.getEmail()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()),false,null));
@@ -77,6 +78,8 @@ public class RegistrationService {
 
 
         user = userService.save(user);
+        app.print("Saved user");
+        app.print(user);
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();
         profileService.save(profile);
