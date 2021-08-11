@@ -126,6 +126,8 @@ public class RegistrationService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new APIResponse("Third party token must be provided",false,null));
 
+
+        app.print("##############LOGIN WITH GOOGLE");
         // generate uuid for user
         ThirdPartyOauthResponse thirdPartyOauthResponse = googleOauthProvider.authentcate(request.getThirdPartyToken());
 
@@ -147,7 +149,10 @@ public class RegistrationService {
                 .email(thirdPartyOauthResponse.getEmail()).isEnabled(Boolean.TRUE)
                 .uuid(generatedUuid).img(thirdPartyOauthResponse.getImage()).username(request.getUsername()).authProvider(request.getAuthProvider()).build();;
 
+
         user = userService.save(user);
+        app.print("Saved user:");
+        app.print(user);
 
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();
