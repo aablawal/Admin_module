@@ -438,8 +438,9 @@ public class UBNAccountOpeningController {
                 CustomerBankAccount customerBankAccount = new CustomerBankAccount();
                 customerBankAccount.setAccountNumber(dataResponseResponse.body().getData().getAccountNumber());
                 customerBankAccount.setAccountType(dataResponseResponse.body().getData().getAccountType());
-                customerBankAccount.setBranchCode(request.getBranchCode());
                 customerBankAccount.setAccountName(dataResponseResponse.body().getData().getAccountName());
+
+                customerBankAccount.setBranchCode(request.getBranchCode());
                 customerBankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
                 customerBankAccount.setCustomerUBNId(request.getCustomerRecordId());
                 customerBankAccount.setUserUUID(jwtUserDetail.getUserUUID());
