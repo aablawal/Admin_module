@@ -412,8 +412,7 @@ public class UBNAccountOpeningController {
 
         Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(ubnAccountCreationRequest);
         app.print("Response:");
-        app.print(responseResponse.body());
-        app.print(responseResponse.message());
+        app.print(responseResponse.body()!=null?responseResponse.body():"Response body is Null");
 
         if (request.getCustomerRecordId() != null) {
             Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
