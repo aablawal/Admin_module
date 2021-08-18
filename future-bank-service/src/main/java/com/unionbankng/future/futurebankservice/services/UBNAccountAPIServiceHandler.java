@@ -96,29 +96,27 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
-
-
     public Response<UBNGetAccountsResponse> getAccountsByMobileNumber(UBNGetAccountsRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-          app.print("Testing token");
-         app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
-
-
         if(response == null)
             return null;
 
-        logger.info("access token is : {}",response.getAccess_token());
 
         app.print("Get accounts nby mobile number");
+        app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
         app.print("Request:");
         app.print(request);
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
-        return ubnAccountAPIService.getAccountsByMobileNumber(
+        Response<UBNGetAccountsResponse>  responseResponse= ubnAccountAPIService.getAccountsByMobileNumber(
                 authorization,request).execute();
 
+        app.print("Response:");
+        app.print(responseResponse.code());
+        app.print(responseResponse.body());
+        return  responseResponse;
     }
 
 
