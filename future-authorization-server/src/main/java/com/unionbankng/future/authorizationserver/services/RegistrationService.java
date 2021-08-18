@@ -48,7 +48,6 @@ public class RegistrationService {
 
     public ResponseEntity register(RegistrationRequest request){
 
-
         app.print("####REGISTER WITH KULA FORM");
         if (userService.existsByEmail(request.getEmail()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(

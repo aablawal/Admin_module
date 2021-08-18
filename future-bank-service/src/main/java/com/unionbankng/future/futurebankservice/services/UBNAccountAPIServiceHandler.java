@@ -53,16 +53,18 @@ public class UBNAccountAPIServiceHandler {
 
         Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
-        return  responseCall.execute().body();
-
+        UBNAuthServerTokenResponse response=  responseCall.execute().body();
+        logger.info("/authserv/oauth/token is : {}",response.getAccess_token());
+        return response;
     }
 
     public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
 
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
-        return  responseCall.execute().body();
-
+        UBNAuthServerTokenResponse response=  responseCall.execute().body();
+        logger.info("/ubnmiserv/oauth/token is : {}",response.getAccess_token());
+        return  response;
     }
 
     public Response<BVNValidationResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
