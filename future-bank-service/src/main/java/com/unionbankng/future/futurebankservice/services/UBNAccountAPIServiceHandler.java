@@ -102,7 +102,9 @@ public class UBNAccountAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
+          app.print("Testing token");
+         app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
+
 
         if(response == null)
             return null;
