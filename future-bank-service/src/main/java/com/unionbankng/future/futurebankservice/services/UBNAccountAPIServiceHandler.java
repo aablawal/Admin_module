@@ -96,7 +96,7 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
-    public Response<UBNGetAccountsResponse> getAccountsByMobileNumber(UBNGetAccountsRequest request) throws IOException {
+   public Response<UBNGetAccountsResponse> getAccountsByMobileNumber(UBNGetAccountsRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
@@ -109,9 +109,8 @@ public class UBNAccountAPIServiceHandler {
         app.print("Request:");
         app.print(request);
 
-        String authorization = String.format("Bearer %s",response.getAccess_token());
         Response<UBNGetAccountsResponse>  responseResponse= ubnAccountAPIService.getAccountsByMobileNumber(
-                authorization,request).execute();
+                response.getAccess_token(),request).execute();
 
         app.print("Response:");
         app.print(responseResponse.code());
