@@ -45,4 +45,24 @@
             <column name="remark" type="TEXT"/>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1629459977782-7">
+        <addColumn tableName="job_contract_extension">
+            <column name="last_modified_by" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1629459977782-9">
+        <addColumn tableName="job_contract_extension">
+            <column name="last_modified_date" type="date"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1629459977782-11">
+        <addColumn tableName="job_contract_extension">
+            <column name="rejected_date" type="date"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1629459977782-3">
+        <addColumn tableName="job_contract_extension">
+            <column name="approved_date" type="date"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

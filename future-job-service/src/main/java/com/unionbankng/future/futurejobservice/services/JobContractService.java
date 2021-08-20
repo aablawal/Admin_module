@@ -244,6 +244,7 @@ public class JobContractService implements Serializable {
                 payment.setExecutedFor(contractReferenceId);
                 payment.setContractReference(contractReferenceId);
                 payment.setExecutedBy(currentUser.getUserUUID());
+                payment.setExecutedByUsername(currentUser.getUserEmail());
 
                 APIResponse paymentResponse=jobPaymentService.makePayment(payment);
                 if (paymentResponse.isSuccess()) {
@@ -543,6 +544,9 @@ public class JobContractService implements Serializable {
                 if (response != null) {
                     if (response.getStatusCode().is2xxSuccessful()) {
                         extension.setStatus(Status.AC);
+                        extension.setLastModifiedBy(currentUser.getUserEmail());
+                        extension.setLastModifiedDate(new Date());
+                        extension.setApprovedDate(new Date());
                         jobContractExtensionRepository.save(extension);
 
                         //fire notification
@@ -908,6 +912,9 @@ public class JobContractService implements Serializable {
                             }
                             if (project != null) {
                                 project.setStatus(Status.CO);
+                                project.setLastModifiedDate(new Date());
+                                project.setApprovedDate(new Date());
+                                project.setLastModifiedBy(currentUser.getUserEmail());
                                 jobProjectSubmissionRepository.save(project);
                             }
                             return new APIResponse("Request Successful", true, contract);
@@ -977,6 +984,8 @@ public class JobContractService implements Serializable {
                             }
                             if (project != null) {
                                 project.setStatus(Status.CO);
+                                project.setLastModifiedDate(new Date());
+                                project.setLastModifiedBy(currentUser.getUserEmail());
                                 jobProjectSubmissionRepository.save(project);
                             }
                             return new APIResponse("Request Successful", true, contract);
@@ -1079,6 +1088,7 @@ public class JobContractService implements Serializable {
                             payment.setExecutedFor(contract.getContractReference());
                             payment.setContractReference(contract.getContractReference());
                             payment.setExecutedBy(currentUser.getUserUUID());
+                            payment.setExecutedByUsername(currentUser.getUserEmail());
 
                             APIResponse paymentResponse=jobPaymentService.makePayment(payment);
                             if (paymentResponse.isSuccess()) {
@@ -1450,6 +1460,7 @@ public class JobContractService implements Serializable {
                         escrowAccount.setAccountName(escrowAccountName);
                         escrowAccount.setNarration(narration);
                         escrowAccount.setExecutedBy(currentUser.getUserUUID());
+                        escrowAccount.setExecutedByUsername(currentUser.getUserEmail());
                         escrowAccount.setExecutedFor(contract.getContractReference());
                         escrowAccount.setContractReference(contract.getContractReference());
                         escrowAccount.setPaymentReference(paymentReference);
@@ -1471,6 +1482,7 @@ public class JobContractService implements Serializable {
                         kulaAccount.setAccountName(kulaIncomeAccountName);
                         kulaAccount.setAccountNumber(kulaIncomeAccountNumber);
                         kulaAccount.setNarration(narration);
+                        kulaAccount.setExecutedByUsername(currentUser.getUserEmail());
                         kulaAccount.setExecutedBy(currentUser.getUserUUID());
                         kulaAccount.setRemark("Credit from Kula to kula Income account for " + job.getTitle());
                         kulaAccount.setExecutedFor(contract.getContractReference());
@@ -1497,6 +1509,7 @@ public class JobContractService implements Serializable {
                             VATAccount.setAccountNumber(VATAccountNumber);
                             VATAccount.setNarration(narration);
                             VATAccount.setExecutedBy(currentUser.getUserUUID());
+                            VATAccount.setExecutedByUsername(currentUser.getUserEmail());
                             VATAccount.setRemark("Credit from Kula to VAT account for " + job.getTitle());
                             VATAccount.setExecutedFor(contract.getContractReference());
                             VATAccount.setContractReference(contract.getContractReference());
@@ -1523,6 +1536,7 @@ public class JobContractService implements Serializable {
                         pepperestAccount.setAccountNumber(pepperestIncomeAccountNumber);
                         pepperestAccount.setNarration(narration);
                         pepperestAccount.setExecutedBy(currentUser.getUserUUID());
+                        pepperestAccount.setExecutedByUsername(currentUser.getUserEmail());
                         pepperestAccount.setRemark("Credit from Kula to Pepperest account for " + job.getTitle());
                         pepperestAccount.setExecutedFor(contract.getContractReference());
                         pepperestAccount.setContractReference(contract.getContractReference());
@@ -1548,6 +1562,7 @@ public class JobContractService implements Serializable {
                         freelancerAccount.setAccountNumber(contract.getFreelancerAccountNumber());
                         freelancerAccount.setNarration(narration);
                         freelancerAccount.setExecutedBy(currentUser.getUserUUID());
+                        freelancerAccount.setExecutedByUsername(currentUser.getUserEmail());
                         freelancerAccount.setRemark("Credit from Kula to Freelancer account for " + job.getTitle());
                         freelancerAccount.setExecutedFor(contract.getContractReference());
                         freelancerAccount.setContractReference(contract.getContractReference());
@@ -1743,6 +1758,7 @@ public class JobContractService implements Serializable {
                 payment.setCreditAccountType("CASA");
                 payment.setPaymentReference(paymentReference);
                 payment.setExecutedBy(currentUser.getUserUUID());
+                payment.setExecutedByUsername(currentUser.getUserEmail());
                 //transfer back the charged amount to the Employer
                 APIResponse transferResponse = jobPaymentService.makePayment(payment);
                 if (transferResponse.isSuccess()) {

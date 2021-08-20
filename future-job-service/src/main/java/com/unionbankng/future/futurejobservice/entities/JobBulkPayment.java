@@ -20,6 +20,7 @@ public class JobBulkPayment implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String executedBy;
+	private String executedByUsername;
 	private String executedFor;
 	@NotNull
 	private String contractReference;

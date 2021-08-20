@@ -54,7 +54,7 @@ public class UBNAccountAPIServiceHandler {
         Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
-        logger.info("/authserv/oauth/token is : {}",response.getAccess_token());
+        app.print("/authserv/oauth/token is :"+response.getAccess_token());
         return response;
     }
 
@@ -63,7 +63,7 @@ public class UBNAccountAPIServiceHandler {
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
-        logger.info("/ubnmiserv/oauth/token is : {}",response.getAccess_token());
+        app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
         return  response;
     }
 
@@ -102,21 +102,22 @@ public class UBNAccountAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
 
-        logger.info("access token is : {}",response.getAccess_token());
 
         app.print("Get accounts nby mobile number");
+        app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
         app.print("Request:");
         app.print(request);
 
-        String authorization = String.format("Bearer %s",response.getAccess_token());
-        return ubnAccountAPIService.getAccountsByMobileNumber(
-                authorization,request).execute();
+        Response<UBNGetAccountsResponse>  responseResponse= ubnAccountAPIService.getAccountsByMobileNumber(
+                response.getAccess_token(),request).execute();
 
+        app.print("Response:");
+        app.print(responseResponse.code());
+        app.print(responseResponse.body());
+        return  responseResponse;
     }
 
 
@@ -187,8 +188,6 @@ public class UBNAccountAPIServiceHandler {
     public Response<UbnCustomerAccountEnquiryResponse> accountEnquiry(UbnCustomerEnquiryRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
-
-        logger.info("Auth token response is : {}",response);
 
         if(response == null)
             return null;

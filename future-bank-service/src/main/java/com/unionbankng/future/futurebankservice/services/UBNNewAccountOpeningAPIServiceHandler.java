@@ -49,6 +49,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
                 .build();
 
         ubnAccountAPIService= retrofit.create(UBNNewAccountOpeningAPIService.class);
+
     }
 
 

@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Table(name="job_contract_submission")
@@ -39,12 +40,20 @@ public class JobProjectSubmission  implements Serializable {
     private  String description;
     @Column(columnDefinition="TEXT")
     private  String remark;
+    private  String lastModifiedBy;
+    @Temporal(TemporalType.DATE)
+    private  Date lastModifiedDate;
     @Temporal(TemporalType.DATE)
     private  Date createdAt;
+    @Temporal(TemporalType.DATE)
+    private Date rejectedDate;
+    @Temporal(TemporalType.DATE)
+    private Date approvedDate;
 
     @PrePersist
     public void setCreatedAt() {
         createdAt = new Date();
     }
+
 
 }

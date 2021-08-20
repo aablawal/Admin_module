@@ -33,6 +33,7 @@ public class JobPaymentService implements Serializable {
       payment.setCurrency("NGN");
       payment.setPaymentReference(paymentRequest.getPaymentReference());
       payment.setExecutedBy(paymentRequest.getExecutedBy());
+      payment.setExecutedByUsername(paymentRequest.getExecutedByUsername());
       payment.setExecutedFor(paymentRequest.getContractReference());
       payment.setInitBranchCode("682");
       //debit the escrow amount

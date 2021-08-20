@@ -95,4 +95,9 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1629459977782-6">
+        <addColumn tableName="job_transfers">
+            <column name="executed_by_username" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

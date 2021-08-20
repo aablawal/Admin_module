@@ -35,8 +35,15 @@ public class JobContractExtension implements Serializable {
     private Status status;
     @Column(columnDefinition="TEXT")
     private  String reason;
+    private  String lastModifiedBy;
+    @Temporal(TemporalType.DATE)
+    private  Date lastModifiedDate;
     @Temporal(TemporalType.DATE)
     private  Date createdAt;
+    @Temporal(TemporalType.DATE)
+    private Date rejectedDate;
+    @Temporal(TemporalType.DATE)
+    private Date approvedDate;
 
     @PrePersist
     public void setCreatedAt() {

@@ -17,6 +17,7 @@ public class JobPayment  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String executedByUsername;
     private String  executedBy;
     private  String  executedFor;
     @NotNull
