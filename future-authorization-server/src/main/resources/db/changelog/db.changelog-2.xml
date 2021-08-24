@@ -35,7 +35,7 @@
     </changeSet>
     <changeSet author="chokeme (generated)" id="1599673191008-5">
         <addColumn tableName="app_user">
-            <column name="date_of_birth" type="datetime2"/>
+            <column name="date_of_birth" type="date"/>
         </addColumn>
     </changeSet>
     <changeSet author="chokeme (generated)" id="1599673191008-6">
@@ -45,8 +45,5 @@
     </changeSet>
     <changeSet author="chokeme (generated)" id="1599673191008-7">
         <addUniqueConstraint columnNames="token" constraintName="UC_USER_CONFIRMATION_TOKENTOKEN_COL" tableName="user_confirmation_token"/>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1599673191008-8">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_confirmation_token" constraintName="FK23f70bn1nnupeobqk4em641lh" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="app_user" validate="true"/>
     </changeSet>
 </databaseChangeLog>
