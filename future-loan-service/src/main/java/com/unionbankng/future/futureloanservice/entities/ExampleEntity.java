@@ -25,9 +25,9 @@ public class ExampleEntity {
     String description;
     @Column(columnDefinition="TEXT")
     String feedback;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     Date lastModifiedDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 
     @PrePersist

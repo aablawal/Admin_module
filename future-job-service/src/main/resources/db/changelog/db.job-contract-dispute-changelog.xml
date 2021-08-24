@@ -11,7 +11,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="job_contract_disputesPK"/>
             </column>
             <column name="attachment" type="varchar(255)"/>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="description" type="varchar (max)"/>
             <column name="employer_id" type="bigint">
                 <constraints nullable="false"/>
@@ -19,7 +19,7 @@
             <column name="job_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_date" type="date"/>
+            <column name="last_modified_date" type="datetime2"/>
             <column name="proposal_id" type="bigint">
                 <constraints nullable="false"/>
             </column>

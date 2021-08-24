@@ -23,7 +23,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="work_method" type="varchar(255)"/>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="currency" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
@@ -38,11 +38,11 @@
                 <constraints nullable="false"/>
             </column>
             <column name="customer_phone" type="varchar(255)"/>
-            <column name="end_date" type="date"/>
+            <column name="end_date" type="datetime2"/>
             <column name="job_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_date" type="date"/>
+            <column name="last_modified_date" type="datetime2"/>
             <column name="merchant_account_number" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
@@ -60,7 +60,7 @@
             <column name="proposal_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="start_date" type="date"/>
+            <column name="start_date" type="datetime2"/>
             <column name="transfer_reference_id" type="varchar(255)"/>
             <column name="user_email" type="varchar(255)">
                 <constraints nullable="false"/>

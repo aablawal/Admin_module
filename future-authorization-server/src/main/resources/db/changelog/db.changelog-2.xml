@@ -35,7 +35,7 @@
     </changeSet>
     <changeSet author="chokeme (generated)" id="1599673191008-5">
         <addColumn tableName="app_user">
-            <column name="date_of_birth" type="date"/>
+            <column name="date_of_birth" type="datetime2"/>
         </addColumn>
     </changeSet>
     <changeSet author="chokeme (generated)" id="1599673191008-6">

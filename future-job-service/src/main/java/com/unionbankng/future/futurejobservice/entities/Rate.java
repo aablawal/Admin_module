@@ -26,9 +26,9 @@ public class Rate  implements Serializable {
     private   String description;
     @Column(columnDefinition="TEXT")
     private   String feedback;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date lastModifiedDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private   Date createdAt;
 
 

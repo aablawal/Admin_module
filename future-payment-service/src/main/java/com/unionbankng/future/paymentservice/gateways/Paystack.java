@@ -12,7 +12,6 @@ import com.unionbankng.future.paymentservice.interfaces.IPayment;
 import com.unionbankng.future.paymentservice.pojos.PaystackTransaction;
 import com.unionbankng.future.paymentservice.services.PaymentReferenceService;
 import com.unionbankng.future.paymentservice.utils.PaystackAuthValidator;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.slf4j.Logger;

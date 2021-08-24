@@ -32,9 +32,9 @@ public class JobTeamDetails  implements Serializable {
     private  Long jobId;
     private   Long amount;
     private Long percentage;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date startDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
     @Column(columnDefinition="TEXT")
     private String description;
@@ -42,7 +42,7 @@ public class JobTeamDetails  implements Serializable {
     @Enumerated(EnumType.STRING)
     private Status status;
     @NotNull
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date createdAt;
 
     @PrePersist

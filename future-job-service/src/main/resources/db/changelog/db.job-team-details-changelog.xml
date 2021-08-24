@@ -11,21 +11,21 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="job_team_detailsPK"/>
             </column>
             <column name="amount" type="bigint"/>
-            <column name="created_at" type="date">
+            <column name="created_at" type="datetime2">
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="varchar (max)"/>
             <column name="employer_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="end_date" type="date"/>
+            <column name="end_date" type="datetime2"/>
             <column name="job_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="proposal_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="start_date" type="date"/>
+            <column name="start_date" type="datetime2"/>
             <column name="status" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>

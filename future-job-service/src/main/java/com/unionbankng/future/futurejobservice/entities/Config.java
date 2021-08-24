@@ -22,7 +22,7 @@ public class Config implements Serializable{
     private ConfigReference reference;
     private String type;
     private String value;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @PrePersist

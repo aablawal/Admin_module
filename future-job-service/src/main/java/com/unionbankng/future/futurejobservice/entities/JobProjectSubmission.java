@@ -41,13 +41,13 @@ public class JobProjectSubmission  implements Serializable {
     @Column(columnDefinition="TEXT")
     private  String remark;
     private  String lastModifiedBy;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date lastModifiedDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date createdAt;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date rejectedDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date approvedDate;
 
     @PrePersist

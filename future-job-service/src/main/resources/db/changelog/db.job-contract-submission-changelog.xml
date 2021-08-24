@@ -10,7 +10,7 @@
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="job_contract_submissionPK"/>
             </column>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="description" type="varchar (max)"/>
             <column name="employer_id" type="bigint">
                 <constraints nullable="false"/>
@@ -40,7 +40,7 @@
     </changeSet>
     <changeSet author="aliyura (generated)" id="1629459977782-4">
         <addColumn tableName="job_contract_submission">
-            <column name="approved_date" type="date"/>
+            <column name="approved_date" type="datetime2"/>
         </addColumn>
     </changeSet>
     <changeSet author="aliyura (generated)" id="1629459977782-8">
@@ -50,12 +50,17 @@
     </changeSet>
     <changeSet author="aliyura (generated)" id="1629459977782-10">
         <addColumn tableName="job_contract_submission">
-            <column name="last_modified_date" type="date"/>
+            <column name="last_modified_date" type="datetime2"/>
         </addColumn>
     </changeSet>
     <changeSet author="aliyura (generated)" id="1629459977782-12">
         <addColumn tableName="job_contract_submission">
-            <column name="rejected_date" type="date"/>
+            <column name="rejected_date" type="datetime2"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1624004288736-2">
+        <addColumn tableName="job_contract_submission">
+            <column name="remark" type="TEXT"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

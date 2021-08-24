@@ -46,7 +46,7 @@ public class JobPayment  implements Serializable {
     private String initBranchCode;
     private String initialPaymentReference;
     private  String paymentReference;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @PrePersist

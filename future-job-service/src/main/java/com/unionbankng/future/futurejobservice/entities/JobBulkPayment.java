@@ -48,7 +48,7 @@ public class JobBulkPayment implements Serializable {
 	private String valueDate;
 	private String crDrFlag;
 	private String feeOrCharges;
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdAt;
 
 	@PrePersist

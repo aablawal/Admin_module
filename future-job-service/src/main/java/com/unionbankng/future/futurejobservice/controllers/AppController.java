@@ -36,6 +36,7 @@ public class AppController {
     }
     @PostMapping("/v1/test")
     public ResponseEntity<APIResponse<Test>> testService(@RequestBody Test test){
+            app.print(test);
               return ResponseEntity.ok().body(new APIResponse("Request Successful", true, testService.add(test)));
     }
     @PostMapping("/v1/notification/test")

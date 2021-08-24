@@ -13,7 +13,7 @@
             <column name="amount" type="double">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="credit_account_bank_code" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
@@ -74,9 +74,6 @@
     </changeSet>
     <changeSet author="aliyura (generated)" id="1621930789671-7">
         <dropColumn columnName="user_id" tableName="job_transfers"/>
-    </changeSet>
-    <changeSet author="aliyura (generated)" id="1621930789671-1">
-        <addNotNullConstraint columnDataType="date" columnName="end_date" tableName="job_milestones" validate="true"/>
     </changeSet>
     <changeSet author="aliyura (generated)" id="1621931170981-2">
         <addColumn tableName="job_transfers">
