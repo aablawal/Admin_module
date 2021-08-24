@@ -1,6 +1,5 @@
-package com.unionbankng.future.futuremessagingservice.repositories;
-
-import com.unionbankng.future.futuremessagingservice.entities.ActivityLog;
+package com.unionbankng.future.futureutilityservice.repositories;
+import com.unionbankng.future.futureutilityservice.entities.ActivityLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

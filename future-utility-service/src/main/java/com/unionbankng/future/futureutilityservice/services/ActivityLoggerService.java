@@ -1,7 +1,6 @@
-package com.unionbankng.future.futuremessagingservice.services;
-import com.unionbankng.future.futuremessagingservice.entities.ActivityLog;
-import com.unionbankng.future.futuremessagingservice.repositories.ActivityLoggerRepository;
-import com.unionbankng.future.futuremessagingservice.util.App;
+package com.unionbankng.future.futureutilityservice.services;
+import com.unionbankng.future.futureutilityservice.entities.ActivityLog;
+import com.unionbankng.future.futureutilityservice.repositories.ActivityLoggerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 public class ActivityLoggerService {
 
     private final ActivityLoggerRepository activityLoggerRepository;
-    private final App app;
 
     public ActivityLog log(ActivityLog log){
        return activityLoggerRepository.save(log);

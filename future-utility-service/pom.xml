@@ -160,7 +160,13 @@
 			<artifactId>liquibase-maven-plugin</artifactId>
 			<version>4.0.0</version>
 		</dependency>
-    </dependencies>
+		<dependency>
+			<groupId>com.fasterxml.uuid</groupId>
+			<artifactId>java-uuid-generator</artifactId>
+			<version>3.1.4</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>

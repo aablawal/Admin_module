@@ -1,4 +1,4 @@
-package com.unionbankng.future.futuremessagingservice.enums;
+package com.unionbankng.future.futureutilityservice.enums;
 
 public enum LoggingOwner {
 

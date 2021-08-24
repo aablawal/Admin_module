@@ -1,11 +1,9 @@
-package com.unionbankng.future.futuremessagingservice.entities;
+package com.unionbankng.future.futureutilityservice.entities;
 
-import com.unionbankng.future.futuremessagingservice.enums.LoggingOwner;
-import com.unionbankng.future.futuremessagingservice.enums.NotificationStatus;
+import com.sun.istack.NotNull;
+import com.unionbankng.future.futureutilityservice.enums.LoggingOwner;
 import lombok.*;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Table(name="activity_logs")
