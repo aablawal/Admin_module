@@ -28,8 +28,8 @@ public class UBNAccountAPIServiceHandler {
 
     Logger logger = LoggerFactory.getLogger(UBNAccountAPIServiceHandler.class);
 
-    @Value("${unionbankng.base.url}")
-    private String ubnBaseURL;
+//    @Value("${unionbankng.base.url}")
+    private String ubnBaseURL="https://unionworkspace.unionbankng.com/";
 
     @Value("#{${unionbankng.credentials}}")
     private Map<String, String> credentials;
