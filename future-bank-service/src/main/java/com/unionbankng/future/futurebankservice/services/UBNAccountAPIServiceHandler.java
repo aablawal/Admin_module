@@ -18,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -32,7 +33,9 @@ public class UBNAccountAPIServiceHandler {
     private String ubnBaseURL="https://unionworkspace.unionbankng.com/";
 
     @Value("#{${unionbankng.credentials}}")
-    private Map<String, String> credentials;
+    private Map<String, String> credentials=new HashMap<>();
+
+
 
     private UBNAccountAPIService ubnAccountAPIService;
     private final App app;
@@ -41,6 +44,15 @@ public class UBNAccountAPIServiceHandler {
 
     @PostConstruct
     public void init() {
+
+        credentials.put("clientSecret","KULAUSERCLIENT");
+        credentials.put("clientId","KULAUSER");
+        credentials.put("grantType","password");
+        credentials.put("username","kulasuser");
+        credentials.put("password","JqOmrhC5Cs");
+
+        app.print(credentials);
+
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ubnBaseURL)
                 .build();
