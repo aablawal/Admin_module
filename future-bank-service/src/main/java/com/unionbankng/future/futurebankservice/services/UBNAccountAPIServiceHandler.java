@@ -32,7 +32,7 @@ public class UBNAccountAPIServiceHandler {
 //    @Value("${unionbankng.base.url}")
     private String ubnBaseURL="https://unionworkspace.unionbankng.com/";
 
-    @Value("#{${unionbankng.credentials}}")
+//    @Value("#{${unionbankng.credentials}}")
     private Map<String, String> credentials=new HashMap<>();
 
 
@@ -44,15 +44,6 @@ public class UBNAccountAPIServiceHandler {
 
     @PostConstruct
     public void init() {
-
-        credentials.put("clientSecret","KULAUSERCLIENT");
-        credentials.put("clientId","KULAUSER");
-        credentials.put("grantType","password");
-        credentials.put("username","kulasuser");
-        credentials.put("password","JqOmrhC5Cs");
-
-        app.print(credentials);
-
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ubnBaseURL)
                 .build();
@@ -63,6 +54,12 @@ public class UBNAccountAPIServiceHandler {
 
     public UBNAuthServerTokenResponse getUBNAuthServerToken() throws IOException {
 
+        credentials.put("clientSecret","KULAUSERCLIENT");
+        credentials.put("clientId","KULAUSER");
+        credentials.put("grantType","password");
+        credentials.put("username","kulasuser");
+        credentials.put("password","JqOmrhC5Cs");
+
         Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
@@ -71,6 +68,12 @@ public class UBNAccountAPIServiceHandler {
     }
 
     public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
+
+        credentials.put("clientSecret","KULAUSERCLIENT");
+        credentials.put("clientId","KULAUSER");
+        credentials.put("grantType","password");
+        credentials.put("username","kulasuser");
+        credentials.put("password","JqOmrhC5Cs");
 
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
