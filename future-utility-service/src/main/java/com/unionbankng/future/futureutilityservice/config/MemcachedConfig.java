@@ -70,7 +70,7 @@ public class MemcachedConfig extends AbstractSSMConfiguration {
     }
 
     @Bean
-    public CacheManager cacheManagerMain() throws Exception {
+    public CacheManager cacheManager() throws Exception {
         // Use SSMCacheManager instead of ExtendedSSMCacheManager if you do not
         // need to set per key expiration
         ExtendedSSMCacheManager cacheManager = new ExtendedSSMCacheManager();

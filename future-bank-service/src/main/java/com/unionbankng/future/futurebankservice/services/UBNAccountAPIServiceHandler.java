@@ -105,7 +105,6 @@ public class UBNAccountAPIServiceHandler {
         if(response == null)
             return null;
 
-
         app.print("Get accounts nby mobile number");
         app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
         app.print("Request:");
@@ -164,8 +163,6 @@ public class UBNAccountAPIServiceHandler {
         Response<UBNFundTransferResponse> responseResponse=  ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
         app.print("Response:");
         app.print(responseResponse.body());
-        app.print(responseResponse.code());
-        app.print(responseResponse.body().getCode());
         return  responseResponse;
     }
 
@@ -181,7 +178,6 @@ public class UBNAccountAPIServiceHandler {
         app.print("Response:");
         app.print(responseResponse.body());
         app.print(responseResponse.code());
-        app.print(responseResponse.body().getCode());
         return  responseResponse;
     }
 
