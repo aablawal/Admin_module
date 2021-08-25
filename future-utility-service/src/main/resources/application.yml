@@ -3,6 +3,8 @@ spring:
     active: ${FUTURE_ENV}
   application:
     name: future-utility-service
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
 server:
   port: 8085
 grpc:
@@ -38,9 +40,9 @@ spring:
 spring:
   config:
     activate:
-      on-profile: master
+      on-profile: production
     import: optional:configserver:http://future-config-server
   cloud:
     config:
       label: master
-      profile: master
+      profile: production

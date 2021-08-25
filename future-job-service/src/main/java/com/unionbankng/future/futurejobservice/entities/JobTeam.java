@@ -1,9 +1,10 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_teams")
@@ -13,32 +14,25 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobTeam {
+public class JobTeam implements Serializable {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @NotNull
-    Long jobId;
+    private Long jobId;
     @NotNull
-    String invitationId;
+    private String invitationId;
     @Column(columnDefinition="TEXT")
-    String selectedTeam;
+    private   String selectedTeam;
     @NotNull
-    JobStatus status;
-    @Temporal(TemporalType.DATE)
-    Date createdAt;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+    @Temporal(TemporalType.TIMESTAMP)
+    private   Date createdAt;
 
-    public JobTeam(JobTeam jobTeam) {
-        this.id = jobTeam.id;
-        this.jobId = jobTeam.jobId;
-        this.invitationId = jobTeam.invitationId;
-        this.selectedTeam = jobTeam.selectedTeam;
-        this.status=jobTeam.status;
-        this.createdAt = new Date();
-    }
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 }

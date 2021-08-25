@@ -1,6 +1,5 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
-import com.unionbankng.future.futurejobservice.repositories.JobRateRepository;
 import com.unionbankng.future.futurejobservice.services.JobFreelancerRateService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -13,12 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 @RequestMapping(path = "api")
 public class JobFreelancerRateController {
-
-    @ModelAttribute
-    public void setResponseHeader(HttpServletResponse response){
-        response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
-    }
 
     private final JobFreelancerRateService jobFreelancerRateService;
     Logger logger = LoggerFactory.getLogger(JobFreelancerRateController.class);

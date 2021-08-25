@@ -4,24 +4,19 @@ import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@ActiveProfiles("test")
-@SpringBootTest
-public class EmailTest {
+public class EmailTest extends AbstractTest{
 
     @Autowired
     EmailSender emailSender;
 
     @Test
-    void sendEmail() throws Exception {
+    public void sendEmail() throws Exception {
 
         EmailBody emailBody = EmailBody.builder().build();
         emailBody.setBody("Hello world");

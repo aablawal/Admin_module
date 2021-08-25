@@ -24,7 +24,7 @@ public class SwaggerConfig {
      private ApiInfo metaData() {
         return new ApiInfoBuilder()
                  .title("Future Messaging Service")
-                .description("bla lblablbalbalalbl")
+                .description("This service handles messaging and notifications")
                 .version("0.0.1")
                 .license("Apache License Version 2.0")
                 .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0\"")

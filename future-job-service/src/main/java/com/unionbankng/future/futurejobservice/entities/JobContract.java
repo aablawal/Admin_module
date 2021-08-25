@@ -1,8 +1,9 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobProposalStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_contracts")
@@ -12,104 +13,73 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobContract {
+public class JobContract implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    Long Id;
+    private  Long Id;
     @NotNull
-    Long proposalId;
+    private Long proposalId;
     @NotNull
-    Long jobId;
-    int appId;
+    private  Long jobId;
+    private int appId;
     @NotNull
-    String referenceId;
+    private String contractReference;
     @NotNull
-    String userEmail;
+    private String userEmail;
     @NotNull
-    int amount;
+    private double amount;
     @NotNull
-    int clearedAmount;
+    private double clearedAmount;
     @NotNull
-    String country;
-    String workMethod;
+    private String country;
+    private String workMethod;
     @NotNull
-    String currency;
-    String customerEmail;
-    String merchantEmail;
-    Boolean isSettled;
-    String settlement;
-    JobProposalStatus status;
-    Long rate;
-    String description;
+    private String currency;
+    private String freelancerEmailAddress;
+    private String employerEmailAddress;
+    private Boolean isSettled;
+    private  String settlement;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+    private  Long rate;
+    private  String description;
     @Column(columnDefinition="TEXT")
-    String feedback;
+    private String feedback;
     @NotNull
-    String merchantAccountNumber;
+    private String employerAccountName;
     @NotNull
-    String customerAccountNumber;
+    private String employerAccountNumber;
     @NotNull
-    String merchantBankCode;
+    private String freelancerAccountName;
     @NotNull
-    String customerBankCode;
+    private String freelancerAccountNumber;
+    private String freelancerPhoneNumber;
+    private String employerPhoneNumber;
     @NotNull
-    String customerName;
-    @NotNull
-    String merchantName;
-    String customerPhone;
-    String merchantPhone;
-    @NotNull
-    int peppfees;
-    String transferReferenceId;
-    @Temporal(TemporalType.DATE)
-    Date startDate;
-    @Temporal(TemporalType.DATE)
-    Date endDate;
-    @Temporal(TemporalType.DATE)
-    Date createdAt;
-    @Temporal(TemporalType.DATE)
-    Date lastModifiedDate;
-
-    public JobContract(JobContract request) {
-        this.proposalId= request.proposalId;
-        this.jobId=request.jobId;
-        this.appId = request.appId;
-        this.referenceId =  request.referenceId;
-        this.userEmail =  request.userEmail;
-        this.amount =  request.amount;
-        this.isSettled=request.isSettled;
-        this.settlement=request.settlement;
-        this.clearedAmount=request.clearedAmount;
-        this.status=request.status;
-        this.country =  request.country;
-        this.currency =  request.currency;
-        this.customerEmail =  request.customerEmail;
-        this.merchantEmail =  request.merchantEmail;
-        this.rate =request.rate;
-        this.description=request.description;
-        this.feedback=request.feedback;
-        this.merchantAccountNumber =  request.merchantAccountNumber;
-        this.customerAccountNumber=request.customerAccountNumber;
-        this.merchantBankCode =  request.merchantBankCode;
-        this.customerBankCode=request.customerBankCode;
-        this.customerName =  request.customerName;
-        this.merchantName =  request.merchantName;
-        this.customerPhone =  request.customerPhone;
-        this.merchantPhone =  request.merchantPhone;
-        this.peppfees =  request.peppfees;
-        this.startDate =  request.startDate;
-        this.endDate =  request.endDate;
-        this.transferReferenceId =  request.transferReferenceId;
-        this.createdAt=new Date();
-    }
+    private int peppfees;
+    private String initialPaymentReferenceA;
+    private String settlementPaymentReferenceA;
+    private String reversalPaymentReferenceA;
+    private String initialPaymentReferenceB;
+    private String settlementPaymentReferenceB;
+    private  String reversalPaymentReferenceB;
+    @Temporal(TemporalType.TIMESTAMP)
+    private  Date startDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private  Date endDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private  Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private   Date lastModifiedDate;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 
     @PreUpdate
-    private void lastModifiedDate() {
+    public void lastModifiedDate() {
         lastModifiedDate = new Date();
     }
 }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SMSListener {
 
-    private static final String QUEUE_NAME = "futuresmsqueue";
+    private static final String QUEUE_NAME = "kulasmsqueue";
 
     private final Logger logger = LoggerFactory.getLogger(SMSListener.class);
     private final ObjectMapper mapper;

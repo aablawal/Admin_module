@@ -15,7 +15,7 @@ import org.thymeleaf.TemplateEngine;
 @RequiredArgsConstructor
 public class NotificationListener {
 
-    private static final String QUEUE_NAME = "futurenotificationqueue";
+    private static final String QUEUE_NAME = "kulanotificationqueue";
     private final NotificationService notificationService;
     private final Logger logger = LoggerFactory.getLogger(NotificationListener.class);
     private final TemplateEngine templateEngine;
@@ -27,7 +27,7 @@ public class NotificationListener {
         NotificationBody notificationBody = mapper.readValue(json, NotificationBody.class);
         logger.info("Notification message Received: {}", notificationBody.getSubject());
         try {
-            notificationService.pushNotification(Long.valueOf(0),notificationBody);
+            notificationService.pushNotification(notificationBody.getRecipient(),notificationBody);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -27,7 +27,7 @@ pipeline {
                             break
                         case 'master':
                             GLOBAL_ENVIRONMENT = 'production'
-                            ACR_LOGINSERVER = env.ACR_PROD_LOGINSERVER
+                            ACR_LOGINSERVER = env.KULA_ACR_PROD_LOGINSERVER
                             break
                         default: 
                             GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
@@ -68,9 +68,10 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-config-server --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context MarcusProdAKSClust"
-                    sh "kubectl set image deployment/future-config-server config-server=${ACR_LOGINSERVER}/future-config-server --namespace sidekiq"
-					sh "kubectl rollout restart deployment/future-config-server --namespace sidekiq"
+//                     sh "az aks get-credentials --resource-group Kula-RG --name UBNKula  --subscription cfda3d2d-75c3-4919-8042-363602a34c0a"
+                    sh "kubectl config use-context ubnkula"
+                    sh "kubectl set image deployment/future-config-server future-config-server=${KULA_ACR_PROD_LOGINSERVER}/future-config-server --namespace kula"
+					sh "kubectl rollout restart deployment/future-config-server --namespace kula"
                   }
                 }
             
@@ -96,14 +97,16 @@ def build(ENVIRONMENT) {
     }
   
   }else{
-    withCredentials([usernamePassword(credentialsId: 'acr-prod-credentials', usernameVariable: 'ACR_USERNAME', passwordVariable: 'ACR_PASSWORD')]) {
+    withCredentials([usernamePassword(credentialsId: 'kula-acr-prod-credentials', usernameVariable: 'ACR_USERNAME', passwordVariable: 'ACR_PASSWORD')]) {
      
      	withMaven( maven: 'maven-3.6.3' ) {
-     		withEnv(["FUTURE_ENV=production","ACR_SERVER=${ACR_LOGINSERVER}"]){
+     		withEnv(["FUTURE_ENV=production","ACR_SERVER=${KULA_ACR_PROD_LOGINSERVER}"]){
      			sh 'cd future-config-server && mvn clean compile jib:build'
      		}
 
-    	 } 
+    	 }
+
+
     }
     
   }

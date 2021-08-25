@@ -110,7 +110,7 @@ public abstract class AbstractTest {
 
         RestTemplate restTemplate = new RestTemplate();
         String fooResourceUrl
-                = "https://keycloak.sidekik.ng/auth/realms/Sidekiq/protocol/openid-connect/token";
+                = "https://testauth.kula.work/auth/realms/Sidekiq/protocol/openid-connect/token";
         ResponseEntity<String> response
                 = restTemplate.postForEntity(fooResourceUrl,request, String.class);
 

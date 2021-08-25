@@ -9,6 +9,7 @@ import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -40,13 +41,14 @@ public class RegistrationService {
     private final ProfileService profileService;
     private  final GoogleOauthProvider googleOauthProvider;
     private final RealmResource keycloakRealmResource;
+    private final App app;
 
     private PasswordValidator passwordValidator  = PasswordValidator.
             buildValidator(false, true, true, 6, 40);
 
     public ResponseEntity register(RegistrationRequest request){
 
-
+        app.print("####REGISTER WITH KULA FORM");
         if (userService.existsByEmail(request.getEmail()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()),false,null));
@@ -57,7 +59,6 @@ public class RegistrationService {
 
 
         Response response = createUserOnKeycloak(request);
-
         logger.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
 
         if(response.getStatus() != 201)
@@ -76,11 +77,11 @@ public class RegistrationService {
 
 
         user = userService.save(user);
-
+        app.print("Saved user");
+        app.print(user);
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();
         profileService.save(profile);
-
         //send confirmation email
         userConfirmationTokenService.sendConfirmationToken(user);
 
@@ -114,6 +115,8 @@ public class RegistrationService {
         // Get realm
         UsersResource usersResource = keycloakRealmResource.users();
 
+        app.print(userRepresentation.getClientConsents());
+
         return usersResource.create(userRepresentation);
 
     }
@@ -125,6 +128,8 @@ public class RegistrationService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new APIResponse("Third party token must be provided",false,null));
 
+
+        app.print("##############LOGIN WITH GOOGLE");
         // generate uuid for user
         ThirdPartyOauthResponse thirdPartyOauthResponse = googleOauthProvider.authentcate(request.getThirdPartyToken());
 
@@ -133,7 +138,6 @@ public class RegistrationService {
                     new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()),false,null));
 
         Response response = createUserOnKeycloak(request);
-
         logger.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
 
         if(response.getStatus() != 201)
@@ -147,7 +151,10 @@ public class RegistrationService {
                 .email(thirdPartyOauthResponse.getEmail()).isEnabled(Boolean.TRUE)
                 .uuid(generatedUuid).img(thirdPartyOauthResponse.getImage()).username(request.getUsername()).authProvider(request.getAuthProvider()).build();;
 
+
         user = userService.save(user);
+        app.print("Saved user:");
+        app.print(user);
 
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();

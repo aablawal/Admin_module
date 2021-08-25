@@ -5,6 +5,7 @@ import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.services.JobService;
 import com.unionbankng.future.futurejobservice.services.UserService;
+import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
@@ -27,25 +28,16 @@ import java.security.Principal;
 @RequestMapping(path = "api")
 public class JobController {
 
-    @ModelAttribute
-    public void setResponseHeader(HttpServletResponse response){
-        response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","GET,POST,DELETE,PUT");
-    }
+    private final App app;
     private final JobService service;
-    private final NotificationSender notificationSender;
-    private final UserService userService;
-    private final JobRepository jobRepository;
-    Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
-    public ResponseEntity<APIResponse> addJob(@Valid @RequestParam(value = "data", required=true) String jobData,
+    public ResponseEntity<APIResponse> addJob( Principal principal,@Valid @RequestParam(value = "data", required=true) String jobData,
                                               @RequestParam(value = "team", required=true) String teamData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
-
                                               @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles) throws IOException{
 
-        Job addedJob=service.addJob(jobData,teamData,supportingFiles,ndaFiles);
+        Job addedJob=service.addJob(principal,jobData,teamData,supportingFiles,ndaFiles);
         if(addedJob!=null)
           return ResponseEntity.ok().body(new APIResponse("success",true,addedJob));
         else
@@ -53,26 +45,18 @@ public class JobController {
     }
 
     @PutMapping("/v1/job/close")
-    public  ResponseEntity<APIResponse> closeJobById(@RequestParam Long id, @RequestParam int state){
-        Job job=service.closeJobById(id,state);
+    public  ResponseEntity<APIResponse> closeJobById( Principal principal,@RequestParam Long id, @RequestParam int state){
+        Job job=service.closeJobById(principal, id,state);
         if(job!=null)
            return ResponseEntity.ok().body(new APIResponse("Job closed successful",true,job));
         else
             return ResponseEntity.ok().body(new APIResponse("Unable to close the job",false,null));
     }
 
-    @PutMapping("/v1/job/open")
-    public  ResponseEntity<APIResponse> openJobById(@RequestParam Long id){
-        Job job=service.openJobById(id);
-        if(job!=null)
-            return ResponseEntity.ok().body(new APIResponse("Job opened successful",true,job));
-        else
-            return ResponseEntity.ok().body(new APIResponse("Unable to open the job",false,null));
-    }
 
     @PutMapping("/v1/job/repeat")
-    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id){
-        Job job=service.repeatJobById(id);
+    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id, Principal principal){
+        Job job=service.repeatJobById(principal,id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job repeated successful",true,job));
         else
@@ -116,10 +100,23 @@ public class JobController {
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobsByOwnerIdAndStatus(oid,status,PageRequest.of(page,size), model)));
     }
-    @GetMapping("/v1/jobs/type/{type}")
-    public ResponseEntity<APIResponse<Model>> getJobsByOwnerId(@PathVariable String type,@RequestParam int page, @RequestParam int size, Model model){
+
+    @GetMapping("/v1/jobs/get_by_type/{type}")
+    public ResponseEntity<APIResponse<Model>> getJobsByType(@PathVariable String type, @RequestParam int page, @RequestParam int size, Model model){
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobsByType(JobType.valueOf(type.toUpperCase()),PageRequest.of(page,size), model)));
+    }
+
+    @GetMapping("/v1/jobs/get_by_type_and_category/{type}")
+    public ResponseEntity<APIResponse<Model>> findJobsByTypeAndCategory(@PathVariable String type,@RequestParam String  category, @RequestParam int page, @RequestParam int size, Model model){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.findJobsByTypeAndCategory(JobType.valueOf(type.toUpperCase()),category,PageRequest.of(page,size), model)));
+    }
+    @GetMapping("/v1/jobs/search/{type}")
+    public ResponseEntity<APIResponse<Model>> searchJobs(@RequestParam String q, @PathVariable String type, @RequestParam int page, @RequestParam int size, Model model){
+        app.print(app);
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.searchJobs(JobType.valueOf(type.toUpperCase()),q,PageRequest.of(page,size), model)));
     }
 
     @GetMapping("/v1/jobs")
@@ -128,10 +125,4 @@ public class JobController {
                 new APIResponse("success",true,service.getJobs(PageRequest.of(page,size), model)));
     }
 
-    @GetMapping("/v1/test")
-    public ResponseEntity<APIResponse<String>> test(@ApiIgnore Principal principal){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return ResponseEntity.ok().body(
-                new APIResponse("success",true, jwtUserDetail));
-    }
 }

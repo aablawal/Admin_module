@@ -20,7 +20,7 @@ public class MessagingToken {
     @NotNull
     @Column(columnDefinition="TEXT")
     String token;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 
     public MessagingToken(MessagingToken notification) {

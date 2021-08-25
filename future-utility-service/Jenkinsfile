@@ -29,7 +29,7 @@ pipeline {
                             break
                         case 'master':
                             GLOBAL_ENVIRONMENT = 'production'
-                            ACR_LOGINSERVER = env.ACR_PROD_LOGINSERVER
+                            ACR_LOGINSERVER = env.KULA_ACR_PROD_LOGINSERVER
                             break
                         default: 
                             GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
@@ -39,15 +39,16 @@ pipeline {
     }
     }
 
-      stage('Test') {
-                steps {
-                    echo 'Testing..'
-                    withMaven( maven: 'maven-3.6.3' ) {
-                    		sh 'cd future-utility-service && mvn clean install -U && mvn test'
-                    }
-
-                }
-            }
+//       stage('Test') {
+//                 steps {
+//                         echo 'Testing..'
+//                         withMaven( maven: 'maven-3.6.3' ) {
+//                                 sh 'cd future-utility-service && mvn clean install -U && mvn test'
+//                         }
+//
+//
+//                 }
+//             }
 
         stage('Build') {
 
@@ -78,9 +79,9 @@ pipeline {
 					sh "kubectl rollout restart deployment/future-utility-service --namespace sidekiq"
 					
                   } else {
-                    sh "kubectl config use-context MarcusProdAKSClust"
-                    sh "kubectl set image deployment/future-utility-service future-utility-service=${ACR_LOGINSERVER}/future-utility-service --namespace sidekiq"
-                    sh "kubectl rollout restart deployment/future-utility-service --namespace sidekiq"
+                    sh "kubectl config use-context ubnkula"
+                    sh "kubectl set image deployment/future-utility-service future-utility-service=${KULA_ACR_PROD_LOGINSERVER}/future-utility-service --namespace kula"
+                    sh "kubectl rollout restart deployment/future-utility-service --namespace kula"
                   }
                 }
             
@@ -106,10 +107,10 @@ def build(ENVIRONMENT) {
     }
   
   }else{
-    withCredentials([usernamePassword(credentialsId: 'acr-prod-credentials', usernameVariable: 'ACR_USERNAME', passwordVariable: 'ACR_PASSWORD')]) {
+    withCredentials([usernamePassword(credentialsId: 'kula-acr-prod-credentials', usernameVariable: 'ACR_USERNAME', passwordVariable: 'ACR_PASSWORD')]) {
      
      	withMaven( maven: 'maven-3.6.3' ) {
-     		withEnv(["FUTURE_ENV=production","ACR_SERVER=${ACR_LOGINSERVER}"]){
+     		withEnv(["FUTURE_ENV=production","ACR_SERVER=${KULA_ACR_PROD_LOGINSERVER}"]){
      			sh 'cd future-utility-service && mvn clean compile jib:build'
      		}
 

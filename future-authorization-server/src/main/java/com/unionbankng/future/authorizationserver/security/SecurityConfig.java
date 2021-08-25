@@ -1,5 +1,6 @@
 package com.unionbankng.future.authorizationserver.security;
 
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.security.authentication.BearerAuthenticationReader;
 import net.devh.boot.grpc.server.security.authentication.CompositeGrpcAuthenticationReader;
@@ -42,10 +43,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
+    private final App app;
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/login","/oauth/token", "/oauth/authorize/**","/api/v1/registration/**",
+        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/login","/oauth/token", "/oauth/authorize/**","/api/v1/registration/**","/api/v1/email/test",
 				"/api/v1/security/**","/api/v1/tags/find_by_type","/api/v1/tags/find_by_id","/api/v1/user_interest/add_for_user","/api/v1/tags/find_by_type_likely_name","/api/v1/tags/create").permitAll()
 				.and().requestMatchers().antMatchers("/api/**")
 				.and().authorizeRequests()
@@ -74,16 +78,21 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     public Keycloak keycloak(KeycloakSpringBootProperties props) {
 
+        app.print("################Connecting to KeyCloack");
         System.out.println(props.getAuthServerUrl());
+        app.print(props);
 
         Keycloak keycloak = KeycloakBuilder.builder() //
                 .serverUrl(props.getAuthServerUrl()) //
                 .realm(props.getRealm()) //
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS) //
-                .clientId(props.getResource()) //
-                .clientSecret((String) props.getCredentials().get("secret")) //
+                .grantType(OAuth2Constants.PASSWORD) //
+                .realm("master")
+                .clientId("admin-cli")
+                .username("admin")
+                .password("Kula@DV2021")
+//                .clientId(props.getResource()) //
+//                .clientSecret((String) props.getCredentials().get("secret")) //
                 .build();
-
         return keycloak;
     }
 
@@ -99,7 +108,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         CorsConfiguration configAutenticacao = new CorsConfiguration();
         configAutenticacao.setAllowCredentials(true);
         configAutenticacao.addAllowedHeader("*");
-        configAutenticacao.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq.azurewebsites.net"));
+        configAutenticacao.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq-frontend.azurewebsites.net","https://kula.work"));
         configAutenticacao.setAllowedMethods(Arrays.asList("GET","PUT","POST","UPDATE","DELETE"));
         configAutenticacao.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", configAutenticacao); // Global for all paths

@@ -1,7 +1,6 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
-import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRateRepository;
@@ -37,7 +36,7 @@ public class AppService {
     public Model getJob(Job job, Model model){
         model.addAttribute("job",job);
         if(job.getType()== JobType.TEAMS_PROJECT)
-            model.addAttribute("teams", jobTeamDetailsRepository.findByJobId(job.id));
+            model.addAttribute("teams", jobTeamDetailsRepository.findByJobId(job.getId()));
         else
             model.addAttribute("teams",null);
         return  model;
@@ -48,9 +47,9 @@ public class AppService {
         for (Job job: page.getContent()) {
             Map<String,Object> data=new HashMap<>();
             data.put("job",job);
-            data.put("proposals", jobProposalRepository.getCountByJobId(job.id));
+            data.put("proposals", jobProposalRepository.getCountByJobId(job.getId()));
             if(job.getType()== JobType.TEAMS_PROJECT)
-                data.put("teams", jobTeamDetailsRepository.findByJobId(job.id));
+                data.put("teams", jobTeamDetailsRepository.findByJobId(job.getId()));
             else
                 data.put("teams",null);
             baseList.add(data);
@@ -59,8 +58,8 @@ public class AppService {
     }
 
     public Model getProposal(JobProposal proposal, Model model){
-        model.addAttribute("teams", jobTeamDetailsRepository.findByJobId(proposal.jobId));
-        model.addAttribute("job",jobRepository.findById(proposal.jobId));
+        model.addAttribute("teams", jobTeamDetailsRepository.findByJobId(proposal.getJobId()));
+        model.addAttribute("job",jobRepository.findById(proposal.getJobId()));
         model.addAttribute("proposal",proposal);
         model.addAttribute("rating",jobRateRepository.findByUserId(proposal.getUserId()));
         return  model;
@@ -70,8 +69,8 @@ public class AppService {
         for (JobProposal proposal: page.getContent()) {
             Map<String,Object> data=new HashMap<>();
             data.put("proposal", proposal);
-            data.put("teams",  jobTeamDetailsRepository.findByJobId(proposal.jobId));
-            data.put("job",jobRepository.findById(proposal.jobId));
+            data.put("teams",  jobTeamDetailsRepository.findByJobId(proposal.getJobId()));
+            data.put("job",jobRepository.findById(proposal.getJobId()));
             data.put("rating",jobRateRepository.findByUserId(proposal.getUserId()));
             baseList.add(data);
         }

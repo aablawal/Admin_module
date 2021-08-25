@@ -46,8 +46,6 @@ public class SecurityController {
 
     @PostMapping("v1/security/change_password")
     public ResponseEntity<APIResponse> changePassword(@NotNull ChangePasswordRequest request){
-
-
         return securityService.changePassword(request);
 
     }

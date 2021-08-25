@@ -1,7 +1,5 @@
 package com.unionbankng.future.futurejobservice.services;
 import com.unionbankng.future.futurejobservice.entities.JobTeamDetails;
-import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
-import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -31,10 +31,10 @@ import java.util.Arrays;
 @EnableCaching
 public class MemcachedConfig extends AbstractSSMConfiguration {
 
-    @Value( "${memcached.service.host}" )
+    @Value("${memcached.service.host}" )
     private String memcachedHost;
 
-    @Value( "${memcached.service.port}" )
+    @Value("${memcached.service.port}" )
     private int memcachedPort;
 
     Logger logger = LoggerFactory.getLogger(MemcachedConfig.class);

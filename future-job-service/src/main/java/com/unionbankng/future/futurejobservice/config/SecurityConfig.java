@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 @Configuration
@@ -33,9 +34,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers("/api/v1/jobs","/api/v1/jobs/type/**").permitAll().and()
+                .antMatchers("/api/v1/ping", "/api/v1/test","/api/v1/notification/test","/api/v1/bank/transfer/test","/api/v1/bulk/bank_transfer/test", "/api/v1/jobs", "/api/v1/jobs/get_by_type/**", "/api/v1/jobs/get_by_type_and_category/**").permitAll().and()
                 .requestMatchers().antMatchers("/api/**").and().authorizeRequests().antMatchers("/api/**").authenticated();
-
     }
 
     @Autowired
@@ -56,7 +56,6 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         return new KeycloakSpringBootConfigResolver();
     }
 
-
     @Bean
     public FilterRegistrationBean<CorsFilter> corFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -64,8 +63,9 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://sidekiq.azurewebsites.net"));
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET","PUT","POST","UPDATE","DELETE"));
+
+        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://sidekiq-frontend.azurewebsites.net","https://kula.work"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "PUT", "POST", "UPDATE", "DELETE"));
         corsConfiguration.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", corsConfiguration); // Global for all paths
 
@@ -73,6 +73,4 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
     }
-
-
 }

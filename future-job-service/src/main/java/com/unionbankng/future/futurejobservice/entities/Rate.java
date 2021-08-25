@@ -3,6 +3,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_freelancer_rating")
@@ -12,42 +13,32 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Rate {
+public class Rate  implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
+   private  Long id;
     @NotNull
-    Long userId;
+    private   Long userId;
     @NotNull
-    Long rate;
+    private  Long rate;
     @NotNull
-    String description;
+    private   String description;
     @Column(columnDefinition="TEXT")
-    String feedback;
-    @Temporal(TemporalType.DATE)
-    Date lastModifiedDate;
-    @Temporal(TemporalType.DATE)
-    Date createdAt;
+    private   String feedback;
+    @Temporal(TemporalType.TIMESTAMP)
+    private  Date lastModifiedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private   Date createdAt;
 
-
-    public Rate(Rate rating) {
-        this.id = rating.id;
-        this.userId=rating.id;
-        this.rate = rating.rate;
-        this.description = rating.description;
-        this.feedback = rating.feedback;
-        this.lastModifiedDate= new Date();
-        this.createdAt = new Date();
-    }
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 
     @PreUpdate
-    private void setLastModifiedDate() {
+    public void setLastModifiedDate() {
         lastModifiedDate = new Date();
     }
 }

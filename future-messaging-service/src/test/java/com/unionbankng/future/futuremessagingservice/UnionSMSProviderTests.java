@@ -13,12 +13,12 @@ public class UnionSMSProviderTests {
 
     @Test
     void sendSMS() throws Exception {
-        SMSProvider UBNSMSProvider = new UnionSMSProvider();
-        SMS sms = new SMS();
-        sms.setMessage("Hello World");
-        sms.setRecipient("08058905125");
-
-        UBNSMSProvider.send(sms);
+//        SMSProvider UBNSMSProvider = new UnionSMSProvider();
+//        SMS sms = new SMS();
+//        sms.setMessage("Hello World");
+//        sms.setRecipient("08058905125");
+//
+//        UBNSMSProvider.send(sms);
 
     }
 }

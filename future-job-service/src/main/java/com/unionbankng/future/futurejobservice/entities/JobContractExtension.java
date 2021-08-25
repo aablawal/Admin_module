@@ -1,8 +1,9 @@
 package com.unionbankng.future.futurejobservice.entities;
-import com.unionbankng.future.futurejobservice.enums.JobExtensionStatus;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name="job_contract_extension")
@@ -12,43 +13,40 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobContractExtension {
+public class JobContractExtension implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @NotNull
-    Long proposalId;
+    private  Long proposalId;
     @NotNull
-    Long userId;
+    private  Long userId;
     @NotNull
-    Long employerId;
+    private  Long employerId;
     @NotNull
-    Long jobId;
+    private  Long jobId;
     @NotNull
-    Date date;
+    private  String contractReference;
+    @NotNull
+    private  Date date;
     @NotNull
     @Enumerated(EnumType.STRING)
-    JobExtensionStatus status;
+    private Status status;
     @Column(columnDefinition="TEXT")
-    String reason;
-    @Temporal(TemporalType.DATE)
-    Date createdAt;
-
-    public JobContractExtension(JobContractExtension request) {
-        this.id = request.id;
-        this.proposalId = request.proposalId;
-        this.userId = request.userId;
-        this.employerId = request.employerId;
-        this.jobId = request.jobId;
-        this.date = request.date;
-        this.reason = request.reason;
-        this.status=request.status;
-        this.createdAt =new Date();
-    }
+    private  String reason;
+    private  String lastModifiedBy;
+    @Temporal(TemporalType.TIMESTAMP)
+    private  Date lastModifiedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private  Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date rejectedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date approvedDate;
 
     @PrePersist
-    private void setCreatedAt() {
+    public void setCreatedAt() {
         createdAt = new Date();
     }
 

@@ -1,30 +1,22 @@
 package com.unionbankng.future.futurejobservice;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unionbankng.future.futurebankservice.grpc.UBNFundsTransferResponse;
-import com.unionbankng.future.futurejobservice.entities.JobTransfer;
-import com.unionbankng.future.futurejobservice.pojos.APIResponse;
-import com.unionbankng.future.futurejobservice.services.BankTransferService;
+import com.unionbankng.future.futurejobservice.entities.JobPayment;
+import com.unionbankng.future.futurejobservice.pojos.PaymentResponse;
+import com.unionbankng.future.futurejobservice.services.UBNBankTransferService;
+import lombok.RequiredArgsConstructor;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import java.util.Date;
-import static org.junit.jupiter.api.Assertions.*;
 
+@RequiredArgsConstructor
 class BankTransferServiceTest {
 
-    @Autowired
-    BankTransferService bankTransferService;
+
+  private final UBNBankTransferService bankTransferService;
 
     @Test
     void transferUBNtoUBN() {
 
-        JobTransfer transfer=new JobTransfer();
-
-        transfer.setUserId(Long.valueOf(1));
-        transfer.setJobId(Long.valueOf(1));
-        transfer.setProposalId(Long.valueOf(1));
-        transfer.setEmployerId(Long.valueOf(1));
+        JobPayment transfer=new JobPayment();
         transfer.setCreatedAt(new Date());
 
         //transfer
@@ -47,7 +39,7 @@ class BankTransferServiceTest {
         transfer.setDebitAccountBranchCode("682");
         transfer.setDebitAccountType("CASA");
         transfer.setDebitNarration("New Naration");
-        UBNFundsTransferResponse response= bankTransferService.transferUBNtoUBN(transfer);
+        PaymentResponse response= bankTransferService.transferUBNtoUBN(transfer);
 
         Assert.assertEquals("00",response.getCode());
     }

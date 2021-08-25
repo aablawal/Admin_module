@@ -31,10 +31,12 @@ public class UnionSMSProvider implements SMSProvider {
         Client client = UBNConfigurationProperties.ignoreSSLClient();
         WebTarget target = client.target(UBNConfigurationProperties.SEND_SMS);
 
+        logger.info("URL:"+UBNConfigurationProperties.SEND_SMS);
+
         UBNSmsRequest request = new UBNSmsRequest();
         request.setAccountNo(UBNConfigurationProperties.SMS_GL);
         request.setMessage(sms.getMessage());
-        request.setSource("M36");
+        request.setSource("Kula");
         request.setMobileNo(sms.getRecipient());
 
         logger.info("sending sms : {}", sms.getRecipient());
