@@ -41,7 +41,7 @@ public class BvnValidationService {
         if (response.isSuccessful()) {
             return  ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         }else{
-            return ResponseEntity.ok().body(new APIResponse<>(response.body().getStatusMessage()!=null?response.body().getStatusMessage():"Unable to Validate BVN", false, null));
+            return ResponseEntity.ok().body(new APIResponse<>(response.body()!=null?response.body().getStatusMessage():"Unable to Validate BVN", false, null));
         }
     }
 
@@ -63,7 +63,7 @@ public class BvnValidationService {
         if (response.isSuccessful() && response.body().getData()!=null) {
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
-            return ResponseEntity.ok().body(new APIResponse<>(response.body().getStatusMessage()!=null?response.body().getStatusMessage():"Unable to Verify BVN", false, null));
+            return ResponseEntity.ok().body(new APIResponse<>(response.body()!=null?response.body().getStatusMessage():"Unable to Verify BVN", false, null));
         }
     }
 }
