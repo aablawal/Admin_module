@@ -2,13 +2,16 @@ package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
+import com.unionbankng.future.futurejobservice.enums.LoggingOwner;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
 import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.TeamMember;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,7 @@ public class JobService {
     private final NotificationSender notificationSender;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
     private final App app;
+    private final AppLogger appLogger;
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
@@ -184,6 +188,21 @@ public class JobService {
                     ex.printStackTrace();
                 }
 
+
+                try {
+                    //############### Activity Logging ###########
+                    ActivityLog log = new ActivityLog();
+                    log.setDescription("Created new Job");
+                    log.setRequestObject(app.toString(job));
+                    log.setRequestObject(app.toString(savedJob));
+                    log.setUsername(currentUser.getUserEmail());
+                    log.setUserId(currentUser.getUserUUID());
+                    appLogger.log(log);
+                    //#########################################
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
                 return savedJob;
 
             }else {
@@ -221,6 +240,20 @@ public class JobService {
             body.setRecipientName(currentUser.getUserFullName());
             notificationSender.pushNotification(body);
             logger.info("Notification fired");
+            try {
+                //############### Activity Logging ###########
+                ActivityLog log = new ActivityLog();
+                log.setDescription("Closed Job");
+                log.setRequestObject(String.valueOf(id));
+                log.setRequestObject(app.toString(job));
+                log.setUsername(currentUser.getUserEmail());
+                log.setUserId(currentUser.getUserUUID());
+                appLogger.log(log);
+                //#########################################
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+
             return jobRepository.save(job);
         }else{
             logger.info("JOBSERVICE: Job not found");
@@ -266,6 +299,20 @@ public class JobService {
                 body.setRecipientName(currentUser.getUserFullName());
                 notificationSender.pushNotification(body);
             }
+            try {
+                //############### Activity Logging ###########
+                ActivityLog log = new ActivityLog();
+                log.setDescription("Repeat Job");
+                log.setRequestObject(String.valueOf(id));
+                log.setRequestObject(app.toString(job));
+                log.setUsername(currentUser.getUserEmail());
+                log.setUserId(currentUser.getUserUUID());
+                appLogger.log(log);
+                //#########################################
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+
             //end
             return  jobRepository.save(job);
         }else{
@@ -273,7 +320,9 @@ public class JobService {
             return  null;
         }
     }
-    public void  deleteJobById(Long id) {
+    public void  deleteJobById(Principal principal, Long id) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+
         try {
             //update configurations table
             Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS);
@@ -284,6 +333,20 @@ public class JobService {
         }catch (Exception ex){
             ex.printStackTrace();
         }
+
+        try {
+            //############### Activity Logging ###########
+            ActivityLog log = new ActivityLog();
+            log.setDescription("Repeat Job");
+            log.setRequestObject(String.valueOf(id));
+            log.setUsername(currentUser.getUserEmail());
+            log.setUserId(currentUser.getUserUUID());
+            appLogger.log(log);
+            //#########################################
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
         jobRepository.deleteById(id);
     }
     public Model findJobById(Long id, Model model) {

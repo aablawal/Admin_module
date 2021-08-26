@@ -10,6 +10,7 @@ import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +65,7 @@ public class JobContractService implements Serializable {
     private final JobContractDisputeRepository jobContractDisputeRepository;
     private final NotificationSender notificationSender;
     private  final UserService userService;
+    private final AppLogger appLogger;
     private final App app;
 
 
@@ -248,6 +250,20 @@ public class JobContractService implements Serializable {
 
                 APIResponse paymentResponse=jobPaymentService.makePayment(payment);
                 if (paymentResponse.isSuccess()) {
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Employer payment to Escrow Successful for job "+job.getTitle());
+                        log.setRequestObject(app.toString(payment));
+                        log.setResponseObject(app.toString(paymentResponse));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                     contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
                     if (job != null) {
                         NotificationBody body = new NotificationBody();
@@ -380,6 +396,21 @@ public class JobContractService implements Serializable {
                 proposal.setContractId(savedContract.getId());
                 jobProposalRepository.save(proposal);
                 jobRepository.save(job);
+
+                try {
+                    //############### Activity Logging ###########
+                    ActivityLog log = new ActivityLog();
+                    log.setDescription("Contract Approved Successfully for job "+job.getTitle());
+                    log.setRequestObject(app.toString(contract));
+                    log.setResponseObject(app.toString(savedContract));
+                    log.setUsername(currentUser.getUserEmail());
+                    log.setUserId(currentUser.getUserUUID());
+                    appLogger.log(log);
+                    //#########################################
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
                 return new APIResponse(remark, true, savedContract);
             } else {
                 logger.info("JOBSERVICE: Transaction failed");
@@ -426,6 +457,20 @@ public class JobContractService implements Serializable {
                         notificationSender.pushNotification(body);
                     }
                     //end
+
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Contract Timeline Extension Request for contract Id"+contract.getId());
+                        log.setRequestObject(app.toString(extensionRequest));
+                        log.setResponseObject(app.toString(extension));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
                     return extension;
                 } else {
                     logger.info("JOBSERVICE: Unable to submit the contract extension");
@@ -444,11 +489,11 @@ public class JobContractService implements Serializable {
     public JobMilestone addNewMilestone(Principal principal, String request) throws JsonProcessingException {
         JobMilestone milestone = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobMilestone.class);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return addNewMilestone(currentUser.getUserFullName(), milestone);
+        return addNewMilestone(currentUser, milestone);
     }
 
 
-    public JobMilestone addNewMilestone(String userName, JobMilestone milestone) {
+    public JobMilestone addNewMilestone(JwtUserDetail currentUser, JobMilestone milestone) {
         try {
             JobContract contract=jobContractRepository.findById(milestone.getContractId()).orElse(null);
             if(contract!=null) {
@@ -464,7 +509,7 @@ public class JobContractService implements Serializable {
                     User employer =userService.getUserById(newMilestone.getEmployerId());
                     if (currentJob != null && employer!=null) {
                         NotificationBody body = new NotificationBody();
-                        body.setBody(userName + " created new milestone on " + currentJob.getTitle() + " for your review and approval");
+                        body.setBody(currentUser.getUserFullName() + " created new milestone on " + currentJob.getTitle() + " for your review and approval");
                         body.setSubject("New Milestone");
                         body.setActionType("REDIRECT");
                         body.setAction("/my-job/contract/milestones/" + newMilestone.getJobId() + "/" + newMilestone.getProposalId());
@@ -477,6 +522,20 @@ public class JobContractService implements Serializable {
                         notificationSender.pushNotification(body);
                     }
                     //end
+
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Created new Milestone for job "+currentJob.getTitle());
+                        log.setRequestObject(app.toString(milestone));
+                        log.setResponseObject(app.toString(newMilestone));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
                     return newMilestone;
                 } else {
                     logger.info("JOBSERVICE: Unable to add new milestone");
@@ -567,6 +626,21 @@ public class JobContractService implements Serializable {
                             notificationSender.pushNotification(body);
                         }
                         //end
+
+                        try {
+                            //############### Activity Logging ###########
+                            ActivityLog log = new ActivityLog();
+                            log.setDescription("Approved Contract Extension for Contract "+contract.getId());
+                            log.setRequestObject(app.toString(request));
+                            log.setResponseObject(app.toString(extension));
+                            log.setUsername(currentUser.getUserEmail());
+                            log.setUserId(currentUser.getUserUUID());
+                            appLogger.log(log);
+                            //#########################################
+                        }catch (Exception ex){
+                            ex.printStackTrace();
+                        }
+
                         return extension;
                     } else {
                         logger.info("JOBSERVICE: Escrow transaction failed");
@@ -592,11 +666,11 @@ public class JobContractService implements Serializable {
 
         JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return submitJob(currentUser.getUserFullName(), request, supportingFiles);
+        return submitJob(currentUser, request, supportingFiles);
 
     }
 
-    public JobProjectSubmission submitJob(String userName, JobProjectSubmission
+    public JobProjectSubmission submitJob(JwtUserDetail currentUser, JobProjectSubmission
             request, MultipartFile[] supportingFiles) {
         try {
             String supporting_file_names = null;
@@ -613,7 +687,7 @@ public class JobContractService implements Serializable {
             User employer=userService.getUserById(request.getEmployerId());
             if (currentJob != null && employer!=null) {
                 NotificationBody body = new NotificationBody();
-                body.setBody(userName + " submitted " + currentJob.getTitle() + " for your review and approval");
+                body.setBody(currentUser.getUserFullName() + " submitted " + currentJob.getTitle() + " for your review and approval");
                 body.setSubject("Project Review");
                 body.setActionType("REDIRECT");
                 body.setAction("/job/ongoing/details/" + request.getJobId());
@@ -626,7 +700,24 @@ public class JobContractService implements Serializable {
                 notificationSender.pushNotification(body);
             }
             //end
-            return jobProjectSubmissionRepository.save(request);
+
+
+           JobProjectSubmission savedRequest=  jobProjectSubmissionRepository.save(request);
+            try {
+                //############### Activity Logging ###########
+                ActivityLog log = new ActivityLog();
+                log.setDescription("Submitted Completed Project for Employer Review");
+                log.setRequestObject(app.toString(request));
+                log.setResponseObject(app.toString(savedRequest));
+                log.setUsername(currentUser.getUserEmail());
+                log.setUserId(currentUser.getUserUUID());
+                appLogger.log(log);
+                //#########################################
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+
+            return savedRequest;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -638,10 +729,10 @@ public class JobContractService implements Serializable {
             JsonProcessingException {
         JobContractDispute request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobContractDispute.class);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return raiseDispute(currentUser.getUserFullName(), currentUser.getUserId(), request, attachmentFiles);
+        return raiseDispute(currentUser, currentUser.getUserId(), request, attachmentFiles);
     }
 
-    public APIResponse raiseDispute(String userName, Long
+    public APIResponse raiseDispute(JwtUserDetail currentUser, Long
             userId, JobContractDispute request, MultipartFile[] attachmentFiles) {
         try {
             String attachments = null;
@@ -675,7 +766,7 @@ public class JobContractService implements Serializable {
                     Job currentJob = jobRepository.findById(dispute.getJobId()).orElse(null);
                     if (currentJob != null) {
                         NotificationBody body = new NotificationBody();
-                        body.setBody(userName + " raised a dispute on " + currentJob.getTitle() + "");
+                        body.setBody(currentUser.getUserFullName() + " raised a dispute on " + currentJob.getTitle() + "");
                         body.setSubject("Dispute Raised Against you");
                         body.setActionType("REDIRECT");
                         body.setAction("/job/details/" + dispute.getJobId());
@@ -687,6 +778,22 @@ public class JobContractService implements Serializable {
                         body.setRecipientName(employer.getFullName());
                         notificationSender.pushNotification(body);
                     }
+
+
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Raised Dispute for  "+currentJob.getTitle());
+                        log.setRequestObject(app.toString(request));
+                        log.setResponseObject(app.toString(dispute));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                     return new APIResponse("success", true, dispute);
 
                 } else {
@@ -707,11 +814,13 @@ public class JobContractService implements Serializable {
 
     public JobProjectSubmission rejectJob(Principal principal, RejectionRequest rejectionRequest, Long jobId, Long
             requestId) {
+
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
         if (request != null) {
             request.setStatus(Status.RE);
             request.setRemark(rejectionRequest.getReason());
-            jobProjectSubmissionRepository.save(request);
+
 
             User freelancer=userService.getUserById(request.getUserId());
             if(freelancer!=null) {
@@ -730,6 +839,22 @@ public class JobContractService implements Serializable {
                 notificationSender.pushNotification(body);
             }
         }
+
+        JobProjectSubmission savedRequest= jobProjectSubmissionRepository.save(request);
+        try {
+            //############### Activity Logging ###########
+            ActivityLog log = new ActivityLog();
+            log.setDescription("Rejected a Project Submitted");
+            log.setRequestObject(app.toString(request));
+            log.setResponseObject(app.toString(savedRequest));
+            log.setUsername(currentUser.getUserEmail());
+            log.setUserId(currentUser.getUserUUID());
+            appLogger.log(log);
+            //#########################################
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
         return request;
     }
 
@@ -738,12 +863,11 @@ public class JobContractService implements Serializable {
             JsonProcessingException {
         JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
-        return submitCompletedMilestone(currentUser.getUserFullName(), milestoneId, request, supportingFiles);
+        return submitCompletedMilestone(currentUser, milestoneId, request, supportingFiles);
     }
 
 
-    public JobProjectSubmission submitCompletedMilestone(String
-                                                                 userName, Long milestoneId, JobProjectSubmission
+    public JobProjectSubmission submitCompletedMilestone(JwtUserDetail currentUser, Long milestoneId, JobProjectSubmission
                                                                  request, MultipartFile[] supportingFiles) {
         try {
             String supporting_file_names = null;
@@ -765,7 +889,7 @@ public class JobContractService implements Serializable {
                 User employer = userService.getUserById(request.getEmployerId());
                 if (currentJob != null && employer!=null) {
                     NotificationBody body = new NotificationBody();
-                    body.setBody(userName + " submitted milestone for your review and approval");
+                    body.setBody(currentUser.getUserFullName() + " submitted milestone for your review and approval");
                     body.setSubject("Milestone Review");
                     body.setActionType("REDIRECT");
                     body.setAction("/my-job/contract/milestones/" + request.getJobId() + "/" + request.getProposalId());
@@ -779,7 +903,23 @@ public class JobContractService implements Serializable {
                 }
                 //end
                 request.setStatus(Status.PA);
-                return jobProjectSubmissionRepository.save(request);
+                JobProjectSubmission savedRequest= jobProjectSubmissionRepository.save(request);
+
+                try {
+                    //############### Activity Logging ###########
+                    ActivityLog log = new ActivityLog();
+                    log.setDescription("Submitted new Milestone Job for Employer Review");
+                    log.setRequestObject(app.toString(request));
+                    log.setResponseObject(app.toString(savedRequest));
+                    log.setUsername(currentUser.getUserEmail());
+                    log.setUserId(currentUser.getUserUUID());
+                    appLogger.log(log);
+                    //#########################################
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
+                return  savedRequest;
             } else {
                 logger.info("JOBSERVICE: Milestone not found");
                 return null;
@@ -827,6 +967,20 @@ public class JobContractService implements Serializable {
                             if (response.getStatusCode().is2xxSuccessful()) {
                                 APIResponse settlementResponse = this.settleContractById(principal, contract.getContractReference());
                                 if (settlementResponse.isSuccess()) {
+
+                                    try {
+                                        //############### Activity Logging ###########
+                                        ActivityLog log = new ActivityLog();
+                                        log.setDescription("Payment to Freelancer Successful for Contract"+contract.getId());
+                                        log.setRequestObject(app.toString(contract));
+                                        log.setResponseObject(app.toString(settlementResponse));
+                                        log.setUsername(currentUser.getUserEmail());
+                                        log.setUserId(currentUser.getUserUUID());
+                                        appLogger.log(log);
+                                        //#########################################
+                                    }catch (Exception ex){
+                                        ex.printStackTrace();
+                                    }
                                     //complete contract
                                     contract.setStatus(Status.CO);
                                     contract.setEndDate(new Date());
@@ -878,6 +1032,19 @@ public class JobContractService implements Serializable {
                                         notificationSender.pushNotification(body);
                                     }
 
+                                    try {
+                                        //############### Activity Logging ###########
+                                        ActivityLog log = new ActivityLog();
+                                        log.setDescription("Ended Contract for job "+job.getTitle());
+                                        log.setRequestObject("ContractId"+contract.getId());
+                                        log.setResponseObject(app.toString(settlementResponse));
+                                        log.setUsername(currentUser.getUserEmail());
+                                        log.setUserId(currentUser.getUserUUID());
+                                        appLogger.log(log);
+                                        //#########################################
+                                    }catch (Exception ex){
+                                        ex.printStackTrace();
+                                    }
                                 }
                                 return settlementResponse;
                                 //end
@@ -1004,8 +1171,7 @@ public class JobContractService implements Serializable {
     }
 
 
-    public APIResponse modifyMilestoneState(Principal
-                                                    principal, Long milestoneId, String newStatus) {
+    public APIResponse modifyMilestoneState(Principal principal, Long milestoneId, String newStatus) {
 
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         return modifyMilestoneState(currentUser, milestoneId, Status.valueOf(newStatus));
@@ -1134,6 +1300,21 @@ public class JobContractService implements Serializable {
                                     remark = "Escrow transaction failed";
                                     logger.info("JOBSERVICE: Escrow transaction failed");
                                 }
+
+                                try {
+                                    //############### Activity Logging ###########
+                                    ActivityLog log = new ActivityLog();
+                                    log.setDescription("Payment to Escrow Successful for Milestone of job "+job.getTitle());
+                                    log.setRequestObject(app.toString(payment));
+                                    log.setResponseObject(app.toString(paymentResponse));
+                                    log.setUsername(currentUser.getUserEmail());
+                                    log.setUserId(currentUser.getUserUUID());
+                                    appLogger.log(log);
+                                    //#########################################
+                                }catch (Exception ex){
+                                    ex.printStackTrace();
+                                }
+
                                 //done
                             } else {
                                 status = 0;
@@ -1180,6 +1361,21 @@ public class JobContractService implements Serializable {
                         body.setRecipientName(freelancer.getFullName());
                         notificationSender.pushNotification(body);
                     }
+
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Rejected Milestone for job "+currentJob.getTitle());
+                        log.setRequestObject(app.toString(milestone));
+                        log.setResponseObject(app.toString(savedMilestone));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                     //end
                     return new APIResponse("success", true, savedMilestone);
                 }
@@ -1208,9 +1404,24 @@ public class JobContractService implements Serializable {
                         body.setRecipientName(freelancer.getFullName());
                         notificationSender.pushNotification(body);
                     }
-                    //end
+
+
                     JobMilestone savedMilestone = jobMilestoneRepository.save(milestone);
-                    return new APIResponse("success", true, savedMilestone);
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Approved Milestone for job "+currentJob.getTitle());
+                        log.setRequestObject(app.toString(milestone));
+                        log.setResponseObject(app.toString(savedMilestone));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                    //end
+                         return new APIResponse("success", true, savedMilestone);
                 } else {
                     logger.info("JOBSERVICE: Transaction failed");
                     return new APIResponse(remark, false, null);
@@ -1255,6 +1466,20 @@ public class JobContractService implements Serializable {
 
                             APIResponse settlementResponse=this.settleContractById(principal,milestone.getMilestoneReference());
                             if(settlementResponse.isSuccess()) {
+
+                                try {
+                                    //############### Activity Logging ###########
+                                    ActivityLog log = new ActivityLog();
+                                    log.setDescription("Payment to Freelancer Successful for Milestone on Contract "+contract.getId());
+                                    log.setRequestObject(app.toString(milestone));
+                                    log.setResponseObject(app.toString(settlementResponse));
+                                    log.setUsername(currentUser.getUserEmail());
+                                    log.setUserId(currentUser.getUserUUID());
+                                    appLogger.log(log);
+                                    //#########################################
+                                }catch (Exception ex){
+                                    ex.printStackTrace();
+                                }
                                 //end milestone
                                 milestone.setStatus(Status.CO);
                                 milestone.setEndDate(new Date());

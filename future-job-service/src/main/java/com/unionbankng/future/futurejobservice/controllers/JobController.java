@@ -64,8 +64,8 @@ public class JobController {
     }
 
     @DeleteMapping("/v1/job/delete/{id}")
-    public ResponseEntity<APIResponse> deleteJob(@PathVariable  Long id){
-        service.deleteJobById(id);
+    public ResponseEntity<APIResponse> deleteJob(Principal principal, @PathVariable  Long id){
+        service.deleteJobById(principal,id);
         return ResponseEntity.ok().body(new APIResponse("Job deleted successful",true,null));
     }
 
