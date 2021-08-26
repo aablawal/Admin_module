@@ -29,6 +29,16 @@ public class App {
             ex.printStackTrace();
         }
     }
+    public String toString(Object obj){
+        try {
+            return new Gson().toJson(obj);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return  null;
+        }
+    }
+
     public void printX(Object obj){
         try {
             logger.info(new Gson().toJson(obj));

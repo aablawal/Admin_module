@@ -23,52 +23,7 @@ class JobContractServiceTest {
     Long requestId=1l;
     Long contractId =1l;
 
-    @Test
-    void addNewMilestone() {
-        JobMilestone milestone =new JobMilestone();
-        milestone.setUserId(userId);
-        milestone.setJobId(jobId);
-        milestone.setProposalId(proposalId);
-        milestone.setTitle("New Milestone");
-        milestone.setDescription("I will design the first Logo");
-        milestone.setStatus(Status.PA);
-        milestone.setAmount(1l);
-        milestone.setEndDate(new Date());
-        milestone.setStartDate(new Date());
-        milestone.setCreatedAt(new Date());
-        JobMilestone savedRequest=jobContractService.addNewMilestone("Test User", milestone);
-        Assert.assertEquals(jobId,savedRequest.getJobId());
-    }
 
-
-    @Test
-    void submitJob() {
-        JobProjectSubmission request = new JobProjectSubmission();
-        request.setJobId(jobId);
-        request.setProposalId(proposalId);
-        request.setUserId(1l);
-        request.setEmployerId(1l);
-        request.setDescription("Test description");
-        request.setStatus(Status.AC);
-        request.setLink("www.projectlink.com");
-        request.setCreatedAt(new Date());
-        JobProjectSubmission savedRequest= jobContractService.submitJob("Test User",request, null);
-        Assert.assertEquals(jobId,savedRequest.getJobId());
-
-    }
-
-    @Test
-    void raiseDispute() {
-        JobContractDispute dispute=new JobContractDispute();
-        dispute.setJobId(jobId);
-        dispute.setEmployerId(userId);
-        dispute.setUserId(userId);
-        dispute.setProposalId(proposalId);
-        dispute.setContractId(contractId);
-        dispute.setDescription("The work i did is great, i need my money");
-        APIResponse response=  jobContractService.raiseDispute("Test User",userId,dispute,null);
-        Assert.assertEquals(true,response.isSuccess());
-    }
 
     @Test
     void rejectJob() {
@@ -76,21 +31,6 @@ class JobContractServiceTest {
         rejectionRequest.setReason("Test Reason");
         JobProjectSubmission contract=  jobContractService.rejectJob(null,rejectionRequest,jobId,requestId);
         Assert.assertEquals(jobId,contract.getJobId());
-    }
-
-    @Test
-    void submitCompletedMilestone() {
-        JobProjectSubmission request = new JobProjectSubmission();
-        request.setJobId(jobId);
-        request.setProposalId(proposalId);
-        request.setUserId(1l);
-        request.setEmployerId(1l);
-        request.setDescription("Test description");
-        request.setStatus(Status.PE);
-        request.setLink("www.projectlink.com");
-        request.setCreatedAt(new Date());
-        JobProjectSubmission savedMilestone= jobContractService.submitCompletedMilestone("Test User", milestoneId,request,null);
-        Assert.assertEquals("www.projectlink.com",savedMilestone.getLink());
     }
 
     @Test

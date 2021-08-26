@@ -39,7 +39,7 @@ public class JsonMessageConverter implements MessageConverter {
      * Extracts JSON payload for further processing by JacksonMapper.
      */
     @Override
-    public Object fromMessage(javax.jms.Message message) throws JMSException, MessageConversionException {
+    public String fromMessage(javax.jms.Message message) throws JMSException, MessageConversionException {
         return ((TextMessage) message).getText();
     }
 }

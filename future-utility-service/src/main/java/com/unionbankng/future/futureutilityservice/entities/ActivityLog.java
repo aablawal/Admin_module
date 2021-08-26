@@ -28,6 +28,7 @@ public class ActivityLog {
     String username;
     String device;
     String ipAddress;
+    @Column(columnDefinition="TEXT")
     String description;
     @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;

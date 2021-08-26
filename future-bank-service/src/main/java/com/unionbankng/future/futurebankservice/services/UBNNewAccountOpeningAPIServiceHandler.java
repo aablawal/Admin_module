@@ -63,7 +63,6 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         Response<UBNAuthServerTokenResponse> response =  responseCall.execute();
 
-
         app.print("Response");
         app.print(response);
         app.print(response.body());

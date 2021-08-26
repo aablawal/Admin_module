@@ -13,6 +13,4 @@ public class EmailSender {
     public void sendEmail(EmailBody emailBody){
         jmsTemplate.convertAndSend(EMAIL_DESTINATION,emailBody);
     }
-
-
 }
