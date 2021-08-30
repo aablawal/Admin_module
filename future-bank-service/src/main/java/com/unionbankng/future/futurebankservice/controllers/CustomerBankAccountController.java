@@ -30,7 +30,7 @@ public class CustomerBankAccountController {
 
 
     @PostMapping("/v1/ubn-account/add_bank_account")
-    public ResponseEntity<APIResponse<CustomerBankAccount>> addBankAccount(@ApiIgnore Principal principal, @RequestBody CustomerBankAccount bankAccount) {
+    public ResponseEntity<APIResponse<CustomerBankAccount>> addBankAccount(Principal principal, @RequestBody CustomerBankAccount bankAccount) {
 
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         if (customerBankAccountService.existsByAccountNumber(bankAccount.getAccountNumber()))
