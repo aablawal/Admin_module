@@ -7,7 +7,6 @@ import com.unionbankng.future.futurebankservice.services.CustomerBankAccountServ
 import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHandler;
 import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
