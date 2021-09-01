@@ -54,11 +54,18 @@ public class JobService {
             Job job = new ObjectMapper().readValue(jobData, Job.class);
             job.setStatus(Status.AC);
 
+
+            app.print("Job Request:");
+            app.print(job);
+
+            app.print("Attached Files");
+            app.print("NDA files:"+nda_files.length);
+            app.print("Supporting Files:"+supporting_files.length);
             //save files if not null
             if (nda_files!=null)
-                nda_file_names = this.fileStoreService.storeFiles(nda_files, job.getOid().toString());
+                nda_file_names = this.fileStoreService.storeFiles(nda_files,"kula-nda");
             if (supporting_files!=null)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, job.getOid().toString());
+                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, "kula");
 
             //cross verify if attached files processed
             if (nda_file_names != null)
