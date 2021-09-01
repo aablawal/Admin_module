@@ -10,12 +10,16 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AppLogger {
 
-    private static final String QUEUE_NAME = "kulaloggingqueue";
+    private static final String LOGGING_QUEUE_NAME = "kulaloggingqueue";
     private final JmsTemplate jmsTemplate;
     public void log(ActivityLog log){
         log.setOwner(LoggingOwner.JOB_SERVICE);
         log.setDevice("Not Detected");
         log.setIpAddress("Not Detected");
-        jmsTemplate.convertAndSend(QUEUE_NAME,log);
+        try {
+            jmsTemplate.convertAndSend(LOGGING_QUEUE_NAME, log);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 }
