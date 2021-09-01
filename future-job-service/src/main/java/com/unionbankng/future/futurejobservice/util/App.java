@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.util;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.uuid.Generators;
@@ -81,5 +82,11 @@ public class App {
         Pattern pattern = Pattern.compile("^\\d{11}$");
         Matcher matcher = pattern.matcher(number);
         return matcher.matches();
+    }
+
+    public ObjectMapper getMapper(){
+        ObjectMapper mapper= new ObjectMapper();
+        mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+        return mapper;
     }
 }
