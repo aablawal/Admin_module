@@ -19,8 +19,11 @@ public class LoggingListener {
 
     @JmsListener(destination = QUEUE_NAME, containerFactory = "jmsListenerContainerFactory")
     public void receiveMessage(String json) throws JsonProcessingException {
+        System.out.println("Log received from Logger queue");
         ActivityLog log = mapper.readValue(json, ActivityLog.class);
         ActivityLog savedLog= activityLoggerService.log(log);
+        System.out.println(mapper.writeValueAsString(savedLog));
+        System.out.println("Logged Successfully");
     }
 
 

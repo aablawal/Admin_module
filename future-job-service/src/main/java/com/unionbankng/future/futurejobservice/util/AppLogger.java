@@ -20,8 +20,10 @@ public class AppLogger {
             log.setDevice(app.getClientDevice());
             log.setIpAddress(app.getClientMACAddress());
             jmsTemplate.convertAndSend(LOGGING_QUEUE_NAME, log);
+            System.out.println("Log pushed to logger successfully");
         }catch (Exception ex){
             ex.printStackTrace();
+            System.out.println("Unable to push to logger queue");
         }
     }
 }

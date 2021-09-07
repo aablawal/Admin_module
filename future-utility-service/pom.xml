@@ -15,7 +15,7 @@
 	<description>Utility Service for project future handles everything that does not have an ideal service ranging from document upload etc</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>9</java.version>
 		<spring-cloud.version>2020.0.0</spring-cloud.version>
 		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
 	</properties>
