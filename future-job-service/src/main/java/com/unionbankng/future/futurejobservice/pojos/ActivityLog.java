@@ -5,12 +5,13 @@ import lombok.*;
 
 import java.io.Serializable;
 
-@Data
-@Getter
-@Setter
-@NoArgsConstructor
-public class ActivityLog implements Serializable {
+public @Data
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
+class ActivityLog implements Serializable {
 
+    private static final long serialVersionUID = -295422703255886286L;
     protected LoggingOwner owner;
     protected String requestObject;
     protected String responseObject;

@@ -55,6 +55,16 @@ public class UserConfirmationTokenService {
         logger.info("Message Queued successfully");
     }
 
+
+    public void sendEmailTest(String email) {
+        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{"Email test from kula app"}, LocaleContextHolder.getLocale())
+                ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Kula Test")
+                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(email).displayName("Test").build())).build();
+
+        emailSender.sendEmail(emailBody);
+        logger.info("Message Queued successfully");
+    }
+
     public TokenConfirm confirmUserAccountByToken(String token) {
 
         logger.info("=============================");

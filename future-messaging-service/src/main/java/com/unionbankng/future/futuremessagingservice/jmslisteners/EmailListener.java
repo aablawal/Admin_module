@@ -31,37 +31,52 @@ public class EmailListener {
     @JmsListener(destination = QUEUE_NAME, containerFactory = "jmsListenerContainerFactory")
     public void receiveMessage(String json) throws JsonProcessingException {
 
+        logger.info("Email received from queue");
         EmailBody emailBody = mapper.readValue(json, EmailBody.class);
         app.print(emailBody);
         logger.info("Received message: {}", emailBody.getSubject());
         EmailProvider emailProvider = new UnionEmailProvider();
 
         try {
-            emailProvider.send(processEmailTemplate(emailBody));
-            logger.info("Email sent out");
+            logger.info("Sending Email....");
+             EmailBody body= processEmailTemplate(emailBody);
+             if(body!=null) {
+                 emailProvider.send(body);
+                 logger.info("Email sent out");
+             }else{
+                 logger.info("Failed to sent the Email");
+             }
         } catch (Exception e) {
+            logger.info("Unable to send Email");
             e.printStackTrace();
+
         }
     }
 
     private EmailBody processEmailTemplate(EmailBody emailBody){
 
-        Context ctx = new Context(LocaleContextHolder.getLocale());
-        if (emailBody.getRecipients().size() == 1) {
-            ctx.setVariable("name", "Dear " + emailBody.getRecipients().get(0).getDisplayName().split(" ")[1] + ",");
-            ctx.setVariable("footname", emailBody.getRecipients().get(0).getDisplayName());
-            ctx.setVariable("year", Calendar.getInstance().get(Calendar.YEAR));
-        } else {
-            ctx.setVariable("name", emailBody.getSubject());
+        try {
+            Context ctx = new Context(LocaleContextHolder.getLocale());
+            if (emailBody.getRecipients().size() == 1) {
+                ctx.setVariable("name", "Dear " + emailBody.getRecipients().get(0).getDisplayName().split(" ")[1] + ",");
+                ctx.setVariable("footname", emailBody.getRecipients().get(0).getDisplayName());
+                ctx.setVariable("year", Calendar.getInstance().get(Calendar.YEAR));
+            } else {
+                ctx.setVariable("name", emailBody.getSubject());
+            }
+
+            ctx.setVariable("body", emailBody.getBody());
+
+            final String htmlContent = templateEngine.process("mail/html/system-email.html", ctx);
+            emailBody.setBody(htmlContent);
+            logger.info("Arranged email template ");
+
+            return emailBody;
+        }catch (Exception ex){
+            System.out.println("Unable to generate email template");
+            ex.printStackTrace();
+            return null;
         }
-
-        ctx.setVariable("body", emailBody.getBody());
-
-        final String htmlContent = templateEngine.process("mail/html/system-email.html", ctx);
-        emailBody.setBody(htmlContent);
-        logger.info("Arranged email template ");
-
-        return emailBody;
     }
 
 }

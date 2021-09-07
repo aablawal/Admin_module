@@ -51,14 +51,21 @@ public class JobService {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             String supporting_file_names = null;
             String nda_file_names=null;
-            Job job = new ObjectMapper().readValue(jobData, Job.class);
+            Job job = app.getMapper().readValue(jobData, Job.class);
             job.setStatus(Status.AC);
 
+
+            app.print("Job Request:");
+            app.print(job);
+
+            app.print("Attached Files");
+            app.print("NDA files:"+nda_files.length);
+            app.print("Supporting Files:"+supporting_files.length);
             //save files if not null
-            if (nda_files!=null)
-                nda_file_names = this.fileStoreService.storeFiles(nda_files, job.getOid().toString());
-            if (supporting_files!=null)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, job.getOid().toString());
+            if (nda_files.length>0)
+                nda_file_names = this.fileStoreService.storeFiles(nda_files,"kula-nda");
+            if (supporting_files.length>0)
+                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, "kula");
 
             //cross verify if attached files processed
             if (nda_file_names != null)
