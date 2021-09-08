@@ -16,6 +16,7 @@ import javax.jms.ConnectionFactory;
 
 @SpringBootApplication
 public class AuthorizationServerApplication {
+
 	public static void main(String[] args) {
 		SpringApplication.run(AuthorizationServerApplication.class, args);
 	}
