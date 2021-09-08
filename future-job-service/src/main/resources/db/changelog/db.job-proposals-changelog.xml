@@ -15,7 +15,7 @@
             <column name="account_number" type="varchar(255)"/>
             <column name="bid_amount" type="bigint"/>
             <column name="comment" type="varchar (max)"/>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="duration" type="bigint"/>
             <column name="duration_type" type="varchar(50)"/>
             <column name="employer_id" type="bigint">
@@ -24,7 +24,7 @@
             <column name="job_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_date" type="date"/>
+            <column name="last_modified_date" type="datetime2"/>
             <column name="milestones" type="varchar (max)"/>
             <column name="payment_terms" type="varchar (max)"/>
             <column name="prepared_currency" type="varchar(255)"/>
@@ -38,8 +38,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="work_method" type="varchar(255)"/>
-            <column name="start_date" type="date"/>
-            <column name="end_date" type="date"/>
+            <column name="start_date" type="datetime2"/>
+            <column name="end_date" type="datetime2"/>
         </createTable>
     </changeSet>
     <changeSet author="ACER NITRO 5 (generated)" id="1606893700632-3">

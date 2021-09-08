@@ -18,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -28,11 +29,13 @@ public class UBNAccountAPIServiceHandler {
 
     Logger logger = LoggerFactory.getLogger(UBNAccountAPIServiceHandler.class);
 
-    @Value("${unionbankng.base.url}")
+   @Value("${unionbankng.base.url}")
     private String ubnBaseURL;
 
-    @Value("#{${unionbankng.credentials}}")
+   @Value("#{${unionbankng.credentials}}")
     private Map<String, String> credentials;
+
+
 
     private UBNAccountAPIService ubnAccountAPIService;
     private final App app;
@@ -50,7 +53,6 @@ public class UBNAccountAPIServiceHandler {
 
 
        public UBNAuthServerTokenResponse getUBNAuthServerToken() throws IOException {
-
         Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
@@ -59,6 +61,12 @@ public class UBNAccountAPIServiceHandler {
     }
 
     public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
+
+//        credentials.put("clientSecret","KULAUSERCLIENT");
+//        credentials.put("clientId","KULAUSER");
+//        credentials.put("grantType","password");
+//        credentials.put("username","kulasuser");
+//        credentials.put("password","JqOmrhC5Cs");
 
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
@@ -102,8 +110,6 @@ public class UBNAccountAPIServiceHandler {
 
         if(response == null)
             return null;
-
-
         app.print("Get accounts nby mobile number");
         app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
         app.print("Request:");
@@ -162,8 +168,6 @@ public class UBNAccountAPIServiceHandler {
         Response<UBNFundTransferResponse> responseResponse=  ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
         app.print("Response:");
         app.print(responseResponse.body());
-        app.print(responseResponse.code());
-        app.print(responseResponse.body().getCode());
         return  responseResponse;
     }
 
@@ -179,15 +183,12 @@ public class UBNAccountAPIServiceHandler {
         app.print("Response:");
         app.print(responseResponse.body());
         app.print(responseResponse.code());
-        app.print(responseResponse.body().getCode());
         return  responseResponse;
     }
 
     public Response<UbnCustomerAccountEnquiryResponse> accountEnquiry(UbnCustomerEnquiryRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
-
-        logger.info("Auth token response is : {}",response);
 
         if(response == null)
             return null;

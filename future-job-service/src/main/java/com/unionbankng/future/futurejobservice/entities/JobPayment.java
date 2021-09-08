@@ -17,6 +17,7 @@ public class JobPayment  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String executedByUsername;
     private String  executedBy;
     private  String  executedFor;
     @NotNull
@@ -45,7 +46,7 @@ public class JobPayment  implements Serializable {
     private String initBranchCode;
     private String initialPaymentReference;
     private  String paymentReference;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @PrePersist

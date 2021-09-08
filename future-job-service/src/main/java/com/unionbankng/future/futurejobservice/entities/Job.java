@@ -60,12 +60,12 @@ public class Job implements Serializable {
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date publishDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastModifiedDate;
     private Boolean terms;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @PrePersist

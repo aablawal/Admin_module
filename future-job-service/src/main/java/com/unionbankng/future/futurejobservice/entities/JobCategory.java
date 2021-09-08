@@ -22,7 +22,7 @@ public class JobCategory implements Serializable {
     private String  title;
     @Column(columnDefinition="TEXT")
     private String description;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @PrePersist

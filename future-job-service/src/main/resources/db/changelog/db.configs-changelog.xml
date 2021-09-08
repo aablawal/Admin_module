@@ -11,7 +11,7 @@
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="configsPK"/>
             </column>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="type" type="varchar(255)"/>
             <column name="uid" type="varchar(255)"/>
             <column name="value" type="varchar(255)"/>

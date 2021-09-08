@@ -17,7 +17,7 @@
             <column name="categories" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="description" type="varchar (max)">
                 <constraints nullable="false"/>
             </column>
@@ -28,13 +28,13 @@
             <column name="interview" type="bit">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_date" type="date"/>
+            <column name="last_modified_date" type="datetime2"/>
             <column name="nda_files" type="varchar (max)"/>
             <column name="oid" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="payment_terms" type="varchar(255)"/>
-            <column name="publish_date" type="date"/>
+            <column name="publish_date" type="datetime2"/>
             <column name="qualification" type="varchar(255)"/>
             <column name="sample_product" type="varchar(255)"/>
             <column name="skills_required" type="varchar(255)"/>

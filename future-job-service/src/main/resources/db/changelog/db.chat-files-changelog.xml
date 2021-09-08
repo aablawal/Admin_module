@@ -10,7 +10,7 @@
             <column autoIncrement="true" name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="chat_filesPK"/>
             </column>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="file_id" type="varchar(255)"/>
             <column name="link" type="varchar (max)">
                 <constraints nullable="false"/>

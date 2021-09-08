@@ -15,7 +15,7 @@
 	<description>Utility Service for project future handles everything that does not have an ideal service ranging from document upload etc</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>9</java.version>
 		<spring-cloud.version>2020.0.0</spring-cloud.version>
 		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
 	</properties>
@@ -66,12 +66,6 @@
 			<version>1.31.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.unionbankng</groupId>
-			<artifactId>future-utilityservice-interface</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<!--Code Optimization-->
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
@@ -117,7 +111,122 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<version>2.3.3.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>7.2.0.jre11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-maven-plugin</artifactId>
+			<version>4.4.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.uuid</groupId>
+			<artifactId>java-uuid-generator</artifactId>
+			<version>3.1.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-spi</artifactId>
+			<version>3.0.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-spring-web</artifactId>
+			<version>3.0.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-spring-security-adapter</artifactId>
+			<version>12.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-spring-boot-adapter-core</artifactId>
+			<version>12.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.simple-spring-memcached</groupId>
+			<artifactId>xmemcached-provider</artifactId>
+			<version>4.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.xmemcached</groupId>
+			<artifactId>xmemcached</artifactId>
+			<version>2.4.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.simple-spring-memcached</groupId>
+			<artifactId>spring-cache</artifactId>
+			<version>4.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<version>2.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>azure-servicebus-jms-spring-boot-starter</artifactId>
+			<version>2.1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.inject</groupId>
+			<artifactId>jersey-hk2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+		</dependency>
+	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
@@ -133,36 +242,67 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>jib-maven-plugin</artifactId>
-				<groupId>com.google.cloud.tools</groupId>
-				<version>${jib-maven-plugin.version}</version>
-				<configuration>
-					<from>
-						<image>adoptopenjdk/openjdk11:alpine-jre-nightly</image>
-					</from>
-					<to>
-						<auth>
-							<!--suppress UnresolvedMavenProperty -->
-							<username>${ACR_USERNAME}</username>
-							<!--suppress UnresolvedMavenProperty -->
-							<password>${ACR_PASSWORD}</password>
-						</auth>
+		<plugin>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-maven-plugin</artifactId>
+			<version>4.0.0</version>
+			<configuration>
+				<propertyFile>src/main/resources/liquibase.properties</propertyFile>
+			</configuration>
+			<dependencies>
+				<dependency>
+					<groupId>org.liquibase.ext</groupId>
+					<artifactId>liquibase-hibernate5</artifactId>
+					<version>4.0.0</version>
+				</dependency>
+				<!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
+				<dependency>
+					<groupId>com.microsoft.sqlserver</groupId>
+					<artifactId>mssql-jdbc</artifactId>
+					<version>8.4.1.jre14</version>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-data-jpa</artifactId>
+					<version>2.3.3.RELEASE</version>
+				</dependency>
+				<!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
+				<dependency>
+					<groupId>javax.validation</groupId>
+					<artifactId>validation-api</artifactId>
+					<version>2.0.1.Final</version>
+				</dependency>
+			</dependencies>
+		</plugin>
+		<plugin>
+			<artifactId>jib-maven-plugin</artifactId>
+			<groupId>com.google.cloud.tools</groupId>
+			<version>${jib-maven-plugin.version}</version>
+			<configuration>
+				<from>
+					<image>adoptopenjdk/openjdk11:alpine-jre-nightly</image>
+				</from>
+				<to>
+					<auth>
 						<!--suppress UnresolvedMavenProperty -->
-						<image>${ACR_SERVER}/${project.artifactId}</image>
-					</to>
-					<container>
-						<environment>
-							<!--suppress UnresolvedMavenProperty -->
-							<FUTURE_ENV>${FUTURE_ENV}</FUTURE_ENV>
-						</environment>
-					</container>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
+						<username>${ACR_USERNAME}</username>
+						<!--suppress UnresolvedMavenProperty -->
+						<password>${ACR_PASSWORD}</password>
+					</auth>
+					<image>${ACR_SERVER}/${project.artifactId}</image>
+				</to>
+				<container>
+					<environment>
+						<!--suppress UnresolvedMavenProperty -->
+						<FUTURE_ENV>${FUTURE_ENV}</FUTURE_ENV>
+					</environment>
+				</container>
+			</configuration>
+		</plugin>
+		<plugin>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-maven-plugin</artifactId>
+		</plugin>
 		</plugins>
 	</build>
 

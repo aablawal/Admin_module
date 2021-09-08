@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.util;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.uuid.Generators;
@@ -7,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +34,16 @@ public class App {
             ex.printStackTrace();
         }
     }
+    public String toString(Object obj){
+        try {
+            return new Gson().toJson(obj);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return  null;
+        }
+    }
+
     public void printX(Object obj){
         try {
             logger.info(new Gson().toJson(obj));
@@ -71,5 +86,17 @@ public class App {
         Pattern pattern = Pattern.compile("^\\d{11}$");
         Matcher matcher = pattern.matcher(number);
         return matcher.matches();
+    }
+
+    public ObjectMapper getMapper(){
+        ObjectMapper mapper= new ObjectMapper();
+        return mapper;
+    }
+
+    public String getClientDevice() {
+        return "Google Chrome";
+    }
+    public String getClientMACAddress(){
+        return "172.17.255.255";
     }
 }

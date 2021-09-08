@@ -20,6 +20,7 @@ public class JobBulkPayment implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String executedBy;
+	private String executedByUsername;
 	private String executedFor;
 	@NotNull
 	private String contractReference;
@@ -47,7 +48,7 @@ public class JobBulkPayment implements Serializable {
 	private String valueDate;
 	private String crDrFlag;
 	private String feeOrCharges;
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdAt;
 
 	@PrePersist

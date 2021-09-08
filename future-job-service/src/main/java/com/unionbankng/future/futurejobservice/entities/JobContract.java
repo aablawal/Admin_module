@@ -64,13 +64,13 @@ public class JobContract implements Serializable {
     private String initialPaymentReferenceB;
     private String settlementPaymentReferenceB;
     private  String reversalPaymentReferenceB;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date startDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date endDate;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date createdAt;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private   Date lastModifiedDate;
 
     @PrePersist

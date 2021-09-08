@@ -1,12 +1,13 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.unionbankng.future.futurejobservice.pojos.APIResponse;
+import com.unionbankng.future.futurejobservice.entities.Test;
+import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.entities.JobBulkPayment;
-import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
-import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.pojos.PaymentRequest;
+import com.unionbankng.future.futurejobservice.repositories.TestRepository;
 import com.unionbankng.future.futurejobservice.services.JobPaymentService;
+import com.unionbankng.future.futurejobservice.services.TestService;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ public class AppController {
 
     private final JobPaymentService jobPaymentService;
     private final NotificationSender notificationSender;
+    private final TestService testService;
+    private final AppLogger appLogger;
     private final App app;
 
     @GetMapping("/v1/ping")
@@ -31,8 +34,18 @@ public class AppController {
         return ResponseEntity.ok().body( new APIResponse("Service is Up", true, "Live"));
     }
     @PostMapping("/v1/test")
-    public ResponseEntity<APIResponse<String>> testService(){
-              return ResponseEntity.ok().body(new APIResponse("Test goes here", true, null));
+    public ResponseEntity<APIResponse<Test>> testService(@RequestBody Test test){
+
+           //############### Activity Logging ###########
+            ActivityLog log = new ActivityLog();
+            log.setDescription("Logging test ");
+            log.setRequestObject("Here is the request");
+            log.setRequestObject("Here is the Response");
+            log.setUsername("net.rabiualiyu@gmail.com");
+            log.setUserId("9873456yuhjnfbdjhk");
+            appLogger.log(log);
+
+        return ResponseEntity.ok().body(new APIResponse("Request Successful", true,log));
     }
     @PostMapping("/v1/notification/test")
     public ResponseEntity<APIResponse<String>> testNotificationService(Principal principal){

@@ -11,8 +11,10 @@ public class EmailSender {
     private static final String EMAIL_DESTINATION = "kulaemailqueue";
     private final JmsTemplate jmsTemplate;
     public void sendEmail(EmailBody emailBody){
-        jmsTemplate.convertAndSend(EMAIL_DESTINATION,emailBody);
+        try {
+            jmsTemplate.convertAndSend(EMAIL_DESTINATION, emailBody);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
-
-
 }

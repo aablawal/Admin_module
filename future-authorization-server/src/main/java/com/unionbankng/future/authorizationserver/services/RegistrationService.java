@@ -6,6 +6,7 @@ import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import com.unionbankng.future.authorizationserver.interfaceimpl.GoogleOauthProvider;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.ErrorResponse;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
@@ -48,11 +49,23 @@ public class RegistrationService {
 
     public ResponseEntity register(RegistrationRequest request){
 
-
         app.print("####REGISTER WITH KULA FORM");
-        if (userService.existsByEmail(request.getEmail()))
+        if (userService.existsByEmail(request.getEmail())) {
+            User existingUser=userService.findByEmail(request.getEmail()).orElse(null);
+            ErrorResponse errorResponse = new ErrorResponse();
+            if(existingUser.getIsEnabled()) {
+                errorResponse.setCode("00");
+                errorResponse.setRemark(messageSource.getMessage("account.active", null, LocaleContextHolder.getLocale()));
+
+            }else {
+                //send confirmation email
+                userConfirmationTokenService.sendConfirmationToken(existingUser);
+                errorResponse.setCode("01");
+                errorResponse.setRemark(messageSource.getMessage("account.inactive", null, LocaleContextHolder.getLocale()));
+            }
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()),false,null));
+                    new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()), false, errorResponse));
+        }
 
         if(!passwordValidator.validatePassword(request.getPassword()))
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
@@ -68,7 +81,6 @@ public class RegistrationService {
 
         // generate uuid for user
         String generatedUuid =  CreatedResponseUtil.getCreatedId(response);
-
 
         User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())

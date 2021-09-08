@@ -43,6 +43,7 @@ public class User implements Serializable {
     @Column(nullable = false, unique = true)
     private String email;
     private String password;
+    private String pin;
     @Column(length = 10)
     private String zipCode;
     @Column(length=5)
@@ -59,7 +60,7 @@ public class User implements Serializable {
     private String country;
     @Column(length = 50)
     private String stateOfResidence;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date dateOfBirth;
     @Column(nullable = false)
     private Boolean isEnabled = true;

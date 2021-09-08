@@ -41,9 +41,9 @@ public class JobContractDispute implements Serializable  {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date lastModifiedDate;
 
     @PrePersist

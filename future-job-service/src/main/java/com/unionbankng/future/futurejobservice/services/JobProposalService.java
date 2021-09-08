@@ -5,11 +5,15 @@ import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
+import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
 import com.unionbankng.future.futurejobservice.pojos.User;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.AppLogger;
+import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -38,16 +42,14 @@ public class JobProposalService  implements Serializable {
     private final JobRepository jobRepository;
     private Logger logger = LoggerFactory.getLogger(JobProposalService.class);
     private final NotificationSender notificationSender;
+    private  final AppLogger appLogger;
 
 
-
-    public JobProposal applyJob(Principal principal, String applicationData, MultipartFile[] supporting_files)throws JsonProcessingException {
-        JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
-        return applyJob(application, supporting_files);
-    }
-
-    public JobProposal applyJob(JobProposal application, MultipartFile[] supporting_files) {
+    public JobProposal applyJob(Principal principal,String applicationData, MultipartFile[] supporting_files) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         try {
+            JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
+
             String supporting_file_names = null;
             Job job = jobRepository.findById(application.getJobId()).orElse(null);
             application.setIsApplied(true);
@@ -112,6 +114,20 @@ public class JobProposalService  implements Serializable {
                     }
                     //end
 
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Applied for "+job.getTitle());
+                        log.setRequestObject(app.toString(application));
+                        log.setResponseObject(app.toString(proposal));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                     return proposal;
                 } else {
                     logger.info("JOBSERVICE: Unable to save Job");
@@ -138,7 +154,9 @@ public class JobProposalService  implements Serializable {
         }
     }
 
-    public JobProposal cancelJobProposal(Long jobId, Long userId){
+    public JobProposal cancelJobProposal(Principal principal, Long jobId, Long userId){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+
         JobProposal proposal=repository.findProposalByUserId(jobId,userId);
         if(proposal!=null) {
             repository.delete(proposal);
@@ -160,15 +178,32 @@ public class JobProposalService  implements Serializable {
                 notificationSender.pushNotification(body);
             }
             //end
+
+            try {
+                //############### Activity Logging ###########
+                ActivityLog log = new ActivityLog();
+                log.setDescription("Canceled Proposal for "+currentJob.getTitle());
+                log.setRequestObject("JobId:"+jobId);
+                log.setResponseObject(app.toString(proposal));
+                log.setUsername(currentUser.getUserEmail());
+                log.setUserId(currentUser.getUserUUID());
+                appLogger.log(log);
+                //#########################################
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            return proposal;
         }
         else {
             logger.info("JOBSERVICE: Proposal not found");
+            return null;
         }
-        return proposal;
     }
 
 
-    public JobProposal declineJobProposal(Long proposalId){
+    public JobProposal declineJobProposal(Principal principal, Long proposalId){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {
             proposal.setStatus(Status.RE);
@@ -193,11 +228,29 @@ public class JobProposalService  implements Serializable {
                 notificationSender.pushNotification(body);
             }
             //end
+
+
+            try {
+                //############### Activity Logging ###########
+                ActivityLog log = new ActivityLog();
+                log.setDescription("Declined Proposal for "+currentJob.getTitle());
+                log.setRequestObject("ProposalId:"+proposalId);
+                log.setResponseObject(app.toString(proposal));
+                log.setUsername(currentUser.getUserEmail());
+                log.setUserId(currentUser.getUserUUID());
+                appLogger.log(log);
+                //#########################################
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+
+            return proposal;
         }
         else {
             logger.info("JOBSERVICE: Proposal not found");
+            return  null;
         }
-        return proposal;
+
     }
 
     public  JobProposal changeProposalPercentage(Long proposalId, int percentage){

@@ -31,10 +31,10 @@ public class JobMilestone  implements Serializable {
     private  Long jobId;
     @NotNull
     private  Long amount;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private   Date startDate;
     @NotNull
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private   Date endDate;
     @NotNull
     @Column(columnDefinition="TEXT")
@@ -55,7 +55,7 @@ public class JobMilestone  implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private  Date createdAt;
 
 

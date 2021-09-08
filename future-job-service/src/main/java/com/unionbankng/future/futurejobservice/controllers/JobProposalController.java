@@ -94,8 +94,8 @@ public class JobProposalController {
     }
 
     @PutMapping("/v1/job/proposal/cancel")
-    public ResponseEntity<APIResponse> cancelJobProposal(@RequestParam Long jid, @RequestParam Long uid) {
-        JobProposal canceledProposal = service.cancelJobProposal(jid, uid);
+    public ResponseEntity<APIResponse> cancelJobProposal(Principal principal, @RequestParam Long jid, @RequestParam Long uid) {
+        JobProposal canceledProposal = service.cancelJobProposal(principal,jid, uid);
         if (canceledProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, canceledProposal));
@@ -106,8 +106,8 @@ public class JobProposalController {
 
     @PutMapping("/v1/job/proposal/decline/{proposalId}")
 
-    public ResponseEntity<APIResponse> declineJobProposal(@PathVariable Long proposalId) {
-        JobProposal declinedProposal = service.declineJobProposal(proposalId);
+    public ResponseEntity<APIResponse> declineJobProposal(Principal principal, @PathVariable Long proposalId) {
+        JobProposal declinedProposal = service.declineJobProposal(principal,proposalId);
         if (declinedProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, declinedProposal));

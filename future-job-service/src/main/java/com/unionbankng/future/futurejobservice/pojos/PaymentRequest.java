@@ -19,5 +19,6 @@ public class PaymentRequest {
     protected String narration;
     protected String executedBy;
     protected String executedFor;
+    protected  String executedByUsername;
     protected String contractReference;
 }

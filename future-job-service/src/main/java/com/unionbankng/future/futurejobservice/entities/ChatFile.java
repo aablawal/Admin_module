@@ -27,7 +27,7 @@ public class ChatFile implements Serializable {
     private String type;
     private Long size;
     private ChatFileUploadStatus status;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @PrePersist

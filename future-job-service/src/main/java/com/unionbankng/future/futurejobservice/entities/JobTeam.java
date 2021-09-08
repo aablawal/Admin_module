@@ -27,7 +27,7 @@ public class JobTeam implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private   Date createdAt;
 
 

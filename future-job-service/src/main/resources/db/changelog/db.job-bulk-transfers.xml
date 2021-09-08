@@ -29,7 +29,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="cr_dr_flag" type="varchar(255)"/>
-            <column name="created_at" type="date"/>
+            <column name="created_at" type="datetime2"/>
             <column name="executed_by" type="varchar(255)"/>
             <column name="executed_for" type="varchar(255)"/>
             <column name="fee_or_charges" type="varchar(255)"/>
@@ -53,6 +53,11 @@
     <changeSet author="aliyura (generated)" id="1623169071247-4">
         <addColumn tableName="job_bulk_transfers">
             <column name="remark" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1629459977782-5">
+        <addColumn tableName="job_bulk_transfers">
+            <column name="executed_by_username" type="varchar(255)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

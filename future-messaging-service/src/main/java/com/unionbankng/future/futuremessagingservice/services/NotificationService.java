@@ -27,7 +27,6 @@ import java.util.*;
 public class NotificationService {
 
     Logger logger = LoggerFactory.getLogger(NotificationService.class);
-
     private final NotificationRepository notificationRepository;
     private  final MessagingTokenRepository messagingTokenRepository;
 

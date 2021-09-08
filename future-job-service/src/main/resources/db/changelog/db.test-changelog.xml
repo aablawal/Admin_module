@@ -1,12 +1,12 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet author="chokeme (generated)" id="1600447093262-3">
-        <dropForeignKeyConstraint baseTableName="user_confirmation_token" constraintName="FK23f70bn1nnupeobqk4em641lh"/>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1600447093262-4">
-        <dropUniqueConstraint constraintName="UC_USER_CONFIRMATION_TOKENTOKEN_COL" tableName="user_confirmation_token"/>
-    </changeSet>
-    <changeSet author="chokeme (generated)" id="1600447093262-5">
-        <dropTable tableName="user_confirmation_token"/>
+    <changeSet author="aliyura (generated)" id="1629459977782-2">
+        <createTable tableName="test">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="testPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="data" type="varchar(255)"/>
+        </createTable>
     </changeSet>
 </databaseChangeLog>

@@ -39,7 +39,7 @@ public class Notification {
     String priority;
     @Column(length = 50)
     String topic;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 
     public Notification(Notification notification) {
