@@ -43,7 +43,8 @@ public class UserConfirmationTokenService {
         String token = UUID.randomUUID().toString();
         memcachedHelperService.save(token, user.getEmail(), tokenExpiryInMinute * 60);
 
-        String generatedURL=confirmationTokenURL;//"No URL";// = String.format("%s?token=%s", confirmationTokenURL, token);
+        String generatedURL="kula.work/"+token;
+        //"No URL";// = String.format("%s?token=%s", confirmationTokenURL, token);
         logger.info("Sending confirmation to {}", user.toString());
         logger.info("Activation Link:"+generatedURL);
 
