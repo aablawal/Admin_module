@@ -30,10 +30,10 @@ public class UBNAccountAPIServiceHandler {
     Logger logger = LoggerFactory.getLogger(UBNAccountAPIServiceHandler.class);
 
    @Value("${unionbankng.base.url}")
-    private String ubnBaseURL;//="https://unionworkspace.unionbankng.com/";
+    private String ubnBaseURL;
 
    @Value("#{${unionbankng.credentials}}")
-    private Map<String, String> credentials;//=new HashMap<>();
+    private Map<String, String> credentials;
 
 
 
@@ -52,14 +52,7 @@ public class UBNAccountAPIServiceHandler {
     }
 
 
-    public UBNAuthServerTokenResponse getUBNAuthServerToken() throws IOException {
-
-//        credentials.put("clientSecret","KULAUSERCLIENT");
-//        credentials.put("clientId","KULAUSER");
-//        credentials.put("grantType","password");
-//        credentials.put("username","kulasuser");
-//        credentials.put("password","JqOmrhC5Cs");
-
+       public UBNAuthServerTokenResponse getUBNAuthServerToken() throws IOException {
         Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
@@ -81,7 +74,7 @@ public class UBNAccountAPIServiceHandler {
         app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
         return  response;
     }
-
+    
     public Response<BVNValidationResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAuthServerToken();
@@ -111,15 +104,12 @@ public class UBNAccountAPIServiceHandler {
 
     }
 
-
-
-    public Response<UBNGetAccountsResponse> getAccountsByMobileNumber(UBNGetAccountsRequest request) throws IOException {
+   public Response<UBNGetAccountsResponse> getAccountsByMobileNumber(UBNGetAccountsRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
         if(response == null)
             return null;
-
         app.print("Get accounts nby mobile number");
         app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
         app.print("Request:");
