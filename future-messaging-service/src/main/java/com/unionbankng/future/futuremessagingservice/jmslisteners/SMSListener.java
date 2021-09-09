@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futuremessagingservice.interfaces.SMSProvider;
 import com.unionbankng.future.futuremessagingservice.pojos.SMS;
+import com.unionbankng.future.futuremessagingservice.services.DirectIPSMSService;
 import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionSMSProvider;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class SMSListener {
 
     private static final String QUEUE_NAME = "kulasmsqueue";
+    private final DirectIPSMSService directIPSMSService;
 
     private final Logger logger = LoggerFactory.getLogger(SMSListener.class);
     private final ObjectMapper mapper;
@@ -24,9 +26,9 @@ public class SMSListener {
     public void receiveMessage(String json) throws JsonProcessingException {
         SMS sms = mapper.readValue(json, SMS.class);
         logger.info("Received message: {}", sms.getRecipient());
-        SMSProvider UBNSMSProvider = new UnionSMSProvider();
         try {
-            UBNSMSProvider.send(sms);
+            directIPSMSService.sendSMS(sms);
+            logger.info("SMS sent out");
         } catch (Exception e) {
             e.printStackTrace();
         }

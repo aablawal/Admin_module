@@ -17,6 +17,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,5 +68,11 @@ public class App {
         Pattern pattern = Pattern.compile("^\\d{11}$");
         Matcher matcher = pattern.matcher(number);
         return matcher.matches();
+    }
+
+    public Long generateOTP(){
+        Random rnd = new Random();
+        Long number = Long.valueOf(rnd.nextInt(999999));
+        return  number;
     }
 }
