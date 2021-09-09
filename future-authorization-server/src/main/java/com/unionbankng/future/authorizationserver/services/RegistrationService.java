@@ -50,7 +50,7 @@ public class RegistrationService {
     public ResponseEntity register(RegistrationRequest request){
 
         app.print("####REGISTER WITH KULA FORM");
-        if (userService.existsByEmail(request.getEmail())) {
+        if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername())) {
             User existingUser=userService.findByEmail(request.getEmail()).orElse(
                     userService.findByUsername(request.getUsername()).orElse(null)
             );
@@ -65,6 +65,7 @@ public class RegistrationService {
                 errorResponse.setCode("01");
                 errorResponse.setRemark(messageSource.getMessage("account.inactive", null, LocaleContextHolder.getLocale()));
             }
+
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()), false, errorResponse));
         }
