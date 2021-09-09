@@ -15,8 +15,8 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class PinService {
 
-    @Value("${kula.encryption.key}")
-    private String encryptionKey="Rabs@1994";
+//    @Value("${kula.encryption.key}")
+    private String encryptionKey="ThisIsSpartaThisIsSparta";
     private final UserRepository userRepository;
     private final CryptoService cryptoService;
 
