@@ -27,8 +27,13 @@ public class PinService {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user=userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if(user!=null){
-            user.setPin((cryptoService.encrypt(pin,encryptionKey)));
-            return new APIResponse<>("Pin Added Successfully", true,   userRepository.save(user));
+            String encrypted=cryptoService.encrypt(pin,encryptionKey);
+            if(encrypted!=null) {
+                user.setPin(encrypted);
+                return new APIResponse<>("Pin Added Successfully", true,   userRepository.save(user));
+            }else{
+                return new APIResponse<>("Unable to Create Pin", true,   false);
+            }
         }else{
             return new APIResponse<>("Account not found", false, null);
         }
