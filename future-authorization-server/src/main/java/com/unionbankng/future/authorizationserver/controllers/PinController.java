@@ -24,6 +24,7 @@ public class PinController {
         return ResponseEntity.ok().body(pinService.createPin(principal, pin));
     }
 
+
     @PostMapping("/v1/pin/verify")
     public ResponseEntity<APIResponse> verifyPin(Principal principal, @RequestParam String pin) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return ResponseEntity.ok().body(pinService.verifyPin(principal, pin));

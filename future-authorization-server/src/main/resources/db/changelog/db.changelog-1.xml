@@ -73,4 +73,9 @@
             <column name="account_name" type="varchar(255)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="chokeme (generated)" id="1599987656588-4">
+        <addColumn tableName="app_user">
+            <column name="pin" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
