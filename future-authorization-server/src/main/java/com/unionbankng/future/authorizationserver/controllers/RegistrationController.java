@@ -34,13 +34,6 @@ public class RegistrationController {
 
     @PostMapping("/v1/registration/register")
     public ResponseEntity<APIResponse> register(@Valid @RequestBody RegistrationRequest request){
-
-        if (userService.existsByUsername(request.getUsername()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    new APIResponse(messageSource.getMessage("username.exist", null, LocaleContextHolder.getLocale()),false,null));
-
-
-        app.print(request);
         if(request.getAuthProvider().equals(AuthProvider.GOOGLE))
             return registrationService.googleRegistration(request);
 
