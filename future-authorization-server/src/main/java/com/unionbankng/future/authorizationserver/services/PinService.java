@@ -4,58 +4,61 @@ import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.JwtUserDetail;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
-import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.CryptoService;
 import com.unionbankng.future.authorizationserver.utils.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
 public class PinService {
 
-    @Value("${kula.encryption.key}")
-    private int key=777;
+//    @Value("${kula.encryption.key}")
+    private String encryptionKey="Gh79j96-6762-493c-837949";
     private final UserRepository userRepository;
-    private final App app;
+    private final CryptoService cryptoService;
 
-    public APIResponse createPin(Principal principal, String pin) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public APIResponse createPin(Principal principal, String pin) {
         System.out.println("###########Creating PIN");
-        System.out.println("Key:"+key);
+        System.out.println("Key:"+encryptionKey);
         System.out.println("Pin:"+pin);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user=userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if(user!=null){
-            user.setPin((app.encrypt(pin,key)));
-            return new APIResponse<>("Pin Added Successfully", true,   userRepository.save(user));
+            if(user.getPin()==null) {
+                String encrypted = cryptoService.encrypt(pin, encryptionKey);
+                if (encrypted != null) {
+                    user.setPin(encrypted);
+                    return new APIResponse<>("Pin Added Successfully", true, userRepository.save(user));
+                } else {
+                    return new APIResponse<>("Unable to Create your Transaction Pin", false, null);
+                }
+            }else{
+               return new APIResponse<>("You Already Added a Transaction Pin to your Account", false, null);
+            }
         }else{
-            return new APIResponse<>("Account not found", false, null);
+            return new APIResponse<>("Unable to fetch authentication details", false, null);
         }
     }
 
-    public APIResponse verifyPin(Principal principal, String pin) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public APIResponse verifyPin(Principal principal, String pin){
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user=userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if(user!=null){
-            String existingPin=app.decrypt(user.getPin(),key);
+            String existingPin=cryptoService.decrypt(user.getPin(),encryptionKey);
             String providedPin=pin;
             System.out.println("##########Pin Verification started");
             System.out.println("Existing:"+existingPin);
             System.out.println("Provided:"+pin);
-            if(existingPin.equals(pin)) {
-                return new APIResponse<>("Pin Verified Successfully", true, user);
+            if(existingPin.equals(providedPin)) {
+                return new APIResponse<>("Verification Successful", true, user);
             }else{
                 return new APIResponse<>("Invalid Pin", false, null);
             }
         }else{
-            return new APIResponse<>("Account not found", false, null);
+            return new APIResponse<>("Unable to fetch authentication details", false, null);
         }
     }
 
