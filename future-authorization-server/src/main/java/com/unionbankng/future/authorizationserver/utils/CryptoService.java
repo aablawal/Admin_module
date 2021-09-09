@@ -1,19 +1,16 @@
-package com.unionbankng.future.authorizationserver.services;
+package com.unionbankng.future.authorizationserver.utils;
 
 import java.security.spec.KeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESedeKeySpec;
-
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
-public class EncryptionService {
+@RequiredArgsConstructor
+public class CryptoService {
 
     private static final String UNICODE_FORMAT = "UTF8";
     public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
@@ -24,15 +21,6 @@ public class EncryptionService {
     private String myEncryptionKey;
     private String myEncryptionScheme;
     SecretKey key;
-
-    public EncryptionService() throws Exception {
-       myEncryptionScheme = DESEDE_ENCRYPTION_SCHEME;
-        arrayBytes = myEncryptionKey.getBytes(UNICODE_FORMAT);
-        ks = new DESedeKeySpec(arrayBytes);
-        skf = SecretKeyFactory.getInstance(myEncryptionScheme);
-        cipher = Cipher.getInstance(myEncryptionScheme);
-        key = skf.generateSecret(ks);
-    }
 
 
     public String encrypt(String text, String password) {

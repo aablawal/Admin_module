@@ -4,6 +4,7 @@ import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.JwtUserDetail;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
+import com.unionbankng.future.authorizationserver.utils.CryptoService;
 import com.unionbankng.future.authorizationserver.utils.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ public class PinService {
     @Value("${kula.encryption.key}")
     private String encryptionKey="Rabs@1994";
     private final UserRepository userRepository;
-    private final EncryptionService encryptionService;
+    private final CryptoService cryptoService;
 
     public APIResponse createPin(Principal principal, String pin) {
         System.out.println("###########Creating PIN");
@@ -26,7 +27,7 @@ public class PinService {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user=userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if(user!=null){
-            user.setPin((encryptionService.encrypt(pin,encryptionKey)));
+            user.setPin((cryptoService.encrypt(pin,encryptionKey)));
             return new APIResponse<>("Pin Added Successfully", true,   userRepository.save(user));
         }else{
             return new APIResponse<>("Account not found", false, null);
@@ -37,7 +38,7 @@ public class PinService {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user=userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if(user!=null){
-            String existingPin=encryptionService.decrypt(user.getPin(),encryptionKey);
+            String existingPin=cryptoService.decrypt(user.getPin(),encryptionKey);
             String providedPin=pin;
             System.out.println("##########Pin Verification started");
             System.out.println("Existing:"+existingPin);
