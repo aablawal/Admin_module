@@ -84,7 +84,7 @@ public class AuthenticationService {
 
                 String mobileNumber = user.getPhoneNumber();
                 if (mobileNumber.startsWith("0"))
-                    mobileNumber = mobileNumber.replaceFirst("0", "+234");
+                    mobileNumber = mobileNumber.replaceFirst("0", "234");
 
                 app.print("Sending OTP.....");
 
