@@ -51,7 +51,9 @@ public class RegistrationService {
 
         app.print("####REGISTER WITH KULA FORM");
         if (userService.existsByEmail(request.getEmail())) {
-            User existingUser=userService.findByEmail(request.getEmail()).orElse(null);
+            User existingUser=userService.findByEmail(request.getEmail()).orElse(
+                    userService.findByUsername(request.getUsername()).orElse(null)
+            );
             ErrorResponse errorResponse = new ErrorResponse();
             if(existingUser.getIsEnabled()) {
                 errorResponse.setCode("00");
