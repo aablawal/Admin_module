@@ -56,16 +56,21 @@ public class AuthenticationService {
     public APIResponse verifyPin(Principal principal, String pin) {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+        app.print(user);
         if (user != null) {
-            String existingPin = cryptoService.decrypt(user.getPin(), encryptionKey);
-            String providedPin = pin;
-            System.out.println("##########Pin Verification started");
-            System.out.println("Existing:" + existingPin);
-            System.out.println("Provided:" + pin);
-            if (existingPin.equals(providedPin)) {
-                return new APIResponse<>("Verification Successful", true, user);
-            } else {
-                return new APIResponse<>("Invalid Pin", false, null);
+            if(user.getPin()!=null) {
+                String existingPin = cryptoService.decrypt(user.getPin(), encryptionKey);
+                String providedPin = pin;
+                System.out.println("##########Pin Verification started");
+                System.out.println("Existing:" + existingPin);
+                System.out.println("Provided:" + pin);
+                if (existingPin.equals(providedPin)) {
+                    return new APIResponse<>("Verification Successful", true, user);
+                } else {
+                    return new APIResponse<>("Invalid Pin", false, null);
+                }
+            }else{
+                return new APIResponse<>("No Transaction PIN set to your Account", false, null);
             }
         } else {
             return new APIResponse<>("Unable to fetch authentication details", false, null);
