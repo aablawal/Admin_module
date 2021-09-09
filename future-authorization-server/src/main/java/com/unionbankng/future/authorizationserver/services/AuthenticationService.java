@@ -37,7 +37,7 @@ public class AuthenticationService {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if (user != null) {
-//            if (user.getPin() == null) {
+            if (user.getPin() == null) {
                 String encrypted = cryptoService.encrypt(pin, encryptionKey);
                 if (encrypted != null) {
                     user.setPin(encrypted);
@@ -45,9 +45,9 @@ public class AuthenticationService {
                 } else {
                     return new APIResponse<>("Unable to Create your Transaction Pin", false, null);
                 }
-//            } else {
-//                return new APIResponse<>("You Already Added a Transaction Pin to your Account", false, null);
-//            }
+            } else {
+                return new APIResponse<>("You Already Added a Transaction Pin to your Account", false, null);
+            }
         } else {
             return new APIResponse<>("Unable to fetch authentication details", false, null);
         }
