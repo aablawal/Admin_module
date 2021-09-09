@@ -70,9 +70,11 @@ public class App {
     }
 
     public SecretKey generateKey(int n) throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(n);
-        SecretKey key = keyGenerator.generateKey();
+        SecretKey key;
+        SecureRandom rand = new SecureRandom();
+        KeyGenerator generator = KeyGenerator.getInstance("AES");
+        generator.init(n, rand);
+        key = generator.generateKey();
         return key;
     }
 
