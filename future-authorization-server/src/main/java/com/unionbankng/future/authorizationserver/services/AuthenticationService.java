@@ -86,14 +86,15 @@ public class AuthenticationService {
                 if (mobileNumber.startsWith("0"))
                     mobileNumber = mobileNumber.replaceFirst("0", "+234");
 
-                System.out.println("Sending OTP.....");
+                app.print("Sending OTP.....");
 
                 SMS sms = new SMS();
                 sms.setMessage("Your OTP is " + otp);
-                sms.setRecipient(user.getPhoneNumber());
+                sms.setRecipient(mobileNumber);
                 app.print("Request:");
                 app.print(sms);
                 smsSender.sendSMS(sms);
+                app.print("OTP sent successfully");
                 return new APIResponse<>("OTP Sent Successfully", true, mobileNumber);
 
             } else {
