@@ -16,7 +16,7 @@ import java.security.Principal;
 public class PinService {
 
 //    @Value("${kula.encryption.key}")
-    private String encryptionKey="ThisIsSpartaThisIsSparta";
+    private String encryptionKey="Gh79j96-6762-493c-837949";
     private final UserRepository userRepository;
     private final CryptoService cryptoService;
 
@@ -27,15 +27,19 @@ public class PinService {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
         User user=userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if(user!=null){
-            String encrypted=cryptoService.encrypt(pin,encryptionKey);
-            if(encrypted!=null) {
-                user.setPin(encrypted);
-                return new APIResponse<>("Pin Added Successfully", true,   userRepository.save(user));
+            if(user.getPin()==null) {
+                String encrypted = cryptoService.encrypt(pin, encryptionKey);
+                if (encrypted != null) {
+                    user.setPin(encrypted);
+                    return new APIResponse<>("Pin Added Successfully", true, userRepository.save(user));
+                } else {
+                    return new APIResponse<>("Unable to Create your Transaction Pin", false, null);
+                }
             }else{
-                return new APIResponse<>("Unable to Create Pin", true,   false);
+               return new APIResponse<>("You Already Added a Transaction Pin to your Account", false, null);
             }
         }else{
-            return new APIResponse<>("Account not found", false, null);
+            return new APIResponse<>("Unable to fetch authentication details", false, null);
         }
     }
 
@@ -48,13 +52,13 @@ public class PinService {
             System.out.println("##########Pin Verification started");
             System.out.println("Existing:"+existingPin);
             System.out.println("Provided:"+pin);
-            if(existingPin.equals(pin)) {
-                return new APIResponse<>("Pin Verified Successfully", true, user);
+            if(existingPin.equals(providedPin)) {
+                return new APIResponse<>("Verification Successful", true, user);
             }else{
                 return new APIResponse<>("Invalid Pin", false, null);
             }
         }else{
-            return new APIResponse<>("Account not found", false, null);
+            return new APIResponse<>("Unable to fetch authentication details", false, null);
         }
     }
 
