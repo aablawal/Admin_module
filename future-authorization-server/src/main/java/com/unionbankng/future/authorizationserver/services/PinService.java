@@ -22,7 +22,7 @@ import java.security.Principal;
 public class PinService {
 
     @Value("${kula.encryption.key}")
-    private int key=777;
+    private int key=240;
     private final UserRepository userRepository;
     private final App app;
 
