@@ -40,10 +40,8 @@ public interface UBNAccountAPIService {
     @POST("ubnmiserv/secured/cbacustomeraccountenquiry")
     Call<UbnCustomerAccountEnquiryResponse> accountEnquiry(@Query("access_token") String accessToken, @Body UbnCustomerEnquiryRequest request);
 
-
     @POST("ubnmiserv/secured/accountNumber")
     Call<UBNAccountStatementResponse> accountStatement(@Query("access_token") String accessToken, @Body UBNAccountStatementRequest request);
-
 
     @POST("ubnmiserv/secured/getaccountsbymobilenumber")
     Call<UBNGetAccountsResponse> getAccountsByMobileNumber(@Query("access_token") String accessToken, @Body UBNGetAccountsRequest request);
