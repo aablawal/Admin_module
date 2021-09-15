@@ -30,7 +30,10 @@ public class JobMilestone  implements Serializable {
     @NotNull
     private  Long jobId;
     @NotNull
-    private  Long amount;
+    private  double amount;
+    private double clearedAmount;
+    private double charges;
+    private double vat;
     @Temporal(TemporalType.TIMESTAMP)
     private   Date startDate;
     @NotNull

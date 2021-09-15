@@ -50,8 +50,10 @@ public class RegistrationService {
     public ResponseEntity register(RegistrationRequest request){
 
         app.print("####REGISTER WITH KULA FORM");
-        if (userService.existsByEmail(request.getEmail())) {
-            User existingUser=userService.findByEmail(request.getEmail()).orElse(null);
+        if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername())) {
+            User existingUser=userService.findByEmail(request.getEmail()).orElse(
+                    userService.findByUsername(request.getUsername()).orElse(null)
+            );
             ErrorResponse errorResponse = new ErrorResponse();
             if(existingUser.getIsEnabled()) {
                 errorResponse.setCode("00");
@@ -64,7 +66,7 @@ public class RegistrationService {
                 errorResponse.setRemark(messageSource.getMessage("account.inactive", null, LocaleContextHolder.getLocale()));
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()), false, errorResponse));
+                    new APIResponse(errorResponse.getRemark(), false, errorResponse));
         }
 
         if(!passwordValidator.validatePassword(request.getPassword()))
@@ -75,13 +77,18 @@ public class RegistrationService {
         Response response = createUserOnKeycloak(request);
         logger.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
 
-        if(response.getStatus() != 201)
-            return ResponseEntity.status(response.getStatus()).body(
-                    new APIResponse(response.getStatusInfo().getReasonPhrase(),false,null));
+        if(response.getStatus() != 201) {
+            if(response.getStatus()==409){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                        new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()), false, null));
+            }else {
+                return ResponseEntity.status(response.getStatus()).body(
+                        new APIResponse(response.getStatusInfo().getReasonPhrase(), false, null));
+            }
+        }
 
         // generate uuid for user
         String generatedUuid =  CreatedResponseUtil.getCreatedId(response);
-
         User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())
                 .email(request.getEmail()).dialingCode(request.getDialingCode()).phoneNumber(request.getPhoneNumber()).isEnabled(Boolean.FALSE)

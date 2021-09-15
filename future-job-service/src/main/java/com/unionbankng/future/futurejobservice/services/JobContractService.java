@@ -168,6 +168,7 @@ public class JobContractService implements Serializable {
             contract.setContractReference(contractReferenceId);
             contract.setInitialPaymentReferenceA(paymentReferenceId);
             contract.setAppId(Integer.valueOf(appId));
+            contract.setClearedAmount(0);
 
             int status = 0;
             String remark = null;
@@ -951,7 +952,6 @@ public class JobContractService implements Serializable {
                             contract.setEndDate(new Date());
                             contract.setIsSettled(true);
                             contract.setSettlement(contract.getContractReference());
-                            contract.setClearedAmount((contract.getAmount()));
 
                             app.print("###################################");
                             app.print("Escrow URL: "+baseURL);
@@ -1242,7 +1242,7 @@ public class JobContractService implements Serializable {
 
                             PaymentRequest payment = new PaymentRequest();
                             payment.setProposalId(contract.getProposalId());
-                            payment.setAmount(Integer.parseInt(milestone.getAmount().toString()));
+                            payment.setAmount(milestone.getAmount());
                             payment.setNarration("Transfer from Employer to Escrow account for Milestone " + milestone.getTitle());
                             payment.setCreditAccountName(escrowAccountName);
                             payment.setCreditAccountNumber(escrowAccountNumber);
@@ -1449,7 +1449,6 @@ public class JobContractService implements Serializable {
                 if (milestone != null) {
 
                     if (project != null) {
-                        contract.setClearedAmount((contract.getClearedAmount() + milestone.getAmount().intValue()));
                         contract.setLastModifiedDate(new Date());
 
                         app.print("###################################");
@@ -1496,7 +1495,7 @@ public class JobContractService implements Serializable {
                                 User freelancer=userService.getUserById(project.getUserId());
                                 if (currentJob != null) {
                                     NotificationBody body = new NotificationBody();
-                                    body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for " + currentJob.getTitle() + ", and the sum of " + milestone.getAmount().toString() + " has been released to your account");
+                                    body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for " + currentJob.getTitle() + ", and the sum of " + milestone.getAmount()+ " has been released to your account");
                                     body.setSubject("Milestone Completed");
                                     body.setActionType("REDIRECT");
                                     body.setAction("/my-job/contract/milestones/" + project.getJobId() + "/" + project.getProposalId());
@@ -1576,7 +1575,7 @@ public class JobContractService implements Serializable {
                     else if (milestone == null)
                         return new APIResponse("No Milestone found with the reference provided", false, null);
                     else
-                        depositedAmount = milestone.getAmount().intValue();
+                        depositedAmount = milestone.getAmount();
 
 
                     if (depositedAmount > 0) {
@@ -1657,7 +1656,6 @@ public class JobContractService implements Serializable {
                         VATCharge = (VATRate * kulaIncomeCharge) / 100;
                         freelancerIncomeAmount = (depositedAmount - pepperestIncomeCharge) - kulaIncomeCharge;
                         kulaIncomeCharge = kulaIncomeCharge - VATCharge;
-
 
                         app.print("VAT is "+VATCharge);
                         app.print("kula Income  is "+kulaIncomeCharge);
@@ -1808,6 +1806,9 @@ public class JobContractService implements Serializable {
                                 contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
                                 contract.setEndDate(new Date());
                                 contract.setLastModifiedDate(new Date());
+                                contract.setClearedAmount(freelancerIncomeAmount);
+                                contract.setVat(VATCharge);
+                                contract.setCharges(kulaIncomeCharge+pepperestIncomeCharge);
                                 proposal.setEndDate(new Date());
                                 proposal.setStatus(Status.CO);
                                 contract.setStatus(Status.CO);
@@ -1821,9 +1822,16 @@ public class JobContractService implements Serializable {
                             } else {
                                 contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
                                 contract.setLastModifiedDate(new Date());
+                                contract.setClearedAmount(contract.getClearedAmount()+ freelancerIncomeAmount);
+                                contract.setVat(contract.getVat()+ VATCharge);
+                                contract.setCharges(contract.getCharges()+ kulaIncomeCharge+pepperestIncomeCharge);
+
                                 if (milestone != null) {
                                     milestone.setStatus(Status.CO);
                                     milestone.setEndDate(new Date());
+                                    milestone.setClearedAmount(freelancerIncomeAmount);
+                                    milestone.setVat(VATCharge);
+                                    milestone.setCharges(kulaIncomeCharge+pepperestIncomeCharge);
 
                                     JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
                                     if (project != null) {
@@ -1939,13 +1947,12 @@ public class JobContractService implements Serializable {
                  if(milestone==null)
                     return new APIResponse("No Milestone found with the reference provided", false, null);
                 else {
-                    depositedAmount = milestone.getAmount().intValue();
+                    depositedAmount = milestone.getAmount();
                     payment.setExecutedFor("Milestone:"+contractReferenceId);
                 }
             }
 
             if(depositedAmount>0) {
-
                 try {
                     //get configurations
                     List<Config> configs = configService.getConfigs();

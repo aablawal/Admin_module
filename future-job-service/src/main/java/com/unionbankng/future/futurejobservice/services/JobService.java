@@ -5,10 +5,7 @@ import com.unionbankng.future.futurejobservice.enums.ConfigReference;
 import com.unionbankng.future.futurejobservice.enums.LoggingOwner;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
-import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
-import com.unionbankng.future.futurejobservice.pojos.NotificationBody;
-import com.unionbankng.future.futurejobservice.pojos.TeamMember;
+import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
@@ -46,7 +43,7 @@ public class JobService {
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
-    public Job addJob(Principal principal, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
+    public APIResponse addJob(Principal principal, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
         try {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
             String supporting_file_names = null;
@@ -58,167 +55,171 @@ public class JobService {
             app.print("Job Request:");
             app.print(job);
 
-            app.print("Attached Files");
-            app.print("NDA files:"+nda_files.length);
-            app.print("Supporting Files:"+supporting_files.length);
-            //save files if not null
-            if (nda_files.length>0)
-                nda_file_names = this.fileStoreService.storeFiles(nda_files,"kula-nda");
-            if (supporting_files.length>0)
-                supporting_file_names = this.fileStoreService.storeFiles(supporting_files, "kula");
+            if(job.getBudget()>=1000) {
 
-            //cross verify if attached files processed
-            if (nda_file_names != null)
-                job.setNdaFiles(nda_file_names);
-            if (supporting_file_names != null)
-                job.setSupportingFiles(supporting_file_names);
+                app.print("Attached Files");
+                app.print("NDA files:" + nda_files.length);
+                app.print("Supporting Files:" + supporting_files.length);
+                //save files if not null
+                if (nda_files.length > 0)
+                    nda_file_names = this.fileStoreService.storeFiles(nda_files, "kula-nda");
+                if (supporting_files.length > 0)
+                    supporting_file_names = this.fileStoreService.storeFiles(supporting_files, "kula");
 
-            Job savedJob=jobRepository.save(job);
-            if(savedJob!=null) {
+                //cross verify if attached files processed
+                if (nda_file_names != null)
+                    job.setNdaFiles(nda_file_names);
+                if (supporting_file_names != null)
+                    job.setSupportingFiles(supporting_file_names);
 
-                if (savedJob.getType() == JobType.TEAMS_PROJECT) {
-                    JobTeam team = new ObjectMapper().readValue(teamData, JobTeam.class);
-                    team.setStatus(Status.AC);
-                    team.setJobId(savedJob.getId());
-                    if (team.getSelectedTeam() != null) {
-                        for (String teamMemberData : team.getSelectedTeam().split("~")) {
-                            logger.info(teamMemberData);
-                            if (teamMemberData != null && teamMemberData != "") {
-                                TeamMember teamMember = new ObjectMapper().readValue(teamMemberData, TeamMember.class);
-                                logger.info(teamMember.toString());
+                Job savedJob = jobRepository.save(job);
+                if (savedJob != null) {
 
-                                if (teamMember != null) {
+                    if (savedJob.getType() == JobType.TEAMS_PROJECT) {
+                        JobTeam team = new ObjectMapper().readValue(teamData, JobTeam.class);
+                        team.setStatus(Status.AC);
+                        team.setJobId(savedJob.getId());
+                        if (team.getSelectedTeam() != null) {
+                            for (String teamMemberData : team.getSelectedTeam().split("~")) {
+                                logger.info(teamMemberData);
+                                if (teamMemberData != null && teamMemberData != "") {
+                                    TeamMember teamMember = new ObjectMapper().readValue(teamMemberData, TeamMember.class);
+                                    logger.info(teamMember.toString());
 
-                                    //get the right user percentage
-                                    String percentageValue = teamMember.getPercentage().replaceAll("%", "");
-                                    //get end date
-                                    Calendar c = Calendar.getInstance();
-                                    c.setTime(new Date());
-                                    c.add(Calendar.DATE, 7);
+                                    if (teamMember != null) {
+                                        //get the right user percentage
+                                        String percentageValue = teamMember.getPercentage().replaceAll("%", "");
+                                        //get end date
+                                        Calendar c = Calendar.getInstance();
+                                        c.setTime(new Date());
+                                        c.add(Calendar.DATE, 7);
 
-                                    //calculate user founds
-                                    int percentage = Integer.parseInt(percentageValue);
-                                    int money = (int) (savedJob.getBudget() / 100) * percentage;
+                                        //calculate user founds
+                                        int percentage = Integer.parseInt(percentageValue);
+                                        int money = (int) (savedJob.getBudget() / 100) * percentage;
 
-                                    JobProposal proposal = new JobProposal();
-                                    proposal.setUserId(teamMember.getId());
-                                    proposal.setJobId(savedJob.getId());
-                                    proposal.setStatus(Status.PE);
-                                    proposal.setEmployerId(savedJob.getOid());
-                                    proposal.setDurationType("D");
-                                    proposal.setDuration(Long.valueOf(7));
-                                    proposal.setEndDate(c.getTime());
-                                    proposal.setStartDate(new Date());
-                                    proposal.setLastModifiedDate(new Date());
-                                    proposal.setAbout(teamMember.getFullName());
-                                    proposal.setFullName(teamMember.getFullName());
-                                    proposal.setEmail(teamMember.getEmail());
-                                    proposal.setImg(teamMember.getImg());
-                                    proposal.setAccountName(teamMember.getAccountName());
-                                    proposal.setAccountNumber(teamMember.getAccountNumber());
-                                    proposal.setAccountType(teamMember.getAccountType());
-                                    proposal.setBranchCode(teamMember.getBranchCode());
-                                    proposal.setWorkMethod("Overall");
-                                    proposal.setPreparedCurrency("NGN");
-                                    proposal.setBidAmount(Long.valueOf(money));
-                                    proposal.setPercentage(Long.valueOf(percentage));
-                                    proposal.setIsApplied(false);
-                                    proposal.setCreatedAt(new Date());
-                                    JobProposal savedProposal = jobProposalRepository.save(proposal);
-                                    if (savedProposal != null) {
+                                        JobProposal proposal = new JobProposal();
+                                        proposal.setUserId(teamMember.getId());
+                                        proposal.setJobId(savedJob.getId());
+                                        proposal.setStatus(Status.PE);
+                                        proposal.setEmployerId(savedJob.getOid());
+                                        proposal.setDurationType("D");
+                                        proposal.setDuration(Long.valueOf(7));
+                                        proposal.setEndDate(c.getTime());
+                                        proposal.setStartDate(new Date());
+                                        proposal.setLastModifiedDate(new Date());
+                                        proposal.setAbout(teamMember.getFullName());
+                                        proposal.setFullName(teamMember.getFullName());
+                                        proposal.setEmail(teamMember.getEmail());
+                                        proposal.setImg(teamMember.getImg());
+                                        proposal.setAccountName(teamMember.getAccountName());
+                                        proposal.setAccountNumber(teamMember.getAccountNumber());
+                                        proposal.setAccountType(teamMember.getAccountType());
+                                        proposal.setBranchCode(teamMember.getBranchCode());
+                                        proposal.setWorkMethod("Overall");
+                                        proposal.setPreparedCurrency("NGN");
+                                        proposal.setBidAmount(Long.valueOf(money));
+                                        proposal.setPercentage(Long.valueOf(percentage));
+                                        proposal.setIsApplied(false);
+                                        proposal.setCreatedAt(new Date());
+                                        JobProposal savedProposal = jobProposalRepository.save(proposal);
+                                        if (savedProposal != null) {
 
-                                        JobTeamDetails teamMemberDetails = new JobTeamDetails();
-                                        teamMemberDetails.setJobId(savedJob.getId());
-                                        teamMemberDetails.setEmployerId(savedJob.getOid());
-                                        teamMemberDetails.setUserId(teamMember.getId());
-                                        teamMemberDetails.setFullName(teamMember.getFullName());
-                                        teamMemberDetails.setEmail(teamMember.getEmail());
-                                        teamMemberDetails.setImg(teamMember.getImg());
-                                        teamMemberDetails.setStatus(Status.PF);
-                                        teamMemberDetails.setProposalId(savedProposal.getId());
-                                        teamMemberDetails.setAmount(Long.valueOf(money));
-                                        teamMemberDetails.setPercentage(Long.valueOf(percentage));
-                                        teamRepository.save(team);
-                                        jobTeamDetailsRepository.save(teamMemberDetails);
+                                            JobTeamDetails teamMemberDetails = new JobTeamDetails();
+                                            teamMemberDetails.setJobId(savedJob.getId());
+                                            teamMemberDetails.setEmployerId(savedJob.getOid());
+                                            teamMemberDetails.setUserId(teamMember.getId());
+                                            teamMemberDetails.setFullName(teamMember.getFullName());
+                                            teamMemberDetails.setEmail(teamMember.getEmail());
+                                            teamMemberDetails.setImg(teamMember.getImg());
+                                            teamMemberDetails.setStatus(Status.PF);
+                                            teamMemberDetails.setProposalId(savedProposal.getId());
+                                            teamMemberDetails.setAmount(Long.valueOf(money));
+                                            teamMemberDetails.setPercentage(Long.valueOf(percentage));
+                                            teamRepository.save(team);
+                                            jobTeamDetailsRepository.save(teamMemberDetails);
 
-                                        NotificationBody body = new NotificationBody();
-                                        body.setBody("Hello! " + teamMemberDetails.getFullName() + ", you have been invited to work on " + savedJob.getTitle() + ".");
-                                        body.setSubject("Job Invitation");
-                                        body.setActionType("REDIRECT");
-                                        body.setAction("/job/details/" + savedJob.getId());
-                                        body.setTopic("'Job'");
-                                        body.setChannel("S");
-                                        body.setPriority("YES");
-                                        body.setRecipient(teamMemberDetails.getId());
-                                        body.setRecipientEmail(teamMemberDetails.getFullName());
-                                        body.setRecipientName(teamMemberDetails.getEmail());
-                                        notificationSender.pushNotification(body);
-                                        logger.info("Notification fired");
+                                            NotificationBody body = new NotificationBody();
+                                            body.setBody("Hello! " + teamMemberDetails.getFullName() + ", you have been invited to work on " + savedJob.getTitle() + ".");
+                                            body.setSubject("Job Invitation");
+                                            body.setActionType("REDIRECT");
+                                            body.setAction("/job/details/" + savedJob.getId());
+                                            body.setTopic("'Job'");
+                                            body.setChannel("S");
+                                            body.setPriority("YES");
+                                            body.setRecipient(teamMemberDetails.getId());
+                                            body.setRecipientEmail(teamMemberDetails.getFullName());
+                                            body.setRecipientName(teamMemberDetails.getEmail());
+                                            notificationSender.pushNotification(body);
+                                            logger.info("Notification fired");
 
+                                        }
                                     }
                                 }
-                            }
 //
+                            }
                         }
                     }
-                }
-                //fire notification
-                Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
-                if (currentJob != null) {
+                    //fire notification
+                    Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
+                    if (currentJob != null) {
 
-                    NotificationBody body = new NotificationBody();
-                    body.setBody("Your job for " + currentJob.getTitle() + " has been published");
-                    body.setSubject("Job Published");
-                    body.setActionType("REDIRECT");
-                    body.setAction("/job/details/" + savedJob.getId());
-                    body.setTopic("'Job'");
-                    body.setChannel("S");
-                    body.setPriority("YES");
-                    body.setRecipient(savedJob.getOid());
-                    body.setRecipientEmail(currentUser.getUserFullName());
-                    body.setRecipientName(currentUser.getUserFullName());
-                    notificationSender.pushNotification(body);
-                    logger.info("Notification fired");
+                        NotificationBody body = new NotificationBody();
+                        body.setBody("Your job for " + currentJob.getTitle() + " has been published");
+                        body.setSubject("Job Published");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/job/details/" + savedJob.getId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setPriority("YES");
+                        body.setRecipient(savedJob.getOid());
+                        body.setRecipientEmail(currentUser.getUserFullName());
+                        body.setRecipientName(currentUser.getUserFullName());
+                        notificationSender.pushNotification(body);
+                        logger.info("Notification fired");
+                    } else {
+                        logger.info("Unable to fire notifications");
+                    }
+                    //end
+
+                    try {
+                        //update configurations table
+                        Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS);
+                        if (existingConfig != null)
+                            configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
+                        else
+                            configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(1));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Created new Job");
+                        log.setRequestObject(app.toString(job));
+                        log.setRequestObject(app.toString(savedJob));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                    return  new APIResponse("Request Successful",true, savedJob);
+
                 } else {
-                    logger.info("Unable to fire notifications");
+                    logger.info("JOBSERVICE: Unable to save Job");
+                    return  new APIResponse("Unable to create Job",false, null);
                 }
-                //end
-
-                try {
-                    //update configurations table
-                    Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS);
-                    if (existingConfig != null)
-                        configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
-                    else
-                        configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(1));
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
-
-                try {
-                    //############### Activity Logging ###########
-                    ActivityLog log = new ActivityLog();
-                    log.setDescription("Created new Job");
-                    log.setRequestObject(app.toString(job));
-                    log.setRequestObject(app.toString(savedJob));
-                    log.setUsername(currentUser.getUserEmail());
-                    log.setUserId(currentUser.getUserUUID());
-                    appLogger.log(log);
-                    //#########################################
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
-                return savedJob;
-
-            }else {
-                logger.info("JOBSERVICE: Unable to save Job");
-                return null;
+            }else{
+                return  new APIResponse("Job Budget can't be less than 1,000 Naira",false, null);
             }
         }catch ( Exception e){
             e.printStackTrace();
-            return null;
+            return  new APIResponse(e.getMessage(),false, null);
         }
     }
 

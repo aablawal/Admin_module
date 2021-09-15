@@ -37,11 +37,7 @@ public class JobController {
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
                                               @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles) throws IOException{
 
-        Job addedJob=service.addJob(principal,jobData,teamData,supportingFiles,ndaFiles);
-        if(addedJob!=null)
-          return ResponseEntity.ok().body(new APIResponse("success",true,addedJob));
-        else
-            return ResponseEntity.ok().body(new APIResponse("failed",false,null));
+            return ResponseEntity.ok().body(service.addJob(principal,jobData,teamData,supportingFiles,ndaFiles));
     }
 
     @PutMapping("/v1/job/close")
