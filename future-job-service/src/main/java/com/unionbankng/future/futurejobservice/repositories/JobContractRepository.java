@@ -19,7 +19,7 @@ public interface JobContractRepository extends JpaRepository<JobContract, Long> 
     @Query(value = "SELECT  count(*) total_job_completed from  job_contracts c, job_proposals p where p.user_id=:userId and c.proposal_id=p.id and c.cleared_amount>0", nativeQuery = true)
     Optional<Long> getTotalJobCompletedByUser(Long userId);
 
-    @Query(value = "SELECT  sum(c.cleared_amount) total_earning from  job_contracts c, job_proposals p where p.user_id=:userId and c.proposal_id=p.id and c.status='CO'", nativeQuery = true)
+    @Query(value = "SELECT  ((sum(c.cleared_amount)-sum(c.vat))-sum(c.charges)) total_earning from  job_contracts c, job_proposals p where p.user_id=:userId and c.proposal_id=p.id and c.status='CO'", nativeQuery = true)
     Optional<Long> getTotalJobEarningByUserId(Long userId);
 
     @Query(value = "SELECT  sum(c.cleared_amount) total_expenditure from  job_contracts c, jobs j where j.oid=:userId and c.job_id=j.id", nativeQuery = true)

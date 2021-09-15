@@ -94,4 +94,19 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1622037021972-3">
+        <addColumn tableName="job_milestones">
+            <column name="cleared_amount" type="double"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1622037021973-3">
+        <addColumn tableName="job_milestones">
+            <column name="vat" type="double"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1622037021974-3">
+        <addColumn tableName="job_milestones">
+            <column name="charges" type="double"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
