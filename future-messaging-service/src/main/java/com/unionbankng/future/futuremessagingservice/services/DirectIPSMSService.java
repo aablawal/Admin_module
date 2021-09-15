@@ -4,6 +4,7 @@ import com.unionbankng.future.futuremessagingservice.pojos.SMS;
 import com.unionbankng.future.futuremessagingservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,9 +16,12 @@ import java.util.Arrays;
 public class DirectIPSMSService {
 
     String baseURL="https://websms.ipintegrated.com/HTTPIntegrator_SendSMS_1";
-    String senderId="M36";
-    String username="unionm36";
-    String password="hello123";
+    @Value("${spring.directIP.SMS-senderId}")
+    String senderId;
+    @Value("${spring.directIP.SMS-username}")
+    String username;
+    @Value("${spring.directIP.SMS-password}")
+    String password;
 
     @Autowired
     private RestTemplate rest;

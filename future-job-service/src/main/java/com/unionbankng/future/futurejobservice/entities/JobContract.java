@@ -31,6 +31,8 @@ public class JobContract implements Serializable {
     private double amount;
     @NotNull
     private double clearedAmount;
+    private double charges;
+    private double vat;
     @NotNull
     private String country;
     private String workMethod;
