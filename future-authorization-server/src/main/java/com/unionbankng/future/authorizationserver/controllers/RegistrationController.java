@@ -61,7 +61,6 @@ public class RegistrationController {
         User user = userService.findByEmail(userEmail).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
         //send confirmation email
         userConfirmationTokenService.sendConfirmationToken(user);
-
         return ResponseEntity.ok().body(
                 new APIResponse("Link sent successfully",true,null));
 

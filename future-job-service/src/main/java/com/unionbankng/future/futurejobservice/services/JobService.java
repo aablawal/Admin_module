@@ -87,7 +87,6 @@ public class JobService {
                                     logger.info(teamMember.toString());
 
                                     if (teamMember != null) {
-
                                         //get the right user percentage
                                         String percentageValue = teamMember.getPercentage().replaceAll("%", "");
                                         //get end date
