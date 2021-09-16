@@ -54,6 +54,7 @@ public class RegistrationService {
             User existingUser=userService.findByEmail(request.getEmail()).orElse(
                     userService.findByUsername(request.getUsername()).orElse(null)
             );
+
             ErrorResponse errorResponse = new ErrorResponse();
             if(existingUser.getIsEnabled()) {
                 errorResponse.setCode("00");
@@ -65,7 +66,7 @@ public class RegistrationService {
                 errorResponse.setCode("01");
                 errorResponse.setRemark(messageSource.getMessage("account.inactive", null, LocaleContextHolder.getLocale()));
             }
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+            return ResponseEntity.status(HttpStatus.OK).body(
                     new APIResponse(errorResponse.getRemark(), false, errorResponse));
         }
 
