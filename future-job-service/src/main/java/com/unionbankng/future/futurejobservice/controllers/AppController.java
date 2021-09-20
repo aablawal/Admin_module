@@ -100,7 +100,6 @@ public class AppController {
     @PostMapping("/v1/bank/transfer/test")
     public ResponseEntity<APIResponse<String>> bankTransfer() throws JsonProcessingException {
 
-
 //        250700012
 //        WESTERN UNION SETTLEMENT A/C -IMPLEMENT
 //        315200043
