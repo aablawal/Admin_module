@@ -46,10 +46,10 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
         GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
         ThirdPartyOauthResponse thirdPartyOauthResponse = new ThirdPartyOauthResponse();
-        thirdPartyOauthResponse.setEmail( payload.getEmail());
-        thirdPartyOauthResponse.setFirstName((String) payload.get("given_name"));
-        thirdPartyOauthResponse.setLastName((String) payload.get("family_name"));
-        thirdPartyOauthResponse.setImage((String) payload.get("picture"));
+//        thirdPartyOauthResponse.setEmail( payload.getEmail());
+//        thirdPartyOauthResponse.setFirstName((String) payload.get("given_name"));
+//        thirdPartyOauthResponse.setLastName((String) payload.get("family_name"));
+//        thirdPartyOauthResponse.setImage((String) payload.get("picture"));
 
         logger.error("Google Auth response: {}", thirdPartyOauthResponse);
         //Check if user exist

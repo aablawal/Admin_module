@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,9 +32,9 @@ public class UserCourseProgressService {
     }
 
 
-    public UserCourseProgress computePercentageAndSaveProgress(UserCourseProgressRequest courseProgressRequest,Principal principal){
+    public UserCourseProgress computePercentageAndSaveProgress(UserCourseProgressRequest courseProgressRequest, OAuth2Authentication authentication){
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         return computePercentageAndSaveProgress(courseProgressRequest,jwtUserDetail.getUserUUID());
     }
@@ -87,8 +88,8 @@ public class UserCourseProgressService {
 
     }
 
-    public UserCourseProgress findMyCourseProgressByCourseId(Long courseId, Principal principal){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public UserCourseProgress findMyCourseProgressByCourseId(Long courseId,OAuth2Authentication authentication){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return findByCourseIdAndUserUUID(courseId,jwtUserDetail.getUserUUID());
 
     }

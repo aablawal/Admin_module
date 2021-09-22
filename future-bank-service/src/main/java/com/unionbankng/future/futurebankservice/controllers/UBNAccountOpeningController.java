@@ -11,13 +11,11 @@ import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.EmailSender;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
@@ -391,10 +389,10 @@ public class UBNAccountOpeningController {
 
     @PostMapping("/v1/ubn_account_opening/complete_account_opening")
     public ResponseEntity<APIResponse<UBNAccountDataResponse>> completeUBNAccountCreation(
-            @RequestBody @Valid CompleteUBNAccountCreationRequest request, @ApiIgnore Principal principal
+            @RequestBody @Valid CompleteUBNAccountCreationRequest request, @ApiIgnore OAuth2Authentication authentication
     ) throws IOException {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         //create ubn account
         UBNAccountCreationRequest ubnAccountCreationRequest = new UBNAccountCreationRequest();

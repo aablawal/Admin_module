@@ -9,6 +9,7 @@ import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import retrofit2.Response;
 import springfox.documentation.annotations.ApiIgnore;
@@ -29,9 +30,9 @@ public class CustomerBankAccountController {
 
 
     @PostMapping("/v1/ubn-account/add_bank_account")
-    public ResponseEntity<APIResponse<CustomerBankAccount>> addBankAccount(Principal principal, @RequestBody CustomerBankAccount bankAccount) {
+    public ResponseEntity<APIResponse<CustomerBankAccount>> addBankAccount(OAuth2Authentication authentication, @RequestBody CustomerBankAccount bankAccount) {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         if (customerBankAccountService.existsByAccountNumber(bankAccount.getAccountNumber()))
             return ResponseEntity.ok().body(new APIResponse<>("You have Already Added an Account", false, null));
 
@@ -49,8 +50,8 @@ public class CustomerBankAccountController {
 
 
     @GetMapping("/v1/ubn-account/get_customer_bank_accounts")
-    public ResponseEntity<APIResponse<List<CustomerBankAccount>>> getCustomerAccounts(@ApiIgnore Principal principal) {
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public ResponseEntity<APIResponse<List<CustomerBankAccount>>> getCustomerAccounts(@ApiIgnore OAuth2Authentication authentication) {
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         List<CustomerBankAccount> accountList = customerBankAccountService.findAllByUserUUID(jwtUserDetail.getUserUUID());
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, accountList));
     }

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,8 +55,8 @@ public class LectureService {
         return lectureRepository.findAllByCourseId(courseId);
     }
 
-    public Page<Lecture> findAllWhereIamCreator(Principal principal, Pageable pageable){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public Page<Lecture> findAllWhereIamCreator(OAuth2Authentication authentication, Pageable pageable){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return findAllByCreatorUUID(jwtUserDetail.getUserUUID(),pageable);
     }
 
@@ -63,12 +64,12 @@ public class LectureService {
         return lectureRepository.findAllByCreatorUUID(creatorUUID,pageable);
     }
 
-    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,Principal principal) throws IOException {
+    public Lecture createNewLecture(MultipartFile file, CreateLectureRequest request,OAuth2Authentication authentication) throws IOException {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         if(request.getType().equals(LectureType.VIDEO)) {
-            return createVideoLecture(file, request,jwtUserDetail.getUserUUID(),JWTUserDetailsExtractor.getAccessTokenString(principal));
+            return createVideoLecture(file, request,jwtUserDetail.getUserUUID(),"");
         }else{
 
             return createQuizLecture(request,jwtUserDetail.getUserUUID());

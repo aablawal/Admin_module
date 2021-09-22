@@ -33,7 +33,6 @@ public class UserConfirmationTokenService {
     private final UserService userService;
     private final EmailSender emailSender;
     private final MemcachedHelperService memcachedHelperService;
-    private final KeycloakService keycloakService;
 
     @Value("${email.sender}")
     private String emailSenderAddress;
@@ -87,7 +86,6 @@ public class UserConfirmationTokenService {
             User user = userService.findByEmail(userEmail).orElse(null);
             if (user!= null) {
                 tokenConfirm.setSuccess(false);
-                keycloakService.enableKeyCloakUser(user.getUuid());
                 user.setIsEnabled(true);
                 userService.save(user);
 

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -30,8 +31,8 @@ public class CourseContentService {
         return courseContentRepository.findAllByCourseId(courseId,sort);
     }
 
-    public Page<CourseContent> findAllByCreatorUUID(Principal principal, Pageable pageable){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public Page<CourseContent> findAllByCreatorUUID(OAuth2Authentication authentication, Pageable pageable){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return findAllByCreatorUUID(jwtUserDetail.getUserUUID(),pageable);
     }
 
@@ -41,9 +42,9 @@ public class CourseContentService {
 
 
 
-    public CourseContent createNewContent(CourseContentRequest request,Principal principal){
+    public CourseContent createNewContent(CourseContentRequest request,OAuth2Authentication authentication){
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         return createNewContent(request,jwtUserDetail.getUserUUID());
     }
