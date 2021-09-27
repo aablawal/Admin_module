@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,8 +42,8 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public Page<Course> findAllWhereIamCreator(Principal principal, Pageable pageable){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public Page<Course> findAllWhereIamCreator(OAuth2Authentication authentication, Pageable pageable){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return findAllByCreatorUUID(jwtUserDetail.getUserUUID(),pageable);
     }
 
@@ -73,8 +74,8 @@ public class CourseService {
         return courseRepository.findAllByInstructorsIn(instructor,pageable);
     }
 
-    public Page<Course> findAllWhereIamInstructor(Principal principal, Pageable pageable){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public Page<Course> findAllWhereIamInstructor(OAuth2Authentication authentication, Pageable pageable){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         System.out.println(jwtUserDetail.getUserUUID());
         Instructor instructor = instructorRepository.findByInstructorUUID(jwtUserDetail.getUserUUID())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course Not Found"));
@@ -101,9 +102,9 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public Course createCourse(CreateCourseRequest request,Principal principal){
+    public Course createCourse(CreateCourseRequest request,OAuth2Authentication authentication){
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         return createCourse(request, jwtUserDetail.getUserUUID());
 
@@ -147,9 +148,9 @@ public class CourseService {
 
 
     //create course from URL
-    public APIResponse createEmbeddedCourse(String  courseData,  String lecturesData, Principal principal) {
+    public APIResponse createEmbeddedCourse(String  courseData,  String lecturesData,OAuth2Authentication authentication) {
         try {
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             EmbeddedCourse embeddedCourse = new ObjectMapper().readValue(courseData, EmbeddedCourse.class);
             EmbeddedCourseLecture[]  embeddedCourseLectures = new ObjectMapper().readValue(lecturesData, EmbeddedCourseLecture[].class);
             embeddedCourse.setCreatorUUID(currentUser.getUserUUID());
@@ -224,9 +225,9 @@ public class CourseService {
             return new APIResponse("Failed", false, ex.getMessage());
         }
     }
-    public void publishCourse(Long courseId, Principal principal) {
+    public void publishCourse(Long courseId,OAuth2Authentication authentication) {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         Course course = courseRepository.findById(courseId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course Not Found"));
 
@@ -240,8 +241,8 @@ public class CourseService {
         save(course);
     }
 
-    public Course updateCourse(Long courseId, CreateCourseRequest request,Principal principal){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public Course updateCourse(Long courseId, CreateCourseRequest request,OAuth2Authentication authentication){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         String userId= jwtUserDetail.getUserUUID();
         Course course = courseRepository.findById(courseId).orElse(null);
         if(course!=null) {

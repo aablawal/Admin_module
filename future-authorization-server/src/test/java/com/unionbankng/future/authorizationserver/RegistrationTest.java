@@ -56,8 +56,6 @@ public class RegistrationTest extends AbstractTest {
         String body = mapper.writeValueAsString(request);
 
         Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
-        Mockito.when(registrationService.createUserOnKeycloak(request)).thenReturn(response);
-
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
@@ -84,7 +82,6 @@ public class RegistrationTest extends AbstractTest {
 
         Mockito.when(googleOauthProvider.authentcate("1/fFAGRNJru1FTz70BzhT3Zg")).thenReturn(thirdPartyOauthResponse);
         Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
-        Mockito.when(registrationService.createUserOnKeycloak(request)).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)

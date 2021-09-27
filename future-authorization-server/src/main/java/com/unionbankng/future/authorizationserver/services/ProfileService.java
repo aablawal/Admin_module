@@ -1,13 +1,5 @@
 package com.unionbankng.future.authorizationserver.services;
-
-import com.google.code.ssm.api.InvalidateSingleCache;
-import com.google.code.ssm.api.ParameterValueKeyProvider;
-import com.google.code.ssm.api.ReadThroughSingleCache;
-import com.unionbankng.future.authorizationserver.entities.Experience;
 import com.unionbankng.future.authorizationserver.entities.Profile;
-import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
-import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
@@ -15,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

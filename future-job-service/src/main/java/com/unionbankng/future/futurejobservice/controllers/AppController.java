@@ -12,6 +12,7 @@ import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -48,7 +49,7 @@ public class AppController {
         return ResponseEntity.ok().body(new APIResponse("Request Successful", true,log));
     }
     @PostMapping("/v1/notification/test")
-    public ResponseEntity<APIResponse<String>> testNotificationService(Principal principal){
+    public ResponseEntity<APIResponse<String>> testNotificationService(OAuth2Authentication authentication){
         NotificationBody body = new NotificationBody();
         body.setBody("Testing notification");
         body.setSubject("Test");
@@ -99,7 +100,6 @@ public class AppController {
 
     @PostMapping("/v1/bank/transfer/test")
     public ResponseEntity<APIResponse<String>> bankTransfer() throws JsonProcessingException {
-
 
 //        250700012
 //        WESTERN UNION SETTLEMENT A/C -IMPLEMENT

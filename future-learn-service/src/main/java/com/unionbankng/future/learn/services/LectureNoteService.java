@@ -5,6 +5,7 @@ import com.unionbankng.future.learn.pojo.JwtUserDetail;
 import com.unionbankng.future.learn.repositories.LectureNoteRepository;
 import com.unionbankng.future.learn.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -20,8 +21,8 @@ public class LectureNoteService {
         return lectureNoteRepository.save(lectureNote);
     }
 
-    public List<LectureNote> findAllByCourseIdAndIam(Long courseId, Principal principal){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public List<LectureNote> findAllByCourseIdAndIam(Long courseId, OAuth2Authentication authentication){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return findAllByCourseIdAndUserUUID(courseId,jwtUserDetail.getUserUUID());
     }
 
@@ -29,8 +30,8 @@ public class LectureNoteService {
         return lectureNoteRepository.findAllByCourseIdAndUserUUID(courseId,userUUID);
     }
 
-    public List<LectureNote> findAllByLectureIdAndIam(Long lectureId, Principal principal){
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public List<LectureNote> findAllByLectureIdAndIam(Long lectureId,OAuth2Authentication authentication){
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return findAllByLectureIdAndUserUUID(lectureId,jwtUserDetail.getUserUUID());
     }
 

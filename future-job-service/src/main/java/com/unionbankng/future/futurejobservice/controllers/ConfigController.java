@@ -22,9 +22,17 @@ public class ConfigController {
     }
 
     @PostMapping("/v1/job/config/update_config")
-    public ResponseEntity<APIResponse<List<Config>>> updateConfis(@RequestBody List<ConfigRequest> configRequest){
+    public ResponseEntity<APIResponse<List<Config>>> updateConfigs(@RequestBody List<ConfigRequest> configRequest){
         return ResponseEntity.ok().body(configService.updateConfigs(configRequest));
     }
 
-
+    @GetMapping("/v1/job/config/get_configs")
+    public ResponseEntity<APIResponse<List<Config>>> getConfigs(){
+        List<Config> configs = configService.getConfigs();
+        if(configs!=null) {
+            return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,configService.getConfigs()));
+        }else{
+            return ResponseEntity.ok().body(new APIResponse<>("No Config Found",false,configService.getConfigs()));
+        }
+    }
 }

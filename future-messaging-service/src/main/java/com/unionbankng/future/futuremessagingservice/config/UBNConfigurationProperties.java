@@ -1,10 +1,11 @@
 package com.unionbankng.future.futuremessagingservice.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.unionbankng.future.futuremessagingservice.pojos.UbnResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
-
 import javax.net.ssl.*;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
@@ -89,8 +90,10 @@ public class UBNConfigurationProperties {
 
         Response response = invocationBuilder.post(Entity.entity(new UbnResponse(), MediaType.APPLICATION_JSON));
 
-        if (response.getStatus() == 200)
-            return response.readEntity(UbnResponse.class).getAccess_token();
+        if (response.getStatus() == 200) {
+            UbnResponse ubnResponse = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue((byte[]) response.getEntity(), UbnResponse.class);
+            return ubnResponse.getAccess_token();
+        }
 
 
         return null;

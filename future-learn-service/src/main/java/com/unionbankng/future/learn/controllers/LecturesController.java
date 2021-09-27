@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,7 +19,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -48,11 +48,10 @@ public class LecturesController {
     }
 
     @GetMapping("/v1/lectures/find_where_iam_creator")
-    public ResponseEntity<APIResponse<Page<Lecture>>> findWhereIamCreator(@ApiIgnore Principal principal, @RequestParam int page
+    public ResponseEntity<APIResponse<Page<Lecture>>> findWhereIamCreator(@ApiIgnore OAuth2Authentication authentication, @RequestParam int page
     , @RequestParam int size){
 
-        Page<Lecture> lectures = lectureService.findAllWhereIamCreator(principal,PageRequest.of(page,size));
-
+        Page<Lecture> lectures = lectureService.findAllWhereIamCreator(authentication,PageRequest.of(page,size));
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,lectures));
     }
@@ -74,9 +73,9 @@ public class LecturesController {
 
     @PostMapping(value = "/v1/lectures/create_new_lecture", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<Lecture>> creatContent(@RequestPart(required = false) MultipartFile file,
-                                                                   @Valid @RequestPart CreateLectureRequest request,@ApiIgnore Principal principal) throws IOException {
+                                                                   @Valid @RequestPart CreateLectureRequest request,@ApiIgnore OAuth2Authentication authentication) throws IOException {
 
-        Lecture lecture = lectureService.createNewLecture(file,request,principal);
+        Lecture lecture = lectureService.createNewLecture(file,request,authentication);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,lecture));
