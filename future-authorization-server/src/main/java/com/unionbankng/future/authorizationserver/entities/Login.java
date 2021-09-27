@@ -1,4 +1,5 @@
 package com.unionbankng.future.authorizationserver.entities;
+import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Table(name="auth_history")
 @Entity
 @Getter
 @Setter
@@ -26,6 +28,8 @@ public class Login implements Serializable {
     private String location;
     private String device;
     private String ipAddress;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date loginDate;
