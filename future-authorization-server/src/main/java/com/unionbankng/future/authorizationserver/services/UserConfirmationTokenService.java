@@ -60,7 +60,7 @@ public class UserConfirmationTokenService {
             URL url = new URL(generatedURL);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 
-            logger.info("Sending confirmation to {}", user.toString());
+            logger.info("Sending confirmation to {}", user);
             logger.info("Activation Link:" +  uri.toASCIIString());
 
             EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{ uri.toASCIIString()}, LocaleContextHolder.getLocale())

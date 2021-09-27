@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class APIResponse<T> {
     private String message;
     private boolean success;

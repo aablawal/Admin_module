@@ -41,20 +41,24 @@ public class RegistrationController {
     }
 
     @PostMapping("/v1/registration/confirmation")
-    public ResponseEntity<APIResponse<Long>> confirmUserAccount(@NotNull  @RequestParam String confirmationToken){
+    public ResponseEntity<APIResponse<Long>> confirmUserAccount(@NotNull  @RequestParam String confirmationToken) {
 
+        app.print("###########Confirming registration");
         TokenConfirm tokenConfirm = userConfirmationTokenService.confirmUserAccountByToken(confirmationToken);
 
-        if (!tokenConfirm.getSuccess())
-             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-                    new APIResponse<>(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()),false,null));
+        if (tokenConfirm != null) {
+            if (tokenConfirm.getSuccess())
+                return ResponseEntity.ok().body(
+                        new APIResponse<>(messageSource.getMessage("account.confirmation.success", null, LocaleContextHolder.getLocale()), true, tokenConfirm.getUserId()));
+            else
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                        new APIResponse<>(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()), false, null));
 
-
-        return ResponseEntity.ok().body(
-                new APIResponse<>(messageSource.getMessage("account.confirmation.success", null, LocaleContextHolder.getLocale()),true,tokenConfirm.getUserId()));
-
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse<>(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()), false, null));
+        }
     }
-
     @PostMapping("/v1/registration/resend_confirmation")
     public ResponseEntity<APIResponse> resendAccountConfirmationEmail(@NotNull  @RequestParam String userEmail){
 

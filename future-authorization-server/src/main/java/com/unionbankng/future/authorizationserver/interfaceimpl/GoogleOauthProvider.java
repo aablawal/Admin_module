@@ -4,12 +4,12 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.unionbankng.future.authorizationserver.controllers.RegistrationController;
 import com.unionbankng.future.authorizationserver.interfaces.ThirdPartyOauthProvider;
-import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
+import com.unionbankng.future.authorizationserver.utils.App;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -27,46 +27,48 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
 
     @Value("${sidekiq.google.client_id}")
     private String googleClientId;
-
+    @Autowired
+    private App app;
     @Override
     public ThirdPartyOauthResponse authentcate(String idToken)  {
 
         GoogleIdToken googleIdToken = null;
+        logger.info("Starting : {}",googleClientId);
 
-        logger.error("Starting : {}",googleClientId);
 
+        app.print("before");
         try {
+            app.print("in try before");
             googleIdToken = getGoogleIdToken(idToken,googleClientId);
-
-        } catch (GeneralSecurityException | IOException e) {
-            logger.error("Google Auth error: {}",e.getLocalizedMessage());
+            app.print("in try");
+        } catch (Exception e) {
+            app.print("in catch");
+            logger.info("Google Auth error: {}",e.getLocalizedMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         }
-        logger.error("Here : {}",idToken);
+        logger.info("Here : {}",idToken);
         GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
         ThirdPartyOauthResponse thirdPartyOauthResponse = new ThirdPartyOauthResponse();
-//        thirdPartyOauthResponse.setEmail( payload.getEmail());
-//        thirdPartyOauthResponse.setFirstName((String) payload.get("given_name"));
-//        thirdPartyOauthResponse.setLastName((String) payload.get("family_name"));
-//        thirdPartyOauthResponse.setImage((String) payload.get("picture"));
+        thirdPartyOauthResponse.setEmail( payload.getEmail());
+        thirdPartyOauthResponse.setFirstName((String) payload.get("given_name"));
+        thirdPartyOauthResponse.setLastName((String) payload.get("family_name"));
+        thirdPartyOauthResponse.setImage((String) payload.get("picture"));
 
-        logger.error("Google Auth response: {}", thirdPartyOauthResponse);
+        logger.info("Google Auth response: {}", thirdPartyOauthResponse);
         //Check if user exist
         return thirdPartyOauthResponse;
     }
 
     private GoogleIdToken getGoogleIdToken(String googleIdTokenString, String clientId) throws GeneralSecurityException, IOException {
+        app.print("token:"+googleIdTokenString);
+        app.print("clientId:"+clientId);
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jacksonFactory)
                 // Specify the CLIENT_ID of the app that accesses the backend:
                 .setAudience(Collections.singletonList(clientId))
                 // Or, if multiple clients access the backend:
                 //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
                 .build();
-
-        logger.error("I am here : {}");
-
             return verifier.verify(googleIdTokenString);
-
     }
 }

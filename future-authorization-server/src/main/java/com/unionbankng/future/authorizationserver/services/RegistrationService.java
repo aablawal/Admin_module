@@ -54,7 +54,8 @@ public class RegistrationService {
                 errorResponse.setCode("00");
                 errorResponse.setRemark(messageSource.getMessage("account.active", null, LocaleContextHolder.getLocale()));
 
-            }else {
+            }
+            else {
                 //send confirmation email
                 userConfirmationTokenService.sendConfirmationToken(existingUser);
                 errorResponse.setCode("01");
@@ -100,18 +101,33 @@ public class RegistrationService {
 
 
         app.print("##############LOGIN WITH GOOGLE");
+        app.print("Request:");
+        app.print(request);
         // generate uuid for user
         ThirdPartyOauthResponse thirdPartyOauthResponse = googleOauthProvider.authentcate(request.getThirdPartyToken());
+        if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername())) {
+            User existingUser=userService.findByEmail(request.getEmail()).orElse(
+                    userService.findByUsername(request.getUsername()).orElse(null)
+            );
 
-        if (userService.existsByEmail(thirdPartyOauthResponse.getEmail()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    new APIResponse(messageSource.getMessage("email.exist", null, LocaleContextHolder.getLocale()),false,null));
+            ErrorResponse errorResponse = new ErrorResponse();
+            if(existingUser.getIsEnabled()) {
+                errorResponse.setCode("00");
+                errorResponse.setRemark(messageSource.getMessage("account.active", null, LocaleContextHolder.getLocale()));
 
+            }else {
+                //send confirmation email
+                userConfirmationTokenService.sendConfirmationToken(existingUser);
+                errorResponse.setCode("01");
+                errorResponse.setRemark(messageSource.getMessage("account.inactive", null, LocaleContextHolder.getLocale()));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new APIResponse(errorResponse.getRemark(), false, errorResponse));
+        }
         // generate uuid for user
         String generatedUuid =  app.makeUIID();
-
         User user = User.builder().firstName(thirdPartyOauthResponse.getFirstName()).lastName(thirdPartyOauthResponse.getLastName())
-                .email(thirdPartyOauthResponse.getEmail())
+                .email(thirdPartyOauthResponse.getEmail()).dialingCode("+234")
                 .username(thirdPartyOauthResponse.getEmail()).isEnabled(Boolean.TRUE)
                 .uuid(generatedUuid).img(thirdPartyOauthResponse.getImage()).username(request.getUsername()).authProvider(request.getAuthProvider()).build();;
 

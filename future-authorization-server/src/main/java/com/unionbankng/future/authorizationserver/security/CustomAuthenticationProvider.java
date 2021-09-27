@@ -2,6 +2,7 @@ package com.unionbankng.future.authorizationserver.security;
 
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.interfaceimpl.GoogleOauthProvider;
+import com.unionbankng.future.authorizationserver.utils.App;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
     @Autowired
     private GoogleOauthProvider googleOauthProvider;
+    @Autowired
+    private App app;
 
 
     @Override
@@ -60,6 +63,8 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
             this.logger.info("Using google");
             googleOauthProvider.authentcate(thirdPartyOauthToken);
+
+
         }
 
 
@@ -73,6 +78,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         if (this.isForcePrincipalAsString()) {
             principalToReturn = user.getUsername();
         }
+
 
         return this.createSuccessAuthentication(principalToReturn, auth, user);
 

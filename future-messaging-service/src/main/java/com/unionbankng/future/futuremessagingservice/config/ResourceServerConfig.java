@@ -78,7 +78,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://sidekiq-frontend.azurewebsites.net","https://kula.work"));
-		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "PUT", "POST", "UPDATE", "DELETE"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "PUT", "POST", "UPDATE", "DELETE","OPTIONS"));
 		corsConfiguration.setMaxAge(3600L);
 		source.registerCorsConfiguration("/**", corsConfiguration); // Global for all paths
 		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<CorsFilter>(new CorsFilter(source));
