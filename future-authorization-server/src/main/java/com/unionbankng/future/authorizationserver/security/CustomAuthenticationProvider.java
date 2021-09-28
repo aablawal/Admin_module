@@ -1,7 +1,9 @@
 package com.unionbankng.future.authorizationserver.security;
 
+import com.unionbankng.future.authorizationserver.entities.Login;
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.interfaceimpl.GoogleOauthProvider;
+import com.unionbankng.future.authorizationserver.repositories.LoginRepository;
 import com.unionbankng.future.authorizationserver.utils.App;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
+import java.util.Date;
 import java.util.Map;
 
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
@@ -22,7 +25,8 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     private GoogleOauthProvider googleOauthProvider;
     @Autowired
     private App app;
-
+    @Autowired
+    private  LoginRepository loginRepository;
 
     @Override
     public Authentication authenticate(Authentication auth)
@@ -48,25 +52,33 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
         this.getPreAuthenticationChecks().check(user);
 
-        if(user.getAuthProvider().equals(AuthProvider.EMAIL)) {
+        Login loginHistory= new Login();
+        loginHistory.setName(user.getFirstName());
+        loginHistory.setUsername(user.getUsername());
+        loginHistory.setLocation("Lagos/Nigeria");
+        loginHistory.setDevice("Not Detected");
+        loginHistory.setIpAddress("Not Detected");
+        loginHistory.setLoginDate(new Date());
+        app.print("########New Login Detected!");
+        app.print(loginHistory);
 
-
+        if(user.getPassword()!=null) {
             if(auth.getCredentials() == null && thirdPartyOauthToken != null)
                 throw new BadCredentialsException(this.messages.getMessage("wrong.authprovider.email.error", "Bad credentials"));
+
+            loginHistory.setAuthProvider(AuthProvider.EMAIL);
+            loginRepository.save(loginHistory);
             additionalAuthenticationChecks(user, (UsernamePasswordAuthenticationToken) auth);
         }
 
-        if(user.getAuthProvider().equals(AuthProvider.GOOGLE)) {
-
+        if(user.getPassword()==null) {
             if(thirdPartyOauthToken == null)
                 throw new BadCredentialsException(this.messages.getMessage("wrong.authprovider.google.error", "Bad credentials"));
-
             this.logger.info("Using google");
+            loginHistory.setAuthProvider(AuthProvider.GOOGLE);
+            loginRepository.save(loginHistory);
             googleOauthProvider.authentcate(thirdPartyOauthToken);
-
-
         }
-
 
         if (!cacheWasUsed) {
             this.getUserCache().putUserInCache(user);
@@ -78,11 +90,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         if (this.isForcePrincipalAsString()) {
             principalToReturn = user.getUsername();
         }
-
-
         return this.createSuccessAuthentication(principalToReturn, auth, user);
-
-
     }
 
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {

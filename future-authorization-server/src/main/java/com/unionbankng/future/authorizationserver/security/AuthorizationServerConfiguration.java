@@ -1,7 +1,4 @@
 package com.unionbankng.future.authorizationserver.security;
-
-import javax.sql.DataSource;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +15,6 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 @Configuration

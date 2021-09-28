@@ -55,6 +55,8 @@ public class SecurityService {
 
         String token = UUID.randomUUID().toString();
 
+        app.print(user);
+
         memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
 
