@@ -7,14 +7,10 @@ import com.unionbankng.future.authorizationserver.pojos.ChangePasswordRequest;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
+import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import com.unionbankng.future.authorizationserver.utils.Utility;
 import lombok.RequiredArgsConstructor;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,11 +35,9 @@ public class SecurityService {
     private final MessageSource messageSource;
     private final EmailSender emailSender;
     private final PasswordEncoder encoder;
+    private final App app;
     private PasswordValidator passwordValidator = PasswordValidator.
             buildValidator(false, true, true, 6, 40);
-
-    private final RealmResource keycloakRealmResource;
-
 
     @Value("${email.sender}")
     private String emailSenderAddress;
@@ -54,14 +48,20 @@ public class SecurityService {
 
     public void initiateForgotPassword(String identifier){
 
+        app.print("#########Initiating forgot password");
+        app.print(identifier);
         User user = userService.findByEmailOrUsername(identifier,identifier)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         String token = UUID.randomUUID().toString();
 
-        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
+        app.print(user);
 
+        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
+
+        app.print("Reset Password Token:");
+        app.print(generatedURL);
 
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,
                 Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
@@ -73,7 +73,6 @@ public class SecurityService {
     }
 
     public Boolean confirmForgotPasswordToken(String token){
-
         String userEmail = memcachedHelperService.getValueByKey(token);
         return userEmail != null;
 
@@ -86,7 +85,6 @@ public class SecurityService {
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new APIResponse("Token expired or not found",false,null));
-        
 
         if(!passwordValidator.validatePassword(password))
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
@@ -100,32 +98,11 @@ public class SecurityService {
         user.setPassword(encoder.encode(password));
 
         userService.save(user);
-
-        //reset keycloak password
-        if(!resetUserKeycloakPasswordCredential(user.getUuid(),password))
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new APIResponse("Password reset failed, can't connect to server",false,null));
-
-
         memcachedHelperService.clear(token);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Password reset successful",true,null));
 
-
-    }
-
-    private Boolean resetUserKeycloakPasswordCredential(String userUUID, String password) {
-
-        UsersResource usersResource = keycloakRealmResource.users();
-        UserResource userResource = usersResource.get(userUUID);
-
-        CredentialRepresentation cr = new CredentialRepresentation();
-        cr.setType(CredentialRepresentation.PASSWORD);
-        cr.setValue(password);
-        userResource.resetPassword(cr);
-
-        return true;
 
     }
 
@@ -150,11 +127,6 @@ public class SecurityService {
 
         user.setPassword(encoder.encode(request.getPassword()));
         userService.save(user);
-
-        //reset keycloak password
-        if(!resetUserKeycloakPasswordCredential(user.getUuid(),request.getPassword()))
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new APIResponse("Password reset failed, can't connect to server",false,null));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request Successful",true,null));

@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
@@ -347,9 +348,9 @@ public class CourseBulkUploadService {
     }
 
 
-    public APIResponse uploadBulkCourseFiles(Principal principal, MultipartFile courseFile) throws IOException {
+    public APIResponse uploadBulkCourseFiles(OAuth2Authentication authentication, MultipartFile courseFile) throws IOException {
         try {
-            JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             Path tempDir = Files.createTempDirectory("");
             File tmpFile = tempDir.resolve(courseFile.getOriginalFilename()).toFile();
             if (tmpFile.length() > 0) {

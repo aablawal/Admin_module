@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,8 +38,8 @@ public class JobProposalController {
     @PostMapping(value = "/v1/job/apply", consumes = "multipart/form-data")
     public ResponseEntity<APIResponse> applyJob(@Valid @RequestParam(value = "data", required = true) String proposalData,
 
-                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,@ApiIgnore Principal principal) throws JsonProcessingException {
-        JobProposal appliedJob = service.applyJob(principal,proposalData, supportingFiles);
+                                                             @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,@ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
+        JobProposal appliedJob = service.applyJob(authentication,proposalData, supportingFiles);
         if (appliedJob != null) {
             logger.info("Success");
             return ResponseEntity.ok().body(new APIResponse("success", true, appliedJob));
@@ -88,14 +89,14 @@ public class JobProposalController {
     }
 
     @PostMapping("/v1/job/proposal/approve")
-    public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore Principal principal) throws JsonProcessingException {
-        APIResponse response = contractService.approveJobProposal(principal, approvalRequest);
+    public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
+        APIResponse response = contractService.approveJobProposal(authentication, approvalRequest);
         return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/v1/job/proposal/cancel")
-    public ResponseEntity<APIResponse> cancelJobProposal(Principal principal, @RequestParam Long jid, @RequestParam Long uid) {
-        JobProposal canceledProposal = service.cancelJobProposal(principal,jid, uid);
+    public ResponseEntity<APIResponse> cancelJobProposal(OAuth2Authentication authentication, @RequestParam Long jid, @RequestParam Long uid) {
+        JobProposal canceledProposal = service.cancelJobProposal(authentication,jid, uid);
         if (canceledProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, canceledProposal));
@@ -106,8 +107,8 @@ public class JobProposalController {
 
     @PutMapping("/v1/job/proposal/decline/{proposalId}")
 
-    public ResponseEntity<APIResponse> declineJobProposal(Principal principal, @PathVariable Long proposalId) {
-        JobProposal declinedProposal = service.declineJobProposal(principal,proposalId);
+    public ResponseEntity<APIResponse> declineJobProposal(OAuth2Authentication authentication, @PathVariable Long proposalId) {
+        JobProposal declinedProposal = service.declineJobProposal(authentication,proposalId);
         if (declinedProposal != null)
             return ResponseEntity.ok().body(
                     new APIResponse("success", true, declinedProposal));

@@ -57,7 +57,6 @@ public class ExperiencesController {
         );
 
         experience = experienceService.saveFromRequest(file,request,experience);
-
         return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
 
     }

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -150,10 +151,10 @@ public class JobContractService implements Serializable {
         return jobMilestoneRepository.findAllMilestonesByProposalAndJobId(proposalId, jobId);
     }
 
-    public APIResponse approveJobProposal(Principal principal, String request) throws JsonProcessingException {
+    public APIResponse approveJobProposal(OAuth2Authentication authentication, String request) throws JsonProcessingException {
 
         JobContract contract = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContract.class);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return approveJobProposal(currentUser, contract);
     }
 
@@ -424,10 +425,10 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobContractExtension requestContractExtension(Principal principal, String request) throws JsonProcessingException {
+    public JobContractExtension requestContractExtension(OAuth2Authentication authentication, String request) throws JsonProcessingException {
 
         JobContractExtension extensionRequest = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContractExtension.class);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return requestContractExtension(currentUser, extensionRequest);
 
     }
@@ -487,9 +488,9 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobMilestone addNewMilestone(Principal principal, String request) throws JsonProcessingException {
+    public JobMilestone addNewMilestone(OAuth2Authentication authentication, String request) throws JsonProcessingException {
         JobMilestone milestone = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobMilestone.class);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return addNewMilestone(currentUser, milestone);
     }
 
@@ -553,9 +554,9 @@ public class JobContractService implements Serializable {
     }
 
 
-    public JobContractExtension approveContractExtension(Principal principal, String request) throws JsonProcessingException {
+    public JobContractExtension approveContractExtension(OAuth2Authentication authentication, String request) throws JsonProcessingException {
         JobContractExtension extensionRequest = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContractExtension.class);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return approveContractExtension(currentUser, extensionRequest);
     }
 
@@ -662,11 +663,11 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobProjectSubmission submitJob(Principal principal, String
+    public JobProjectSubmission submitJob(OAuth2Authentication authentication, String
             projectData, MultipartFile[] supportingFiles) throws JsonProcessingException {
 
         JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return submitJob(currentUser, request, supportingFiles);
 
     }
@@ -725,11 +726,11 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public APIResponse raiseDispute(Principal principal, String
+    public APIResponse raiseDispute(OAuth2Authentication authentication, String
             projectData, MultipartFile[] attachmentFiles) throws
             JsonProcessingException {
         JobContractDispute request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobContractDispute.class);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return raiseDispute(currentUser, currentUser.getUserId(), request, attachmentFiles);
     }
 
@@ -813,10 +814,10 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public JobProjectSubmission rejectJob(Principal principal, RejectionRequest rejectionRequest, Long jobId, Long
+    public JobProjectSubmission rejectJob(OAuth2Authentication authentication, RejectionRequest rejectionRequest, Long jobId, Long
             requestId) {
 
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         JobProjectSubmission request = jobProjectSubmissionRepository.findById(requestId).orElse(null);
         if (request != null) {
             request.setStatus(Status.RE);
@@ -859,11 +860,10 @@ public class JobContractService implements Serializable {
         return request;
     }
 
-    public JobProjectSubmission submitCompletedMilestone(Principal
-                                                                 principal, Long milestoneId, String projectData, MultipartFile[] supportingFiles) throws
+    public JobProjectSubmission submitCompletedMilestone(OAuth2Authentication authentication, Long milestoneId, String projectData, MultipartFile[] supportingFiles) throws
             JsonProcessingException {
         JobProjectSubmission request = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(projectData, JobProjectSubmission.class);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return submitCompletedMilestone(currentUser, milestoneId, request, supportingFiles);
     }
 
@@ -931,10 +931,10 @@ public class JobContractService implements Serializable {
             return null;
         }
     }
-    public APIResponse endContract(Principal principal, Rate
+    public APIResponse endContract(OAuth2Authentication authentication, Rate
             rating, Long jobId, Long proposalId, Long userId, int state) {
         try {
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             Job job = jobRepository.findById(jobId).orElse(null);
             JobProposal proposal = jobProposalRepository.findProposalByUserId(jobId, userId);
             JobContract contract = jobContractRepository.findContractByProposalAndJobId(proposalId, jobId);
@@ -965,7 +965,7 @@ public class JobContractService implements Serializable {
                             //done
 
                             if (response.getStatusCode().is2xxSuccessful()) {
-                                APIResponse settlementResponse = this.settleContractById(principal, contract.getContractReference());
+                                APIResponse settlementResponse = this.settleContractById(authentication, contract.getContractReference());
                                 if (settlementResponse.isSuccess()) {
 
                                     try {
@@ -1171,9 +1171,9 @@ public class JobContractService implements Serializable {
     }
 
 
-    public APIResponse modifyMilestoneState(Principal principal, Long milestoneId, String newStatus) {
+    public APIResponse modifyMilestoneState(OAuth2Authentication authentication, Long milestoneId, String newStatus) {
 
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         return modifyMilestoneState(currentUser, milestoneId, Status.valueOf(newStatus));
 
     }
@@ -1438,9 +1438,9 @@ public class JobContractService implements Serializable {
     }
 
     public APIResponse approveCompletedMilestone
-            (Principal principal, String milestoneReference){
+            (OAuth2Authentication authentication, String milestoneReference){
         try {
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             JobMilestone milestone = jobMilestoneRepository.findMilestoneByMilestoneReference(milestoneReference).orElse(null);
             JobContract contract = jobContractRepository.findByContractReference(milestone.getContractReference()).orElse(null);
             JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
@@ -1463,7 +1463,7 @@ public class JobContractService implements Serializable {
                         //done
                         if (response.getStatusCode().is2xxSuccessful()) {
 
-                            APIResponse settlementResponse=this.settleContractById(principal,milestone.getMilestoneReference());
+                            APIResponse settlementResponse=this.settleContractById(authentication,milestone.getMilestoneReference());
                             if(settlementResponse.isSuccess()) {
 
                                 try {
@@ -1533,9 +1533,9 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public APIResponse settleContractById(Principal principal, String contractReferenceId) throws CloneNotSupportedException {
+    public APIResponse settleContractById(OAuth2Authentication authentication, String contractReferenceId) throws CloneNotSupportedException {
         try {
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             JobContract contract;
             JobMilestone milestone;
             app.print("Settling Contract Id: " + contractReferenceId);
@@ -1911,8 +1911,8 @@ public class JobContractService implements Serializable {
     }
 
 
-    public APIResponse reverseContractPaymentById(Principal principal, String contractReferenceId) throws JsonProcessingException {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public APIResponse reverseContractPaymentById(OAuth2Authentication authentication, String contractReferenceId) throws JsonProcessingException {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         //check if contract exist
         JobContract contract;
         JobMilestone milestone;

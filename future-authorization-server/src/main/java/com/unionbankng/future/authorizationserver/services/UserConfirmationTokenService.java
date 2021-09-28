@@ -33,7 +33,6 @@ public class UserConfirmationTokenService {
     private final UserService userService;
     private final EmailSender emailSender;
     private final MemcachedHelperService memcachedHelperService;
-    private final KeycloakService keycloakService;
 
     @Value("${email.sender}")
     private String emailSenderAddress;
@@ -61,7 +60,7 @@ public class UserConfirmationTokenService {
             URL url = new URL(generatedURL);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 
-            logger.info("Sending confirmation to {}", user.toString());
+            logger.info("Sending confirmation to {}", user);
             logger.info("Activation Link:" +  uri.toASCIIString());
 
             EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{ uri.toASCIIString()}, LocaleContextHolder.getLocale())
@@ -87,7 +86,6 @@ public class UserConfirmationTokenService {
             User user = userService.findByEmail(userEmail).orElse(null);
             if (user!= null) {
                 tokenConfirm.setSuccess(false);
-                keycloakService.enableKeyCloakUser(user.getUuid());
                 user.setIsEnabled(true);
                 userService.save(user);
 

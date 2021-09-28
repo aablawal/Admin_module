@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,17 +33,17 @@ public class JobController {
     private final JobService service;
 
     @PostMapping(value="/v1/job/add", consumes="multipart/form-data")
-    public ResponseEntity<APIResponse> addJob( Principal principal,@Valid @RequestParam(value = "data", required=true) String jobData,
+    public ResponseEntity<APIResponse> addJob(OAuth2Authentication authentication, @Valid @RequestParam(value = "data", required=true) String jobData,
                                               @RequestParam(value = "team", required=true) String teamData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles,
                                               @RequestParam(value = "ndaFiles", required = false) MultipartFile[] ndaFiles) throws IOException{
 
-            return ResponseEntity.ok().body(service.addJob(principal,jobData,teamData,supportingFiles,ndaFiles));
+            return ResponseEntity.ok().body(service.addJob(authentication,jobData,teamData,supportingFiles,ndaFiles));
     }
 
     @PutMapping("/v1/job/close")
-    public  ResponseEntity<APIResponse> closeJobById( Principal principal,@RequestParam Long id, @RequestParam int state){
-        Job job=service.closeJobById(principal, id,state);
+    public  ResponseEntity<APIResponse> closeJobById(OAuth2Authentication authentication,@RequestParam Long id, @RequestParam int state){
+        Job job=service.closeJobById(authentication, id,state);
         if(job!=null)
            return ResponseEntity.ok().body(new APIResponse("Job closed successful",true,job));
         else
@@ -51,8 +52,8 @@ public class JobController {
 
 
     @PutMapping("/v1/job/repeat")
-    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id, Principal principal){
-        Job job=service.repeatJobById(principal,id);
+    public  ResponseEntity<APIResponse> repeatJobById(@RequestParam Long id,OAuth2Authentication authentication){
+        Job job=service.repeatJobById(authentication,id);
         if(job!=null)
             return ResponseEntity.ok().body(new APIResponse("Job repeated successful",true,job));
         else
@@ -60,8 +61,8 @@ public class JobController {
     }
 
     @DeleteMapping("/v1/job/delete/{id}")
-    public ResponseEntity<APIResponse> deleteJob(Principal principal, @PathVariable  Long id){
-        service.deleteJobById(principal,id);
+    public ResponseEntity<APIResponse> deleteJob(OAuth2Authentication authentication, @PathVariable  Long id){
+        service.deleteJobById(authentication,id);
         return ResponseEntity.ok().body(new APIResponse("Job deleted successful",true,null));
     }
 

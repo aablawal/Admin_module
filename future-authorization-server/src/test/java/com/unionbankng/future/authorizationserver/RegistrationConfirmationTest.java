@@ -1,6 +1,5 @@
 package com.unionbankng.future.authorizationserver;
 
-import com.unionbankng.future.authorizationserver.services.KeycloakService;
 import com.unionbankng.future.authorizationserver.services.MemcachedHelperService;
 import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import org.junit.Assert;
@@ -21,11 +20,6 @@ public class RegistrationConfirmationTest extends AbstractTest {
     @MockBean
     MemcachedHelperService memcachedHelperService;
 
-    @MockBean
-    KeycloakService keycloakService;
-
-
-
 
     @Override
     @Before
@@ -35,23 +29,15 @@ public class RegistrationConfirmationTest extends AbstractTest {
 
     @Test
     public void tokenDoesNotExist()  {
-
         Mockito.when(memcachedHelperService.getValueByKey("12233334444")).thenReturn(null);
-
-        doNothing().when(keycloakService).enableKeyCloakUser(anyString());
         boolean confirmed = userConfirmationTokenService.confirmUserAccountByToken("12233334444").getSuccess();
         Assert.assertEquals(false,confirmed);
-
     }
 
 
     @Test
     public void successTokenTest() {
-
         Mockito.when(memcachedHelperService.getValueByKey("12233334444")).thenReturn("abc@gmail.com");
-
-        doNothing().when(keycloakService).enableKeyCloakUser(anyString());
-
         boolean confirmed = userConfirmationTokenService.confirmUserAccountByToken("12233334444").getSuccess();
 
         Assert.assertEquals(Boolean.TRUE,confirmed);

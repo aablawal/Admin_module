@@ -8,6 +8,7 @@ import com.unionbankng.future.futurejobservice.services.JobContractService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 import java.security.Principal;
 import java.util.Date;
@@ -34,19 +35,19 @@ class JobContractServiceTest {
     }
 
     @Test
-    void endContract(Principal principal) {
+    void endContract(OAuth2Authentication authentication) {
         Rate rate=new Rate();
         rate.setRate(5l);
         rate.setDescription("Very Good");
         rate.setFeedback("You have done a good job");
         rate.setUserId(1l);
-        APIResponse response=   jobContractService.endContract(principal,rate,jobId,proposalId,userId,1);
+        APIResponse response=   jobContractService.endContract(authentication,rate,jobId,proposalId,userId,1);
         Assert.assertEquals(true,response.isSuccess());
     }
 
     @Test
-    void approveCompletedMilestone(Principal principal) {
-        APIResponse response= jobContractService.approveCompletedMilestone(principal,"milestonerefrence goes here");
+    void approveCompletedMilestone(OAuth2Authentication authentication) {
+        APIResponse response= jobContractService.approveCompletedMilestone(authentication,"milestonerefrence goes here");
         Assert.assertEquals(true,response.isSuccess());
     }
 }

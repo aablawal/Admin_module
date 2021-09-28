@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -37,9 +38,9 @@ public class AnnouncementsController {
 
     @PostMapping(value = "/v1/announcements/create_or_update")
     public ResponseEntity<APIResponse<Announcement>> createOrUpdateAnnouncement(@RequestBody CreateAnnouncementRequest request
-    ,@ApiIgnore Principal principal) {
+    ,@ApiIgnore OAuth2Authentication authentication) {
 
-        Announcement announcement = announcementService.createOrUpdateAnnouncement(request,principal);
+        Announcement announcement = announcementService.createOrUpdateAnnouncement(request,authentication);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,announcement));
     }

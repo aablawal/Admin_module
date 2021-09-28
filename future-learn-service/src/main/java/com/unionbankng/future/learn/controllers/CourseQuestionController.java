@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -48,9 +49,9 @@ public class CourseQuestionController {
 
     @PostMapping(value = "/v1/course_question/publish")
     public ResponseEntity<APIResponse<CourseQuestion>> publishQuestion(@RequestBody PublishCourseQuestionRequest request
-    , @ApiIgnore Principal principal) {
+    , @ApiIgnore OAuth2Authentication authentication) {
 
-        CourseQuestion courseQuestion = courseQuestionService.publishCourseQuestion(request,principal);
+        CourseQuestion courseQuestion = courseQuestionService.publishCourseQuestion(request,authentication);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true, courseQuestion));
     }

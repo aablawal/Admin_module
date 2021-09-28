@@ -1,8 +1,4 @@
 package com.unionbankng.future.authorizationserver.services;
-
-import com.google.code.ssm.api.InvalidateSingleCache;
-import com.google.code.ssm.api.ParameterValueKeyProvider;
-import com.google.code.ssm.api.ReadThroughSingleCache;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
@@ -12,8 +8,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

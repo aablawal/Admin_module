@@ -1,17 +1,10 @@
 package com.unionbankng.future.authorizationserver;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.io.IOException;
 
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
-import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import org.junit.After;
-import org.keycloak.adapters.springboot.KeycloakSpringBootProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,9 +54,6 @@ public abstract class AbstractTest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Autowired
-    KeycloakSpringBootProperties props;
-
 
     protected void setUp() {
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -104,7 +94,6 @@ public abstract class AbstractTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBasicAuth(props.getResource(), (String) props.getCredentials().get("secret"));
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
