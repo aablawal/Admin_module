@@ -3,8 +3,10 @@ package com.unionbankng.future.futuremessagingservice.jmslisteners;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
+import com.unionbankng.future.futuremessagingservice.pojos.APIResponse;
 import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
-import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionEmailProvider;
+import com.unionbankng.future.futuremessagingservice.pojos.UbnEmailResponse;
+import com.unionbankng.future.futuremessagingservice.services.UBNEmailService;
 import com.unionbankng.future.futuremessagingservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public class EmailListener {
     private static final String QUEUE_NAME = "kulaemailqueue";
     private final Logger logger = LoggerFactory.getLogger(EmailListener.class);
     private final TemplateEngine templateEngine;
+    private final UBNEmailService ubnEmailService;
     private final ObjectMapper mapper;
     private final App app;
 
@@ -35,14 +38,15 @@ public class EmailListener {
         EmailBody emailBody = mapper.readValue(json, EmailBody.class);
         app.print(emailBody);
         logger.info("Received message: {}", emailBody.getSubject());
-        EmailProvider emailProvider = new UnionEmailProvider();
 
         try {
             logger.info("Sending Email....");
              EmailBody body= processEmailTemplate(emailBody);
              if(body!=null) {
-                 emailProvider.send(body);
+                APIResponse<UbnEmailResponse> response= ubnEmailService.sendEmail(body);
                  logger.info("Email sent out");
+                 app.print("Response:");
+                 app.print(response);
              }else{
                  logger.info("Failed to sent the Email");
              }
