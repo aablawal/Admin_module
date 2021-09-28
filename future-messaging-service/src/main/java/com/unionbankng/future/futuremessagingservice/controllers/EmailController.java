@@ -7,6 +7,7 @@ import com.unionbankng.future.futuremessagingservice.pojos.SendGridEmailBody;
 import com.unionbankng.future.futuremessagingservice.services.DirectIPSMSService;
 import com.unionbankng.future.futuremessagingservice.services.SendGridEmailService;
 import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionEmailProvider;
+import com.unionbankng.future.futuremessagingservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,10 +23,22 @@ import javax.validation.Valid;
 public class EmailController {
 
     private final UnionEmailProvider unionEmailProvider;
+    private  final App app;
 
     @PostMapping(value = "/v1/email/send_email")
     public ResponseEntity<APIResponse> sendEmail(@RequestBody EmailBody body) throws Exception {
-        unionEmailProvider.send(body);
+        try {
+            app.print("Sending Email....");
+            if(body!=null) {
+                unionEmailProvider.send(body);
+                app.print("Email sent out");
+            }else{
+                app.print("Failed to sent the Email");
+            }
+        } catch (Exception e) {
+            app.print("Unable to send Email");
+            e.printStackTrace();
+        }
         return ResponseEntity.ok().body(new APIResponse("Message sent",true,null));
     }
 }

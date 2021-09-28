@@ -49,7 +49,6 @@ public class EmailListener {
         } catch (Exception e) {
             logger.info("Unable to send Email");
             e.printStackTrace();
-
         }
     }
 
