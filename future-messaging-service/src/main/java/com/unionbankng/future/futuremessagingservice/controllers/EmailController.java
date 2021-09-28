@@ -1,5 +1,6 @@
 package com.unionbankng.future.futuremessagingservice.controllers;
 
+import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
 import com.unionbankng.future.futuremessagingservice.pojos.APIResponse;
 import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
 import com.unionbankng.future.futuremessagingservice.pojos.SMS;
@@ -22,15 +23,16 @@ import javax.validation.Valid;
 @RequestMapping(path = "api")
 public class EmailController {
 
-    private final UnionEmailProvider unionEmailProvider;
-    private  final App app;
+    private final App app;
 
     @PostMapping(value = "/v1/email/send_email")
     public ResponseEntity<APIResponse> sendEmail(@RequestBody EmailBody body) throws Exception {
         try {
+            EmailProvider emailProvider = new UnionEmailProvider();
+
             app.print("Sending Email....");
             if(body!=null) {
-                unionEmailProvider.send(body);
+                emailProvider.send(body);
                 app.print("Email sent out");
             }else{
                 app.print("Failed to sent the Email");
