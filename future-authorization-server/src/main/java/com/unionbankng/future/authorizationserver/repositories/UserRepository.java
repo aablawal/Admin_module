@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
     Boolean existsByUsername(String username);
     Optional<User> findByEmailOrUsername(String email, String username);
+    Optional<User> findByEmailOrPhoneNumber(String email, String phoneNumber);
     @Query(value = "SELECT TOP(10) * FROM app_user u  where (email like %:q% or first_name like %:q% or last_name like %:q% or phone_number like %:q% or user_address like %:q% or country like %:q% or state_of_residence like %:q% or username like %:q%)", nativeQuery = true)
     Optional<List<User>> findUsersBySearch(String q);
 }

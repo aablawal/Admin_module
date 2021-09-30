@@ -40,17 +40,23 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
         this.logger.info(String.format("token is : %s",thirdPartyOauthToken));
         String username = auth.getPrincipal() == null ? "NONE_PROVIDED" : auth.getName();
+        app.print("username:"+username);
         boolean cacheWasUsed = true;
         FutureDAOUserDetails user = (FutureDAOUserDetails)this.getUserCache().getUserFromCache(username);
 
+        app.print(this.getUserCache().getUserFromCache(username));
         if(user == null) {
             cacheWasUsed =false;
+
+            app.print(auth.getName());
             user = (FutureDAOUserDetails) this.retrieveUser(auth.getName(),
                     (UsernamePasswordAuthenticationToken) auth);
-
         }
 
+        app.print(user);
+
         this.getPreAuthenticationChecks().check(user);
+
 
         Login loginHistory= new Login();
         loginHistory.setName(user.getFirstName());
