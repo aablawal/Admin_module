@@ -1,5 +1,6 @@
 package com.unionbankng.future.futuremessagingservice.controllers;
 
+import com.unionbankng.future.futuremessagingservice.entities.ContactUs;
 import com.unionbankng.future.futuremessagingservice.interfaces.EmailProvider;
 import com.unionbankng.future.futuremessagingservice.pojos.APIResponse;
 import com.unionbankng.future.futuremessagingservice.pojos.EmailBody;
@@ -36,5 +37,25 @@ public class EmailController {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body(new APIResponse("Message sent",true,null));
+    }
+
+    @PostMapping(value = "/v1/email/send_contactus")
+    public ResponseEntity<APIResponse> contactUs(@RequestBody ContactUs contactUs) throws Exception {
+        try {
+            app.print("Sending contact us message....");
+            if (contactUs != null) {
+                APIResponse apiResponse = ubnEmailService.contactUs(contactUs);
+                if (apiResponse.isSuccess())
+                    app.print("Contact us message sent out");
+                return ResponseEntity.ok().body(apiResponse);
+            } else {
+                app.print("Failed to contact us");
+                return ResponseEntity.ok().body(new APIResponse("Failed to contact us", false, null));
+            }
+        } catch (Exception e) {
+            app.print("Unable to send Email");
+            e.printStackTrace();
+            return ResponseEntity.ok().body(new APIResponse("Unable to send Email", false, null));
+        }
     }
 }

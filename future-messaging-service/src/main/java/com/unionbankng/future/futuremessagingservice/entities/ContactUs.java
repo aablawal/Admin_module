@@ -1,44 +1,28 @@
 package com.unionbankng.future.futuremessagingservice.entities;
-import com.unionbankng.future.futuremessagingservice.enums.NotificationStatus;
+import com.unionbankng.future.futuremessagingservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Table(name="notifications")
+@Table(name="contactus_messages")
 @Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notification {
+public class ContactUs {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     Long id;
-    @NotNull
-    Long source;
-    @NotNull
-    Long destination;
-    @NotNull
+    String name;
+    String email;
     @Column(columnDefinition="TEXT")
     String message;
     @Column(columnDefinition="TEXT")
     String subject;
-    @NotNull
     @Enumerated(EnumType.STRING)
-    NotificationStatus status;
-    @Column(columnDefinition="TEXT")
-    String attachment;
-    @Column(length = 50)
-    String channel;
-    String action;
-    @Column(length = 50)
-    String actionType;
-    @Column(length = 50)
-    String priority;
-    @Column(length = 50)
-    String topic;
+    Status status;
     @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 
