@@ -36,9 +36,7 @@ public class UsersController {
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
                                                           @PathVariable Long userId) throws IOException {
-
         User user = userService.updateProfileImage(image,userId);
-
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
