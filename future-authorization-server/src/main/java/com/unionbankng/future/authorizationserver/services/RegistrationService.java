@@ -44,9 +44,11 @@ public class RegistrationService {
     public ResponseEntity register(RegistrationRequest request){
 
         app.print("####REGISTER WITH KULA FORM");
-        if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername())) {
+        if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername()) || userService.existsByPhoneNumber(request.getPhoneNumber())) {
             User existingUser=userService.findByEmail(request.getEmail()).orElse(
-                    userService.findByUsername(request.getUsername()).orElse(null)
+                    userService.findByUsername(request.getUsername()).orElse(
+                            userService.findByPhoneNumber(request.getPhoneNumber()).orElse(null)
+                    )
             );
 
             ErrorResponse errorResponse = new ErrorResponse();
