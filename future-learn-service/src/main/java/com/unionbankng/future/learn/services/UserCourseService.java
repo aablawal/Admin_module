@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -56,9 +57,9 @@ public class UserCourseService {
         return userCourseRepository.countAllByUserUUID(userUUID);
     }
 
-    public UserCourse enrollForFreeCourse(CourseEnrollmentRequest courseEnrollmentRequest, Principal principal){
+    public UserCourse enrollForFreeCourse(CourseEnrollmentRequest courseEnrollmentRequest, OAuth2Authentication authentication){
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         return enrollForFreeCourse(courseEnrollmentRequest,jwtUserDetail.getUserUUID());
 
@@ -146,9 +147,9 @@ public class UserCourseService {
     }
 
 
-    public List<Course> getMyCourses(Principal principal){
+    public List<Course> getMyCourses(OAuth2Authentication authentication){
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         return getMyCourses(jwtUserDetail.getUserUUID());
 
@@ -166,9 +167,9 @@ public class UserCourseService {
 
     }
 
-    public Boolean isUserEnrolledForCourse(Principal principal, Long courseId) {
+    public Boolean isUserEnrolledForCourse(OAuth2Authentication authentication, Long courseId) {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         return existByUserUUIDAndCourseId(jwtUserDetail.getUserUUID(),courseId);
 

@@ -8,6 +8,7 @@ import lombok.Data;
 @Builder
 public class JwtUserDetail {
 
+    private Long userId;
     private String userUUID;
     private String userEmail;
     private String userImg;

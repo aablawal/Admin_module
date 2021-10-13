@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,8 +46,8 @@ public class JobProposalService  implements Serializable {
     private  final AppLogger appLogger;
 
 
-    public JobProposal applyJob(Principal principal,String applicationData, MultipartFile[] supporting_files) {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public JobProposal applyJob(OAuth2Authentication authentication, String applicationData, MultipartFile[] supporting_files) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         try {
             JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
 
@@ -109,6 +110,8 @@ public class JobProposalService  implements Serializable {
                             body.setRecipient(proposal.getEmployerId());
                             body.setRecipientEmail(employer.getEmail());
                             body.setRecipientName(employer.getFullName());
+                            body.setPriority("YES");
+
                             notificationSender.pushNotification(body);
                         }
                     }
@@ -154,8 +157,8 @@ public class JobProposalService  implements Serializable {
         }
     }
 
-    public JobProposal cancelJobProposal(Principal principal, Long jobId, Long userId){
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public JobProposal cancelJobProposal(OAuth2Authentication authentication, Long jobId, Long userId){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         JobProposal proposal=repository.findProposalByUserId(jobId,userId);
         if(proposal!=null) {
@@ -201,8 +204,8 @@ public class JobProposalService  implements Serializable {
     }
 
 
-    public JobProposal declineJobProposal(Principal principal, Long proposalId){
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public JobProposal declineJobProposal(OAuth2Authentication authentication, Long proposalId){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         JobProposal proposal=repository.findById(proposalId).orElse(null);
         if(proposal!=null) {

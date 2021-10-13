@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,9 +40,9 @@ public class AnnouncementService {
 
 
     @Transactional
-    public Announcement createOrUpdateAnnouncement(CreateAnnouncementRequest request, Principal principal) {
+    public Announcement createOrUpdateAnnouncement(CreateAnnouncementRequest request, OAuth2Authentication authentication) {
 
-        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         return createOrUpdateAnnouncement(request,jwtUserDetail.getUserUUID());
     }

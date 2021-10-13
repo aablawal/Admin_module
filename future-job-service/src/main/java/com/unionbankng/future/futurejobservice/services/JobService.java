@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,9 +44,9 @@ public class JobService {
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
 
-    public APIResponse addJob(Principal principal, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
+    public APIResponse addJob(OAuth2Authentication authentication, String jobData, String teamData, MultipartFile[] supporting_files, MultipartFile[] nda_files) throws IOException {
         try {
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             String supporting_file_names = null;
             String nda_file_names=null;
             Job job = app.getMapper().readValue(jobData, Job.class);
@@ -224,8 +225,8 @@ public class JobService {
     }
 
 
-    public Job closeJobById(Principal principal, Long id, int state){
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public Job closeJobById(OAuth2Authentication authentication, Long id, int state){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
             if (state == 1)
@@ -269,8 +270,8 @@ public class JobService {
         }
     }
 
-    public Job repeatJobById(Principal principal, Long id){
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public Job repeatJobById(OAuth2Authentication authentication, Long id){
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         Job job =jobRepository.findById(id).orElse(null);
         if(job!=null) {
 
@@ -328,8 +329,8 @@ public class JobService {
             return  null;
         }
     }
-    public void  deleteJobById(Principal principal, Long id) {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public void  deleteJobById(OAuth2Authentication authentication, Long id) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
 
         try {
             //update configurations table

@@ -7,6 +7,7 @@ import com.unionbankng.future.learn.services.UserCourseProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -22,9 +23,9 @@ public class UserCourseProgressController {
     private final UserCourseProgressService userCourseProgressService;
 
     @GetMapping("/v1/user_course_progress/get_my_progress")
-    public ResponseEntity<APIResponse<UserCourseProgress>> getMyProgress(@ApiIgnore Principal principal, @RequestParam Long courseId){
+    public ResponseEntity<APIResponse<UserCourseProgress>> getMyProgress(@ApiIgnore OAuth2Authentication authentication, @RequestParam Long courseId){
 
-        UserCourseProgress userCourseProgress = userCourseProgressService.findMyCourseProgressByCourseId(courseId, principal);
+        UserCourseProgress userCourseProgress = userCourseProgressService.findMyCourseProgressByCourseId(courseId, authentication);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,userCourseProgress));
@@ -32,9 +33,9 @@ public class UserCourseProgressController {
 
     @PostMapping("/v1/user_course_progress/save_my_progress")
     public ResponseEntity<APIResponse<UserCourseProgress>> saveMyCourseProgress(@RequestBody @Valid UserCourseProgressRequest request,
-                                                               @ApiIgnore Principal principal){
+                                                               @ApiIgnore OAuth2Authentication authentication){
 
-        UserCourseProgress userCourseProgress = userCourseProgressService.computePercentageAndSaveProgress(request,principal);
+        UserCourseProgress userCourseProgress = userCourseProgressService.computePercentageAndSaveProgress(request,authentication);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new APIResponse("Request successful",true,userCourseProgress));

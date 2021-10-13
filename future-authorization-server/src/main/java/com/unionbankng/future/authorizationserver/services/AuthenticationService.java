@@ -1,18 +1,23 @@
 
 package com.unionbankng.future.authorizationserver.services;
+import com.unionbankng.future.authorizationserver.entities.Login;
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.JwtUserDetail;
-import com.unionbankng.future.authorizationserver.pojos.SMS;
+import com.unionbankng.future.authorizationserver.pojos.*;
+import com.unionbankng.future.authorizationserver.repositories.LoginRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
-import com.unionbankng.future.authorizationserver.utils.App;
-import com.unionbankng.future.authorizationserver.utils.CryptoService;
-import com.unionbankng.future.authorizationserver.utils.JWTUserDetailsExtractor;
-import com.unionbankng.future.authorizationserver.utils.SMSSender;
+import com.unionbankng.future.authorizationserver.utils.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -30,11 +35,11 @@ public class AuthenticationService {
     private final App app;
 
 
-    public APIResponse createPin(Principal principal, String pin) {
+    public APIResponse createPin(OAuth2Authentication authentication, String pin) {
         System.out.println("###########Creating PIN");
         System.out.println("Key:" + encryptionKey);
         System.out.println("Pin:" + pin);
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         if (user != null) {
             if (user.getPin() == null) {
@@ -53,8 +58,8 @@ public class AuthenticationService {
         }
     }
 
-    public APIResponse verifyPin(Principal principal, String pin) {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+    public APIResponse verifyPin(OAuth2Authentication authentication, String pin) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         app.print(user);
         if (user != null) {
@@ -78,10 +83,10 @@ public class AuthenticationService {
     }
 
 
-    public APIResponse generateOTP(Principal principal) {
+    public APIResponse generateOTP(OAuth2Authentication authentication) {
         try {
 
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
             if (user != null) {
                 String otp = this.app.generateOTP().toString();
@@ -113,10 +118,10 @@ public class AuthenticationService {
         }
     }
 
-    public APIResponse verifyOTP(Principal principal, String otp) {
+    public APIResponse verifyOTP(OAuth2Authentication authentication, String otp) {
 
         try {
-            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(principal);
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
             if (user != null) {
                 System.out.println("Verifying OTP....");

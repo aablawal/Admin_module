@@ -6,10 +6,6 @@ import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateReques
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +25,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
-    private final RealmResource keycloakRealmResource;
 
 
     @Cacheable(value = "user", key = "#id")
@@ -116,10 +110,6 @@ public class UserService {
             user.setDialingCode(request.getDialingCode());
         if (request.getPhoneNumber() != null)
             user.setPhoneNumber(request.getPhoneNumber());
-
-        if (isKeycloakPropertyChanged)
-            updateKeycloakFirstAndLastNames(user.getUuid(),request.getFirstName(),request.getLastName());
-
         return userRepository.save(user);
     }
 
@@ -157,10 +147,6 @@ public class UserService {
         user.setCity(request.getCity());
         user.setZipCode(request.getZipCode());
 
-
-        if (isKeycloakPropertyChanged)
-           updateKeycloakFirstAndLastNames(user.getUuid(),request.getFirstName(),request.getLastName());
-
         return userRepository.save(user);
     }
 
@@ -169,15 +155,4 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
-    private void updateKeycloakFirstAndLastNames(String userUUID, String firstName, String lastName){
-
-        UsersResource usersResource = keycloakRealmResource.users();
-        UserResource userResource = usersResource.get(userUUID);
-
-        UserRepresentation userRepresentation = userResource.toRepresentation();
-
-        userRepresentation.setLastName(lastName);
-        userRepresentation.setFirstName(firstName);
-        userResource.update(userRepresentation);
-    }
 }

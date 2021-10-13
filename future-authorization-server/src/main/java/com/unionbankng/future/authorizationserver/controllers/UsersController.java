@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,9 +36,7 @@ public class UsersController {
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
                                                           @PathVariable Long userId) throws IOException {
-
         User user = userService.updateProfileImage(image,userId);
-
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
@@ -67,9 +66,8 @@ public class UsersController {
 
 
     @GetMapping("/v1/users/get_details_with_token")
-    public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore Principal principal) {
-        System.out.println(principal);
-        User user =  userService.findByUuid(principal.getName())
+    public ResponseEntity<APIResponse<UserByTokenResponse>> getUserByToken(@ApiIgnore OAuth2Authentication authentication) {
+        User user =  userService.findByUuid(authentication.getName())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         UserByTokenResponse userByTokenResponse = new UserByTokenResponse();

@@ -42,19 +42,6 @@ public class Notification {
     @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 
-    public Notification(Notification notification) {
-        this.id = notification.id;
-        this.source = notification.source;
-        this.destination = notification.destination;
-        this.message = notification.message;
-        this.status=notification.status;
-        this.action=notification.action;
-        this.actionType=notification.actionType;
-        this.topic=notification.topic;
-        this.attachment = notification.attachment;
-        this.createdAt = notification.createdAt;
-    }
-
     @PrePersist
     private void setCreatedAt() {
         createdAt = new Date();
