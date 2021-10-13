@@ -100,22 +100,16 @@ public class AppController {
 
     @PostMapping("/v1/bank/transfer/test")
     public ResponseEntity<APIResponse<String>> bankTransfer() throws JsonProcessingException {
-
-//        250700012
-//        WESTERN UNION SETTLEMENT A/C -IMPLEMENT
-//        315200043
-//        WESTERN UNION-COMMISSION
-
         PaymentRequest payment = new PaymentRequest();
         payment.setAmount(20);
         payment.setNarration("Testing Narration");
-        payment.setCreditAccountName("CPC CASH DEPOSIT ACCOUNT IMPLEMENT");
-        payment.setCreditAccountNumber("210210071");
-        payment.setDebitAccountName("WESTERN UNION-COMMISSION");
-        payment.setDebitAccountNumber("315200043");
+        payment.setCreditAccountName("GL M36 FLOAT ACCOUNT");
+        payment.setCreditAccountNumber("250990140");
+        payment.setDebitAccountName("OLANLOKUN LANRE");
+        payment.setDebitAccountNumber("0040553624");
         payment.setExecutedBy("Test User");
         payment.setExecutedFor("Test");
-        payment.setDebitAccountType("GL");
+        payment.setDebitAccountType("CASA");
         payment.setCreditAccountType("GL");
         payment.setPaymentReference("skdjkasjdksjkadj");
         APIResponse response= jobPaymentService.makePayment(payment);
