@@ -20,7 +20,6 @@ public class AppController {
     private final SecurityService securityService;
     @PostMapping("/v1/email/test/forgot_password")
     public ResponseEntity<APIResponse<Tag>> testForgotPassword() {
-
         securityService.initiateForgotPassword("net.rabiualiyu@gmail.com");
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,null));
     }
