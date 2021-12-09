@@ -35,7 +35,7 @@ public class BvnValidationService {
 
         logger.info("status: "+response.isSuccessful());
         logger.info("message: "+response.message());
-        app.print("Response:");
+        app.print("API Response:");
         app.print(response);
 
         if (response.isSuccessful()) {
