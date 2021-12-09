@@ -58,7 +58,7 @@ public class BvnValidationService {
 
         logger.info("status: " + response.isSuccessful());
         logger.info("message: " + response.message());
-        app.print("Response:");
+        app.print("API Response:");
         app.print(response);
         app.print("RESPONSE BODY: " + response.body().toString());
         if (response.isSuccessful() && response.body().getData()!=null) {
