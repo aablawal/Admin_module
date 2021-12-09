@@ -20,7 +20,7 @@ public class BvnValidationService {
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
 
 
-    public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
+    public ResponseEntity<APIResponse<ValidateBvnResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
 
         ValidateBvnRequest request = new ValidateBvnRequest();
         request.setBvn(bvn);
@@ -31,7 +31,7 @@ public class BvnValidationService {
         app.print("Request:");
         app.print(request);
 
-        Response<BVNValidationResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
+        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
         logger.info("status: "+response.isSuccessful());
         logger.info("message: "+response.message());
@@ -39,9 +39,9 @@ public class BvnValidationService {
         app.print(response);
 
         if (response.isSuccessful()) {
-            return  ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
+            return  ResponseEntity.ok().body(new APIResponse<>("BVN validation successful", true, response.body()));
         }else{
-            return ResponseEntity.ok().body(new APIResponse<>(response.body()!=null?response.body().getStatusMessage():"Unable to Validate BVN", false, null));
+            return ResponseEntity.ok().body(new APIResponse<>("Unable to Validate BVN", false, null));
         }
     }
 
