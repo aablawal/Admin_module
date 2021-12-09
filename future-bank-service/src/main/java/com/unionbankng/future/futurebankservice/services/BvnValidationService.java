@@ -60,9 +60,12 @@ public class BvnValidationService {
         logger.info("message: " + response.message());
         app.print("Response:");
         app.print(response);
+        app.print("RESPONSE BODY: " + response.body().toString());
         if (response.isSuccessful() && response.body().getData()!=null) {
+            app.print("Success block");
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
+            app.print("Failure block");
             return ResponseEntity.ok().body(new APIResponse<>(response.body()!=null?response.body().getStatusMessage():"Unable to Verify BVN", false, null));
         }
     }
