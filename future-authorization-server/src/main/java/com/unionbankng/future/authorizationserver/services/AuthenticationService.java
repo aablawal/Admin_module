@@ -102,7 +102,7 @@ public class AuthenticationService {
                 app.print("Sending OTP.....");
 
                 SMS sms = new SMS();
-                sms.setMessage("#############Your OTP is " + otp);
+                sms.setMessage("Your OTP is " + otp);
                 sms.setRecipient(mobileNumber);
                 app.print("Request:");
                 app.print(sms);
