@@ -15,7 +15,7 @@ public interface UBNAccountAPIService {
                                                   @Query("client_secret") String clientSecret,@Query("grant_type") String grantType,
                                                   @Query("client_id") String clientId);
 
-    @POST("BVNValidationService/verifyBVN")
+    @POST("account-service/account/validate/bvn")
     Call<ValidateBvnResponse> validateBVN(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Body ValidateBvnRequest request);
 
     @POST("account-service/account/validate/otp")
