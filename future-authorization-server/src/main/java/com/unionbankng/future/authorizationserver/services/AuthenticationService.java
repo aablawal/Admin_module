@@ -85,21 +85,24 @@ public class AuthenticationService {
 
     public APIResponse generateOTP(OAuth2Authentication authentication) {
         try {
-
+            app.print("############GENERATING OTP");
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+            app.print(user);
             if (user != null) {
                 String otp = this.app.generateOTP().toString();
                 memcachedHelperService.save(user.getUuid(), otp, tokenExpiryInMinute * 60);
+
 
                 String mobileNumber = user.getPhoneNumber();
                 if (mobileNumber.startsWith("0"))
                     mobileNumber = mobileNumber.replaceFirst("0", "234");
 
+                app.print(mobileNumber);
                 app.print("Sending OTP.....");
 
                 SMS sms = new SMS();
-                sms.setMessage("Your OTP is " + otp);
+                sms.setMessage("############Your OTP is " + otp);
                 sms.setRecipient(mobileNumber);
                 app.print("Request:");
                 app.print(sms);
