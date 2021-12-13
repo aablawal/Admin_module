@@ -110,6 +110,8 @@ public class JobProposalService  implements Serializable {
                             body.setRecipient(proposal.getEmployerId());
                             body.setRecipientEmail(employer.getEmail());
                             body.setRecipientName(employer.getFullName());
+                            body.setPriority("YES");
+
                             notificationSender.pushNotification(body);
                         }
                     }

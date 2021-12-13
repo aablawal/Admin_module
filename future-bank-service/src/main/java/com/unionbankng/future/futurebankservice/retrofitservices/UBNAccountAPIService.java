@@ -16,11 +16,10 @@ public interface UBNAccountAPIService {
                                                   @Query("client_id") String clientId);
 
     @POST("BVNValidationService/verifyBVN")
-    Call<BVNValidationResponse> validateBVN(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Body ValidateBvnRequest request);
+    Call<ValidateBvnResponse> validateBVN(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Body ValidateBvnRequest request);
 
     @POST("account-service/account/validate/otp")
     Call<BVNVerificationResponse> verifyBVN(@Header("Authorization") String token, @Header("ChannelCode") String channelCode, @Body VerifyBvnRequest request);
-
 
     @POST("ubnmiserv/secured/openaccount")
     Call<UBNCreateAccountResponse> openAccount(@Query("access_token") String accessToken, @Body UBNCreateAccountNewCustomerRequest request);

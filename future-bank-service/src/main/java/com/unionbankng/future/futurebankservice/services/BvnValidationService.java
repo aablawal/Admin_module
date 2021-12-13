@@ -20,7 +20,7 @@ public class BvnValidationService {
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
 
 
-    public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
+    public ResponseEntity<APIResponse<ValidateBvnResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
 
         ValidateBvnRequest request = new ValidateBvnRequest();
         request.setBvn(bvn);
@@ -31,17 +31,20 @@ public class BvnValidationService {
         app.print("Request:");
         app.print(request);
 
-        Response<BVNValidationResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
+        Response<ValidateBvnResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
         logger.info("status: "+response.isSuccessful());
         logger.info("message: "+response.message());
-        app.print("Response:");
+        app.print("API Response:");
         app.print(response);
+        app.print("RESPONSE BODY: " + response.body().toString());
 
         if (response.isSuccessful()) {
-            return  ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
+            app.print("Success block");
+            return  ResponseEntity.ok().body(new APIResponse<>("BVN validation successful", true, response.body()));
         }else{
-            return ResponseEntity.ok().body(new APIResponse<>(response.body()!=null?response.body().getStatusMessage():"Unable to Validate BVN", false, null));
+            app.print("Failure block");
+            return ResponseEntity.ok().body(new APIResponse<>("Unable to Validate BVN", false, null));
         }
     }
 
@@ -58,11 +61,14 @@ public class BvnValidationService {
 
         logger.info("status: " + response.isSuccessful());
         logger.info("message: " + response.message());
-        app.print("Response:");
+        app.print("API Response:");
         app.print(response);
+        app.print("RESPONSE BODY: " + response.body().toString());
         if (response.isSuccessful() && response.body().getData()!=null) {
+            app.print("Success block");
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
+            app.print("Failure block");
             return ResponseEntity.ok().body(new APIResponse<>(response.body()!=null?response.body().getStatusMessage():"Unable to Verify BVN", false, null));
         }
     }

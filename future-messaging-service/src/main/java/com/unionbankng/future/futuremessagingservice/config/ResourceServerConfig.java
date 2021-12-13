@@ -32,7 +32,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.cors().and().requestMatchers().antMatchers("/api/**").and().authorizeRequests().antMatchers("/api/**").authenticated();
+		http.cors().and().csrf().disable().authorizeRequests()
+				.antMatchers("/api/v1/email/send_contactus").permitAll().and()
+				.requestMatchers().antMatchers("/api/**").and().authorizeRequests().antMatchers("/api/**").authenticated();
 	}
 
 	@Override

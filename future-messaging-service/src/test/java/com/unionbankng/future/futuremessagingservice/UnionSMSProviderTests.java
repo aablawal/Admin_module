@@ -1,8 +1,5 @@
 package com.unionbankng.future.futuremessagingservice;
 
-import com.unionbankng.future.futuremessagingservice.interfaces.SMSProvider;
-import com.unionbankng.future.futuremessagingservice.pojos.SMS;
-import com.unionbankng.future.futuremessagingservice.smsandemailproviders.UnionSMSProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

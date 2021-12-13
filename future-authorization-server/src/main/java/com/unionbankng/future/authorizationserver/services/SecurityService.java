@@ -96,6 +96,7 @@ public class SecurityService {
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         user.setPassword(encoder.encode(password));
+        user.setIsEnabled(Boolean.TRUE);
 
         userService.save(user);
         memcachedHelperService.clear(token);

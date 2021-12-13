@@ -19,7 +19,6 @@ public class FutureDAOUserDetails extends User implements UserDetails {
 
 
 	public FutureDAOUserDetails(User user) {
-
 		super(user);
     }
 

@@ -3,11 +3,13 @@ package com.unionbankng.future.authorizationserver.security;
 import com.unionbankng.future.authorizationserver.entities.Login;
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.interfaceimpl.GoogleOauthProvider;
+import com.unionbankng.future.authorizationserver.pojos.ErrorResponse;
 import com.unionbankng.future.authorizationserver.repositories.LoginRepository;
+import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.utils.App;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -23,6 +25,10 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
     @Autowired
     private GoogleOauthProvider googleOauthProvider;
+    @Autowired
+    private  MessageSource messageSource;
+    @Autowired
+    private  UserConfirmationTokenService userConfirmationTokenService;
     @Autowired
     private App app;
     @Autowired
@@ -40,17 +46,34 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
         this.logger.info(String.format("token is : %s",thirdPartyOauthToken));
         String username = auth.getPrincipal() == null ? "NONE_PROVIDED" : auth.getName();
+        app.print("username:"+username);
         boolean cacheWasUsed = true;
         FutureDAOUserDetails user = (FutureDAOUserDetails)this.getUserCache().getUserFromCache(username);
 
+        app.print(this.getUserCache().getUserFromCache(username));
         if(user == null) {
             cacheWasUsed =false;
+
+            app.print(auth.getName());
             user = (FutureDAOUserDetails) this.retrieveUser(auth.getName(),
                     (UsernamePasswordAuthenticationToken) auth);
-
         }
 
+        app.print(user);
+
+
+
+        app.print("Login user object:");
+        app.print(user);
+        ErrorResponse errorResponse = new ErrorResponse();
+        if(!user.getIsEnabled()){
+            userConfirmationTokenService.sendConfirmationToken(user);
+            errorResponse.setCode("01");
+            errorResponse.setRemark(messageSource.getMessage("account.inactive", null, LocaleContextHolder.getLocale()));
+            throw new BadCredentialsException(errorResponse.getCode());
+        }
         this.getPreAuthenticationChecks().check(user);
+
 
         Login loginHistory= new Login();
         loginHistory.setName(user.getFirstName());
