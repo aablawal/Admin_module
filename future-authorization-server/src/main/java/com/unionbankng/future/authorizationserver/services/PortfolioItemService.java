@@ -22,7 +22,7 @@ public class PortfolioItemService {
     private final PortfolioItemRepository portfolioItemRepository;
     private final FileStorageService fileStorageService;
 
-    public Page<PortfolioItem> findAllByUserId (Long userId, Pageable pageable){
+    public Page<PortfolioItem> findAllByProfileId(Long userId, Pageable pageable){
         return portfolioItemRepository.findAllByProfileId(userId,pageable);
     }
 

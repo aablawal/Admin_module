@@ -26,10 +26,10 @@ public class PortfolioItemsController {
     private final PortfolioItemService portfolioItemService;
 
     @GetMapping("/v1/portfolio_items/find_by_profile_id/{profileId}")
-    public ResponseEntity<APIResponse<Page<PortfolioItem>>> findPortfolioItemByUserId(@PathVariable Long profileId,
-                                                              @RequestParam int pageNo, @RequestParam int limit) {
+    public ResponseEntity<APIResponse<Page<PortfolioItem>>> findPortfolioItemByProfileId(@PathVariable Long profileId,
+                                                                                         @RequestParam int pageNo, @RequestParam int limit) {
 
-        Page<PortfolioItem> portfolioItems = portfolioItemService.findAllByUserId(profileId,PageRequest.of(pageNo, limit,
+        Page<PortfolioItem> portfolioItems = portfolioItemService.findAllByProfileId(profileId,PageRequest.of(pageNo, limit,
                 Sort.by("createdAt").ascending()));
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItems));
@@ -46,7 +46,7 @@ public class PortfolioItemsController {
     }
 
     @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart PortfolioItemRequest request)
+    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience(@Nullable  @RequestPart("file") MultipartFile file, @Valid @RequestBody PortfolioItemRequest request)
             throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(

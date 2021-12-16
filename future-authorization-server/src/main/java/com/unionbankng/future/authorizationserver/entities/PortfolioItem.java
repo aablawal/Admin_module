@@ -22,17 +22,23 @@ public class PortfolioItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private Long profileId;
+
     private String title;
+
     @Column(columnDefinition="TEXT")
     private String description;
+
     private String link;
+
     private String media;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 

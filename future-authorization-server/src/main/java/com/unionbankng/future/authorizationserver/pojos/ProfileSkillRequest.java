@@ -6,10 +6,10 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class EntitySkillRequest {
-    @NotNull
-    private Long entityId;
+public class ProfileSkillRequest {
 
-    @NotNull
-    private List<Long> skillIds;
+    private Long profileId;
+
+//    @NotNull
+    private List<String> skills;
 }

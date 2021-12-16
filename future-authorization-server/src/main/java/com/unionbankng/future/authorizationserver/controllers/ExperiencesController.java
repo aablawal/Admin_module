@@ -33,12 +33,13 @@ public class ExperiencesController {
 
         List<Experience> experiences = experienceService.findByProfileId(profileId,Sort.by("startDate").ascending());
 
-        return ResponseEntity.ok().body(new APIResponse<List<Experience>>("Request Successful",true,experiences));
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, experiences));
 
     }
 
+
     @PostMapping(value = "/v1/experiences/create_new", consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Experience>> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestPart ExperienceRequest request)
+    public ResponseEntity<APIResponse<Experience>> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestBody ExperienceRequest request)
             throws IOException {
 
         Experience experience = experienceService.saveFromRequest(file,request,new Experience());
@@ -58,8 +59,8 @@ public class ExperiencesController {
 
         experience = experienceService.saveFromRequest(file,request,experience);
         return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
-
     }
+
 
     @DeleteMapping("/v1/experiences/delete/{experienceId}")
     public ResponseEntity<APIResponse<String>> deleteExperience(@PathVariable Long experienceId){

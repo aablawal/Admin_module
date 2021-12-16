@@ -22,12 +22,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/v1/profile")
 public class ProfileController {
 
     private final ProfileService profileService;
 
-    @PostMapping(value = "/v1/profile/{profileId}/update_cover_photo",consumes = { "multipart/form-data" })
+    @PostMapping(value = "/{profileId}/update-cover-photo", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<Profile>> updateCoverPhoto(@Nullable @RequestPart("image") MultipartFile image,
                                                         @PathVariable Long profileId) throws IOException {
 
@@ -36,7 +36,7 @@ public class ProfileController {
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,profile));
     }
 
-    @GetMapping("/v1/profile/get_profile_by_user_id/{userId}")
+    @GetMapping("/get-profile-by-user-id/{userId}")
     public ResponseEntity<APIResponse<RepresentationModel>> getProfileByUserId(@PathVariable Long userId) throws IOException {
 
         Profile profile = profileService.findByUserId(userId).orElseThrow(
@@ -46,7 +46,7 @@ public class ProfileController {
         Link experiencesLink = linkTo(methodOn(ExperiencesController.class)
                 .findExperienceByProfileId(profile.getId())).withRel("experiences");
         Link portfolioLink = linkTo(methodOn(PortfolioItemsController.class)
-                .findPortfolioItemByUserId(profile.getId(),0,10)).withRel("portfolio");
+                .findPortfolioItemByProfileId(profile.getId(),0,10)).withRel("portfolio");
         Link qualifications = linkTo(methodOn(QualificationsController.class)
                 .findQualificationsByProfileId(profile.getId())).withRel("qualifications");
         Link Photos = linkTo(methodOn(PhotosController.class)
@@ -55,18 +55,18 @@ public class ProfileController {
                 .findExperienceByProfileId(profile.getId(),0,10)).withRel("videos");
         Link skills = linkTo(methodOn(ProfileSkillsController.class)
                 .findQualificationsByProfileId(profile.getId(),0,10)).withRel("skills");
+        String phoneNumber = profileService.getPhoneNumberByProfileId(profile.getId());
 
         representationModel.add(experiencesLink,portfolioLink,qualifications,Photos,videos,skills);
+
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,representationModel));
     }
 
-    @PostMapping(value = "/v1/profile/update_profile/{profileId}")
-    public ResponseEntity<APIResponse<Profile>> uploadProfileImage(@PathVariable Long profileId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
-
+    @PutMapping(value = "/{profileId}")
+    public ResponseEntity<APIResponse<Profile>> updateProfile(@PathVariable Long profileId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
 
         Profile profile = profileService.updateProfile(profileId, request);
-
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,profile));
     }
 

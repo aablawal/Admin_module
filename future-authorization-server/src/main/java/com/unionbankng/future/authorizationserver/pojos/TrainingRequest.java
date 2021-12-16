@@ -2,19 +2,27 @@ package com.unionbankng.future.authorizationserver.pojos;
 
 import lombok.Data;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class PortfolioItemRequest {
+public class TrainingRequest {
 
-    private Long portfolioItemId;
+    private Long trainingId;
+
     @NotNull
     private Long profileId;
+
     @NotNull
     private String title;
-//    @NotNull
+
+    private String organization;
+
+    @NotNull//2012
+    private String yearAwarded;
+
+    @NotNull//2012
+    private String linkOrId;
+
     private String description;
-    private String link;
-    private String media;
+
 }

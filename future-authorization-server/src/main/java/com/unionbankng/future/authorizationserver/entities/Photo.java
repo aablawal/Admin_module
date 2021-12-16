@@ -22,18 +22,23 @@ public class Photo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private Long profileId;
+
     @Column(nullable = false)
     private String title;
+
     @Column(columnDefinition="TEXT")
     private String comment;
+
     @Column(nullable = false)
     private String source;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 

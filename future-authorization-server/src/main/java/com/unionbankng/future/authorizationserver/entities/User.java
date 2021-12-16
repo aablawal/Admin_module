@@ -24,51 +24,76 @@ public class User implements Serializable {
      *
      */
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String img;
+
     private String coverImg;
+
     @NotNull
     @Column(length=32, nullable = false)
     private String firstName;
+
     @Column(length=32, nullable = false)
     private String lastName;
+
     @Column(length=50, nullable = false, unique = true)
     private String uuid;
+
     @Column(columnDefinition="TEXT")
     private String umid;
+
     @Column(nullable = false, unique = true)
     private String username;
+
     @Column(nullable = false, unique = true)
     private String email;
+
     private String password;
+
     private String pin;
+
     @Column(length = 10)
     private String zipCode;
+
     @Column(length=5)
     private String dialingCode;
+
     @Column(length=32, unique = true)
     private String phoneNumber;
+
     @Column(length = 12)
     private String accountNumber;
+
     private String accountName;
+
     private String userAddress;
+
     @Column(length=100)
     private String city;
+
     @Column(length = 3)
     private String country;
+
     @Column(length = 50)
     private String stateOfResidence;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateOfBirth;
+
     @Column(nullable = false)
     private Boolean isEnabled = true;
+
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider;
+
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateUpdated;
 

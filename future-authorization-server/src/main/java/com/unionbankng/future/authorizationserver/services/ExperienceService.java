@@ -53,7 +53,7 @@ public class ExperienceService {
 
     @CacheEvict(value = "experience", allEntries = true)
     public Experience saveFromRequest (MultipartFile file,ExperienceRequest request, Experience experience) throws IOException {
-        experience.setProfileId(request.getProfileId());
+        experience.setTitle(request.getTitle());
         experience.setCompany(request.getCompany());
         experience.setIsCurrent(request.getCurrent());
         experience.setDescription(request.getDescription());
@@ -65,7 +65,6 @@ public class ExperienceService {
             String source = fileStorageService.storeFile(file, request.getProfileId(), BlobType.IMAGE);
             experience.setMedia(source);
         }
-        experience.setTitle(request.getTitle());
         return experienceRepository.save(experience);
     }
 

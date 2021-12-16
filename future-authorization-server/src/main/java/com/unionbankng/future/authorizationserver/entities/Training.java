@@ -1,7 +1,5 @@
 package com.unionbankng.future.authorizationserver.entities;
 
-import com.unionbankng.future.authorizationserver.enums.EmploymentType;
-import com.unionbankng.future.authorizationserver.enums.SocialMedia;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +14,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSocialMedia implements Serializable {
+public class Training implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,14 +22,20 @@ public class UserSocialMedia implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private Long userId;
-
     @Column(nullable = false)
-    private String token;
+    private Long profileId;
 
-    @Enumerated(value = EnumType.STRING)
-    private SocialMedia socialMedia;
+    private String organization;
+
+    private String title;
+
+    private String linkOrId;
+
+    @Column(length = 20)
+    private String yearAwarded;
+
+    @Column(columnDefinition="TEXT")
+    private String description;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -51,8 +55,7 @@ public class UserSocialMedia implements Serializable {
     }
 
     @Override
-    public boolean equals(Object experience) {
-        return this.id.equals(((UserSocialMedia)experience).getId());
-
+    public boolean equals(Object qualification) {
+        return this.id.equals(((Training)qualification).getId());
     }
 }
