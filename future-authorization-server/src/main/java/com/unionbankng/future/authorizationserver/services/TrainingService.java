@@ -1,8 +1,10 @@
 package com.unionbankng.future.authorizationserver.services;
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.entities.Training;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.pojos.TrainingRequest;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
 import com.unionbankng.future.authorizationserver.repositories.TrainingRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class TrainingService {
 
     private final TrainingRepository trainingRepository;
+    private final ProfileRepository profileRepository;
 
     @Cacheable(value = "trainings_by_profile", key="#profileId")
     public List<Training> findAllByProfileId(Long profileId, Sort sort){
@@ -50,12 +53,15 @@ public class TrainingService {
 
 
     @Caching(evict = {
-            @CacheEvict(value = "trainings_by_profile", key="#request.profileId"),
+            @CacheEvict(value = "trainings_by_profile", key="#request.userId"),
             @CacheEvict(value = "training", allEntries = true)
     })
     public Training saveFromRequest (TrainingRequest request, Training training) throws IOException {
 
-        training.setProfileId(request.getProfileId());
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        training.setProfileId(profile.getId());
         training.setTitle(request.getTitle());
         training.setDescription(request.getDescription());
         training.setOrganization(request.getOrganization());

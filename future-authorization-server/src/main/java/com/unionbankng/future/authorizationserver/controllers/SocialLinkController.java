@@ -18,10 +18,10 @@ public class SocialLinkController {
 
 
     @PostMapping("/social-link")
-    public ResponseEntity<APIResponse<String>> addSocialLink(UserSocialLink userSocialLink){
+    public ResponseEntity<APIResponse<String>> addSocialLink(@RequestBody UserSocialLink userSocialLink){
 
-        socialLinkService.saveSocialLinkFromRequest(userSocialLink);
         app.print("Adding Social link to user profile");
+        socialLinkService.saveSocialLinkFromRequest(userSocialLink);
         app.print(userSocialLink);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful"));

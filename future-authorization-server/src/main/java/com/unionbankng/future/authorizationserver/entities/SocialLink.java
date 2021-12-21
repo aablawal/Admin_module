@@ -26,6 +26,7 @@ public class SocialLink implements Serializable {
     @Column(nullable = false)
     private Long userId;
 
+    @Enumerated(EnumType.STRING)
     private SocialMedia socialMedia;
 
     private String url;

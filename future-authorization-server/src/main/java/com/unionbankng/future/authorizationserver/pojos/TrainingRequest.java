@@ -9,18 +9,18 @@ public class TrainingRequest {
 
     private Long trainingId;
 
-    @NotNull
     private Long profileId;
 
-    @NotNull
+    private Long userId;
+
     private String title;
 
     private String organization;
 
-    @NotNull//2012
+
     private String yearAwarded;
 
-    @NotNull//2012
+
     private String linkOrId;
 
     private String description;

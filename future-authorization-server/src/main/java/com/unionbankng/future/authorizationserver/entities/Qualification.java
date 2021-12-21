@@ -34,10 +34,10 @@ public class Qualification implements Serializable {
 
     private String fieldOfStudy;
 
-    @Column(length = 20)//2012
+    @Column(length = 20)
     private String startYear;
 
-    @Column(length = 20)//2012
+    @Column(length = 20)
     private String endYear;
 
     private String grade;

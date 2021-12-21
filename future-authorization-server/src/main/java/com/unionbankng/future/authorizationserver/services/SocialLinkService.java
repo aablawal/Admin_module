@@ -47,8 +47,17 @@ public class SocialLinkService {
 
     public void saveSocialLinkFromRequest(UserSocialLink userSocialLink) {
 
-        socialLinkRepository.deleteAllByUserId(userSocialLink.getUserId());
+        logger.info("Deleting user previous social link");
 
+        List<SocialLink> allUserSocialLink = socialLinkRepository.findAllByUserId(userSocialLink.getUserId()).
+                orElse(new ArrayList<>());
+
+        for (SocialLink socialLink : allUserSocialLink) {
+            logger.info("deleting :" + socialLink.getSocialMedia().name());
+            socialLinkRepository.delete(socialLink);
+        }
+
+        logger.info("previous social link successfully deleted");
         if(userSocialLink.getBehance() != null && !userSocialLink.getBehance().isBlank()){
             SocialLink socialLink = new SocialLink();
             socialLink.setUserId(userSocialLink.getUserId());
@@ -57,11 +66,11 @@ public class SocialLinkService {
             socialLinkRepository.save(socialLink);
         }
 
-        if(userSocialLink.getLinkedin() != null && !userSocialLink.getLinkedin().isBlank()){
+        if(userSocialLink.getLinkedIn() != null && !userSocialLink.getLinkedIn().isBlank()){
             SocialLink socialLink = new SocialLink();
             socialLink.setUserId(userSocialLink.getUserId());
             socialLink.setSocialMedia(SocialMedia.LINKEDIN);
-            socialLink.setUrl(userSocialLink.getLinkedin());
+            socialLink.setUrl(userSocialLink.getLinkedIn());
             socialLinkRepository.save(socialLink);
         }
 
@@ -97,6 +106,8 @@ public class SocialLinkService {
             socialLinkRepository.save(socialLink);
         }
 
+        logger.info("Social Link successfully updated");
+
     }
 
     public UserSocialLink findUserSocialLinks(Long userId) {
@@ -109,7 +120,7 @@ public class SocialLinkService {
             if(socialLink.getSocialMedia() != null && socialLink.getSocialMedia().equals(SocialMedia.TWITTER))
                 userSocialLink.setTwitter(socialLink.getUrl());
             else if(socialLink.getSocialMedia() != null && socialLink.getSocialMedia().equals(SocialMedia.LINKEDIN))
-                userSocialLink.setLinkedin(socialLink.getUrl());
+                userSocialLink.setLinkedIn(socialLink.getUrl());
             else if(socialLink.getSocialMedia() != null && socialLink.getSocialMedia().equals(SocialMedia.BEHANCE))
                 userSocialLink.setBehance(socialLink.getUrl());
             else if(socialLink.getSocialMedia() != null && socialLink.getSocialMedia().equals(SocialMedia.DRIBBLE))

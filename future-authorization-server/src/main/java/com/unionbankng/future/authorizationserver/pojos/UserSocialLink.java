@@ -11,7 +11,7 @@ public class UserSocialLink {
 
     private String twitter;
 
-    private String linkedin;
+    private String LinkedIn;
 
     private String dribble;
 

@@ -1,6 +1,8 @@
 package com.unionbankng.future.authorizationserver.services;
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +25,20 @@ import java.util.Optional;
 public class QualificationService {
 
     private final QualificationRepository qualificationRepository;
+    private final ProfileRepository profileRepository;
     private final FileStorageService fileStorageService;
 
     @Cacheable(value = "qualifications_by_profile", key="#profileId")
     public List<Qualification> findAllByProfileId(Long profileId, Sort sort){
         return qualificationRepository.findAllByProfileId(profileId,sort);
+    }
+
+    @Cacheable(value = "qualifications_by_user", key="#userId")
+    public List<Qualification> findAllByUserId(Long userId, Sort sort){
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        return qualificationRepository.findAllByProfileId(profile.getId(), sort);
     }
 
     @Cacheable(value = "qualification", key="#id")
@@ -53,11 +64,14 @@ public class QualificationService {
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "qualifications_by_profile", key="#request.profileId"),
+            @CacheEvict(value = "qualifications_by_user", key="#request.userId"),
             @CacheEvict(value = "qualification", allEntries = true)
     })
     public Qualification saveFromRequest (MultipartFile file,QualificationRequest request, Qualification qualification) throws IOException {
-        qualification.setProfileId(request.getProfileId());
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        qualification.setProfileId(profile.getId());
         qualification.setActivities(request.getActivities());
         qualification.setDegree(request.getDegree());
         qualification.setDescription(request.getDescription());

@@ -8,6 +8,7 @@ import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.pojos.TrainingRequest;
 import com.unionbankng.future.authorizationserver.services.QualificationService;
 import com.unionbankng.future.authorizationserver.services.TrainingService;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,7 @@ public class QualificationsController {
 
     private final QualificationService qualificationService;
     private final TrainingService trainingService;
+    private final App app;
 
     @GetMapping("/v1/qualifications/find_by_profile_id/{profileId}")
     public ResponseEntity<APIResponse<List<Qualification>>> findQualificationsByProfileId(@PathVariable Long profileId) {
@@ -70,29 +72,40 @@ public class QualificationsController {
     }
 
 
-    @PostMapping(value = "/v1/qualification",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<String>> addNewQualificationAndTraining(@Nullable @RequestPart("file") MultipartFile file,
-                                                                                     @Valid @RequestBody EducationAndTrainingRequest request)
+    @PostMapping(value = "/v1/qualification")
+    public ResponseEntity<APIResponse<String>> addNewQualificationAndTraining(@Valid @RequestBody EducationAndTrainingRequest request)
             throws IOException {
 
-        QualificationRequest qualificationRequest = new QualificationRequest();
-        qualificationRequest.setProfileId(request.getProfileId());
-        qualificationRequest.setCountry(request.getCountry());
-        qualificationRequest.setDegree(request.getDegree());
-        qualificationRequest.setStartYear(request.getStartYear());
-        qualificationRequest.setEndYear(request.getEndYear());
+        app.print("Qualification COntroller: Adding new qualification/training");
 
-        qualificationService.saveFromRequest(file, qualificationRequest, new Qualification());
+        if(request.getSchool() != null && !request.getSchool().isBlank()){
+            app.print("Qualification COntroller: Adding new qualification");
+            QualificationRequest qualificationRequest = new QualificationRequest();
+            qualificationRequest.setUserId(request.getUserId());
+            qualificationRequest.setSchool(request.getSchool());
+            qualificationRequest.setCountry(request.getCountry());
+            qualificationRequest.setDegree(request.getDegree());
+            qualificationRequest.setStartYear(request.getStartYear());
+            qualificationRequest.setEndYear(request.getEndYear());
+            Qualification qualification = qualificationService.saveFromRequest(null, qualificationRequest, new Qualification());
+            app.print(qualification);
+        }
 
-        TrainingRequest trainingRequest = new TrainingRequest();
-        trainingRequest.setProfileId(request.getProfileId());
-        trainingRequest.setTitle(request.getTrainingTitle());
-        trainingRequest.setOrganization(request.getTrainingOrganization());
-        trainingRequest.setLinkOrId(request.getTrainingLinkOrId());
-        trainingRequest.setDescription(request.getTrainingDescription());
-        trainingRequest.setYearAwarded(request.getTrainingYearAwarded());
 
-        trainingService.saveFromRequest(trainingRequest, new Training());
+        if(request.getTrainingTitle() != null && !request.getTrainingTitle().isBlank()){
+            app.print("Qualification Controller: Adding new Training");
+            TrainingRequest trainingRequest = new TrainingRequest();
+            trainingRequest.setUserId(request.getUserId());
+            trainingRequest.setProfileId(request.getProfileId());
+            trainingRequest.setTitle(request.getTrainingTitle());
+            trainingRequest.setOrganization(request.getTrainingOrganization());
+            trainingRequest.setLinkOrId(request.getTrainingLinkOrId());
+            trainingRequest.setDescription(request.getTrainingDescription());
+            trainingRequest.setYearAwarded(request.getTrainingYearAwarded());
+
+            Training training = trainingService.saveFromRequest(trainingRequest, new Training());
+            app.print(training);
+        }
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );
 

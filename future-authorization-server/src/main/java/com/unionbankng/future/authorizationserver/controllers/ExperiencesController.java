@@ -6,6 +6,7 @@ import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
 import com.unionbankng.future.authorizationserver.services.ExperienceService;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ExperiencesController {
 
     private final ExperienceService experienceService;
+    private final App app;
 
     @GetMapping("/v1/experiences/find_by_profile_id/{profileId}")
     public ResponseEntity<APIResponse<List<Experience>>> findExperienceByProfileId(@PathVariable Long profileId) {
@@ -38,11 +40,27 @@ public class ExperiencesController {
     }
 
 
-    @PostMapping(value = "/v1/experiences/create_new", consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Experience>> addNewExperience(@Nullable @RequestPart("file") MultipartFile file, @Valid @RequestBody ExperienceRequest request)
+    @GetMapping("/v1/experiences/{userId}")
+    public ResponseEntity<APIResponse<List<Experience>>> findExperienceByUserId(@PathVariable Long userId) {
+
+
+        app.print("Experience Controller: Fetching List of USer experience");
+
+        List<Experience> experiences = experienceService.findByUserId(userId,Sort.by("startDate").ascending());
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, experiences));
+
+    }
+
+
+    @PostMapping(value = "/v1/experiences/create-new")
+    public ResponseEntity<APIResponse<Experience>> addNewExperience(@Valid @RequestBody ExperienceRequest request)
             throws IOException {
 
-        Experience experience = experienceService.saveFromRequest(file,request,new Experience());
+        app.print("Experience Controller: Printing Experience Request");
+        app.print(request);
+
+        Experience experience = experienceService.saveFromRequest(null,request,new Experience());
         return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
 
     }
