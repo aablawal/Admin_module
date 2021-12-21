@@ -75,7 +75,7 @@ public class UBNAccountAPIServiceHandler {
         return  response;
     }
     
-    public Response<ValidateBvnResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
+    public Response<BVNValidationResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
 
         UBNAuthServerTokenResponse response = getUBNAuthServerToken();
 

@@ -18,7 +18,7 @@ public class BVNController {
     private final BvnValidationService bvnValidationService;
 
     @PostMapping("/v1/bvn/validate_bvn")
-    public ResponseEntity<APIResponse<ValidateBvnResponse>> validateCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
+    public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
        return bvnValidationService.validateCustomerBVN(bvn,dob);
     }
 
