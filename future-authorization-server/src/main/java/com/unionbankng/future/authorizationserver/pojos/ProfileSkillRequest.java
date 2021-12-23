@@ -8,8 +8,7 @@ import java.util.List;
 @Data
 public class ProfileSkillRequest {
 
-    private Long profileId;
+    private Long userId;
 
-//    @NotNull
     private List<String> skills;
 }

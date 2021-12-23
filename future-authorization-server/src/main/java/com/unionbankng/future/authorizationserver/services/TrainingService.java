@@ -34,6 +34,15 @@ public class TrainingService {
         return trainingRepository.findAllByProfileId(profileId,sort);
     }
 
+
+    @Cacheable(value = "trainings_by_user", key="#userId")
+    public List<Training> findAllByUserId(Long userId, Sort sort){
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        return trainingRepository.findAllByProfileId(profile.getId(), sort);
+    }
+
     @Cacheable(value = "training", key="#id")
     public Optional<Training> findById (Long id){
         return trainingRepository.findById(id);

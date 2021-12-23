@@ -35,6 +35,12 @@ public class PortfolioItem implements Serializable {
 
     private String media;
 
+    @Column
+    private String portfolioVideoMedia;
+
+    @Column
+    private String portfolioImageMedia;
+
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

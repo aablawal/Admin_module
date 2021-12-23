@@ -17,7 +17,6 @@ public class TrainingRequest {
 
     private String organization;
 
-
     private String yearAwarded;
 
 

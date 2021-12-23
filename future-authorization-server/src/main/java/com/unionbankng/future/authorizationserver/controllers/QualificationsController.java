@@ -10,7 +10,6 @@ import com.unionbankng.future.authorizationserver.services.QualificationService;
 import com.unionbankng.future.authorizationserver.services.TrainingService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -76,10 +76,10 @@ public class QualificationsController {
     public ResponseEntity<APIResponse<String>> addNewQualificationAndTraining(@Valid @RequestBody EducationAndTrainingRequest request)
             throws IOException {
 
-        app.print("Qualification COntroller: Adding new qualification/training");
+        app.print("Qualification Controller: Adding new qualification/training");
 
         if(request.getSchool() != null && !request.getSchool().isBlank()){
-            app.print("Qualification COntroller: Adding new qualification");
+            app.print("Qualification Controller: Adding new qualification");
             QualificationRequest qualificationRequest = new QualificationRequest();
             qualificationRequest.setUserId(request.getUserId());
             qualificationRequest.setSchool(request.getSchool());
@@ -108,6 +108,71 @@ public class QualificationsController {
         }
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );
+
+    }
+
+
+
+    @GetMapping(value = "/v1/qualification/education/{userId}")
+    public ResponseEntity<APIResponse<List<?>>> getAllQualificationByUserId(@PathVariable Long userId)
+            throws IOException {
+
+        app.print("Qualification Controller: fetching all users qualification");
+
+        List<Qualification> qualifications = qualificationService.
+                findAllByUserId(userId,Sort.by("createdAt").ascending());
+
+        List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();
+
+        for (Qualification qualification : qualifications) {
+            EducationAndTrainingRequest educationAndTrainingRequest = new EducationAndTrainingRequest();
+            educationAndTrainingRequest.setQualificationId(qualification.getId());
+            educationAndTrainingRequest.setSchool(qualification.getSchool());
+            educationAndTrainingRequest.setCountry(qualification.getSchool());
+            educationAndTrainingRequest.setDegree(qualification.getDegree());
+            educationAndTrainingRequest.setStartYear(qualification.getStartYear());
+            educationAndTrainingRequest.setEndYear(qualification.getEndYear());
+            educationAndTrainingRequests.add(educationAndTrainingRequest);
+        }
+
+        app.print("Qualification Controller: fetching all users qualification completed");
+        app.print(educationAndTrainingRequests);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, educationAndTrainingRequests) );
+
+    }
+
+
+    @GetMapping(value = "/v1/qualification/training/{userId}")
+    public ResponseEntity<APIResponse<List<?>>> getAllTrainingByUserId(@PathVariable Long userId)
+            throws IOException {
+
+        app.print("Qualification Controller: fetching all users training");
+        app.print(userId);
+
+        List<Training> trainings = trainingService.
+                findAllByUserId(userId,Sort.by("createdAt").ascending());
+
+        app.print(trainings);
+        List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();
+
+
+        for (Training training : trainings) {
+            EducationAndTrainingRequest educationAndTrainingRequest = new EducationAndTrainingRequest();
+            educationAndTrainingRequest.setTrainingId(training.getId());
+            educationAndTrainingRequest.setTrainingTitle(training.getTitle());
+            educationAndTrainingRequest.setTrainingOrganization(training.getOrganization());
+            educationAndTrainingRequest.setTrainingLinkOrId(training.getLinkOrId());
+            educationAndTrainingRequest.setTrainingDescription(training.getDescription());
+            educationAndTrainingRequest.setTrainingYearAwarded(training.getYearAwarded());
+
+            educationAndTrainingRequests.add(educationAndTrainingRequest);
+        }
+
+        app.print("Qualification Controller: fetching all users training completed");
+        app.print(educationAndTrainingRequests);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, educationAndTrainingRequests) );
 
     }
 

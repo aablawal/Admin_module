@@ -73,6 +73,7 @@ public class QualificationService {
         );
         qualification.setProfileId(profile.getId());
         qualification.setActivities(request.getActivities());
+        qualification.setSchool(request.getSchool());
         qualification.setDegree(request.getDegree());
         qualification.setDescription(request.getDescription());
         qualification.setEndYear(request.getEndYear());

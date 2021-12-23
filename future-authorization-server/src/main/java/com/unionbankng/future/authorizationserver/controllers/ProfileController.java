@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -31,6 +33,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final ProfileRepository profileRepository;
     private final App app;
 
     @PostMapping(value = "/{profileId}/update-cover-photo", consumes = { "multipart/form-data" })
@@ -45,7 +48,7 @@ public class ProfileController {
     @GetMapping("/get-profile-by-user-id/{userId}")
     public ResponseEntity<APIResponse<RepresentationModel>> getProfileByUserId(@PathVariable Long userId) throws IOException {
 
-        app.print("Profile Controller: Fetching user profile bu user Id");
+        app.print("Profile Controller: Fetching user profile by user Id");
 
         Profile profile = profileService.findByUserId(userId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
@@ -67,6 +70,8 @@ public class ProfileController {
 
         representationModel.add(experiencesLink,portfolioLink,qualifications,Photos,videos,skills);
 
+        app.print("Finished fetching user profile");
+        app.print(representationModel);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,representationModel));
     }
@@ -79,20 +84,18 @@ public class ProfileController {
     }
 
 
+    @PostMapping(value = "/update-by-userid/{userId}")
+    public ResponseEntity<APIResponse<Profile>> updateProfileByUserId(@PathVariable Long userId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
 
-    @GetMapping(value = "")
-    public ResponseEntity<APIResponse<Object>> getLoggedUserProfile() throws IOException {
 
-        Object userId = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        Object userId2 = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Object userId3 = SecurityContextHolder.getContext().getAuthentication().getDetails();
-        app.print(userId);
-        app.print(userId3);
-        app.print("##########PRINTING SECURITY CREDENTIALS");
-        app.print(userId.toString());
-        app.print(userId3.toString());
+        app.print("Updating user profile by Id with request: ");
+        app.print(request);
+        Long profileId = profileRepository.findByUserId(userId).get().getId();
 
-        return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true, userId));
+        Profile profile = profileService.updateProfile(profileId, request);
+        app.print("Finished updating user profile");
+        app.print(profile);
+        return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,profile));
     }
 
 }

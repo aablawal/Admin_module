@@ -28,6 +28,7 @@ public class SocialLinkController {
 
     }
 
+
     @GetMapping("/social-link/{userId}")
     public ResponseEntity<APIResponse<?>> getSocialLinks(@PathVariable Long userId) {
 

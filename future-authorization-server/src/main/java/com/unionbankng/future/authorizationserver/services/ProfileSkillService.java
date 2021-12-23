@@ -62,28 +62,37 @@ public class ProfileSkillService {
         app.print("Profile Skill Service: Saving Skills");
         app.print(request);
 
-        Profile profile = profileRepository.findById(request.getProfileId()).orElseThrow(
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
         profile.getSkills().clear();
         for(String skill : request.getSkills()){
             ProfileSkill profileSkill = new ProfileSkill();
             profileSkill.setSkillName(skill);
+            profileSkill.setProfileId(profile.getId());
             profileSkillRepository.save(profileSkill);
             profile.getSkills().add(profileSkill);
             profileRepository.save(profile);
+            app.print(profileSkill);
         }
 
     }
 
 
-    public Set<ProfileSkill> getProfileSkills(Long profileId) {
+    public List<String> getProfileSkills(Long userId) {
         app.print("Profile Skill Service: Getting Skills");
-        app.print(profileId);
+        app.print(userId);
 
-        Profile profile = profileRepository.findById(profileId).orElseThrow(
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
 
-        return profile.getSkills();
+        Set<ProfileSkill> userSkills = profile.getSkills();
+
+        List<String> profileSkillRequests = new ArrayList<>();
+        for (ProfileSkill userSkill : userSkills) {
+            profileSkillRequests.add(userSkill.getSkillName());
+        }
+
+        return profileSkillRequests;
 
     }
 }

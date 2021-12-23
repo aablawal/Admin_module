@@ -52,17 +52,16 @@ public class ProfileSkillsController {
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,null));
     }
 
+    //Add SKILLS TO PROFILE
     @PostMapping("/v1/user-skills/add-skills")
     public ResponseEntity<APIResponse<String>> addProfileSkills(@Valid @RequestBody ProfileSkillRequest request) {
         profileSkillService.saveProfileSkills(request);
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful"));
-
     }
 
-    @GetMapping("/v1/user-skills/get-skills/{profileId}")
-    public ResponseEntity<APIResponse<Set<ProfileSkill>>> getProfileSkills(@PathVariable Long profileId) {
-        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, profileSkillService.getProfileSkills(profileId)));
-
+    @GetMapping("/v1/user-skills/get-skills/{userId}")
+    public ResponseEntity<APIResponse<?>> getProfileSkills(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, profileSkillService.getProfileSkills(userId)));
     }
 
 }

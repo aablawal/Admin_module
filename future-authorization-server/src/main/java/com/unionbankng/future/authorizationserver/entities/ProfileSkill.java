@@ -48,7 +48,7 @@ public class ProfileSkill implements Serializable {
 
     @Override
     public boolean equals(Object userSkill) {
-        return this.id.equals(((ProfileSkill)userSkill).getId());
+        return this.skillName.equals(((ProfileSkill)userSkill).getSkillName());
 
     }
 }

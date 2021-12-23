@@ -38,7 +38,7 @@ public class PhotosController {
     }
 
     @PostMapping(value = "/v1/photos/create_new",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Photo>> addNewPhoto(@RequestPart("file") MultipartFile file,@Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
+    public ResponseEntity<APIResponse<Photo>> addNewPhoto(@RequestPart("file") MultipartFile file, @Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Photo photo = photoService.saveFromRequest(file,request,new Photo());
         return ResponseEntity.ok().body(new APIResponse<Photo>("Request Successful",true,photo));
