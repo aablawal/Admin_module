@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 public class FileStorageService {
@@ -21,7 +22,7 @@ public class FileStorageService {
 
 
     public String storeFile(MultipartFile file, Long userId,BlobType blobType) throws IOException {
-        String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
         String fileName = userId + "_" + System.currentTimeMillis() + fileExtension;

@@ -1,7 +1,9 @@
 package com.unionbankng.future.authorizationserver.services;
 import com.unionbankng.future.authorizationserver.entities.Profile;
+import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
+import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,6 +23,7 @@ public class ProfileService {
 
     private final ProfileRepository profileRepository;
     private final FileStorageService fileStorageService;
+    private final UserRepository userRepository;
 
 
     @Cacheable(value = "user_profile", key="#userId")
@@ -66,8 +69,22 @@ public class ProfileService {
             profile.setIsEmployer(request.getIsEmployer());
         if(request.getIsFreelancer() != null)
             profile.setIsFreelancer(request.getIsFreelancer());
+        if(request.getPhoneNumber() != null){
+            User user = userRepository.findById(profile.getUserId()).orElseThrow(
+                    ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            user.setPhoneNumber(request.getPhoneNumber());
+            userRepository.save(user);
+        }
 
         return profileRepository.save(profile);
+    }
+
+
+    public String getPhoneNumberByProfileId(Long profileId){
+        Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
+        User user = userRepository.findById(profile.getUserId()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+       return user.getPhoneNumber() == null ? "" : user.getPhoneNumber();
     }
 
 

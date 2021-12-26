@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1640137089184-6" author="FSAUDU (generated)">
+        <addColumn tableName="portfolio_item">
+            <column name="portfolio_image_media" type="VARCHAR(255)"/>
+            <column name="portfolio_video_media" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1640137089184-5" author="FSAUDU (generated)">
+        <modifyDataType columnName="social_media" newDataType="VARCHAR(255)" tableName="social_link"/>
+    </changeSet>
+
+</databaseChangeLog>
