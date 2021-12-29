@@ -45,6 +45,9 @@ public class JobContract implements Serializable {
     @Enumerated(EnumType.STRING)
     private Status status;
     private  Long rate;
+    private  Double KulaChargeRate;
+    private  Double VATChargeRate;
+    private  Double EscrowCharges;
     private  String description;
     @Column(columnDefinition="TEXT")
     private String feedback;
