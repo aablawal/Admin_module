@@ -1,9 +1,6 @@
 package com.unionbankng.future.futurebankservice.controllers;
 
-import com.unionbankng.future.futurebankservice.pojos.APIResponse;
-import com.unionbankng.future.futurebankservice.pojos.BVNValidationResponse;
-import com.unionbankng.future.futurebankservice.pojos.BVNVerificationResponse;
-import com.unionbankng.future.futurebankservice.pojos.UBNCustomerSegmentResponse;
+import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.BvnValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

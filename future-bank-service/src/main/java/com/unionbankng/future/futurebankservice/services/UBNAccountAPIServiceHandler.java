@@ -53,10 +53,12 @@ public class UBNAccountAPIServiceHandler {
 
 
        public UBNAuthServerTokenResponse getUBNAuthServerToken() throws IOException {
+        logger.info("Fetching Auth Server Token");
         Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
+
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
-        app.print("/authserv/oauth/token is :"+response.getAccess_token());
+        app.print("/authserv/oauth/token is :"+ (response != null ? response.getAccess_token() : "null"));
         return response;
     }
 
@@ -71,7 +73,7 @@ public class UBNAccountAPIServiceHandler {
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
-        app.print("/ubnmiserv/oauth/token is :"+response.getAccess_token());
+        app.print("/ubnmiserv/oauth/token is :"+ (response != null ? response.getAccess_token() : null));
         return  response;
     }
     
@@ -79,7 +81,7 @@ public class UBNAccountAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAuthServerToken();
 
-        logger.info("Auth token response is : {}",response);
+        logger.info("Auth token response is : {}",response == null ? "null" : response);
         if(response == null)
             return null;
 

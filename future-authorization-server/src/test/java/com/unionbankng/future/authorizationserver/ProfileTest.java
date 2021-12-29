@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
-import com.unionbankng.future.authorizationserver.repositories.PortfolioItemRepository;
 import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
-import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.FileStorageService;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
@@ -20,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -111,7 +108,7 @@ public class ProfileTest extends AbstractTest {
         profileUpdateRequest.setIsFreelancer(true);
         profileUpdateRequest.setJobTitle("new Test Job Title");
         profileUpdateRequest.setPricePerHour(BigDecimal.TEN);
-        profileUpdateRequest.setProfileType(ProfileType.EMPLOYER);
+        profileUpdateRequest.setProfileType(ProfileType.GIG_PROVIDER);
         String body = mapper.writeValueAsString(profileUpdateRequest);
 
         mvc.perform(MockMvcRequestBuilders.post(String.format("/api/v1/profile/update_profile/%s",profile.getId()))

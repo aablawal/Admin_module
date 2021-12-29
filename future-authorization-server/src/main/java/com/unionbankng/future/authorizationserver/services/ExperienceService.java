@@ -1,8 +1,12 @@
 package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.entities.Experience;
+import com.unionbankng.future.authorizationserver.entities.Profile;
+import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
 import com.unionbankng.future.authorizationserver.repositories.ExperienceRepository;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
+import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,12 +26,22 @@ import java.util.Optional;
 public class ExperienceService {
 
     private final ExperienceRepository experienceRepository;
+    private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
 
     @Cacheable(value = "experiences", key="#profileId")
     public List<Experience> findByProfileId(Long profileId, Sort sort){
         return experienceRepository.findByProfileId(profileId,sort);
+    }
+
+    @Cacheable(value = "experiences", key="#userId")
+    public List<Experience> findByUserId(Long userId, Sort sort){
+       Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        return findByProfileId(profile.getId(), sort);
     }
 
     @CacheEvict(value = "experiences", allEntries = true)
@@ -53,7 +67,12 @@ public class ExperienceService {
 
     @CacheEvict(value = "experience", allEntries = true)
     public Experience saveFromRequest (MultipartFile file,ExperienceRequest request, Experience experience) throws IOException {
-        experience.setProfileId(request.getProfileId());
+
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        experience.setProfileId(profile.getId());
+        experience.setTitle(request.getTitle());
         experience.setCompany(request.getCompany());
         experience.setIsCurrent(request.getCurrent());
         experience.setDescription(request.getDescription());
@@ -65,7 +84,6 @@ public class ExperienceService {
             String source = fileStorageService.storeFile(file, request.getProfileId(), BlobType.IMAGE);
             experience.setMedia(source);
         }
-        experience.setTitle(request.getTitle());
         return experienceRepository.save(experience);
     }
 
