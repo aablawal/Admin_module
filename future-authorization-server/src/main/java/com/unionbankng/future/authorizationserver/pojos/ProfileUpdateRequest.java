@@ -11,10 +11,12 @@ import java.util.Date;
 
 @Data
 public class ProfileUpdateRequest {
+    private long userId;
     private ProfileType profileType;
     private Boolean isEmployer;
     private Boolean isFreelancer;
     private BigDecimal pricePerHour;
     private String jobTitle;
+    private String phoneNumber;
     private  String bio;
 }

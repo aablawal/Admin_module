@@ -7,6 +7,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -21,21 +24,34 @@ public class Profile implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, unique = true)
     private Long userId;
+
     private String coverPhoto;
+
     @Enumerated(EnumType.STRING)
     private ProfileType profileType;
+
     private Boolean isEmployer = false;
+
     private Boolean isFreelancer = false;
+
     @Column(precision = 19, scale = 2)
     private BigDecimal pricePerHour;
+
     private String jobTitle;
+
     @Column(columnDefinition="TEXT")
     private  String bio;
+
+    @OneToMany
+    private Set<ProfileSkill> skills = new HashSet<>();
+
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
