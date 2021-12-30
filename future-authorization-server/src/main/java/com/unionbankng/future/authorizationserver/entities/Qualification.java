@@ -22,25 +22,38 @@ public class Qualification implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private Long profileId;
+
+    private String country;
+
     private String school;
+
     private String degree;
+
     private String fieldOfStudy;
-    @Column(length = 20)//2012
+
+    @Column(length = 20)
     private String startYear;
-    @Column(length = 20)//2012
+
+    @Column(length = 20)
     private String endYear;
+
     private String grade;
+
     @Column(columnDefinition="TEXT")
     private String description;
+
     @Column(columnDefinition="TEXT")
     private String activities;
+
     private String media;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 

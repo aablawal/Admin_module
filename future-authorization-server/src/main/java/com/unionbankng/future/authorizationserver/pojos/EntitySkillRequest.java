@@ -9,6 +9,7 @@ import java.util.List;
 public class EntitySkillRequest {
     @NotNull
     private Long entityId;
+
     @NotNull
     private List<Long> skillIds;
 }

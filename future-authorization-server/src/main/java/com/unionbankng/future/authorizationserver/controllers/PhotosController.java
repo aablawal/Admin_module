@@ -4,7 +4,6 @@ import com.unionbankng.future.authorizationserver.entities.Photo;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.PhotoAndVideoRequest;
 import com.unionbankng.future.authorizationserver.services.PhotoService;
-import liquibase.license.LicenseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +36,7 @@ public class PhotosController {
     }
 
     @PostMapping(value = "/v1/photos/create_new",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Photo>> addNewPhoto(@RequestPart("file") MultipartFile file,@Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
+    public ResponseEntity<APIResponse<Photo>> addNewPhoto(@RequestPart("file") MultipartFile file, @Valid @RequestPart PhotoAndVideoRequest request) throws IOException {
 
         Photo photo = photoService.saveFromRequest(file,request,new Photo());
         return ResponseEntity.ok().body(new APIResponse<Photo>("Request Successful",true,photo));

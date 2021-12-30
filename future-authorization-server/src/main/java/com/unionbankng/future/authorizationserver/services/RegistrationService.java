@@ -21,9 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
-import java.util.Arrays;
-
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
@@ -44,16 +41,21 @@ public class RegistrationService {
     public ResponseEntity register(RegistrationRequest request){
 
         app.print("####REGISTER WITH KULA FORM");
-        if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername())) {
+        if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername()) || userService.existsByPhoneNumber(request.getPhoneNumber())) {
+
+            app.print("@@@@@@User already exist");
             User existingUser=userService.findByEmail(request.getEmail()).orElse(
-                    userService.findByUsername(request.getUsername()).orElse(null)
+                    userService.findByUsername(request.getUsername()).orElse(
+                            userService.findByPhoneNumber(request.getPhoneNumber()).orElse(null)
+                    )
             );
 
+            app.print("User found:");
+            app.print(existingUser);
             ErrorResponse errorResponse = new ErrorResponse();
             if(existingUser.getIsEnabled()) {
                 errorResponse.setCode("00");
                 errorResponse.setRemark(messageSource.getMessage("account.active", null, LocaleContextHolder.getLocale()));
-
             }
             else {
                 //send confirmation email

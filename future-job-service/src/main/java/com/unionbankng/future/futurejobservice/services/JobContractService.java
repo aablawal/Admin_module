@@ -1673,6 +1673,8 @@ public class JobContractService implements Serializable {
                         app.print(this.VATAccountName);
                         app.print(this.VATAccountNumber);
 
+
+
                         ArrayList<JobBulkPayment> bulkPaymentStack = new ArrayList<>();
                         String paymentReference = app.makeUIID();
                         String narration = "Settlement from Kula for " + job.getTitle();
@@ -1800,6 +1802,11 @@ public class JobContractService implements Serializable {
 
                         APIResponse apiResponse = jobPaymentService.makeBulkPayment(bulkPaymentStack);
                         if (apiResponse.isSuccess()) {
+                            //update contract information
+                            contract.setKulaChargeRate(kulaIncomeRate);
+                            contract.setVATChargeRate(VATRate);
+                            contract.setEscrowCharges(pepperestIncomeCharge);
+
                             //update job
                             if (contract.getWorkMethod().equals("Overall")) {
                                 contract.setIsSettled(true);

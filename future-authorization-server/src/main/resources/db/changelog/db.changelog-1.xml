@@ -78,4 +78,14 @@
             <column name="pin" type="varchar(255)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1640860261824-4">
+        <addColumn tableName="app_user">
+            <column name="gender" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1640860261824-5">
+        <addColumn tableName="app_user">
+            <column name="kyc_level" type="int" defaultValue="1" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -49,6 +49,9 @@ public class UserService {
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+    public Optional<User> findByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber);
+    }
     public Page<User> findAll(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
@@ -133,26 +136,29 @@ public class UserService {
         }
 
 
-        Boolean isKeycloakPropertyChanged = !user.getLastName().equals(request.getLastName()) ||
-                !user.getFirstName().equals(request.getFirstName());
+//        Boolean isKeycloakPropertyChanged = !user.getLastName().equals(request.getLastName()) ||
+//                !user.getFirstName().equals(request.getFirstName());
 
 
-        user.setLastName(request.getLastName());
-        user.setFirstName(request.getFirstName());
-        user.setCountry(request.getCountry());
-        user.setStateOfResidence(request.getStateOfResidence());
-        user.setUserAddress(request.getAddress());
-        user.setCountry(request.getCountry());
-        user.setDateOfBirth(request.getDateOfBirth());
-        user.setCity(request.getCity());
-        user.setZipCode(request.getZipCode());
+        if(request != null){
+            user.setLastName(!request.getLastName().isBlank() ? request.getLastName() : user.getLastName());
+            user.setFirstName(!request.getFirstName().isBlank() ? request.getFirstName() : user.getFirstName());
+            user.setCountry(!request.getCountry().isBlank() ? request.getCountry() : user.getCountry());
+            user.setStateOfResidence(request.getStateOfResidence());
+            user.setUserAddress(request.getAddress());
+            user.setDateOfBirth(request.getDateOfBirth());
+            user.setCity(request.getCity());
+            user.setZipCode(request.getZipCode());
+        }
+
 
         return userRepository.save(user);
     }
-
-
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+    public boolean existsByPhoneNumber(String phoneNumber) {
+        return userRepository.existsByPhoneNumber(phoneNumber);
     }
 
 }

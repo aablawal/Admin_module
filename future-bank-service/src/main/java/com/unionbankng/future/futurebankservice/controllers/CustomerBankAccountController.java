@@ -63,7 +63,7 @@ public class CustomerBankAccountController {
         request.setMobileNumber(number);
         Response<UBNGetAccountsResponse> responseResponse = ubnAccountAPIServiceHandler.getAccountsByMobileNumber(request);
         if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body().getMessage()!=null?responseResponse.body().getMessage():"Request Failed", false, null));
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.body() !=null?responseResponse.body().getMessage():"Request Failed", false, null));
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body()));
 

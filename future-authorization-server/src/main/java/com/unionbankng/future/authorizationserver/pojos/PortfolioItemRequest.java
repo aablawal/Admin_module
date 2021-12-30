@@ -1,20 +1,28 @@
 package com.unionbankng.future.authorizationserver.pojos;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class PortfolioItemRequest {
 
     private Long portfolioItemId;
-    @NotNull
+
     private Long profileId;
-    @NotNull
+
+    private Long userId;
+
     private String title;
-    @NotNull
+
     private String description;
+
     private String link;
+
     private String media;
+
+    private List<MultipartFile> files;
 }
