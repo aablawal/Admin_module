@@ -7,22 +7,17 @@ import com.unionbankng.future.authorizationserver.repositories.ProfileRepository
 import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
-import org.springframework.boot.info.GitProperties;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;

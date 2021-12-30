@@ -69,8 +69,10 @@ public class User implements Serializable {
     private String accountNumber;
 
     private String accountName;
-
     private String userAddress;
+    private String gender;
+    @Column(length = 5)
+    private int kycLevel;
 
     @Column(length=100)
     private String city;
@@ -110,7 +112,11 @@ public class User implements Serializable {
         this.authProvider = user.getAuthProvider();
         this.email = user.getEmail();
         this.password = user.getPassword();
+        this.kycLevel=user.getKycLevel();
+        this.dateOfBirth=user.getDateOfBirth();
+        this.userAddress=user.getUserAddress();
         this.city = user.getCity();
+        this.gender=user.getGender();
         this.zipCode = user.getZipCode();
     }
 

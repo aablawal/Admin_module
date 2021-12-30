@@ -92,7 +92,19 @@ public class App {
         ObjectMapper mapper= new ObjectMapper();
         return mapper;
     }
-
+    public String toPhoneNumber(String phoneNumber) {
+        String userPhone = phoneNumber;
+        if (phoneNumber.startsWith("234") || phoneNumber.startsWith("+234")) {
+            if (phoneNumber.length() == 13) {
+                String str_getMOBILE = phoneNumber.substring(3);
+                userPhone = "0" + str_getMOBILE;
+            } else if (phoneNumber.length() == 14) {
+                String str_getMOBILE = phoneNumber.substring(4);
+                userPhone = "0" + str_getMOBILE;
+            }
+        }
+        return userPhone;
+    }
     public String getClientDevice() {
         return "Google Chrome";
     }

@@ -20,7 +20,17 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         additionalInfo.put("userUUID", user.getUuid());
         additionalInfo.put("userEmail", user.getEmail());
         additionalInfo.put("userImg", user.getImg());
-        additionalInfo.put("userFullName", user.toString());
+        additionalInfo.put("userFullName", user.getImg());
+        additionalInfo.put("isEnabled", user.getIsEnabled());
+        additionalInfo.put("firstName", user.getFirstName());
+        additionalInfo.put("lastName", user.getLastName());
+        additionalInfo.put("authProvider", user.getAuthProvider());
+        additionalInfo.put("kycLevel", user.getKycLevel());
+        additionalInfo.put("userAddress", user.getUserAddress());
+        additionalInfo.put("city", user.getCity());
+        additionalInfo.put("gender", user.getGender());
+        additionalInfo.put("zipCode", user.getZipCode());
+
 
         ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
 

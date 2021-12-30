@@ -69,10 +69,27 @@ public class App {
         Matcher matcher = pattern.matcher(number);
         return matcher.matches();
     }
+    public ObjectMapper getMapper(){
+        ObjectMapper mapper= new ObjectMapper();
+        return mapper;
+    }
 
     public Long generateOTP(){
         Random rnd = new Random();
         Long number = Long.valueOf(rnd.nextInt(999999));
         return  number;
+    }
+    public String toPhoneNumber(String phoneNumber) {
+        String userPhone = phoneNumber;
+        if (phoneNumber.startsWith("234") || phoneNumber.startsWith("+234")) {
+            if (phoneNumber.length() == 13) {
+                String str_getMOBILE = phoneNumber.substring(3);
+                userPhone = "0" + str_getMOBILE;
+            } else if (phoneNumber.length() == 14) {
+                String str_getMOBILE = phoneNumber.substring(4);
+                userPhone = "0" + str_getMOBILE;
+            }
+        }
+        return userPhone;
     }
 }

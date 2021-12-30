@@ -21,7 +21,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController

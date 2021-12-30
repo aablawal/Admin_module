@@ -21,9 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
-import java.util.Arrays;
-
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
