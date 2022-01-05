@@ -80,6 +80,9 @@ public class SecurityService {
 
     public ResponseEntity resetPassword(String token, String password){
 
+        app.print("Resetting user password");
+        app.print(token);
+
         String userEmail = memcachedHelperService.getValueByKey(token);
 
         if(userEmail == null)
