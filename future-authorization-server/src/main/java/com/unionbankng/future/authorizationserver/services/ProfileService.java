@@ -4,6 +4,7 @@ import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.ProfileUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
+import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,6 +25,7 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+    private final App app;
 
 
     @Cacheable(value = "user_profile", key="#userId")
@@ -56,19 +58,23 @@ public class ProfileService {
 
     @CachePut(value = "profile", key="#profileId")
     public Profile updateProfile(Long profileId, ProfileUpdateRequest request) throws IOException {
-
+        app.print("Service: Updating profile info");
+        app.print(request);
         Profile profile = profileRepository.findById(profileId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
 
-        if(request.getJobTitle() != null)
+        if(request.getJobTitle() != null){
             profile.setJobTitle(request.getJobTitle());
+        }
         if(request.getPricePerHour() != null)
             profile.setPricePerHour(request.getPricePerHour());
         if(request.getBio() != null)
-            request.setBio(request.getBio());
+            profile.setBio(request.getBio());
         if(request.getIsEmployer() != null)
             profile.setIsEmployer(request.getIsEmployer());
         if(request.getIsFreelancer() != null)
             profile.setIsFreelancer(request.getIsFreelancer());
+        if (request.getProfileType() != null)
+            profile.setProfileType(request.getProfileType());
         if(request.getPhoneNumber() != null){
             User user = userRepository.findById(profile.getUserId()).orElseThrow(
                     ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
