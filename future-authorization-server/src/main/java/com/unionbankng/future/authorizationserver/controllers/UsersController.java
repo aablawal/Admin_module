@@ -33,13 +33,6 @@ public class UsersController {
     private final ProfileService profileService;
 
 
-    @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
-                                                          @PathVariable Long userId) throws IOException {
-        User user = userService.updateProfileImage(image,userId);
-        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
-    }
-
     @GetMapping("/v1/users/{userId}")
     public ResponseEntity<APIResponse<User>> getUserById(@PathVariable Long userId) {
 
@@ -98,6 +91,13 @@ public class UsersController {
 
     }
 
+    @DeleteMapping("/v1/users/delete/{userId}")
+    public ResponseEntity<APIResponse> deleteUser(@PathVariable  Long userId){
+
+        profileService.deleteAllByUserId(userId);
+        userService.deleteById(userId);
+        return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
+    }
 
     //Endpoint for updating user profile image
     @PostMapping(value = "/v1/users/profile-image/{userId}", consumes = { "multipart/form-data" })
@@ -108,6 +108,9 @@ public class UsersController {
         User user = userService.updateProfile(userId,null,img,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
+
+
+
 
 
     //Endpoint for updating user cover image
@@ -121,12 +124,11 @@ public class UsersController {
     }
 
 
-
-    @DeleteMapping("/v1/users/delete/{userId}")
-    public ResponseEntity<APIResponse> deleteUser(@PathVariable  Long userId){
-
-        profileService.deleteAllByUserId(userId);
-        userService.deleteById(userId);
-        return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
+    @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
+    public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
+                                                                @PathVariable Long userId) throws IOException {
+        User user = userService.updateProfileImage(image,userId);
+        return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
+
 }
