@@ -34,6 +34,25 @@ public class KYCController {
     private final UserRepository userRepository;
     private final App app;
 
+
+    @PostMapping("/v1/kyc/add_bvn/{bvn}")
+    public APIResponse addVerifiedBVN(@PathVariable String bvn,OAuth2Authentication authentication){
+        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
+
+        if(app.validBvn(bvn)) {
+            user.setBvn(bvn);
+            user.setKycLevel(1);
+            userRepository.save(user);
+            return new APIResponse("BVN Added",
+                    true, user);
+        }else{
+            return new APIResponse("Invalid BVN Number",
+                    false, null);
+        }
+
+    }
+
     @PostMapping("/v1/kyc/id_verification")
     public APIResponse<String> verifyId(
             @Valid @RequestParam(value = "data") String bioData,
@@ -45,7 +64,7 @@ public class KYCController {
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
         if(user!=null) {
 
-            if (user.getKycLevel() == 2 || user.getKycLevel() == 4)
+            if (user.getKycLevel() >=2)
                 return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                         false, null);
 
@@ -140,7 +159,7 @@ public class KYCController {
     public APIResponse<String> verifyId(@RequestBody VerifymeWebhook verifymeWebhook) {
         if (verifymeWebhook != null) {
             Long id = Long.valueOf(verifymeWebhook.getData().getId());
-            KycAddressVerification kycAddressVerification = kycAddressRepository.findByResid(id).orElseThrow(null);
+            KycAddressVerification kycAddressVerification = kycAddressRepository.findByResID(id).orElseThrow(null);
             User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
             if (user != null) {
 
@@ -162,7 +181,7 @@ public class KYCController {
                     kycAddressVerification.setStatus(verifymeWebhook.getData().getStatus().getStatus());
                     kycAddressVerification.setSubStatus(verifymeWebhook.getData().getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
-                    user.setKycLevel(5);
+                    user.setKycLevel(3);
                     userRepository.save(user);
                     // Send Email User
                     kycService.sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "KYC Upgrade Status");
@@ -210,8 +229,8 @@ public class KYCController {
                 //Approved
                 if (adminKycRequest.getVerificationType().equals("ID")) {
                     // KYC Verification request
-                    user.setKycLevel(2);
-
+                    user.setKycLevel(3);
+                    userRepository.save(user);
                     // Upgrade kyc status
                     Kyc kyc_detail = new Kyc();
                     kyc_detail.setVerificationStatus(true);
@@ -223,9 +242,6 @@ public class KYCController {
                     return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
                             true, "KYC Verification approved");
                 } else {
-                    // Upgrade user account tier
-                    user.setKycLevel(3);
-
                     // Upgrade kyc status
                     Kyc kyc_detail = new Kyc();
                     kyc_detail.setVerificationStatus(false);
@@ -239,9 +255,6 @@ public class KYCController {
             } else {
                 //Reject
                 if (adminKycRequest.getVerificationType().equals("ADDRESS")) {
-                    // Upgrade user account tier
-                    user.setKycLevel(1);
-
                     // Upgrade kyc status
                     Kyc kyc_detail = new Kyc();
                     kyc_detail.setVerificationStatus(true);
@@ -253,8 +266,6 @@ public class KYCController {
                     return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
                             true, "KYC Verification rejected!");
                 } else {
-                    // Upgrade user account tier
-                    user.setKycLevel(5);
                     // Upgrade kyc status
                     Kyc kyc_detail = new Kyc();
                     kyc_detail.setVerificationStatus(false);

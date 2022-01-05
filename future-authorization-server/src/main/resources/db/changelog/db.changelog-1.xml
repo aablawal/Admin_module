@@ -83,9 +83,14 @@
             <column name="gender" type="varchar(255)"/>
         </addColumn>
     </changeSet>
-    <changeSet author="aliyura (generated)" id="1640860261824-5">
+<!--    <changeSet author="aliyura (generated)" id="1640860261824-5">-->
+<!--        <addColumn tableName="app_user">-->
+<!--            <column name="kyc_level" type="int" defaultValue="0" />-->
+<!--        </addColumn>-->
+<!--    </changeSet>-->
+    <changeSet author="aliyura (generated)" id="1641366676118-3">
         <addColumn tableName="app_user">
-            <column name="kyc_level" type="int" defaultValue="1" />
+            <column name="bvn" type="varchar(50)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

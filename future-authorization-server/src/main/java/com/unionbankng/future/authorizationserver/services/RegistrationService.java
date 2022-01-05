@@ -74,6 +74,7 @@ public class RegistrationService {
         // generate uuid for user
         String generatedUuid = app.makeUIID();
         User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
+                .kycLevel(0)
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())
                 .email(request.getEmail()).username(request.getEmail()).dialingCode(request.getDialingCode()).phoneNumber(request.getPhoneNumber()).isEnabled(Boolean.FALSE)
                 .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername())
@@ -129,7 +130,7 @@ public class RegistrationService {
         // generate uuid for user
         String generatedUuid =  app.makeUIID();
         User user = User.builder().firstName(thirdPartyOauthResponse.getFirstName()).lastName(thirdPartyOauthResponse.getLastName())
-                .email(thirdPartyOauthResponse.getEmail()).dialingCode("+234")
+                .email(thirdPartyOauthResponse.getEmail()).dialingCode("+234").kycLevel(0)
                 .username(thirdPartyOauthResponse.getEmail()).isEnabled(Boolean.TRUE)
                 .uuid(generatedUuid).img(thirdPartyOauthResponse.getImage()).username(request.getUsername()).authProvider(request.getAuthProvider()).build();;
 

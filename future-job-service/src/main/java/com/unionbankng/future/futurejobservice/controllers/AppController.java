@@ -6,6 +6,7 @@ import com.unionbankng.future.futurejobservice.entities.JobBulkPayment;
 import com.unionbankng.future.futurejobservice.repositories.TestRepository;
 import com.unionbankng.future.futurejobservice.services.JobPaymentService;
 import com.unionbankng.future.futurejobservice.services.TestService;
+import com.unionbankng.future.futurejobservice.services.UserWalletService;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 @RequestMapping(path = "api")
 public class AppController {
 
+    private final UserWalletService walletService;
     private final JobPaymentService jobPaymentService;
     private final NotificationSender notificationSender;
     private final TestService testService;
@@ -36,17 +38,7 @@ public class AppController {
     }
     @PostMapping("/v1/test")
     public ResponseEntity<APIResponse<Test>> testService(@RequestBody Test test){
-
-           //############### Activity Logging ###########
-            ActivityLog log = new ActivityLog();
-            log.setDescription("Logging test ");
-            log.setRequestObject("Here is the request");
-            log.setRequestObject("Here is the Response");
-            log.setUsername("net.rabiualiyu@gmail.com");
-            log.setUserId("9873456yuhjnfbdjhk");
-            appLogger.log(log);
-
-        return ResponseEntity.ok().body(new APIResponse("Request Successful", true,log));
+        return ResponseEntity.ok().body(new APIResponse("Request Successful", true, walletService.getAuth()));
     }
     @PostMapping("/v1/notification/test")
     public ResponseEntity<APIResponse<String>> testNotificationService(OAuth2Authentication authentication){

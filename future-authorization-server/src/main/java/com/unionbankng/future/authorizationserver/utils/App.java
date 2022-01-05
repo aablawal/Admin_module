@@ -62,6 +62,12 @@ public class App {
         return email.matches(regex);
     }
 
+    public boolean validBvn(String bvn) {
+        Pattern pattern = Pattern.compile("^\\d{11}$");
+        Matcher matcher = pattern.matcher(bvn);
+        return matcher.matches();
+    }
+
     public boolean validNumber(String number) {
         if (number.startsWith("+234"))
            number= number.replace("+234", "0");
