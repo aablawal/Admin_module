@@ -55,9 +55,11 @@ public class SecurityService {
 
         String token = UUID.randomUUID().toString();
 
+        app.print("#### Password Reset");
         app.print(user);
+        app.print(token);
 
-        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
+        memcachedHelperService.save(token,user.getEmail(),0);
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
 
         app.print("Reset Password Token:");
@@ -80,10 +82,13 @@ public class SecurityService {
 
     public ResponseEntity resetPassword(String token, String password){
 
-        app.print("Resetting user password");
+        app.print("######### Resetting user password");
         app.print(token);
 
         String userEmail = memcachedHelperService.getValueByKey(token);
+        
+        app.print("########### Reset Password");
+        app.print(userEmail);
 
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
