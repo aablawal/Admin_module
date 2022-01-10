@@ -21,7 +21,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -40,6 +39,7 @@ public class UsersController {
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
+
 
     @GetMapping("/v1/users/search")
     public ResponseEntity<APIResponse> getUsersBySearch(@RequestParam String  q) {
@@ -82,7 +82,7 @@ public class UsersController {
     @PostMapping(value = "/v1/users/{userId}/update_profile", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId,
                                                                 @Nullable @RequestPart("coverImg") MultipartFile coverImg,
-                                                                @Nullable @RequestPart("img") MultipartFile img,
+                                                                 @Nullable @RequestPart("img") MultipartFile img,
                                                                  @RequestPart PersonalInfoUpdateRequest request)
             throws IOException {
 
@@ -123,7 +123,13 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
 
-
+    @DeleteMapping("/v1/users/delete/{userId}")
+    public ResponseEntity<APIResponse> deleteUser(@PathVariable  Long userId){
+        profileService.deleteAllByUserId(userId);
+        userService.deleteById(userId);
+        return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
+   }
+  
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
                                                                 @PathVariable Long userId) throws IOException {

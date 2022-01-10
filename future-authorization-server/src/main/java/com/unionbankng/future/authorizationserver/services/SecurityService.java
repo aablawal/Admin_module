@@ -56,6 +56,7 @@ public class SecurityService {
         String token = UUID.randomUUID().toString();
 
         app.print(user);
+        app.print(token);
 
         memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
@@ -84,6 +85,7 @@ public class SecurityService {
         app.print(token);
 
         String userEmail = memcachedHelperService.getValueByKey(token);
+        app.print("Memecatch Value:"+userEmail);
 
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(

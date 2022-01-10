@@ -11,5 +11,14 @@ public class JwtUserDetail {
     private String userEmail;
     private String userImg;
     private String userFullName;
+    private int kycLevel;
+    private Boolean isEnabled;
+    private String walletId;
+    private String firstName;
+    private String lastName;
+    private String userAddress;
+    private String city;
+    private String gender;
+    private String zipCode;
 
 }

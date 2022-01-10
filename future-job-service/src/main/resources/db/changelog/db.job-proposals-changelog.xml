@@ -87,4 +87,9 @@
             <column name="terms" type="bit"/>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1641380843151-10">
+        <addColumn tableName="job_proposals">
+            <column name="payment_method" type="int"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

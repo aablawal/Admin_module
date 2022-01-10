@@ -1,15 +1,11 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.Experience;
-import com.unionbankng.future.authorizationserver.entities.PortfolioItem;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ExperienceRequest;
-import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
 import com.unionbankng.future.authorizationserver.services.ExperienceService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
