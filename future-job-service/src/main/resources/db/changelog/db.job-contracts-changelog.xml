@@ -240,4 +240,9 @@
             <column name="vatcharge_rate" type="double precision"/>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1641380843151-9">
+        <addColumn tableName="job_contracts">
+            <column name="payment_method" type="int"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

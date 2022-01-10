@@ -51,20 +51,15 @@ public class User implements Serializable {
 
     @Column(nullable = false, unique = true)
     private String username;
-
     @Column(nullable = false, unique = true)
     private String email;
-
     private String password;
-
+    private String walletId;
     private String pin;
-
     @Column(length = 10)
     private String zipCode;
-
     @Column(length=5)
     private String dialingCode;
-
     @Column(length=32, unique = true)
     private String phoneNumber;
 
@@ -120,6 +115,7 @@ public class User implements Serializable {
         this.userAddress=user.getUserAddress();
         this.city = user.getCity();
         this.gender=user.getGender();
+        this.walletId=user.getWalletId();
         this.zipCode = user.getZipCode();
     }
 

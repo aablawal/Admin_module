@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
+import com.unionbankng.future.futurejobservice.enums.PaymentMethod;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.*;
@@ -62,6 +63,7 @@ public class JobContractService implements Serializable {
     private final JobRateRepository jobRateRepository;
     private final FileStoreService fileStoreService;
     private final JobPaymentService jobPaymentService;
+    private final  JobWalletPaymentService jobWalletPaymentService;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
     private final JobContractDisputeRepository jobContractDisputeRepository;
     private final NotificationSender notificationSender;
@@ -233,41 +235,88 @@ public class JobContractService implements Serializable {
                 app.print("Contract Details:");
                 app.print(contract);
 
-                //transfer the amount to Sidekiq main account
-                PaymentRequest payment = new PaymentRequest();
-                payment.setProposalId(contract.getProposalId());
-                payment.setAmount(contract.getAmount());
-                payment.setNarration("Transfer from Employer to Escrow account for job Contract");
-                payment.setCreditAccountName(escrowAccountName);
-                payment.setCreditAccountNumber(escrowAccountNumber);
-                payment.setCreditAccountType("GL");
-                payment.setDebitAccountName(contract.getEmployerAccountName());
-                payment.setDebitAccountNumber(contract.getEmployerAccountNumber());
-                payment.setDebitAccountType("CASA");
-                payment.setPaymentReference(paymentReferenceId);
-                payment.setExecutedFor(contractReferenceId);
-                payment.setContractReference(contractReferenceId);
-                payment.setExecutedBy(currentUser.getUserUUID());
-                payment.setExecutedByUsername(currentUser.getUserEmail());
+                Boolean isPaid=false;
 
-                APIResponse paymentResponse=jobPaymentService.makePayment(payment);
-                if (paymentResponse.isSuccess()) {
-                    try {
-                        //############### Activity Logging ###########
-                        ActivityLog log = new ActivityLog();
-                        log.setDescription("Employer payment to Escrow Successful for job "+job.getTitle());
-                        log.setRequestObject(app.toString(payment));
-                        log.setResponseObject(app.toString(paymentResponse));
-                        log.setUsername(currentUser.getUserEmail());
-                        log.setUserId(currentUser.getUserUUID());
-                        appLogger.log(log);
-                        //#########################################
-                    }catch (Exception ex){
-                        ex.printStackTrace();
+                if(contract.getPaymentMethod().equals(PaymentMethod.WALLET)) {
+                    //transfer the amount to Kula main account from Wallet
+                    PaymentRequest payment = new PaymentRequest();
+                    payment.setProposalId(contract.getProposalId());
+                    payment.setAmount(contract.getAmount());
+                    payment.setNarration("Transfer from Employer to Escrow account for job Contract");
+                    payment.setCreditAccountName(escrowAccountName);
+                    payment.setCreditAccountNumber(escrowAccountNumber);
+                    payment.setCreditAccountType("GL");
+                    payment.setPaymentReference(paymentReferenceId);
+                    payment.setExecutedFor(contractReferenceId);
+                    payment.setContractReference(contractReferenceId);
+                    payment.setExecutedBy(currentUser.getUserUUID());
+                    payment.setExecutedByUsername(currentUser.getUserEmail());
+
+                    APIResponse paymentResponse = jobWalletPaymentService.debitWallet(currentUser, payment);
+                    if (paymentResponse.isSuccess()) {
+                        try {
+                            isPaid=true;
+                            //############### Activity Logging ###########
+                            ActivityLog log = new ActivityLog();
+                            log.setDescription("Employer payment to Escrow Successful for job "+job.getTitle());
+                            log.setRequestObject(app.toString(payment));
+                            log.setResponseObject(app.toString(paymentResponse));
+                            log.setUsername(currentUser.getUserEmail());
+                            log.setUserId(currentUser.getUserUUID());
+                            appLogger.log(log);
+                            //#########################################
+                        }catch (Exception ex){
+                            ex.printStackTrace();
+                        }
+                        contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
+                    } else {
+                        isPaid=false;
                     }
 
-                    contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
-                    if (job != null) {
+                }
+                else {
+                    //transfer the amount to Sidekiq main account
+                    PaymentRequest payment = new PaymentRequest();
+                    payment.setProposalId(contract.getProposalId());
+                    payment.setAmount(contract.getAmount());
+                    payment.setNarration("Transfer from Employer to Escrow account for job Contract");
+                    payment.setCreditAccountName(escrowAccountName);
+                    payment.setCreditAccountNumber(escrowAccountNumber);
+                    payment.setCreditAccountType("GL");
+                    payment.setDebitAccountName(contract.getEmployerAccountName());
+                    payment.setDebitAccountNumber(contract.getEmployerAccountNumber());
+                    payment.setDebitAccountType("CASA");
+                    payment.setPaymentReference(paymentReferenceId);
+                    payment.setExecutedFor(contractReferenceId);
+                    payment.setContractReference(contractReferenceId);
+                    payment.setExecutedBy(currentUser.getUserUUID());
+                    payment.setExecutedByUsername(currentUser.getUserEmail());
+
+                    APIResponse paymentResponse = jobPaymentService.makePayment(payment);
+                    if (paymentResponse.isSuccess()) {
+                        try {
+                            isPaid = true;
+                            //############### Activity Logging ###########
+                            ActivityLog log = new ActivityLog();
+                            log.setDescription("Employer payment to Escrow Successful for job " + job.getTitle());
+                            log.setRequestObject(app.toString(payment));
+                            log.setResponseObject(app.toString(paymentResponse));
+                            log.setUsername(currentUser.getUserEmail());
+                            log.setUserId(currentUser.getUserUUID());
+                            appLogger.log(log);
+                            //#########################################
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
+                    } else {
+                        isPaid = false;
+                    }
+                }
+
+                if(isPaid){
+
+                   if (job != null) {
                         NotificationBody body = new NotificationBody();
                         body.setBody("Your payment of " + contract.getAmount() + " has been successful");
                         body.setSubject("Payment Successful");
@@ -352,7 +401,7 @@ public class JobContractService implements Serializable {
                     }
                 } else {
                     status = 0;
-                    remark =paymentResponse.getMessage();
+                    remark ="Payment Failed";
                 }
             }
             if (status == 1) {
@@ -1587,6 +1636,7 @@ public class JobContractService implements Serializable {
                         double pepperestIncomeCharge = 0;
                         double freelancerIncomeAmount=0;
                         int TOTAL_JOBS_COMPLETED = 0;
+                        boolean isPaid=false;
 
                         //###########################
                         // CALCULATE VAT AND CHARGES BASE ON CONFIGS
@@ -1781,20 +1831,50 @@ public class JobContractService implements Serializable {
                         escrowFreelancerAccountDebit.setTransactionId("7");
                         escrowFreelancerAccountDebit.setRemark("Debited by Kula to Freelancer account for " + job.getTitle());
                         //update escrow account information with the payment for kula
-                        //##################
-                        freelancerAccount.setTransactionId("8");
-                        freelancerAccount.setAccountName(contract.getFreelancerAccountName());
-                        freelancerAccount.setAccountNumber(contract.getFreelancerAccountNumber());
-                        freelancerAccount.setNarration(narration);
-                        freelancerAccount.setExecutedBy(currentUser.getUserUUID());
-                        freelancerAccount.setExecutedByUsername(currentUser.getUserEmail());
-                        freelancerAccount.setRemark("Credit from Kula to Freelancer account for " + job.getTitle());
-                        freelancerAccount.setExecutedFor(contract.getContractReference());
-                        freelancerAccount.setContractReference(contract.getContractReference());
-                        freelancerAccount.setPaymentReference(paymentReference);
-                        freelancerAccount.setCrDrFlag("C");
-                        freelancerAccount.setAccountType("CASA");
-                        freelancerAccount.setAmount(freelancerIncomeAmount);
+
+                       if(proposal.getPaymentMethod().equals(PaymentMethod.WALLET)) {
+                           //transfer the amount to Kula main account from Wallet
+                           PaymentRequest payment = new PaymentRequest();
+                           payment.setProposalId(contract.getProposalId());
+                           payment.setAmount(freelancerIncomeAmount);
+                           payment.setNarration("Credit from Kula to Freelancer account for " + job.getTitle());
+                           payment.setDebitAccountName(escrowAccountName);
+                           payment.setDebitAccountNumber(escrowAccountNumber);
+                           payment.setDebitAccountType("GL");
+                           payment.setPaymentReference(paymentReference);
+                           payment.setExecutedFor(contractReferenceId);
+                           payment.setContractReference(contractReferenceId);
+                           payment.setExecutedBy(currentUser.getUserUUID());
+                           payment.setExecutedByUsername(currentUser.getUserEmail());
+                           app.print("Request:");
+                           app.print(payment);
+                           APIResponse paymentResponse = jobWalletPaymentService.creditWallet(currentUser, payment);
+                           if (paymentResponse.isSuccess()) {
+                               isPaid=true;
+                               app.print("Wallet payment to freelancer successful");
+                               app.print(paymentResponse);
+                           }else{
+                               app.print("Wallet payment to freelancer failed ");
+                               app.print(paymentResponse);
+                           }
+
+
+                       }else{
+                           //##################
+                           freelancerAccount.setTransactionId("8");
+                           freelancerAccount.setAccountName(contract.getFreelancerAccountName());
+                           freelancerAccount.setAccountNumber(contract.getFreelancerAccountNumber());
+                           freelancerAccount.setNarration(narration);
+                           freelancerAccount.setExecutedBy(currentUser.getUserUUID());
+                           freelancerAccount.setExecutedByUsername(currentUser.getUserEmail());
+                           freelancerAccount.setRemark("Credit from Kula to Freelancer account for " + job.getTitle());
+                           freelancerAccount.setExecutedFor(contract.getContractReference());
+                           freelancerAccount.setContractReference(contract.getContractReference());
+                           freelancerAccount.setPaymentReference(paymentReference);
+                           freelancerAccount.setCrDrFlag("C");
+                           freelancerAccount.setAccountType("CASA");
+                           freelancerAccount.setAmount(freelancerIncomeAmount);
+                       }
                         //############# add to bulk transfer stack ###########
                         bulkPaymentStack.add(escrowFreelancerAccountDebit);
                         bulkPaymentStack.add(freelancerAccount);

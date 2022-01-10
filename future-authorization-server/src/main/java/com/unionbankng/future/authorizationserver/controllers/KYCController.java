@@ -35,13 +35,21 @@ public class KYCController {
     private final App app;
 
 
-    @PostMapping("/v1/kyc/add_bvn/{bvn}")
-    public APIResponse addVerifiedBVN(@PathVariable String bvn,OAuth2Authentication authentication){
+    @PostMapping("/v1/kyc/initiation")
+    public APIResponse initiateKYC(@RequestBody KYCInitiationRequest request,OAuth2Authentication authentication){
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
-        if(app.validBvn(bvn)) {
-            user.setBvn(bvn);
+        if(request.getBvn()==null)
+            return new APIResponse("Provide user verified BVN Number",
+                    false, null);
+        if(request.getWalletId()==null)
+            return new APIResponse("Provide user wallet Id",
+                    false, null);
+
+        if(app.validBvn(request.getBvn())) {
+            user.setBvn(request.getBvn());
+            user.setWalletId(request.getWalletId());
             user.setKycLevel(1);
             userRepository.save(user);
             return new APIResponse("BVN Added",

@@ -93,4 +93,9 @@
             <column name="bvn" type="varchar(50)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="aliyura (generated)" id="1641378084537-3">
+        <addColumn tableName="app_user">
+            <column name="wallet_id" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

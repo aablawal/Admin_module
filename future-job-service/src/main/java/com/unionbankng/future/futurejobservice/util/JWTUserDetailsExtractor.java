@@ -15,7 +15,8 @@ public class JWTUserDetailsExtractor {
 
         return JwtUserDetail.builder().userId(((Integer) detailsMap.get("userId")).longValue()).userEmail(detailsMap.get("userEmail").toString()).userImg(userImg)
                 .userFullName(detailsMap.get("userFullName").toString())
-                .kycLevel(detailsMap.get("kycLevel") == null ? 1 : Integer.valueOf(detailsMap.get("kycLevel").toString()))
+                .kycLevel(detailsMap.get("kycLevel") == null ? 0 : Integer.valueOf(detailsMap.get("kycLevel").toString()))
+                .walletId(detailsMap.get("walletId").toString())
                 .isEnabled(Boolean.valueOf(detailsMap.get("isEnabled").toString()))
                 .firstName(detailsMap.get("firstName").toString())
                 .lastName(detailsMap.get("lastName").toString())

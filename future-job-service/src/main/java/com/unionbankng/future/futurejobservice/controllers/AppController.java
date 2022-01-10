@@ -3,20 +3,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Test;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.entities.JobBulkPayment;
-import com.unionbankng.future.futurejobservice.repositories.TestRepository;
 import com.unionbankng.future.futurejobservice.services.JobPaymentService;
 import com.unionbankng.future.futurejobservice.services.TestService;
-import com.unionbankng.future.futurejobservice.services.UserWalletService;
+import com.unionbankng.future.futurejobservice.services.WalletService;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
-import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 
 @RestController
@@ -24,7 +21,7 @@ import java.util.ArrayList;
 @RequestMapping(path = "api")
 public class AppController {
 
-    private final UserWalletService walletService;
+    private final WalletService walletService;
     private final JobPaymentService jobPaymentService;
     private final NotificationSender notificationSender;
     private final TestService testService;
@@ -37,7 +34,7 @@ public class AppController {
         return ResponseEntity.ok().body( new APIResponse("Service is Up", true, "Live"));
     }
     @PostMapping("/v1/test")
-    public ResponseEntity<APIResponse<Test>> testService(@RequestBody Test test){
+    public ResponseEntity<APIResponse<Test>> testService(){
         return ResponseEntity.ok().body(new APIResponse("Request Successful", true, walletService.getAuth()));
     }
     @PostMapping("/v1/notification/test")

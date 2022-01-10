@@ -29,6 +29,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         additionalInfo.put("userAddress", user.getUserAddress());
         additionalInfo.put("city", user.getCity());
         additionalInfo.put("gender", user.getGender());
+        additionalInfo.put("walletId", user.getWalletId());
         additionalInfo.put("zipCode", user.getZipCode());
 
 

@@ -89,7 +89,7 @@ public class UsersController {
     @PostMapping(value = "/v1/users/{userId}/update_profile", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId,
                                                                 @Nullable @RequestPart("coverImg") MultipartFile coverImg,
-                                                                @Nullable @RequestPart("img") MultipartFile img,
+                                                                 @Nullable @RequestPart("img") MultipartFile img,
                                                                  @RequestPart PersonalInfoUpdateRequest request)
             throws IOException {
 
@@ -124,7 +124,6 @@ public class UsersController {
 
     @DeleteMapping("/v1/users/delete/{userId}")
     public ResponseEntity<APIResponse> deleteUser(@PathVariable  Long userId){
-
         profileService.deleteAllByUserId(userId);
         userService.deleteById(userId);
         return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
