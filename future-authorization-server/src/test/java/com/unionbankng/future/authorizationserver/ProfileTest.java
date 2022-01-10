@@ -108,7 +108,7 @@ public class ProfileTest extends AbstractTest {
         profileUpdateRequest.setIsFreelancer(true);
         profileUpdateRequest.setJobTitle("new Test Job Title");
         profileUpdateRequest.setPricePerHour(BigDecimal.TEN);
-        profileUpdateRequest.setProfileType(ProfileType.GIG_PROVIDER);
+        profileUpdateRequest.setProfileType(ProfileType.EMPLOYER);
         String body = mapper.writeValueAsString(profileUpdateRequest);
 
         mvc.perform(MockMvcRequestBuilders.post(String.format("/api/v1/profile/update_profile/%s",profile.getId()))
