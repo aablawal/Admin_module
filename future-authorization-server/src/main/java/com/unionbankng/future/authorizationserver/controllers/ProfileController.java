@@ -45,8 +45,14 @@ public class ProfileController {
 
         app.print("Profile Controller: Fetching user profile by user Id");
 
-        Profile profile = profileService.findByUserId(userId).orElseThrow(
+        Long profileId = profileRepository.findByUserId(userId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found")).getId();
+
+
+        Profile profile = profileService.findById(profileId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
+
+        app.print(profile);
 
         RepresentationModel representationModel = RepresentationModel.of(profile);
         Link experiencesLink = linkTo(methodOn(ExperiencesController.class)
@@ -66,7 +72,7 @@ public class ProfileController {
         representationModel.add(experiencesLink,portfolioLink,qualifications,Photos,videos,skills);
 
         app.print("Finished fetching user profile");
-        app.print(representationModel);
+//        app.print(representationModel);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,representationModel));
     }
@@ -82,10 +88,11 @@ public class ProfileController {
     @PostMapping(value = "/update-by-userid/{userId}")
     public ResponseEntity<APIResponse<Profile>> updateProfileByUserId(@PathVariable Long userId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
 
-
         app.print("Updating user profile by Id with request: ");
         app.print(request);
         Long profileId = profileRepository.findByUserId(userId).get().getId();
+
+        app.print("Profile Id is "+ profileId.toString());
 
         Profile profile = profileService.updateProfile(profileId, request);
         app.print("Finished updating user profile");

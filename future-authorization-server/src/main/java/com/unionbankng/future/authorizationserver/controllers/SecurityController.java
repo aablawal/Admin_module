@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ChangePasswordRequest;
 import com.unionbankng.future.authorizationserver.services.SecurityService;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,12 @@ public class SecurityController {
 
 
     private  final SecurityService securityService;
+    private final App app;
 
     @PostMapping("v1/security/initiate_forgot_password")
     public ResponseEntity<APIResponse> initiateForgotPassword(@RequestParam String identifier){
 
+        app.print("Initiatinf Forgot password");
         securityService.initiateForgotPassword(identifier);
 
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -39,7 +42,7 @@ public class SecurityController {
 
     @PostMapping("v1/security/reset_password")
     public ResponseEntity<APIResponse> resetPassword(@NotNull  @RequestParam String token, @NotNull @RequestParam String password){
-
+        app.print("Resetting password");
         return securityService.resetPassword(token,password);
 
     }

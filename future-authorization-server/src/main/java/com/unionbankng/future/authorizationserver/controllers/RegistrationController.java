@@ -34,8 +34,12 @@ public class RegistrationController {
 
     @PostMapping("/v1/registration/register")
     public ResponseEntity<APIResponse> register(@Valid @RequestBody RegistrationRequest request){
+        app.print("Registration Process begin");
+        app.print(request);
         if(request.getAuthProvider().equals(AuthProvider.GOOGLE))
             return registrationService.googleRegistration(request);
+
+
 
         return registrationService.register(request);
     }
@@ -59,6 +63,7 @@ public class RegistrationController {
                     new APIResponse<>(messageSource.getMessage("confirmation.token.expired", null, LocaleContextHolder.getLocale()), false, null));
         }
     }
+
     @PostMapping("/v1/registration/resend_confirmation")
     public ResponseEntity<APIResponse> resendAccountConfirmationEmail(@NotNull  @RequestParam String userEmail){
 
