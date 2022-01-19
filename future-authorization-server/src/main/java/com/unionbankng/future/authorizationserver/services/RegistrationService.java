@@ -44,7 +44,8 @@ public class RegistrationService {
         if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername()) || userService.existsByPhoneNumber(request.getPhoneNumber())) {
 
             app.print("@@@@@@User already exist");
-            User existingUser = userService.findByEmail(request.getEmail()).orElse(
+            User existingUser = null;
+                    existingUser = userService.findByEmail(request.getEmail()).orElse(
                     userService.findByUsername(request.getUsername()).orElse(
                             userService.findByPhoneNumber(request.getPhoneNumber()).orElse(null)
                     )
