@@ -4,6 +4,7 @@ import com.google.code.ssm.api.ParameterValueKeyProvider;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
+import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,6 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
+    private final App app;
 
 
     @Cacheable(value = "user", key = "#id")
@@ -118,21 +120,25 @@ public class UserService {
 
     @CachePut(value = "user", key = "#userId")
     public User updateProfile(@ParameterValueKeyProvider Long userId, MultipartFile coverImg, MultipartFile img, PersonalInfoUpdateRequest request) throws IOException {
-
+        app.print("Updating user profile");
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
         if (img != null) {
+            app.print("Updating user profile image");
             if (user.getImg() != null)
                 fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
             String source = fileStorageService.storeFile(img, userId, BlobType.IMAGE);
             user.setImg(source);
+            app.print(source);
         }
 
         if (coverImg != null) {
+            app.print("Updating user cover image");
             if (user.getCoverImg() != null)
                 fileStorageService.deleteFileFromStorage(user.getCoverImg(), BlobType.IMAGE);
             String source = fileStorageService.storeFile(coverImg, userId, BlobType.IMAGE);
             user.setCoverImg(source);
+            app.print(source);
         }
 
 
@@ -141,6 +147,7 @@ public class UserService {
 
 
         if(request != null){
+            app.print("Updating user profile information");
             user.setLastName(!request.getLastName().isBlank() ? request.getLastName() : user.getLastName());
             user.setFirstName(!request.getFirstName().isBlank() ? request.getFirstName() : user.getFirstName());
             user.setCountry(!request.getCountry().isBlank() ? request.getCountry() : user.getCountry());
