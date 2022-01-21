@@ -74,7 +74,7 @@ public class ExperienceService {
         experience.setProfileId(profile.getId());
         experience.setTitle(request.getTitle());
         experience.setCompany(request.getCompany());
-        experience.setIsCurrent(request.getCurrent());
+        experience.setIsCurrent(request.getCurrent() != null && request.getCurrent());
         experience.setDescription(request.getDescription());
         experience.setStartDate(request.getStartDate());
         experience.setEmploymentType(request.getEmploymentType());

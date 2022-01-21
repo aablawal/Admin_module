@@ -1,13 +1,11 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
-import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.entities.Training;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.EducationAndTrainingRequest;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.pojos.TrainingRequest;
-import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.services.QualificationService;
 import com.unionbankng.future.authorizationserver.services.TrainingService;
 import com.unionbankng.future.authorizationserver.utils.App;
@@ -32,7 +30,6 @@ public class QualificationsController {
 
     private final QualificationService qualificationService;
     private final TrainingService trainingService;
-    private final ProfileService profileService;
     private final App app;
 
     @GetMapping("/v1/qualifications/find_by_profile_id/{profileId}")
@@ -80,16 +77,11 @@ public class QualificationsController {
             throws IOException {
 
         app.print("Qualification Controller: Adding new qualification/training");
-        Profile profile = profileService.findByUserId(request.getUserId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
-        );
-
-        request.setProfileId(profile.getId());
+        app.print(request);
 
         if(request.getSchool() != null && !request.getSchool().isBlank()){
             app.print("Qualification Controller: Adding new qualification");
             QualificationRequest qualificationRequest = new QualificationRequest();
-            qualificationRequest.setProfileId(profile.getId());
             qualificationRequest.setUserId(request.getUserId());
             qualificationRequest.setSchool(request.getSchool());
             qualificationRequest.setCountry(request.getCountry());
@@ -104,8 +96,8 @@ public class QualificationsController {
         if(request.getTrainingTitle() != null && !request.getTrainingTitle().isBlank()){
             app.print("Qualification Controller: Adding new Training");
             TrainingRequest trainingRequest = new TrainingRequest();
-            trainingRequest.setProfileId(profile.getId());
             trainingRequest.setUserId(request.getUserId());
+            trainingRequest.setProfileId(request.getProfileId());
             trainingRequest.setTitle(request.getTrainingTitle());
             trainingRequest.setOrganization(request.getTrainingOrganization());
             trainingRequest.setLinkOrId(request.getTrainingLinkOrId());
