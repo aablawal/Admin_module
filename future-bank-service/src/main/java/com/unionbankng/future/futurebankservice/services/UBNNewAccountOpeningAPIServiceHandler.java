@@ -467,8 +467,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
             String authorization = String.format("Bearer %s", response.getAccess_token());
             Response<UBNCompleteAccountPaymentResponse> ubnResponse = ubnAccountAPIService.completeUBNAccountCreation(authorization, "01", request).execute();
             app.print("Response:");
-            app.print(ubnResponse.body());
-            app.print(ubnResponse.body().getStatusMessage());
+            app.print(ubnResponse.body() == null ? "ubnResponse.body() = null" : ubnResponse.body());
+            app.print(ubnResponse.body() == null ? "ubnResponse.body() = null" : ubnResponse.body().getStatusMessage());
             return  ubnResponse;
         }
         catch ( Exception ex){
