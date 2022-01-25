@@ -6,6 +6,7 @@ import com.unionbankng.future.futurejobservice.pojos.ContractRequest;
 import com.unionbankng.future.futurejobservice.pojos.RejectionRequest;
 import com.unionbankng.future.futurejobservice.services.UBNBankTransferService;
 import com.unionbankng.future.futurejobservice.services.JobContractService;
+import com.unionbankng.future.futurejobservice.util.App;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ import java.util.List;
 @RequestMapping(path = "api")
 public class JobContractController {
 
+
+    private final App app;
     private  final JobContractService jobContractService;
     Logger logger = LoggerFactory.getLogger(JobContractController.class);
 
@@ -58,6 +61,10 @@ public class JobContractController {
     public ResponseEntity<APIResponse> submitContract(@Valid @RequestParam(value = "data", required=true) String projectData,
                                               @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles, @ApiIgnore OAuth2Authentication authentication) throws IOException {
         JobProjectSubmission response= jobContractService.submitJob(authentication, projectData,supportingFiles);
+
+
+        app.print("Its here to submit job >>>>");
+
         if(response!=null)
             return ResponseEntity.ok().body(new APIResponse("success",true, response));
         else

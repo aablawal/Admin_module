@@ -3,6 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
+import com.unionbankng.future.futurejobservice.enums.PaymentMethod;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
@@ -90,6 +91,9 @@ public class JobProposalService  implements Serializable {
 
 
             app.print(application);
+            if(application.getPaymentMethod()==null)
+                application.setPaymentMethod(PaymentMethod.BANK);
+
             JobProposal proposal = repository.save(application);
             if (proposal != null) {
 

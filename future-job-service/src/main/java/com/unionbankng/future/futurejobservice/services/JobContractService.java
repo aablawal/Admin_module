@@ -188,6 +188,9 @@ public class JobContractService implements Serializable {
             proposal.setStartDate(new Date());
             proposal.setEndDate(c.getTime());
 
+            if(contract.getPaymentMethod()==null)
+                contract.setPaymentMethod(PaymentMethod.BANK);
+
             if (contract.getWorkMethod().equals("Milestone")) {
                 status = 1;
                 //fire notification
@@ -724,6 +727,9 @@ public class JobContractService implements Serializable {
     public JobProjectSubmission submitJob(JwtUserDetail currentUser, JobProjectSubmission
             request, MultipartFile[] supportingFiles) {
         try {
+
+            app.print("Submitting job>>>>");
+            app.print(request);
             String supporting_file_names = null;
             request.setStatus(Status.PE);
 
@@ -734,9 +740,11 @@ public class JobContractService implements Serializable {
                 request.setSupportingFiles(supporting_file_names);
 
             //fire notification
+            app.print("It is here");
             Job currentJob = jobRepository.findById(request.getJobId()).orElse(null);
             User employer=userService.getUserById(request.getEmployerId());
             if (currentJob != null && employer!=null) {
+                app.print("Its here 2");
                 NotificationBody body = new NotificationBody();
                 body.setBody(currentUser.getUserFullName() + " submitted " + currentJob.getTitle() + " for your review and approval");
                 body.setSubject("Project Review");
@@ -753,6 +761,7 @@ public class JobContractService implements Serializable {
             //end
 
 
+            app.print("It is here 3");
            JobProjectSubmission savedRequest=  jobProjectSubmissionRepository.save(request);
             try {
                 //############### Activity Logging ###########
@@ -768,6 +777,7 @@ public class JobContractService implements Serializable {
                 ex.printStackTrace();
             }
 
+            app.print("Done");
             return savedRequest;
         } catch (Exception ex) {
             ex.printStackTrace();

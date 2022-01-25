@@ -14,7 +14,11 @@ public class JWTUserDetailsExtractor {
 
         String userImg = detailsMap.get("userImg") == null ? null : detailsMap.get("userImg").toString();
 
-        return JwtUserDetail.builder().userId(((Integer) detailsMap.get("userId")).longValue()).userEmail(detailsMap.get("userEmail").toString()).userImg(userImg)
+        return JwtUserDetail.builder().
+                userId(((Integer) detailsMap.get("userId")).longValue())
+                .userFullName(detailsMap.get("userFullName").toString())
+                .userUUID(detailsMap.get("userUUID").toString())
+                .userEmail(detailsMap.get("userEmail").toString()).userImg(userImg)
                 .userFullName(detailsMap.get("userFullName").toString())
                 .kycLevel(detailsMap.get("kycLevel") == null ? 0 : Integer.valueOf(detailsMap.get("kycLevel").toString()))
                 .walletId(detailsMap.get("walletId") == null ? null: detailsMap.get("walletId").toString())
