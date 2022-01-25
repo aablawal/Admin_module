@@ -77,6 +77,7 @@ public class QualificationsController {
             throws IOException {
 
         app.print("Qualification Controller: Adding new qualification/training");
+        app.print(request);
 
         if(request.getSchool() != null && !request.getSchool().isBlank()){
             app.print("Qualification Controller: Adding new qualification");

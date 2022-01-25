@@ -25,7 +25,6 @@ public class ExperienceRequest {
     @NotNull
     private String company;
 
-    @NotNull
     private Boolean current;
 
     @NotNull

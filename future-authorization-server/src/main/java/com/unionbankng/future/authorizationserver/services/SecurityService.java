@@ -88,7 +88,7 @@ public class SecurityService {
         app.print("Memecatch Value:"+userEmail);
 
         if(userEmail == null)
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new APIResponse("Token expired or not found",false,null));
 
         if(!passwordValidator.validatePassword(password))

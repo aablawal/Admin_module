@@ -6,6 +6,7 @@ import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateReques
 import com.unionbankng.future.authorizationserver.pojos.UserByTokenResponse;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.services.UserService;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class UsersController {
 
     private final UserService userService;
     private final ProfileService profileService;
+    private final App app;
 
 
     @GetMapping("/v1/users/{userId}")
@@ -104,7 +106,9 @@ public class UsersController {
     public ResponseEntity<APIResponse<User>> uploadUserProfileImage(@PathVariable Long userId,
                                                                 @Nullable @RequestPart("img") MultipartFile img)
             throws IOException {
-
+        app.print("Uploading user profile picture");
+        app.print(img.getOriginalFilename());
+        app.print(img.getName());
         User user = userService.updateProfile(userId,null,img,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
@@ -118,7 +122,9 @@ public class UsersController {
     public ResponseEntity<APIResponse<User>> uploadUserCoverImage(@PathVariable Long userId,
                                                                     @Nullable @RequestPart("coverImg") MultipartFile coverImg)
             throws IOException {
-
+        app.print("Uploading user Cover image");
+        app.print(coverImg.getOriginalFilename());
+        app.print(coverImg.getName());
         User user = userService.updateProfile(userId,coverImg,null,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
