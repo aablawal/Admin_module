@@ -123,13 +123,13 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
 
-    @DeleteMapping("/v1/users/delete/{userId}")
-    public ResponseEntity<APIResponse> deleteUser(@PathVariable  Long userId){
-        profileService.deleteAllByUserId(userId);
-        userService.deleteById(userId);
-        return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
-   }
-  
+//    @DeleteMapping("/v1/users/delete/{userId}")
+//    public ResponseEntity<APIResponse> deleteUserById(@PathVariable  Long userId){
+//        profileService.deleteAllByUserId(userId);
+//        userService.deleteById(userId);
+//        return ResponseEntity.ok().body(new APIResponse("User deleted successful",true,null));
+//   }
+//
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
                                                                 @PathVariable Long userId) throws IOException {

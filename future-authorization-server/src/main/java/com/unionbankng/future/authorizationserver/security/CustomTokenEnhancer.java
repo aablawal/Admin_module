@@ -20,7 +20,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         additionalInfo.put("userUUID", user.getUuid());
         additionalInfo.put("userEmail", user.getEmail());
         additionalInfo.put("userImg", user.getImg());
-        additionalInfo.put("userFullName", user.getImg());
+        additionalInfo.put("userFullName", user.getFirstName()+" "+user.getLastName());
         additionalInfo.put("isEnabled", user.getIsEnabled());
         additionalInfo.put("firstName", user.getFirstName());
         additionalInfo.put("lastName", user.getLastName());

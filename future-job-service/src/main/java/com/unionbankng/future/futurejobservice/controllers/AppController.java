@@ -9,6 +9,7 @@ import com.unionbankng.future.futurejobservice.services.WalletService;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
+import com.unionbankng.future.futurejobservice.util.SMSSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -24,6 +25,7 @@ public class AppController {
     private final WalletService walletService;
     private final JobPaymentService jobPaymentService;
     private final NotificationSender notificationSender;
+    private final SMSSender smsSender;
     private final TestService testService;
     private final AppLogger appLogger;
     private final App app;
@@ -31,6 +33,10 @@ public class AppController {
     @GetMapping("/v1/ping")
     public ResponseEntity<APIResponse<String>> pingService(){
         app.print("Pinging....");
+        SMS sms= new SMS();
+        sms.setRecipient("+2348064160204");
+        sms.setMessage("This is just Test");
+        smsSender.sendSMS(sms);
         return ResponseEntity.ok().body( new APIResponse("Service is Up", true, "Live"));
     }
     @PostMapping("/v1/test")
