@@ -6,6 +6,7 @@ import com.unionbankng.future.futurejobservice.retrofitservices.BankServiceInter
 import com.unionbankng.future.futurejobservice.util.App;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -23,8 +24,8 @@ public class UBNBankTransferService {
     private BankServiceInterface bankServiceInterface;
     private final App app;
 
-//    @Value("${kula.bankService.baseURL}")
-    private String bankServiceBaseURL="http://localhost:8080";
+    @Value("${kula.bankService.baseURL}")
+    private String bankServiceBaseURL;
 
 
     @PostConstruct
