@@ -21,8 +21,9 @@ public class EmailSender {
             CachingConnectionFactory connectionFactory = (CachingConnectionFactory) jmsTemplate.getConnectionFactory();
             connectionFactory.setCacheProducers(false);
             jmsTemplate.convertAndSend(EMAIL_DESTINATION, emailBody);
+            app.print("Email successfully sent");
         }catch (Exception ex){
-            System.out.println("Unable to send Email");
+            app.print("Unable to send Email");
             ex.printStackTrace();
         }
     }
