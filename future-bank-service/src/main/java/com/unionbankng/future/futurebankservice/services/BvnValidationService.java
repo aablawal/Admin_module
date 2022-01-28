@@ -41,7 +41,8 @@ public class BvnValidationService {
 
         if (response.isSuccessful()) {
             app.print("Success block");
-            return  ResponseEntity.ok().body(new APIResponse<>("BVN validation successful", true, response.body()));
+            return  ResponseEntity.ok().body(new APIResponse<>(response.body() != null ?
+                    response.body().getStatusMessage() : "Response body is null", true, response.body()));
         }else{
             app.print("Failure block");
             return ResponseEntity.ok().body(new APIResponse<>("Unable to Validate BVN", false, null));
