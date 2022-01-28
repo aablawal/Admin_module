@@ -61,7 +61,7 @@ public class AppController {
     }
 
     @PostMapping("/v1/bulk/bank_transfer/test")
-    public ResponseEntity<APIResponse<String>> testBulkTransfer(){
+    public ResponseEntity<APIResponse<String>> testBulkTransfer(@RequestHeader(value="Authorization") String authToken){
 
         ArrayList<JobBulkPayment> bulkPayments=new ArrayList<>();
         JobBulkPayment bank1= new JobBulkPayment();
@@ -70,11 +70,11 @@ public class AppController {
         bank1.setAccountType("GL");
         bank1.setAccountName("CPC CASH DEPOSIT ACCOUNT IMPLEMENT");
         bank1.setNarration("My first testing");
-        bank1.setAmount(11);
+        bank1.setAmount(15);
         bank1.setCrDrFlag("D");
         bank1.setExecutedBy("Test User");
         bank1.setExecutedFor("Test Something");
-        bank1.setPaymentReference("Testiksjdjskdjksjd");
+        bank1.setPaymentReference("test111");
         bulkPayments.add(bank1);
 
         JobBulkPayment bank2= new JobBulkPayment();
@@ -83,21 +83,21 @@ public class AppController {
         bank2.setAccountType("GL");
         bank2.setAccountName("WESTERN UNION-COMMISSION");
         bank2.setNarration("My first testing");
-        bank2.setAmount(11);
+        bank2.setAmount(15);
         bank2.setCrDrFlag("C");
         bank2.setExecutedBy("Test User");
         bank2.setExecutedFor("Test Something");
-        bank2.setPaymentReference("tolustest");
+        bank2.setPaymentReference("test111");
         bulkPayments.add(bank2);
-        APIResponse response=jobPaymentService.makeBulkPayment(bulkPayments);
+        APIResponse response=jobPaymentService.makeBulkPayment(authToken,bulkPayments);
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/v1/bank/transfer/test")
-    public ResponseEntity<APIResponse<String>> bankTransfer() throws JsonProcessingException {
+    public ResponseEntity<APIResponse<String>> bankTransfer(@RequestHeader(value="Authorization") String authToken) throws JsonProcessingException {
         PaymentRequest payment = new PaymentRequest();
-        payment.setAmount(20);
-        payment.setNarration("Testing Narration");
+        payment.setAmount(52);
+        payment.setNarration("Testing Narration 2");
         payment.setCreditAccountName("GL M36 FLOAT ACCOUNT");
         payment.setCreditAccountNumber("250990140");
         payment.setDebitAccountName("OLANLOKUN LANRE");
@@ -106,8 +106,8 @@ public class AppController {
         payment.setExecutedFor("Test");
         payment.setDebitAccountType("CASA");
         payment.setCreditAccountType("GL");
-        payment.setPaymentReference("skdjkasjdksjkadj");
-        APIResponse response= jobPaymentService.makePayment(payment);
+        payment.setPaymentReference("q898sjdjasid98ejd9w8e");
+        APIResponse response = jobPaymentService.makePayment(authToken, payment);
         return ResponseEntity.ok().body(response);
 
     }

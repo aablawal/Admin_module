@@ -153,14 +153,14 @@ public class JobContractService implements Serializable {
         return jobMilestoneRepository.findAllMilestonesByProposalAndJobId(proposalId, jobId);
     }
 
-    public APIResponse approveJobProposal(OAuth2Authentication authentication, String request) throws JsonProcessingException {
+    public APIResponse approveJobProposal(String authToken, OAuth2Authentication authentication, String request) throws JsonProcessingException {
 
         JobContract contract = new ObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false).readValue(request, JobContract.class);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        return approveJobProposal(currentUser, contract);
+        return approveJobProposal(authToken,currentUser, contract);
     }
 
-    public APIResponse approveJobProposal(JwtUserDetail currentUser, JobContract contract) {
+    public APIResponse approveJobProposal(String authToken,JwtUserDetail currentUser, JobContract contract) {
         try {
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
@@ -295,7 +295,7 @@ public class JobContractService implements Serializable {
                     payment.setExecutedBy(currentUser.getUserUUID());
                     payment.setExecutedByUsername(currentUser.getUserEmail());
 
-                    APIResponse paymentResponse = jobPaymentService.makePayment(payment);
+                    APIResponse paymentResponse = jobPaymentService.makePayment(authToken,payment);
                     if (paymentResponse.isSuccess()) {
                         try {
                             isPaid = true;
@@ -990,7 +990,7 @@ public class JobContractService implements Serializable {
             return null;
         }
     }
-    public APIResponse endContract(OAuth2Authentication authentication, Rate
+    public APIResponse endContract(String authToken, OAuth2Authentication authentication, Rate
             rating, Long jobId, Long proposalId, Long userId, int state) {
         try {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
@@ -1024,7 +1024,7 @@ public class JobContractService implements Serializable {
                             //done
 
                             if (response.getStatusCode().is2xxSuccessful()) {
-                                APIResponse settlementResponse = this.settleContractById(authentication, contract.getContractReference());
+                                APIResponse settlementResponse = this.settleContractById(authToken,authentication, contract.getContractReference());
                                 if (settlementResponse.isSuccess()) {
 
                                     try {
@@ -1230,14 +1230,14 @@ public class JobContractService implements Serializable {
     }
 
 
-    public APIResponse modifyMilestoneState(OAuth2Authentication authentication, Long milestoneId, String newStatus) {
+    public APIResponse modifyMilestoneState(String authToken,OAuth2Authentication authentication, Long milestoneId, String newStatus) {
 
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        return modifyMilestoneState(currentUser, milestoneId, Status.valueOf(newStatus));
+        return modifyMilestoneState(authToken,currentUser, milestoneId, Status.valueOf(newStatus));
 
     }
 
-    public APIResponse modifyMilestoneState(JwtUserDetail
+    public APIResponse modifyMilestoneState(String authToken, JwtUserDetail
                                                     currentUser, Long milestoneId, Status
                                                     newStatus) {
 
@@ -1315,7 +1315,7 @@ public class JobContractService implements Serializable {
                             payment.setExecutedBy(currentUser.getUserUUID());
                             payment.setExecutedByUsername(currentUser.getUserEmail());
 
-                            APIResponse paymentResponse=jobPaymentService.makePayment(payment);
+                            APIResponse paymentResponse=jobPaymentService.makePayment(authToken,payment);
                             if (paymentResponse.isSuccess()) {
 
                                 milestone.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
@@ -1497,7 +1497,7 @@ public class JobContractService implements Serializable {
     }
 
     public APIResponse approveCompletedMilestone
-            (OAuth2Authentication authentication, String milestoneReference){
+            (String authToken, OAuth2Authentication authentication, String milestoneReference){
         try {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             JobMilestone milestone = jobMilestoneRepository.findMilestoneByMilestoneReference(milestoneReference).orElse(null);
@@ -1522,7 +1522,7 @@ public class JobContractService implements Serializable {
                         //done
                         if (response.getStatusCode().is2xxSuccessful()) {
 
-                            APIResponse settlementResponse=this.settleContractById(authentication,milestone.getMilestoneReference());
+                            APIResponse settlementResponse=this.settleContractById(authToken,authentication,milestone.getMilestoneReference());
                             if(settlementResponse.isSuccess()) {
 
                                 try {
@@ -1592,7 +1592,7 @@ public class JobContractService implements Serializable {
         }
     }
 
-    public APIResponse settleContractById(OAuth2Authentication authentication, String contractReferenceId) throws CloneNotSupportedException {
+    public APIResponse settleContractById(String authToken,OAuth2Authentication authentication, String contractReferenceId) throws CloneNotSupportedException {
         try {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             JobContract contract;
@@ -1890,7 +1890,7 @@ public class JobContractService implements Serializable {
                         bulkPaymentStack.add(freelancerAccount);
                         app.print(bulkPaymentStack);
 
-                        APIResponse apiResponse = jobPaymentService.makeBulkPayment(bulkPaymentStack);
+                        APIResponse apiResponse = jobPaymentService.makeBulkPayment(authToken,bulkPaymentStack);
                         if (apiResponse.isSuccess()) {
                             //update contract information
                             contract.setKulaChargeRate(kulaIncomeRate);
@@ -2004,141 +2004,6 @@ public class JobContractService implements Serializable {
         }catch (Exception ex){
             ex.printStackTrace();
             return new APIResponse("Oops! Unable to settle contract", false, null);
-        }
-    }
-
-
-    public APIResponse reverseContractPaymentById(OAuth2Authentication authentication, String contractReferenceId) throws JsonProcessingException {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        //check if contract exist
-        JobContract contract;
-        JobMilestone milestone;
-        contract= jobContractRepository.findByContractReference(contractReferenceId).orElse(null);
-        milestone= jobMilestoneRepository.findMilestoneByMilestoneReference(contractReferenceId).orElse(null);
-        if (contract == null) {
-            if (milestone == null)
-                return new APIResponse("Contract not found from Reference Id Provided", false, null);
-            else {
-                contract=jobContractRepository.findById(milestone.getContractId()).orElse(null);
-            }
-        }
-
-        if (contract.getStatus().equals(Status.WP) || (milestone!=null && milestone.getStatus().equals(Status.WP))) {
-            //check if proposal is available
-            JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
-            if (proposal == null)
-                return new APIResponse("Proposal not found for the Contract", false, null);
-
-            //check if job is available
-            Job job = jobRepository.findById(contract.getJobId()).orElse(null);
-            if (job == null)
-                return new APIResponse("Job not found for the Contract", false, null);
-
-
-            PaymentRequest payment = new PaymentRequest();
-            double depositedAmount;
-            if(contract.getWorkMethod().equals("Overall")){
-                    depositedAmount=contract.getAmount();
-                    payment.setExecutedFor("Contract:"+contractReferenceId);
-            }else{
-                 if(milestone==null)
-                    return new APIResponse("No Milestone found with the reference provided", false, null);
-                else {
-                    depositedAmount = milestone.getAmount();
-                    payment.setExecutedFor("Milestone:"+contractReferenceId);
-                }
-            }
-
-            if(depositedAmount>0) {
-                try {
-                    //get configurations
-                    List<Config> configs = configService.getConfigs();
-                    app.print(configs);
-                    if (!configs.isEmpty()) {
-                        for (Config currentConfig : configs) {
-                            //#getting escrow account
-                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
-                                this.escrowAccountName = currentConfig.getValue();
-                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
-                                this.escrowAccountNumber = currentConfig.getValue();
-                        }
-                    }
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return new APIResponse("Unable to extract job service configurations", false, null);
-                }
-
-                app.print("###ESCROW ACCOUNT");
-                app.print(this.escrowAccountName);
-                app.print(this.escrowAccountNumber);
-
-
-                String paymentReference = app.makeUIID();
-                //reverse payment to employer
-                payment.setProposalId(contract.getProposalId());
-                payment.setAmount(depositedAmount);
-                payment.setNarration("Reversal from Kula for " + job.getTitle());
-                payment.setDebitAccountName(escrowAccountName);
-                payment.setDebitAccountNumber(escrowAccountNumber);
-                payment.setDebitAccountType("GL");
-                payment.setCreditAccountName(contract.getEmployerAccountName());
-                payment.setCreditAccountNumber(contract.getEmployerAccountNumber());
-                payment.setCreditAccountType("CASA");
-                payment.setPaymentReference(paymentReference);
-                payment.setExecutedBy(currentUser.getUserUUID());
-                payment.setExecutedByUsername(currentUser.getUserEmail());
-                //transfer back the charged amount to the Employer
-                APIResponse transferResponse = jobPaymentService.makePayment(payment);
-                if (transferResponse.isSuccess()) {
-                    //update the contract and deactivate contract when reversal is done
-                    contract.setReversalPaymentReferenceB(transferResponse.getPayload().toString());
-                    if (milestone != null) {
-                        milestone.setReversalPaymentReferenceB(transferResponse.getPayload().toString());
-                        milestone.setStatus(Status.IA);
-                        milestone.setEndDate(new Date());
-                    } else {
-                        contract.setStatus(Status.IA);
-                        proposal.setStatus(Status.IA);
-                        contract.setLastModifiedDate(new Date());
-
-                    }
-
-                    try {
-                        //update configurations table
-                        Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS_REJECTED);
-                        if (existingConfig != null)
-                            configService.updateConfig(ConfigReference.TOTAL_JOBS_REJECTED, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
-                        else
-                            configService.updateConfig(ConfigReference.TOTAL_JOBS_REJECTED, String.valueOf(1));
-                    }catch (Exception ex){
-                        ex.printStackTrace();
-                    }
-                    jobMilestoneRepository.save(milestone);
-                    jobContractRepository.save(contract);
-                    logger.info("JOBSERVICE: Payment successful");
-
-                    NotificationBody body = new NotificationBody();
-                    body.setBody("Reversal of NGN" + depositedAmount + " has been successful");
-                    body.setSubject("Payment Reversal");
-                    body.setActionType("INFORMATION");
-                    body.setTopic("'Job'");
-                    body.setChannel("S");
-                    body.setPriority("YES");
-                    body.setRecipient(currentUser.getUserId());
-                    body.setRecipientEmail(currentUser.getUserEmail());
-                    body.setRecipientName(currentUser.getUserFullName());
-                    notificationSender.pushNotification(body);
-
-                    return new APIResponse("Reversal Successful", true, transferResponse.getPayload());
-                } else {
-                    return new APIResponse(transferResponse.getMessage(), false, null);
-                }
-            }else{
-                return new APIResponse("Contract amount can't be ZERO", false, null);
-            }
-        } else {
-            return new APIResponse("This Contract is not active, it  might have  been settled already", false, null);
         }
     }
 }

@@ -25,7 +25,7 @@ public class JobPaymentService implements Serializable {
     private final JobBulkPaymentRepository jobBulkPaymentRepository;
     private final App app;
 
-  public APIResponse makePayment(PaymentRequest paymentRequest) {
+  public APIResponse makePayment(String authToken,PaymentRequest paymentRequest) {
 
       //transfer back the charged amount to the Employer
       JobPayment payment = new JobPayment();
@@ -53,7 +53,8 @@ public class JobPaymentService implements Serializable {
       app.print(payment);
       PaymentResponse transferResponse = null;
       try {
-          transferResponse = bankTransferService.transferUBNtoUBN(payment);
+          transferResponse = bankTransferService.transferUBNtoUBN(authToken,payment);
+          app.print(transferResponse);
       }catch (Exception ex){
           ex.printStackTrace();
       }
@@ -79,7 +80,7 @@ public class JobPaymentService implements Serializable {
           return new APIResponse(remark, false, null);
       }
   }
-    public APIResponse makeBulkPayment(ArrayList<JobBulkPayment> bulkPaymentBatchItems){
+    public APIResponse makeBulkPayment(String authToken, ArrayList<JobBulkPayment> bulkPaymentBatchItems){
 
         ArrayList<UBNBulkFundTransferBatchItem> batchItems= new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -98,6 +99,7 @@ public class JobPaymentService implements Serializable {
             bank.setValueDate(simpleDateFormat.format(new Date()));
             bank.setCrDrFlag(batchItem.getCrDrFlag());
             bank.setFeeOrCharges("false");
+            bank.setTransactionId(batchItem.getTransactionId());
             batchItems.add(bank);
         }
         UBNBulkFundTransferRequest request =new  UBNBulkFundTransferRequest();
@@ -111,7 +113,7 @@ public class JobPaymentService implements Serializable {
 
         PaymentResponse transferResponse = null;
         try {
-           transferResponse = bankTransferService.transferBulkUBNtoUBN(request);
+           transferResponse = bankTransferService.transferBulkUBNtoUBN(authToken,request);
         }catch (Exception ex){
             ex.printStackTrace();
         }

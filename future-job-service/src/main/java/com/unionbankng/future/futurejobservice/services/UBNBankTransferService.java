@@ -6,7 +6,6 @@ import com.unionbankng.future.futurejobservice.retrofitservices.BankServiceInter
 import com.unionbankng.future.futurejobservice.util.App;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -24,8 +23,8 @@ public class UBNBankTransferService {
     private BankServiceInterface bankServiceInterface;
     private final App app;
 
-    @Value("${kula.bankService.baseURL}")
-    private String bankServiceBaseURL;
+//    @Value("${kula.bankService.baseURL}")
+    private String bankServiceBaseURL="http://localhost:8080";
 
 
     @PostConstruct
@@ -45,7 +44,7 @@ public class UBNBankTransferService {
     }
 
 
-    public PaymentResponse transferUBNtoUBN(JobPayment transfer) throws IOException {
+    public PaymentResponse transferUBNtoUBN(String authToken, JobPayment transfer) throws IOException {
         app.print("Transfer Request >>>");
         app.print(transfer);
         UBNFundTransferRequest request = new UBNFundTransferRequest();
@@ -68,28 +67,36 @@ public class UBNBankTransferService {
         request.setValueDate("2020-12-04");
         request.setPaymentTypeCode("FT");
         request.setPaymentReference(transfer.getPaymentReference());
-        String token = "";
-        Response<UBNFundTransferResponse> apiResponse = bankServiceInterface.transferFunds(token, request).execute();
+        Response<APIResponse<UBNFundTransferResponse>> apiResponse = bankServiceInterface.transferFunds(authToken, request).execute();
+
         PaymentResponse response = new PaymentResponse();
-        response.setCode(apiResponse.body().getCode());
-        response.setMessage(jobPaymentResponseService.getResponseMessage(apiResponse.body().getCode(), apiResponse.body().getMessage()));
-        response.setReference(apiResponse.body().getReference());
+        if(apiResponse.isSuccessful() && apiResponse.body().getPayload()!=null) {
+            response.setCode(apiResponse.body().getPayload().getCode());
+            response.setMessage(jobPaymentResponseService.getResponseMessage(apiResponse.body().getPayload().getCode(), apiResponse.body().getPayload().getMessage()));
+            response.setReference(apiResponse.body().getPayload().getReference());
 
+        }else{
+            response.setCode(String.valueOf(apiResponse.code()));
+            response.setMessage(apiResponse.message());
+        }
         return response;
-
     }
 
-    public PaymentResponse transferBulkUBNtoUBN(UBNBulkFundTransferRequest paymentRequest) throws IOException {
+    public PaymentResponse transferBulkUBNtoUBN(String authToken, UBNBulkFundTransferRequest paymentRequest) throws IOException {
         app.print("Bulk Transfer Request >>>");
          //fire the request
-        String token = "";
-        Response<UBNBulkFundTransferResponse> apiResponse = bankServiceInterface.transferBulkFund(token, paymentRequest).execute();
+        Response<APIResponse<UBNBulkFundTransferResponse>> apiResponse = bankServiceInterface.transferBulkFund(authToken, paymentRequest).execute();
         PaymentResponse response = new PaymentResponse();
-        response.setCode(apiResponse.body().getCode());
-        response.setBatchId(apiResponse.body().getBatchId());
-        response.setMessage(jobPaymentResponseService.getResponseMessage(apiResponse.body().getCode(), apiResponse.body().getMessage()));
-        response.setCbaBatchNo(apiResponse.body().getCbaBatchNo());
-        response.setReference(apiResponse.body().getReference());
+        if(apiResponse.isSuccessful() && apiResponse.body().getPayload()!=null) {
+            response.setCode(apiResponse.body().getPayload().getCode());
+            response.setBatchId(apiResponse.body().getPayload().getBatchId());
+            response.setMessage(jobPaymentResponseService.getResponseMessage(apiResponse.body().getPayload().getCode(), apiResponse.body().getMessage()));
+            response.setCbaBatchNo(apiResponse.body().getPayload().getCbaBatchNo());
+            response.setReference(apiResponse.body().getPayload().getReference());
+        }else{
+            response.setCode(String.valueOf(apiResponse.code()));
+            response.setMessage(apiResponse.message());
+        }
         return response;
     }
 }
