@@ -1,7 +1,7 @@
 package com.unionbankng.future.futurejobservice.services;
 
-import com.unionbankng.future.futurebankservice.grpc.UBNBulkFundTransferBatchItem;
-import com.unionbankng.future.futurebankservice.grpc.UBNBulkFundsTransferRequest;
+import com.unionbankng.future.futurejobservice.pojos.UBNBulkFundTransferRequest;
+import com.unionbankng.future.futurejobservice.pojos.UBNBulkFundTransferBatchItem;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.*;
@@ -51,22 +51,32 @@ public class JobPaymentService implements Serializable {
       payment.setCreditNarration(paymentRequest.getNarration());
 
       app.print(payment);
-
-      PaymentResponse transferResponse = bankTransferService.transferUBNtoUBN(payment);
-      if (transferResponse.getCode().compareTo("00") == 0) {
-          //save the payment history
-          payment.setInitialPaymentReference(paymentRequest.getPaymentReference());
-          payment.setPaymentReference(transferResponse.getReference());
-          payment.setContractReference(paymentRequest.getContractReference());
-          jobPaymentRepository.save(payment);
-          logger.info("JOBSERVICE: Payment successful");
-          return new APIResponse("Payment Successful", true, transferResponse.getReference());
-      } else {
-          String remark = transferResponse.getCode() + ": Payment Failed " + transferResponse.getMessage();
+      PaymentResponse transferResponse = null;
+      try {
+          transferResponse = bankTransferService.transferUBNtoUBN(payment);
+      }catch (Exception ex){
+          ex.printStackTrace();
+      }
+      if(transferResponse!=null) {
+          if (transferResponse.getCode().compareTo("00") == 0) {
+              //save the payment history
+              payment.setInitialPaymentReference(paymentRequest.getPaymentReference());
+              payment.setPaymentReference(transferResponse.getReference());
+              payment.setContractReference(paymentRequest.getContractReference());
+              jobPaymentRepository.save(payment);
+              logger.info("JOBSERVICE: Payment successful");
+              return new APIResponse("Payment Successful", true, transferResponse.getReference());
+          } else {
+              String remark = transferResponse.getCode() + ": Payment Failed " + transferResponse.getMessage();
+              logger.info("JOBSERVICE: Payment failed");
+              logger.error(transferResponse.getMessage());
+              logger.error(transferResponse.getCode());
+              return new APIResponse(remark, false, transferResponse);
+          }
+      }else{
+          String remark = "Payment Failed ";
           logger.info("JOBSERVICE: Payment failed");
-          logger.error(transferResponse.getMessage());
-          logger.error(transferResponse.getCode());
-          return new APIResponse(remark, false, transferResponse);
+          return new APIResponse(remark, false, null);
       }
   }
     public APIResponse makeBulkPayment(ArrayList<JobBulkPayment> bulkPaymentBatchItems){
@@ -75,50 +85,60 @@ public class JobPaymentService implements Serializable {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String referenceId="BULK"+app.makeUIID().substring(0,5);
 
-        for(JobBulkPayment batchItem: bulkPaymentBatchItems){
-            UBNBulkFundTransferBatchItem bank=UBNBulkFundTransferBatchItem.newBuilder()
-                    .setAccountNumber(batchItem.getAccountNumber())
-                    .setAccountType(batchItem.getAccountType())
-                    .setAccountName(batchItem.getAccountName())
-                    .setAccountBranchCode("000")
-                    .setAccountBankCode("032")
-                    .setNarration(batchItem.getNarration())
-                    .setInstrumentNumber("")
-                    .setAmount(String.valueOf(batchItem.getAmount()))
-                    .setValueDate(simpleDateFormat.format(new Date()))
-                    .setCrDrFlag(batchItem.getCrDrFlag())
-                    .setFeeOrCharges("false").build();
+        for(JobBulkPayment batchItem: bulkPaymentBatchItems) {
+            UBNBulkFundTransferBatchItem bank = new UBNBulkFundTransferBatchItem();
+            bank.setAccountNumber(batchItem.getAccountNumber());
+            bank.setAccountType(batchItem.getAccountType());
+            bank.setAccountName(batchItem.getAccountName());
+            bank.setAccountBranchCode("000");
+            bank.setAccountBankCode("032");
+            bank.setNarration(batchItem.getNarration());
+            bank.setInstrumentNumber("");
+            bank.setAmount(String.valueOf(batchItem.getAmount()));
+            bank.setValueDate(simpleDateFormat.format(new Date()));
+            bank.setCrDrFlag(batchItem.getCrDrFlag());
+            bank.setFeeOrCharges("false");
             batchItems.add(bank);
         }
-        UBNBulkFundsTransferRequest request = UBNBulkFundsTransferRequest.newBuilder()
-                .setCurrency("NGN")
-                .setPaymentReference(referenceId)
-                .setInitBranchCode("000")
-                .setTransactionDate(simpleDateFormat.format(new Date()))
-                .setPaymentTypeCode("FT")
-                .setExternalSystemReference("")
-                .addAllBatchItems(batchItems).build();
+        UBNBulkFundTransferRequest request =new  UBNBulkFundTransferRequest();
+        request.setCurrency("NGN");
+        request.setPaymentReference(referenceId);
+        request .setInitBranchCode("000");
+        request .setTransactionDate(simpleDateFormat.format(new Date()));
+        request.setPaymentTypeCode("FT");
+        request .setExternalSystemReference("");
+        request .setBatchItems(batchItems);
 
-        PaymentResponse transferResponse = bankTransferService.transferBulkUBNtoUBN(request);
-        if (transferResponse.getCode().compareTo("00") == 0) {
-
-            for(JobBulkPayment batchItem: bulkPaymentBatchItems){
-                batchItem.setInitialPaymentReference(referenceId);
-                batchItem.setPaymentReference(transferResponse.getReference());
-                batchItem.setAccountBranchCode("000");
-                batchItem.setAccountBankCode("032");
-                batchItem.setFeeOrCharges("false");
-                batchItem.setInstrumentNumber("");
+        PaymentResponse transferResponse = null;
+        try {
+           transferResponse = bankTransferService.transferBulkUBNtoUBN(request);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        if(transferResponse!=null) {
+            if (transferResponse.getCode().compareTo("00") == 0) {
+                for (JobBulkPayment batchItem : bulkPaymentBatchItems) {
+                    batchItem.setInitialPaymentReference(referenceId);
+                    batchItem.setPaymentReference(transferResponse.getReference());
+                    batchItem.setAccountBranchCode("000");
+                    batchItem.setAccountBankCode("032");
+                    batchItem.setFeeOrCharges("false");
+                    batchItem.setInstrumentNumber("");
+                }
+                jobBulkPaymentRepository.saveAll(bulkPaymentBatchItems);
+                logger.info("JOBSERVICE: Payment successful");
+                return new APIResponse("Payment Successful", true, transferResponse.getReference());
+            } else {
+                String remark = transferResponse.getCode() + ": Payment Failed " + transferResponse.getMessage();
+                logger.info("JOBSERVICE: Payment failed");
+                logger.error(transferResponse.getMessage());
+                logger.error(transferResponse.getCode());
+                return new APIResponse(remark, false, transferResponse);
             }
-            jobBulkPaymentRepository.saveAll(bulkPaymentBatchItems);
-            logger.info("JOBSERVICE: Payment successful");
-            return new APIResponse("Payment Successful", true, transferResponse.getReference());
-        } else {
-            String remark = transferResponse.getCode() +": Payment Failed " + transferResponse.getMessage();
+        }else{
+            String remark = "Payment Failed ";
             logger.info("JOBSERVICE: Payment failed");
-            logger.error(transferResponse.getMessage());
-            logger.error(transferResponse.getCode());
-            return new APIResponse(remark, false, transferResponse);
+            return new APIResponse(remark, false, null);
         }
     }
 }
