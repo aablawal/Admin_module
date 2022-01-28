@@ -15,9 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import javax.ws.rs.core.Response;
-
 import java.net.URI;
 import java.util.UUID;
 
@@ -55,7 +52,7 @@ public class RegistrationTest extends AbstractTest {
 
         String body = mapper.writeValueAsString(request);
 
-        Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
+//        Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
@@ -81,7 +78,7 @@ public class RegistrationTest extends AbstractTest {
         thirdPartyOauthResponse.setImage("https://localhost:8080/test_image.com");
 
         Mockito.when(googleOauthProvider.authentcate("1/fFAGRNJru1FTz70BzhT3Zg")).thenReturn(thirdPartyOauthResponse);
-        Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
+//        Response response = Response.created(URI.create("https://test.com/"+ UUID.randomUUID().toString())).build();
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/registration/register")
                 .contentType(MediaType.APPLICATION_JSON)

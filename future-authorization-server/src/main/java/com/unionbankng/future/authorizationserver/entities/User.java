@@ -43,25 +43,23 @@ public class User implements Serializable {
     @Column(length=50, nullable = false, unique = true)
     private String uuid;
 
+    @Column(length=50)
+    private String bvn;
+
     @Column(columnDefinition="TEXT")
     private String umid;
 
     @Column(nullable = false, unique = true)
     private String username;
-
     @Column(nullable = false, unique = true)
     private String email;
-
     private String password;
-
+    private String walletId;
     private String pin;
-
     @Column(length = 10)
     private String zipCode;
-
     @Column(length=5)
     private String dialingCode;
-
     @Column(length=32, unique = true)
     private String phoneNumber;
 
@@ -69,8 +67,10 @@ public class User implements Serializable {
     private String accountNumber;
 
     private String accountName;
-
     private String userAddress;
+    private String gender;
+    @Column(length = 5)
+    private int kycLevel;
 
     @Column(length=100)
     private String city;
@@ -110,7 +110,12 @@ public class User implements Serializable {
         this.authProvider = user.getAuthProvider();
         this.email = user.getEmail();
         this.password = user.getPassword();
+        this.kycLevel=user.getKycLevel();
+        this.dateOfBirth=user.getDateOfBirth();
+        this.userAddress=user.getUserAddress();
         this.city = user.getCity();
+        this.gender=user.getGender();
+        this.walletId=user.getWalletId();
         this.zipCode = user.getZipCode();
     }
 

@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.entities;
 
+import com.unionbankng.future.futurejobservice.enums.PaymentMethod;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
@@ -56,6 +57,7 @@ public class JobProposal implements Serializable {
     private String accountType;
     private Boolean isApplied;
     private String branchCode;
+    private PaymentMethod paymentMethod;
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     private Status status;

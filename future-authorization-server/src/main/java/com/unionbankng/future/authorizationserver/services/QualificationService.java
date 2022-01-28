@@ -64,7 +64,7 @@ public class QualificationService {
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "qualifications_by_user", key="#request.userId"),
+            @CacheEvict(value = "qualifications_by_user", key="#request.profileId"),
             @CacheEvict(value = "qualification", allEntries = true)
     })
     public Qualification saveFromRequest (MultipartFile file,QualificationRequest request, Qualification qualification) throws IOException {

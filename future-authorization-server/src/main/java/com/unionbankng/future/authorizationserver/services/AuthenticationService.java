@@ -40,7 +40,9 @@ public class AuthenticationService {
         System.out.println("Key:" + encryptionKey);
         System.out.println("Pin:" + pin);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        app.print(currentUser);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+        app.print(user);
         if (user != null) {
             if (user.getPin() == null) {
                 String encrypted = cryptoService.encrypt(pin, encryptionKey);

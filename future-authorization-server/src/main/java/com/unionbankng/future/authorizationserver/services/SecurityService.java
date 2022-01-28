@@ -81,15 +81,12 @@ public class SecurityService {
     }
 
     public ResponseEntity resetPassword(String token, String password){
-
-        app.print("######### Resetting user password");
+        app.print("Resetting user password");
         app.print(token);
 
         String userEmail = memcachedHelperService.getValueByKey(token);
-        
-        app.print("########### Reset Password");
-        app.print(userEmail);
-
+        app.print("Memecatch Value:"+userEmail);
+      
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new APIResponse("Token expired or not found",false,null));

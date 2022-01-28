@@ -19,7 +19,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.OAS_30)
           .select()
           .paths(PathSelectors.any())
-          .apis(RequestHandlerSelectors.basePackage("com.unionbankng.future.authorizationserver.controllers"))
+          .apis(RequestHandlerSelectors.basePackage("com.unionbankng.future.authorizationserver.pojos.controllers"))
           .build().apiInfo(metaData());                                           
     }
     

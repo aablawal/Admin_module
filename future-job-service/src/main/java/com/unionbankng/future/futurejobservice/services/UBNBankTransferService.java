@@ -18,6 +18,8 @@ public class UBNBankTransferService {
     private final App app;
 
     public PaymentResponse transferUBNtoUBN(JobPayment transfer){
+        app.print("Transfer Request >>>");
+        app.print(transfer);
         UBNFundsTransferRequest request = UBNFundsTransferRequest.newBuilder().
         setAmount(transfer.getAmount()).
         setCreditAccountName(transfer.getCreditAccountName()).

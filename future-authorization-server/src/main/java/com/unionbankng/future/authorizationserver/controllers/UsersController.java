@@ -6,6 +6,7 @@ import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateReques
 import com.unionbankng.future.authorizationserver.pojos.UserByTokenResponse;
 import com.unionbankng.future.authorizationserver.services.ProfileService;
 import com.unionbankng.future.authorizationserver.services.UserService;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -31,6 +31,7 @@ public class UsersController {
 
     private final UserService userService;
     private final ProfileService profileService;
+    private final App app;
 
 
     @GetMapping("/v1/users/{userId}")
@@ -40,6 +41,7 @@ public class UsersController {
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
+
 
     @GetMapping("/v1/users/search")
     public ResponseEntity<APIResponse> getUsersBySearch(@RequestParam String  q) {
@@ -82,7 +84,7 @@ public class UsersController {
     @PostMapping(value = "/v1/users/{userId}/update_profile", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@PathVariable Long userId,
                                                                 @Nullable @RequestPart("coverImg") MultipartFile coverImg,
-                                                                @Nullable @RequestPart("img") MultipartFile img,
+                                                                 @Nullable @RequestPart("img") MultipartFile img,
                                                                  @RequestPart PersonalInfoUpdateRequest request)
             throws IOException {
 
@@ -104,7 +106,9 @@ public class UsersController {
     public ResponseEntity<APIResponse<User>> uploadUserProfileImage(@PathVariable Long userId,
                                                                 @Nullable @RequestPart("img") MultipartFile img)
             throws IOException {
-
+        app.print("Uploading user profile picture");
+        app.print(img.getOriginalFilename());
+        app.print(img.getName());
         User user = userService.updateProfile(userId,null,img,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
@@ -118,12 +122,12 @@ public class UsersController {
     public ResponseEntity<APIResponse<User>> uploadUserCoverImage(@PathVariable Long userId,
                                                                     @Nullable @RequestPart("coverImg") MultipartFile coverImg)
             throws IOException {
-
+        app.print("Uploading user Cover image");
+        app.print(coverImg.getOriginalFilename());
+        app.print(coverImg.getName());
         User user = userService.updateProfile(userId,coverImg,null,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
-
-
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
                                                                 @PathVariable Long userId) throws IOException {

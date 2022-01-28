@@ -3,19 +3,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unionbankng.future.futurejobservice.entities.Test;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.entities.JobBulkPayment;
-import com.unionbankng.future.futurejobservice.repositories.TestRepository;
 import com.unionbankng.future.futurejobservice.services.JobPaymentService;
 import com.unionbankng.future.futurejobservice.services.TestService;
+import com.unionbankng.future.futurejobservice.services.WalletService;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
-import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
+import com.unionbankng.future.futurejobservice.util.SMSSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 
 @RestController
@@ -23,8 +22,10 @@ import java.util.ArrayList;
 @RequestMapping(path = "api")
 public class AppController {
 
+    private final WalletService walletService;
     private final JobPaymentService jobPaymentService;
     private final NotificationSender notificationSender;
+    private final SMSSender smsSender;
     private final TestService testService;
     private final AppLogger appLogger;
     private final App app;
@@ -32,21 +33,15 @@ public class AppController {
     @GetMapping("/v1/ping")
     public ResponseEntity<APIResponse<String>> pingService(){
         app.print("Pinging....");
+        SMS sms= new SMS();
+        sms.setRecipient("+2348064160204");
+        sms.setMessage("This is just Test");
+        smsSender.sendSMS(sms);
         return ResponseEntity.ok().body( new APIResponse("Service is Up", true, "Live"));
     }
     @PostMapping("/v1/test")
-    public ResponseEntity<APIResponse<Test>> testService(@RequestBody Test test){
-
-           //############### Activity Logging ###########
-            ActivityLog log = new ActivityLog();
-            log.setDescription("Logging test ");
-            log.setRequestObject("Here is the request");
-            log.setRequestObject("Here is the Response");
-            log.setUsername("net.rabiualiyu@gmail.com");
-            log.setUserId("9873456yuhjnfbdjhk");
-            appLogger.log(log);
-
-        return ResponseEntity.ok().body(new APIResponse("Request Successful", true,log));
+    public ResponseEntity<APIResponse<Test>> testService(){
+        return ResponseEntity.ok().body(new APIResponse("Request Successful", true, walletService.getAuth()));
     }
     @PostMapping("/v1/notification/test")
     public ResponseEntity<APIResponse<String>> testNotificationService(OAuth2Authentication authentication){

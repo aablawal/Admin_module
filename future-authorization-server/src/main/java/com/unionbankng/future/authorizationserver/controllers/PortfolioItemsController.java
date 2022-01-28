@@ -38,7 +38,8 @@ public class PortfolioItemsController {
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItems));
 
     }
-//,consumes = { "multipart/form-data" }
+
+
     @PostMapping(value = "/v1/portfolio_items/create_new")
     public ResponseEntity<APIResponse<PortfolioItem>> addNewPortfolioItem(@Valid @RequestBody PortfolioItemRequest request) throws IOException {
         app.print(" ###### Adding portfolio");

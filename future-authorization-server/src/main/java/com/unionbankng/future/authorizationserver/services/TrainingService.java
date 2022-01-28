@@ -62,7 +62,7 @@ public class TrainingService {
 
 
     @Caching(evict = {
-            @CacheEvict(value = "trainings_by_profile", key="#request.userId"),
+            @CacheEvict(value = "trainings_by_profile", key="#request.profileId"),
             @CacheEvict(value = "training", allEntries = true)
     })
     public Training saveFromRequest (TrainingRequest request, Training training) throws IOException {
