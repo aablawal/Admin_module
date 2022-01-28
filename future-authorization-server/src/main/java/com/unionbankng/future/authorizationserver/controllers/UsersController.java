@@ -113,10 +113,6 @@ public class UsersController {
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
 
-
-
-
-
     //Endpoint for updating user cover image
     @PostMapping(value = "/v1/users/cover-image/{userId}", consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadUserCoverImage(@PathVariable Long userId,
@@ -128,6 +124,7 @@ public class UsersController {
         User user = userService.updateProfile(userId,coverImg,null,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
+
     @PostMapping(value = "/v1/users/{userId}/upload_profile_image",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<User>> uploadProfileImage(@Nullable @RequestPart("image") MultipartFile image,
                                                                 @PathVariable Long userId) throws IOException {
