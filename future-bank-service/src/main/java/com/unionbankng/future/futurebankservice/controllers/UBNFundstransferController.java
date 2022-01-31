@@ -6,11 +6,9 @@ import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHan
 import com.unionbankng.future.futurebankservice.services.UBNResponseService;
 import com.unionbankng.future.futurebankservice.util.App;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import retrofit2.Response;
 
 import java.io.IOException;

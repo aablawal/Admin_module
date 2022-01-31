@@ -4,6 +4,13 @@ import com.fasterxml.uuid.Generators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,11 +22,11 @@ public class App {
     public void log(String message) {
         logger.info(message);
     }
-    public void print(Object obj){
+
+    public void print(Object obj) {
         try {
             logger.info(new ObjectMapper().writeValueAsString(obj));
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -28,8 +35,8 @@ public class App {
         UUID timebaseUUID = Generators.timeBasedGenerator().generate();
         return timebaseUUID.toString();
     }
-    public boolean validImage(String fileName)
-    {
+
+    public boolean validImage(String fileName) {
         String regex = "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$";
         Pattern p = Pattern.compile(regex);
         if (fileName == null) {
@@ -46,7 +53,7 @@ public class App {
 
     public boolean validNumber(String number) {
         if (number.startsWith("+234"))
-            number= number.replace("+234", "0");
+            number = number.replace("+234", "0");
         Pattern pattern = Pattern.compile("^\\d{11}$");
         Matcher matcher = pattern.matcher(number);
         return matcher.matches();
