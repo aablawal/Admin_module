@@ -16,7 +16,6 @@ public enum ConfigReference {
     VAT_INCOME_ACCOUNT_NUMBER,
     ESCROW_ACCOUNT_NAME,
     ESCROW_ACCOUNT_NUMBER;
-
     public String value() {
         return name();
     }

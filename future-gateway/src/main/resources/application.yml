@@ -44,9 +44,9 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://localhost:8083
-    loan-service:
-      path: /loanserv/**
-      url: http://localhost:8090
+    wallet-service:
+      path: /walletserv/**
+      url: http://localhost:9090
 
 ---
 spring:
@@ -73,9 +73,9 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
-    loan-service:
-      path: /loanserv/**
-      url: http://future-loan-service
+    wallet-service:
+      path: /walletserv/**
+      url: http://wallet-service
 
 ---
 spring:
@@ -102,6 +102,6 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
-    loan-service:
-      path: /loanserv/**
-      url: http://future-loan-service
+    wallet-service:
+      path: /walletserv/**
+      url: http://wallet-service

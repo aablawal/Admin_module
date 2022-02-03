@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.entities;
+import com.unionbankng.future.futurejobservice.enums.PaymentMethod;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import lombok.*;
 import javax.persistence.*;
@@ -61,6 +62,7 @@ public class JobContract implements Serializable {
     private String freelancerAccountNumber;
     private String freelancerPhoneNumber;
     private String employerPhoneNumber;
+    private PaymentMethod paymentMethod;
     @NotNull
     private int peppfees;
     private String initialPaymentReferenceA;

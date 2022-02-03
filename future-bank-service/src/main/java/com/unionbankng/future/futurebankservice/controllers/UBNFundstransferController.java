@@ -6,11 +6,9 @@ import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHan
 import com.unionbankng.future.futurebankservice.services.UBNResponseService;
 import com.unionbankng.future.futurebankservice.util.App;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import retrofit2.Response;
 
 import java.io.IOException;
@@ -28,11 +26,15 @@ public class UBNFundstransferController {
     public ResponseEntity<APIResponse<UBNFundTransferResponse>> transferFundsUBN(@RequestBody UBNFundTransferRequest request) throws IOException {
         //determine existing or non existing customer
         Response<UBNFundTransferResponse> responseResponse = ubnAccountAPIServiceHandler.transferFundsUBN(request);
-//        String responseMessage=ubnResponseService.getResponseMessage(responseResponse.body().getCode(),responseResponse.body().getMessage());
-        app.print(responseResponse.body());
-
-        if(!responseResponse.body().getCode().equals("00"))
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred "+responseResponse.body().getMessage(), false, responseResponse.body()));
+        if(responseResponse==null){
+            if(responseResponse.body()==null){
+                if(!responseResponse.body().getCode().equals("00")){
+                    return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred "+responseResponse.body().getMessage(), false, responseResponse.body()));
+                }
+                return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Unable to complete payment", false, responseResponse.body()));
+            }
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Unable to complete payment", false, null));
+        }
         //update customer details with account number
         return ResponseEntity.ok().body(new APIResponse<>("Funds transfer successful", true, responseResponse.body()));
     }
@@ -40,12 +42,17 @@ public class UBNFundstransferController {
     @PostMapping("/v1/ubn_funds/bulk_transfer")
     public ResponseEntity<APIResponse<UBNBulkFundTransferResponse>> transferBulkFundsUBN(@RequestBody UBNBulkFundTransferRequest request) throws IOException {
         app.print(request);
-        //determine existing or non existing customer
         Response<UBNBulkFundTransferResponse> responseResponse = ubnAccountAPIServiceHandler.transferBulkFundsUBN(request);
         app.print(responseResponse);
-        if(!responseResponse.isSuccessful())
-            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred", false, null));
-        //update customer details with account number
+        if(responseResponse==null){
+            if(responseResponse.body()==null){
+                if(!responseResponse.body().getCode().equals("00")){
+                    return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("An error occurred "+responseResponse.body().getMessage(), false, responseResponse.body()));
+                }
+                return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Unable to complete payment", false, responseResponse.body()));
+            }
+            return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>("Unable to complete payment", false, null));
+        }
         return ResponseEntity.ok().body(new APIResponse<>("Funds transfer successful", true, responseResponse.body()));
     }
 

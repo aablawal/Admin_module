@@ -89,8 +89,8 @@ public class JobProposalController {
     }
 
     @PostMapping("/v1/job/proposal/approve")
-    public ResponseEntity<APIResponse> approveJobProposal(@Valid @RequestBody String approvalRequest, Model model, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
-        APIResponse response = contractService.approveJobProposal(authentication, approvalRequest);
+    public ResponseEntity<APIResponse> approveJobProposal(@RequestHeader(value="Authorization") String authorization, @Valid @RequestBody String approvalRequest, Model model, @ApiIgnore OAuth2Authentication authentication) throws JsonProcessingException {
+        APIResponse response = contractService.approveJobProposal(authorization,authentication, approvalRequest);
         return ResponseEntity.ok().body(response);
     }
 
