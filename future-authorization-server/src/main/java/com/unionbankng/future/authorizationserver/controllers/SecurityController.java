@@ -42,7 +42,7 @@ public class SecurityController {
                 new APIResponse("Request successful",isSuccess,null));
     }
 
-    //Reset user's password
+
     @PostMapping("v1/security/reset_password")
     public ResponseEntity<APIResponse> resetPassword(@RequestBody @Valid ResetPasswordRequest request){
         app.print("Resetting password");
