@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class ResetPassword {
+public class ResetPasswordRequest {
     @NotBlank
     private String token;
 

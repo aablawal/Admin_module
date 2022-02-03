@@ -2,7 +2,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ChangePasswordRequest;
-import com.unionbankng.future.authorizationserver.pojos.ResetPassword;
+import com.unionbankng.future.authorizationserver.pojos.ResetPasswordRequest;
 import com.unionbankng.future.authorizationserver.services.SecurityService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class SecurityController {
 
     //Reset user's password
     @PostMapping("v1/security/reset_password")
-    public ResponseEntity<APIResponse> resetPassword(@RequestBody @Valid ResetPassword request){
+    public ResponseEntity<APIResponse> resetPassword(@RequestBody @Valid ResetPasswordRequest request){
         app.print("Resetting password");
         app.print(request.toString());
         return securityService.resetPassword(request.getToken(), request.getNewPassword());
