@@ -146,6 +146,5 @@ public class RegistrationService {
         logger.info("new google registration");
         return ResponseEntity.ok().body(
                 new APIResponse(messageSource.getMessage("success.registration.message", null, LocaleContextHolder.getLocale()),true, user.getId()));
-
     }
 }
