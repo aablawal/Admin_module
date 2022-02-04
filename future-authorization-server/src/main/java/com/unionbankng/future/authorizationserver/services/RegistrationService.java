@@ -81,7 +81,6 @@ public class RegistrationService {
                 .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername())
                 .authProvider(request.getAuthProvider()).build();
 
-
         user = userService.save(user);
         app.print("Saved user");
         app.print(user);
