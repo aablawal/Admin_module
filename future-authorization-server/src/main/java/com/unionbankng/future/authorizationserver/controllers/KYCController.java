@@ -7,6 +7,7 @@ import com.unionbankng.future.authorizationserver.repositories.KycAddressReposit
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.KYCService;
+import com.unionbankng.future.authorizationserver.services.WalletService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.authorizationserver.utils.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import retrofit2.Response;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -29,6 +32,7 @@ import java.util.Optional;
 public class KYCController {
     private final MessageSource messageSource;
     private final KYCService kycService;
+    private final WalletService walletService;
     private final KycRepository kycRepository;
     private final KycAddressRepository kycAddressRepository;
     private final UserRepository userRepository;
@@ -43,15 +47,19 @@ public class KYCController {
         if(request.getBvn()==null)
             return new APIResponse("Provide user verified BVN Number",
                     false, null);
-        if(request.getWalletId()==null)
-            return new APIResponse("Provide user wallet Id",
-                    false, null);
 
-        if(app.validBvn(request.getBvn())) {
+        if(user != null && app.validBvn(request.getBvn())) {
             user.setBvn(request.getBvn());
-            user.setWalletId(request.getWalletId());
             user.setKycLevel(1);
             userRepository.save(user);
+
+            APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getId()), user.getFirstName() + " " + user.getLastName(), user.getBvn());
+            if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {
+                user.setWalletId(walletResponse.getPayload().get("walletId"));
+            }else {
+                return new APIResponse("Wallet creation failed", false, null);
+            }
+
             return new APIResponse("BVN Added",
                     true, user);
         }else{
