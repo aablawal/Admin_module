@@ -9,7 +9,5 @@ import java.util.List;
 public @Data
 @Builder
 class KYCInitiationRequest implements Serializable {
-
     protected String bvn;
-    protected String walletId;
 }
