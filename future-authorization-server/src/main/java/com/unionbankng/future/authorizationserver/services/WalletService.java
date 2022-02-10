@@ -1,6 +1,7 @@
 package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.CreateWalletRequest;
 import com.unionbankng.future.authorizationserver.pojos.WalletAuthResponse;
 import com.unionbankng.future.authorizationserver.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.authorizationserver.utils.App;
@@ -89,12 +90,17 @@ public class WalletService implements Serializable {
             app.print(userId);
             app.print("customerName:");
             app.print(customerName);
+            app.print("bvn:");
+            app.print(bvn);
 
             WalletAuthResponse auth= getAuth();
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
-                Response<Map<String, String>> response = walletServiceInterface.createWallet(token,
-                        userId, customerName, bvn).execute();
+                app.print("wallet auth token:");
+                app.print(token);
+                app.print("##### Creating new Wallet....");
+                CreateWalletRequest createWalletRequest = new CreateWalletRequest(userId, customerName, bvn);
+                Response<Map<String, String>> response = walletServiceInterface.createWallet(token, createWalletRequest).execute();
                 app.print("Response:");
                 app.print(response);
                 app.print(response.body());

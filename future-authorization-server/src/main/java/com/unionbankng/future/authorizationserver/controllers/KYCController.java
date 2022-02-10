@@ -40,27 +40,34 @@ public class KYCController {
 
 
     @PostMapping("/v1/kyc/initiation")
-    public APIResponse initiateKYC(@RequestBody KYCInitiationRequest request,OAuth2Authentication authentication){
+    public APIResponse<?> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn){
+
+        app.print("initiateKYC");
+
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
-        if(request.getBvn()==null)
+        if(bvn==null || !app.validBvn(bvn))
             return new APIResponse("Provide user verified BVN Number",
                     false, null);
 
-        if(user != null && app.validBvn(request.getBvn())) {
-            user.setBvn(request.getBvn());
+        if(user != null && app.validBvn(bvn)) {
+
+
+            APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getUuid()), user.getFirstName() + " " + user.getLastName(), bvn);
+            if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {
+                app.print("Wallet created successfully");
+                app.print("Wallet ID: " + walletResponse.getPayload().get("walletId"));
+                user.setWalletId(walletResponse.getPayload().get("walletId"));
+            }else {
+                return new APIResponse<>("Wallet creation failed", false, null);
+            }
+
+            user.setBvn(bvn);
             user.setKycLevel(1);
             userRepository.save(user);
 
-            APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getId()), user.getFirstName() + " " + user.getLastName(), user.getBvn());
-            if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {
-                user.setWalletId(walletResponse.getPayload().get("walletId"));
-            }else {
-                return new APIResponse("Wallet creation failed", false, null);
-            }
-
-            return new APIResponse("BVN Added",
+            return new APIResponse<>("BVN Added",
                     true, user);
         }else{
             return new APIResponse("Invalid BVN Number",

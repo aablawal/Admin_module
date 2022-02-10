@@ -1,5 +1,6 @@
 package com.unionbankng.future.authorizationserver.retrofitservices;
 
+import com.unionbankng.future.authorizationserver.pojos.CreateWalletRequest;
 import com.unionbankng.future.authorizationserver.pojos.WalletAuthResponse;
 import retrofit2.Call;
 import retrofit2.http.*;
@@ -18,14 +19,13 @@ public interface WalletServiceInterface {
                                                    @Field("password") String password,
                                                    @Header("Authorization") String authorization);
 
-    @POST("/api/v1/wallet/instant_credit")
+
+    @POST("/api/v1/wallets/create_wallet")
     @Headers({
             "Accept: application/json"
     })
     Call<Map<String, String>> createWallet(@Header("Authorization") String authorization,
-                                           @Query("userId") String userId,
-                                           @Query("customerName") String customerName,
-                                           @Query("bvn") String bvn);
+                                           @Body CreateWalletRequest createWalletRequest);
 
 
 }
