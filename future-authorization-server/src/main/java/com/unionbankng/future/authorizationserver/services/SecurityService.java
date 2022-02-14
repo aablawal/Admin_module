@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,12 +47,16 @@ public class SecurityService {
     @Value("${forgot.password.url}")
     private String forgotPasswordURL;
 
-    public void initiateForgotPassword(String identifier){
+    public ResponseEntity<?> initiateForgotPassword(String identifier){
 
         app.print("#########Initiating forgot password");
         app.print(identifier);
-        User user = userService.findByEmailOrUsername(identifier,identifier)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        Optional<User> emailOwner = userService.findByEmailOrUsername(identifier,identifier);
+
+        if(emailOwner.isEmpty()){
+            return ResponseEntity.ok().body(new APIResponse<>("This email is not registered", false, null));
+        }
+        User user = emailOwner.get();
 
         String token = UUID.randomUUID().toString();
 
@@ -72,6 +77,10 @@ public class SecurityService {
                         email(user.getEmail()).displayName(user.toString()).build())).build();
 
         emailSender.sendEmail(emailBody);
+
+        APIResponse<String> response = new APIResponse<>("Password Reset Email Sent", true, null);
+
+        return ResponseEntity.ok().body(response);
     }
 
     public Boolean confirmForgotPasswordToken(String token){
@@ -88,7 +97,7 @@ public class SecurityService {
 
 
         String userEmail = memcachedHelperService.getValueByKey(token);
-        app.print("Memecatch Value:"+userEmail);
+        app.print("Memcached Value:"+userEmail);
       
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(

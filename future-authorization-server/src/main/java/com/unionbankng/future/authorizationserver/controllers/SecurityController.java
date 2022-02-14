@@ -23,13 +23,10 @@ public class SecurityController {
     private final App app;
 
     @PostMapping("v1/security/initiate_forgot_password")
-    public ResponseEntity<APIResponse> initiateForgotPassword(@RequestParam String identifier){
+    public ResponseEntity<?> initiateForgotPassword(@RequestParam String identifier){
+        app.print("Initiating Forgot password");
+        return securityService.initiateForgotPassword(identifier);
 
-        app.print("Initiatinf Forgot password");
-        securityService.initiateForgotPassword(identifier);
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new APIResponse("Request successful",true,null));
     }
 
     @GetMapping("v1/security/confirm_reset_token")
