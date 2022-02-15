@@ -30,14 +30,14 @@ public class WalletService implements Serializable {
     private WalletServiceInterface walletServiceInterface;
     private final App app;
 
-//    @Value("${kula.walletBaseURL}")
-    private String walletBaseURL = "http://localhost:9090";
+    @Value("${kula.walletBaseURL}")
+    private String walletBaseURL;// = "http://localhost:9090";
 
-//    @Value("${kula.walletUsername}")
-    private String username = "marcus";
+    @Value("${kula.walletUsername}")
+    private String username;// = "marcus";
 
-//    @Value("${kula.walletPassword}")
-    private String password = "password";
+    @Value("${kula.walletPassword}")
+    private String password;// = "password";
 
     @PostConstruct
     public void init() {
