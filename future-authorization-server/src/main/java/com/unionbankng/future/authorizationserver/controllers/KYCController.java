@@ -47,6 +47,8 @@ public class KYCController {
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
+        app.print(user);
+
         if(bvn==null || !app.validBvn(bvn))
             return new APIResponse("Provide user verified BVN Number",
                     false, null);
@@ -55,6 +57,7 @@ public class KYCController {
 
 
             APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getUuid()), user.getFirstName() + " " + user.getLastName(), bvn);
+            app.print("walletResponse: " + walletResponse);
             if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {
                 app.print("Wallet created successfully");
                 app.print("Wallet ID: " + walletResponse.getPayload().get("walletId"));

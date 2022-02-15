@@ -1,4 +1,5 @@
 package com.unionbankng.future.authorizationserver.services;
+
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.authorizationserver.utils.App;
@@ -25,14 +26,14 @@ public class WalletService implements Serializable {
     private WalletServiceInterface walletServiceInterface;
     private final App app;
 
-    @Value("${kula.walletBaseURL}")
-    private String walletBaseURL;
+//    @Value("${kula.walletBaseURL}")
+    private String walletBaseURL = "http://localhost:9090";
 
-    @Value("${kula.walletUsername}")
-    private String username;
+//    @Value("${kula.walletUsername}")
+    private String username = "marcus";
 
-    @Value("${kula.walletPassword}")
-    private String password;
+//    @Value("${kula.walletPassword}")
+    private String password = "password";
 
     @PostConstruct
     public void init() {
@@ -42,6 +43,11 @@ public class WalletService implements Serializable {
                 .writeTimeout(20, TimeUnit.SECONDS)
                 .readTimeout(50, TimeUnit.SECONDS)
                 .build();
+
+        for (int i = 0; i < 100; i++) {
+            app.print("Wallet Service init");
+            app.print(walletBaseURL);
+        }
 
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(walletBaseURL)
@@ -61,7 +67,11 @@ public class WalletService implements Serializable {
         try {
             app.print("Generating Wallet access token ....");
             String  basicAuth=computeBasicAuthorization();
+            app.print("basicAuth");
             app.print(basicAuth);
+            app.print(walletBaseURL);
+            app.print(username);
+            app.print(password);
             Response<WalletAuthResponse> response = walletServiceInterface.getWalletServiceToken("password",username,password,basicAuth).execute();
             app.print("Response:");
             app.print(response);
