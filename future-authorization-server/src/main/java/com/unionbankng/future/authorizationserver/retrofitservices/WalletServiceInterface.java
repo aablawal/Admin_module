@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface WalletServiceInterface {
 
-    @POST("/oauth/token")
+    @POST("oauth/token")
     @FormUrlEncoded
     @Headers({
             "Accept: application/json"
@@ -20,7 +20,7 @@ public interface WalletServiceInterface {
                                                    @Header("Authorization") String authorization);
 
 
-    @POST("/api/v1/wallets/create_wallet")
+    @POST("api/v1/wallets/create_wallet")
     @Headers({
             "Accept: application/json"
     })
