@@ -1,8 +1,5 @@
 package com.unionbankng.future.authorizationserver.services;
-
-import com.unionbankng.future.authorizationserver.pojos.APIResponse;
-import com.unionbankng.future.authorizationserver.pojos.CreateWalletRequest;
-import com.unionbankng.future.authorizationserver.pojos.WalletAuthResponse;
+import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.Base64;
@@ -31,13 +26,13 @@ public class WalletService implements Serializable {
     private final App app;
 
     @Value("${kula.walletBaseURL}")
-    private String walletBaseURL;// = "http://localhost:9090";
+    private String walletBaseURL;
 
     @Value("${kula.walletUsername}")
-    private String username;// = "marcus";
+    private String username;
 
     @Value("${kula.walletPassword}")
-    private String password;// = "password";
+    private String password;
 
     @PostConstruct
     public void init() {
@@ -112,7 +107,7 @@ public class WalletService implements Serializable {
                     return  new APIResponse(response.message(),false,null);
                 }
             }else{
-                return  new APIResponse("Unable to generate wallet auth token",false,null);
+                return  new APIResponse("Sorry, we are unable to generate wallet auth token",false,null);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

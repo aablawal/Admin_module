@@ -60,7 +60,7 @@ public class KYCController {
                 app.print("Wallet ID: " + walletResponse.getPayload().get("walletId"));
                 user.setWalletId(walletResponse.getPayload().get("walletId"));
             }else {
-                return new APIResponse<>("Wallet creation failed", false, null);
+                return new APIResponse<>("Sorry, Wallet creation failed at this time, try again soon!", false, null);
             }
 
             user.setBvn(bvn);
