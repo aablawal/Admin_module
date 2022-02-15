@@ -26,6 +26,7 @@ public class WalletService implements Serializable {
     private WalletServiceInterface walletServiceInterface;
     private final App app;
 
+
     @Value("${kula.walletBaseURL}")
     private String walletBaseURL;
 
@@ -43,11 +44,6 @@ public class WalletService implements Serializable {
                 .writeTimeout(20, TimeUnit.SECONDS)
                 .readTimeout(50, TimeUnit.SECONDS)
                 .build();
-
-        for (int i = 0; i < 100; i++) {
-            app.print("Wallet Service init");
-            app.print(walletBaseURL);
-        }
 
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(walletBaseURL)

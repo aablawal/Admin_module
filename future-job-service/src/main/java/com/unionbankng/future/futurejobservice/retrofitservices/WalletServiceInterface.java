@@ -9,7 +9,7 @@ import retrofit2.http.*;
 
 public interface WalletServiceInterface {
 
-    @POST("oauth/token")
+    @POST("/oauth/token")
     @FormUrlEncoded
     @Headers({
             "Accept: application/json"
@@ -19,14 +19,14 @@ public interface WalletServiceInterface {
                                                    @Field("password") String password,
                                                    @Header("Authorization") String authorization);
 
-    @POST("api/v1/wallet/instant_credit")
+    @POST("/api/v1/wallet/instant_credit")
     @Headers({
             "Accept: application/json"
     })
     Call<WalletDebitCreditResponse> creditWallet(@Header("Authorization") String authorization, @Body WalletCreditRequest request);
 
 
-    @POST("api/v1/wallet/instant_debit")
+    @POST("/api/v1/wallet/instant_debit")
     @Headers({
             "Accept: application/json"
     })
