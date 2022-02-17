@@ -39,10 +39,26 @@ public class AppController {
         smsSender.sendSMS(sms);
         return ResponseEntity.ok().body( new APIResponse("Service is Up", true, "Live"));
     }
+
     @PostMapping("/v1/test")
     public ResponseEntity<APIResponse<Test>> testService(){
-        return ResponseEntity.ok().body(new APIResponse("Request Successful", true, walletService.getAuth()));
+        NotificationBody body = new NotificationBody();
+        body.setBody("Hello Test!, your job CYX has been published on Kula");
+        body.setSubject("Job Posted Successfully");
+        body.setActionType("REDIRECT");
+        body.setAction("/job/details/1");
+        body.setTopic("'Job'");
+        body.setChannel("S");
+        body.setPriority("YES");
+        body.setRecipient(1l);
+        body.setRecipientEmail("net.rabiualiyu@gmail.com");
+        body.setRecipientName("Rabiu Aliyu");
+        notificationSender.pushNotification(body);
+        app.print("Notification fired");
+
+        return ResponseEntity.ok().body(new APIResponse("Request Successful", true, null));
     }
+
     @PostMapping("/v1/notification/test")
     public ResponseEntity<APIResponse<String>> testNotificationService(OAuth2Authentication authentication){
         NotificationBody body = new NotificationBody();
@@ -54,8 +70,9 @@ public class AppController {
         body.setChannel("S");
         body.setPriority("YES");
         body.setRecipientEmail("net.rabiualiyu@gmail.com");
-        body.setRecipientName("Rabiu Abdul Aliyu");
+        body.setRecipientName("Rabiu Aliyu");
         body.setRecipient(1l);
+
         notificationSender.pushNotification(body);
         return ResponseEntity.ok().body(new APIResponse("Notification Fired", true, body));
     }
