@@ -29,7 +29,6 @@ public class UBNBankTransferService {
 //    private String bankServiceBaseURL="http://localhost:8080";
 
 
-
     @PostConstruct
     public void init() {
 
