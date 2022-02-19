@@ -33,8 +33,6 @@ public class BvnValidationService {
 
         Response<BVNValidationResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
 
-        logger.info("status: "+response.isSuccessful());
-        logger.info("message: "+response.message());
         app.print("API Response:");
         app.print(response);
         app.print("RESPONSE BODY: " + (response.body() != null ? response.body().getStatusMessage() : "Response body is null"));
@@ -60,8 +58,6 @@ public class BvnValidationService {
         app.print(request);
         Response<BVNVerificationResponse> response = ubnAccountAPIServiceHandler.verifyCustomerBVN(request);
 
-        logger.info("status: " + response.isSuccessful());
-        logger.info("message: " + response.message());
         app.print("API Response:");
         app.print(response);
         app.print("RESPONSE BODY: " + response.body().toString());
