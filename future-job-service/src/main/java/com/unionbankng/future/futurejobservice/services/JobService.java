@@ -174,7 +174,7 @@ public class JobService {
                         body.setChannel("S");
                         body.setPriority("YES");
                         body.setRecipient(savedJob.getOid());
-                        body.setRecipientEmail(currentUser.getUserFullName());
+                        body.setRecipientEmail(currentUser.getUserEmail());
                         body.setRecipientName(currentUser.getUserFullName());
                         notificationSender.pushNotification(body);
                         logger.info("Notification fired");
@@ -245,7 +245,7 @@ public class JobService {
             body.setChannel("S");
             body.setPriority("NORMAL");
             body.setRecipient(job.getOid());
-            body.setRecipientEmail(currentUser.getUserFullName());
+            body.setRecipientEmail(currentUser.getUserEmail());
             body.setRecipientName(currentUser.getUserFullName());
             notificationSender.pushNotification(body);
             logger.info("Notification fired");
@@ -304,7 +304,7 @@ public class JobService {
                 body.setChannel("S");
                 body.setPriority("NORMAL");
                 body.setRecipient(job.getOid());
-                body.setRecipientEmail(currentUser.getUserFullName());
+                body.setRecipientEmail(currentUser.getUserEmail());
                 body.setRecipientName(currentUser.getUserFullName());
                 notificationSender.pushNotification(body);
             }

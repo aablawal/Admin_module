@@ -1,9 +1,11 @@
 package com.unionbankng.future.futurebankservice.pojos;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data 
+@Data
+@AllArgsConstructor
 public class BVNVerificationResponse {
 	 private String statusCode;
 	 private String statusMessage;

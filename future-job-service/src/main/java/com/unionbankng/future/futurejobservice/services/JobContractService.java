@@ -334,11 +334,11 @@ public class JobContractService implements Serializable {
                         notificationSender.pushNotification(body);
                     }
 
-                    app.print("###################################");
+                    app.print("Creating Escrow Request###################################");
                     app.print("Escrow URL: "+baseURL);
                     app.print("Escrow Token: "+token);
                     HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
+                    String request=baseURL + "/Transaction/create?appid=" + appId
                             + "&referenceid=" + contract.getContractReference()
                             + "&user_email=" + contract.getUserEmail()
                             + "&amount=" + contract.getAmount()
@@ -357,13 +357,15 @@ public class JobContractService implements Serializable {
                             + "&peppfees=" + contract.getPeppfees()
                             + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate())
                             + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate())
-                            + "&transfer_reference_id=" + contract.getReversalPaymentReferenceA(), HttpMethod.POST, entity, String.class);
+                            + "&transfer_reference_id=" + contract.getReversalPaymentReferenceA();
+
+                    app.print(request);
+                    ResponseEntity<String> response = rest.exchange(request, HttpMethod.POST, entity, String.class);
                     if (response.getStatusCode().is2xxSuccessful()) {
                         status = 1;
                         remark = "success";
 
                         app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
-
                         //fire notifications
                         NotificationBody body1 = new NotificationBody();
                         body1.setBody("Your " + contract.getAmount() + " deducted is currently in our Escrow, it will only be released to the freelancer when you confirm that the job done is okay by you.");

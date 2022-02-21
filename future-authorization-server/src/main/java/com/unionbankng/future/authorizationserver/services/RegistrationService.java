@@ -81,7 +81,6 @@ public class RegistrationService {
                 .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername())
                 .authProvider(request.getAuthProvider()).build();
 
-
         user = userService.save(user);
         app.print("Saved user");
         app.print(user);
@@ -147,6 +146,5 @@ public class RegistrationService {
         logger.info("new google registration");
         return ResponseEntity.ok().body(
                 new APIResponse(messageSource.getMessage("success.registration.message", null, LocaleContextHolder.getLocale()),true, user.getId()));
-
     }
 }

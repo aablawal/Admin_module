@@ -29,7 +29,7 @@ public class UserService {
     private final App app;
 
 
-    @Cacheable(value = "user", key = "#id")
+//    @Cacheable(value = "user", key = "#id")
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
@@ -125,8 +125,11 @@ public class UserService {
 
         if (img != null) {
             app.print("Updating user profile image");
-            if (user.getImg() != null)
+            if (user.getImg() != null){
+                app.print("Deleting old image");
                 fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
+                app.print("Deleted old image");
+            }
             String source = fileStorageService.storeFile(img, userId, BlobType.IMAGE);
             user.setImg(source);
             app.print(source);
@@ -134,8 +137,11 @@ public class UserService {
 
         if (coverImg != null) {
             app.print("Updating user cover image");
-            if (user.getCoverImg() != null)
+            if (user.getCoverImg() != null){
+                app.print("Deleting old cover image");
                 fileStorageService.deleteFileFromStorage(user.getCoverImg(), BlobType.IMAGE);
+                app.print("Deleted old cover image");
+            }
             String source = fileStorageService.storeFile(coverImg, userId, BlobType.IMAGE);
             user.setCoverImg(source);
             app.print(source);

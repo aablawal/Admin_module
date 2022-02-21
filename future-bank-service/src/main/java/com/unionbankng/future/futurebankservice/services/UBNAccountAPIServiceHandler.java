@@ -54,8 +54,20 @@ public class UBNAccountAPIServiceHandler {
 
        public UBNAuthServerTokenResponse getUBNAuthServerToken() throws IOException {
         logger.info("Fetching Auth Server Token");
-        Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
-                credentials.get("grantType"),credentials.get("clientId"));
+
+           logger.info("URL:"+ubnBaseURL);
+           logger.info("username:"+credentials.get("username"));
+           logger.info("password:"+credentials.get("password"));
+           logger.info("clientSecret:"+credentials.get("clientSecret"));
+           logger.info("grantType:"+credentials.get("grantType"));
+           logger.info("clientId:"+credentials.get("clientId"));
+
+        Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),
+                credentials.get("password"),credentials.get("clientSecret"), credentials.get("grantType"),
+                credentials.get("clientId"));
+
+        app.print("responseCall.request().url().url()");
+        app.print(responseCall.request().url().url());
 
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
         app.print("/authserv/oauth/token is :"+ (response != null ? response.getAccess_token() : "null"));
@@ -70,14 +82,20 @@ public class UBNAccountAPIServiceHandler {
 //        credentials.put("username","kulasuser");
 //        credentials.put("password","JqOmrhC5Cs");
 
+        logger.info("Fetching Account Server Token");
+
+
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
+        app.print(responseCall);
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
         app.print("/ubnmiserv/oauth/token is :"+ (response != null ? response.getAccess_token() : null));
         return  response;
     }
     
     public Response<BVNValidationResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
+
+        logger.info("Fetching BVN Validation");
 
         UBNAuthServerTokenResponse response = getUBNAuthServerToken();
 
