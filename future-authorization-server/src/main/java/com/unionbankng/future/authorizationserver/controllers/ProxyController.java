@@ -6,6 +6,7 @@ import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ApiResponseProxy;
 import com.unionbankng.future.authorizationserver.services.SecurityService;
 import com.unionbankng.future.authorizationserver.services.UserService;
+import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,17 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProxyController {
 
     private final UserService userService;
+    private final App app;
 
     @GetMapping("/v1/proxy/user/get_by_id/{userId}")
     public ApiResponseProxy<User> getUserById(@PathVariable String userId) {
+        app.print("ProxyController.getUserById()");
+        app.print("userId: " + userId);
+
         User user = userService.findByUuid(userId).orElse(null);
+        app.print("user: " + user);
         if (user != null) {
+            app.print("Success block for user: " + user);
             return new ApiResponseProxy<>("Request successful", true, "01", user);
         } else {
             return new ApiResponseProxy<>("User not found", false, "02", null);
