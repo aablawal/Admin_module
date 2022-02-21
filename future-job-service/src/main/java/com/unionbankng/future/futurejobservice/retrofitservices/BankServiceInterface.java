@@ -16,7 +16,4 @@ public interface BankServiceInterface {
             "Accept: application/json"
     })
     Call<APIResponse<UBNBulkFundTransferResponse>> transferBulkFund(@Header("Authorization") String authorization, @Body UBNBulkFundTransferRequest request);
-
-
-
 }
