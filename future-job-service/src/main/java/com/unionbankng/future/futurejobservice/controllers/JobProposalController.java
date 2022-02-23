@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
@@ -73,6 +74,12 @@ public class JobProposalController {
     public ResponseEntity<APIResponse<List<Job>>> getAppliedJobByUserId(@PathVariable Long id, @RequestParam int page, @RequestParam int size, Model model) {
         return ResponseEntity.ok().body(
                 new APIResponse("success", true, service.findAppliedJobsByUserId(id, PageRequest.of(page, size), model)));
+    }
+
+    @GetMapping("/v1/jobs/count/applied/{id}")
+    public ResponseEntity<APIResponse<Long>> getNoOfAppliedJobByUserId(@PathVariable Long id) {
+        return ResponseEntity.ok().body(
+                new APIResponse("success", true, service.noOfAppliedJobsByUserId(id)));
     }
 
     @GetMapping("/v1/job/proposals/count/{jid}")

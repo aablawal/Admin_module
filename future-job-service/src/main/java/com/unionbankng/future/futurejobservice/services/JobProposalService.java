@@ -1,5 +1,4 @@
 package com.unionbankng.future.futurejobservice.services;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.Serializable;
-import java.security.Principal;
 import java.util.Date;
 
 @Service
@@ -320,6 +318,10 @@ public class JobProposalService  implements Serializable {
         Page<JobProposal> paginatedData= repository.findProposalsByUserId(pageable, userid);
         Model proposalList = appService.getProposalCollection(paginatedData, model).addAttribute("currentPage", pageable.getPageNumber());
         return proposalList;
+    }
+
+    public long noOfAppliedJobsByUserId(Long userid) {
+        return repository.findNoOfProposalsByUserId(userid);
     }
 
     public Model getProposals(Pageable pageable, Model model){
