@@ -1,11 +1,13 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.entities.Training;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.EducationAndTrainingRequest;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.pojos.TrainingRequest;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.services.QualificationService;
 import com.unionbankng.future.authorizationserver.services.TrainingService;
 import com.unionbankng.future.authorizationserver.utils.App;
@@ -30,6 +32,7 @@ public class QualificationsController {
 
     private final QualificationService qualificationService;
     private final TrainingService trainingService;
+    private final ProfileRepository profileRepository;
     private final App app;
 
     @GetMapping("/v1/qualifications/find_by_profile_id/{profileId}")
@@ -77,11 +80,17 @@ public class QualificationsController {
             throws IOException {
 
         app.print("Qualification Controller: Adding new qualification/training");
+
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        request.setProfileId(profile.getId());
         app.print(request);
 
         if(request.getSchool() != null && !request.getSchool().isBlank()){
             app.print("Qualification Controller: Adding new qualification");
             QualificationRequest qualificationRequest = new QualificationRequest();
+            qualificationRequest.setProfileId(request.getProfileId());
             qualificationRequest.setUserId(request.getUserId());
             qualificationRequest.setSchool(request.getSchool());
             qualificationRequest.setCountry(request.getCountry());
@@ -120,8 +129,12 @@ public class QualificationsController {
 
         app.print("Qualification Controller: fetching all users qualification");
 
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+
         List<Qualification> qualifications = qualificationService.
-                findAllByUserId(userId,Sort.by("createdAt").ascending());
+                findAllByProfileId(profile.getId(), Sort.by("createdAt").ascending());
 
         List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();
 
@@ -151,8 +164,12 @@ public class QualificationsController {
         app.print("Qualification Controller: fetching all users training");
         app.print(userId);
 
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+
         List<Training> trainings = trainingService.
-                findAllByUserId(userId,Sort.by("createdAt").ascending());
+                findAllByProfileId(profile.getId(), Sort.by("createdAt").ascending());
 
         app.print(trainings);
         List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();

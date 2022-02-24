@@ -36,12 +36,12 @@ public class ExperienceService {
         return experienceRepository.findByProfileId(profileId,sort);
     }
 
-    @Cacheable(value = "experiences", key="#userId")
+//    @Cacheable(value = "experiences", key="#userId")
     public List<Experience> findByUserId(Long userId, Sort sort){
        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
         );
-        return findByProfileId(profile.getId(), sort);
+        return experienceRepository.findByProfileId(profile.getId(),sort);
     }
 
     @CacheEvict(value = "experiences", allEntries = true)
@@ -65,7 +65,7 @@ public class ExperienceService {
         experienceRepository.deleteById(id);
     }
 
-    @CacheEvict(value = "experience", allEntries = true)
+    @CacheEvict(value = "experience", allEntries = true, key = "#request.userId")
     public Experience saveFromRequest (MultipartFile file,ExperienceRequest request, Experience experience) throws IOException {
 
         Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
