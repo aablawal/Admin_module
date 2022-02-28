@@ -292,7 +292,7 @@ public class KYCController {
                     return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
                             true, "KYC Verification rejected!");
                 } else {
-                    // Upgrade kyc status
+                    // Upgrade kyc status 
                     Kyc kyc_detail = new Kyc();
                     kyc_detail.setVerificationStatus(false);
                     kycRepository.save(kyc_detail);
