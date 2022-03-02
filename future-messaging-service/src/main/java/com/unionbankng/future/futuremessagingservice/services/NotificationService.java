@@ -116,20 +116,6 @@ public class NotificationService {
                     }
 
                 }
-
-                if(notificationBody.getPriority().equals("YES")){
-                    //send an email for priority notifications
-                    app.print("Sending Notification to Email.....");
-                    app.print(notificationBody.getAttachment());
-                    EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
-                    ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(notificationBody.getSubject())
-                            .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(notificationBody.getRecipientEmail()).displayName(notificationBody.getRecipientName()).build())).build();
-
-                    emailSender.sendEmail(emailBody);
-                    logger.info("Message Queued successfully");
-                }else{
-                    app.print("Notification not a Priority one");
-                }
                 return notificationRepository.save(traditionalNotification);
 
             }catch (Exception e){
