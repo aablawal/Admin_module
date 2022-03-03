@@ -26,6 +26,19 @@ spring:
     config:
       uri: http://localhost:8082
       label: develop
+azure:
+  keyvault:
+    keyvault1:
+      client-id: ${KEY_VAULT_CLIENT_ID}
+      client-key: ${KEY_VAULT_CLIENT_KEY}
+      tenant-id: ${KEY_VAULT_TENANT_ID}
+      uri: ${KEY_VAULT_URL}
+    keyvault2:
+      client-id: ${KEY_VAULT_CLIENT_ID}
+      client-key: ${KEY_VAULT_CLIENT_KEY}
+      tenant-id: ${KEY_VAULT_TENANT_ID}
+      uri: ${KEY_VAULT2_URL}
+    order: keyvault1,keyvault2
 #azure:
 #  keyvault:
 #    client-id: 4bb3e1f9-374c-4668-a223-269379512081
