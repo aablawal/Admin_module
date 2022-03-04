@@ -36,6 +36,19 @@ spring:
     config:
       label: staging
       profile: staging
+azure:
+  keyvault:
+    keyvault1:
+      client-id: ${KEY_VAULT_CLIENT_ID}
+      client-key: ${KEY_VAULT_CLIENT_KEY}
+      tenant-id: ${KEY_VAULT_TENANT_ID}
+      uri: ${KEY_VAULT_URL}
+    keyvault2:
+      client-id: ${KEY_VAULT_CLIENT_ID}
+      client-key: ${KEY_VAULT_CLIENT_KEY}
+      tenant-id: ${KEY_VAULT_TENANT_ID}
+      uri: ${KEY_VAULT2_URL}
+    order: keyvault1,keyvault2
 ---
 spring:
   config:
