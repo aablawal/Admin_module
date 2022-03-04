@@ -35,18 +35,18 @@ public class JobPaymentService implements Serializable {
       payment.setExecutedBy(paymentRequest.getExecutedBy());
       payment.setExecutedByUsername(paymentRequest.getExecutedByUsername());
       payment.setExecutedFor(paymentRequest.getContractReference());
-      payment.setInitBranchCode("682");
+      payment.setInitBranchCode("000");
       //debit the escrow amount
       payment.setDebitAccountName(paymentRequest.getDebitAccountName());
       payment.setDebitAccountNumber(paymentRequest.getDebitAccountNumber());
-      payment.setDebitAccountBranchCode("682");
+      payment.setDebitAccountBranchCode("000");
       payment.setDebitAccountType(paymentRequest.getDebitAccountType());
       payment.setDebitNarration(paymentRequest.getNarration());
       //credit the employer account
       payment.setCreditAccountName(paymentRequest.getCreditAccountName());
       payment.setCreditAccountNumber(paymentRequest.getCreditAccountNumber());
       payment.setCreditAccountBankCode("032");
-      payment.setCreditAccountBranchCode("682");
+      payment.setCreditAccountBranchCode("000");
       payment.setCreditAccountType(paymentRequest.getCreditAccountType());
       payment.setCreditNarration(paymentRequest.getNarration());
 
