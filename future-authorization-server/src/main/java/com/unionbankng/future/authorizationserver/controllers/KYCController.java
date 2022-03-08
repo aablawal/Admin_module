@@ -115,8 +115,8 @@ public class KYCController {
 
 
     @PostMapping("/v1/kyc/address_verification")
-    public APIResponse<String> verifyAddress(@PathVariable String userid, @RequestBody AddressVerificationRequestVerifyme addressVerificationRequestVerifyme,OAuth2Authentication authentication) throws Exception {
-        String[] params = new String[]{userid, "User"};
+    public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequestVerifyme addressVerificationRequestVerifyme,OAuth2Authentication authentication) throws Exception {
+//        String[] params = new String[]{userid, "User"};
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 

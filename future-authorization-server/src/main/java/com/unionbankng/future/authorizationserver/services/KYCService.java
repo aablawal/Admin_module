@@ -317,7 +317,7 @@ public class KYCService {
                         kyc.setSelfieImage(savedSelfieUrl);
                         kyc.setIdImage(savedIdImageUrl);
                         kycRepository.save(kyc);
-                        // Upgrade User KYC level to tear 2
+                        // Upgrade User KYC level to tear 2 TODO confirm from rabiu if this is really an upgrade to tier 3
                         user.setKycLevel(3);
                         userRepository.save(user);
                         // Send Email to User
@@ -415,7 +415,7 @@ public class KYCService {
                     kyc.setSelfieImage(savedSelfieUrl);
                     kyc.setIdImage(savedIdImageUrl);
                     kycRepository.save(kyc);
-                    user.setKycLevel(3);
+                    user.setKycLevel(3); //TODO confirm from Rabiu
                     userRepository.save(user);
                     // Send Email to User
                     sendKycEmailUser(user, "kyc.verification.email.not.verified", "Photo Verification Update");
@@ -504,7 +504,7 @@ public class KYCService {
                 kyc.setSelfieImage(savedSelfieUrl);
                 kyc.setIdImage(savedIdImageUrl);
                 kycRepository.save(kyc);
-                // Upgrade User KYC level to tear 2
+                // Upgrade User KYC level to tear 2 TODO confirm from rabiu
                 user.setKycLevel(3);
                 // Send Email to User
                 sendKycEmailUser(user, "kyc.verification.email.not.verified", "Photo Verification Update");
