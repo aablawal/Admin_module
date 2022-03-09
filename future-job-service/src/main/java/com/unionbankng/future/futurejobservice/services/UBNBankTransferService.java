@@ -24,9 +24,8 @@ public class UBNBankTransferService {
     private BankServiceInterface bankServiceInterface;
     private final App app;
 
-//    @Value("${kula.bankService.baseURL}")
-//    private String bankServiceBaseURL;
-    private String bankServiceBaseURL="http://localhost:8080";
+    @Value("${kula.bankService.baseURL}")
+    private String bankServiceBaseURL;
 
 
     @PostConstruct
