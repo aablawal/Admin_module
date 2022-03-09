@@ -140,7 +140,7 @@ public class KYCService {
             passportFaceMatchRequest2.setEmail(user.getEmail());
             passportFaceMatchRequest2.setFirstName(user.getFirstName());
             passportFaceMatchRequest2.setGender(user.getGender());
-            passportFaceMatchRequest2.setPhone(verifyKycRequest.getPhoneNumber());
+            passportFaceMatchRequest2.setPhone(user.getPhoneNumber()); //Todo: Verify Phone Number required. Check for the phone number in the BVN verification.
             passportFaceMatchRequest2.setLastName(user.getLastName());
             passportFaceMatchRequest2.setSelfie(selfieImageBase64);
             passportFaceMatchRequest2.setSearchParameter(verifyKycRequest.getIdNumber());

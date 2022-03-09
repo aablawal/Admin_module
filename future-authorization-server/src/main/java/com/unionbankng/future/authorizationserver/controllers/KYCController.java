@@ -1,9 +1,12 @@
 package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
+import com.unionbankng.future.authorizationserver.entities.KycBVNVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.VerificationStatus;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
+import com.unionbankng.future.authorizationserver.repositories.KycBVNRepository;
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.KYCService;
@@ -35,12 +38,13 @@ public class KYCController {
     private final WalletService walletService;
     private final KycRepository kycRepository;
     private final KycAddressRepository kycAddressRepository;
+    private final KycBVNRepository kycBVNRepository;
     private final UserRepository userRepository;
     private final App app;
 
 
     @PostMapping("/v1/kyc/initiation")
-    public APIResponse<?> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn){
+    public APIResponse<?> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam String dob){
 
         app.print("initiateKYC");
 
@@ -48,6 +52,8 @@ public class KYCController {
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
         app.print(user);
+        app.print(bvn);
+        app.print(dob);
 
         if(bvn==null || !app.validBvn(bvn))
             return new APIResponse("Provide user verified BVN Number",
@@ -70,6 +76,18 @@ public class KYCController {
             user.setKycLevel(1);
             userRepository.save(user);
 
+            KycBVNVerification kycBVNVerification = new KycBVNVerification();
+            kycBVNVerification.setBvn(bvn);
+            kycBVNVerification.setDob(dob);
+            kycBVNVerification.setUserUuid(user.getUuid());
+            kycBVNVerification.setUserId(user.getId());
+            kycBVNVerification.setFirstname(user.getFirstName());
+            kycBVNVerification.setLastname(user.getLastName());
+            kycBVNVerification.setStatus(VerificationStatus.VERIFIED);
+            kycBVNRepository.save(kycBVNVerification);
+
+
+
             return new APIResponse<>("BVN Added",
                     true, user);
         }else{
@@ -90,9 +108,20 @@ public class KYCController {
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
         if(user!=null) {
 
-            if (user.getKycLevel() >=2)
+            if (user.getKycLevel() >=2) {
                 return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                         false, null);
+            }
+
+            KycBVNVerification kycBVNVerification = kycBVNRepository.findByUserId(user.getId()).orElse(null);
+            if(kycBVNVerification!=null && kycBVNVerification.getStatus()==VerificationStatus.VERIFIED) {
+                verifyKycRequest.setDob(kycBVNVerification.getDob());
+            }
+
+            if(user.getGender() == null) {
+                user.setGender(verifyKycRequest.getGender());
+                userRepository.save(user);
+            }
 
             if (verifyKycRequest.getIdType().equals("INTERNATIONAL-PASSPORT")) {
                 return kycService.VerifyInternationalPassport(verifyKycRequest,selfieImage, idImage,user);
@@ -120,9 +149,17 @@ public class KYCController {
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
-        if(user.getKycLevel()==3 || user.getKycLevel()==5)
+        assert user != null;
+        if(user.getKycLevel()==3 || user.getKycLevel()==5) //Todo: Ask Rabiu what KYC level 5 is
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                             false,  "User Already verified");
+
+        KycBVNVerification kycBVNVerification = kycBVNRepository.findByUserId(user.getId()).orElse(null);
+
+        if(kycBVNVerification!=null && kycBVNVerification.getStatus()==VerificationStatus.VERIFIED) {
+            addressVerificationRequestVerifyme.getApplicant().setDob(kycBVNVerification.getDob());
+            addressVerificationRequestVerifyme.getApplicant().setPhone(user.getPhoneNumber());
+        }
 
         String idType = "KYC";
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -137,7 +174,7 @@ public class KYCController {
         applicant.setLastname(user.getLastName());
         applicant.setIdNumber(userPhone);
         applicant.setFirstname(user.getFirstName());
-        applicant.setIdType(idType);
+        applicant.setIdType(idType); //Todo: Confirm what is the id type of "KYC"
         applicant.setPhone(userPhone);
 
         AddressVerificationRequestVerifyme addressVerificationRequestVerifyme1 = new AddressVerificationRequestVerifyme();
