@@ -194,4 +194,57 @@ public class QualificationsController {
 
     }
 
+
+
+    @PutMapping(value = "/v1/qualification")
+    public ResponseEntity<APIResponse<String>> editQualificationAndTraining(@Valid @RequestBody EducationAndTrainingRequest request)
+            throws IOException {
+
+        app.print("Qualification Controller: editing qualification/training");
+
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        request.setProfileId(profile.getId());
+        app.print(request);
+
+        if(request.getSchool() != null && !request.getSchool().isBlank()){
+            app.print("Qualification Controller: Editing qualification");
+            QualificationRequest qualificationRequest = new QualificationRequest();
+            qualificationRequest.setProfileId(request.getProfileId());
+            qualificationRequest.setUserId(request.getUserId());
+            qualificationRequest.setSchool(request.getSchool());
+            qualificationRequest.setCountry(request.getCountry());
+            qualificationRequest.setDegree(request.getDegree());
+            qualificationRequest.setStartYear(request.getStartYear());
+            qualificationRequest.setEndYear(request.getEndYear());
+            Qualification qualification = qualificationService.findById(request.getQualificationId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Qualification not found")
+            );
+            Qualification updatedQualification = qualificationService.saveFromRequest(null, qualificationRequest, qualification);
+            app.print(updatedQualification);
+        }
+
+
+        if(request.getTrainingTitle() != null && !request.getTrainingTitle().isBlank()){
+            app.print("Qualification Controller: Editing Training");
+            TrainingRequest trainingRequest = new TrainingRequest();
+            trainingRequest.setUserId(request.getUserId());
+            trainingRequest.setProfileId(request.getProfileId());
+            trainingRequest.setTitle(request.getTrainingTitle());
+            trainingRequest.setOrganization(request.getTrainingOrganization());
+            trainingRequest.setLinkOrId(request.getTrainingLinkOrId());
+            trainingRequest.setDescription(request.getTrainingDescription());
+            trainingRequest.setYearAwarded(request.getTrainingYearAwarded());
+            Training training = trainingService.findById(request.getTrainingId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Training not found")
+            );
+            Training updatedTraining = trainingService.saveFromRequest(trainingRequest, training);
+            app.print(updatedTraining);
+        }
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );
+
+    }
+
 }
