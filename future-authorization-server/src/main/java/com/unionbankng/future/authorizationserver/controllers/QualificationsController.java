@@ -55,7 +55,7 @@ public class QualificationsController {
 
     }
 
-    @PostMapping(value = "/v1/qualifications/update_existing",consumes = { "multipart/form-data" })
+    @PostMapping(value = "/v1/qualifications/update_existing")//,consumes = { "multipart/form-data" }
     public ResponseEntity<APIResponse<Qualification>> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart QualificationRequest request)
             throws IOException {
 
