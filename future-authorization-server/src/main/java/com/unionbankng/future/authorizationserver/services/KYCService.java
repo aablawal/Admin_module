@@ -24,6 +24,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -60,31 +61,43 @@ public class KYCService {
     private String getAccessTokenForKycServiceService() throws IOException {
         Calendar calendar = Calendar.getInstance();
         Response<KYCTokenResponse> response = getAccessToken();
-        if (!response.isSuccessful())
+        if (!response.isSuccessful()){
+            app.print("KYC Service Token request failed");
             return null;
+        }
 
+        app.print("KYC Service Token request successful");
         KYCTokenResponse tokenResponse = response.body();
         accessTokenForKycService = tokenResponse.getAccess_token();
-        calendar.add(Calendar.SECOND, Integer.valueOf(tokenResponse.getExpires_in()));
+        calendar.add(Calendar.SECOND, Integer.parseInt(tokenResponse.getExpires_in()));
         tokenExpiryTime = calendar.getTime();
         return accessTokenForKycService;
     }
 
 
     public String getAccessTokenForWalletServiceCache() throws Exception {
-        if (accessTokenForKycService == null || accessTokenForKycService == null) {
+        if (accessTokenForKycService == null) {
+            app.print("KYC Service Token is null");
             return getAccessTokenForKycServiceService();
         }
-        if (new Date().compareTo(tokenExpiryTime) > 0)
+        if (new Date().compareTo(tokenExpiryTime) > 0){
+            app.print("KYC Service Token is expired");
             return getAccessTokenForKycServiceService();
+        }
         logger.info("retrieving token from cache");
         return accessTokenForKycService;
     }
 
 
     public Response<KYCTokenResponse> getAccessToken() throws IOException {
-        String basicCred = credentials.get("clientId") + ":" + credentials.get("clientSecret");
+        String basicCred = credentials.get("username") + ":" + credentials.get("password");
+        System.out.println(basicCred);
         final String basic = "Basic " + Base64.getEncoder().encodeToString(basicCred.getBytes());
+        app.print("Basic: " + basic);
+        app.print(kycServiceInterface.getAccessToken(basic, credentials.get("username"),
+                credentials.get("password"), credentials.get("grantType")).request().toString());
+        app.print(kycServiceInterface.getAccessToken(basic, credentials.get("username"),
+                credentials.get("password"), credentials.get("grantType")).toString());
         return kycServiceInterface.getAccessToken(basic, credentials.get("username"),
                 credentials.get("password"), credentials.get("grantType")).execute();
     }
@@ -95,8 +108,10 @@ public class KYCService {
         return kycServiceInterface.getNinFullDetail(token, request).execute();
     }
 
-    public Response<PassportFaceMatchResponse> getpassportFaceMatch(PassportFaceMatchRequest request) throws Exception {
+    public Response<PassportFaceMatchResponse> getPassportFaceMatch(PassportFaceMatchRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print("token");
+        app.print(token);
         return kycServiceInterface.getpassportFaceMatch(token, request).execute();
     }
 
@@ -127,20 +142,24 @@ public class KYCService {
         int randomNumber = rand.nextInt(maxNumber) + 1;
 
         if (selfieImage == null) {
+
             return new APIResponse<>("User Selfie Image Required", false, null);
         } else if (idImage == null) {
             return new APIResponse<>("User Id Image Required", false, null);
 
         } else {
-            String selfieImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
+            String selfieImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(selfieImage.getBytes());
             String idImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
+            Date dateOfBirth = user.getDateOfBirth();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String dateOfBirthString = formatter.format(dateOfBirth);
 
             PassportFaceMatchRequest passportFaceMatchRequest2 = new PassportFaceMatchRequest();
-            passportFaceMatchRequest2.setDob(verifyKycRequest.getDob());
+            passportFaceMatchRequest2.setDob(dateOfBirthString);
             passportFaceMatchRequest2.setEmail(user.getEmail());
             passportFaceMatchRequest2.setFirstName(user.getFirstName());
             passportFaceMatchRequest2.setGender(user.getGender());
-            passportFaceMatchRequest2.setPhone(user.getPhoneNumber()); //Todo: Verify Phone Number required. Check for the phone number in the BVN verification.
+            passportFaceMatchRequest2.setPhone(app.toPhoneNumber(user.getPhoneNumber())); //Todo: Verify Phone Number required. Check for the phone number in the BVN verification.
             passportFaceMatchRequest2.setLastName(user.getLastName());
             passportFaceMatchRequest2.setSelfie(selfieImageBase64);
             passportFaceMatchRequest2.setSearchParameter(verifyKycRequest.getIdNumber());
@@ -148,10 +167,28 @@ public class KYCService {
             passportFaceMatchRequest2.setTransactionReference(String.valueOf(randomNumber));
             passportFaceMatchRequest2.setVerificationType("PASSPORT-FACE-MATCH-VERIFICATION");
 
-            Response<PassportFaceMatchResponse> response = getpassportFaceMatch(passportFaceMatchRequest2);
+            app.print("Verify International Passport with Verifyme");
+
+            passportFaceMatchRequest2.setFirstName("John");
+            passportFaceMatchRequest2.setLastName("Doe");
+            passportFaceMatchRequest2.setGender("Male");
+            passportFaceMatchRequest2.setDob("1988-11-05");
+            passportFaceMatchRequest2.setEmail("johndoe@email.com");
+            passportFaceMatchRequest2.setPhone("07030000000");
+
+            app.print(passportFaceMatchRequest2);
+            Response<PassportFaceMatchResponse> response = getPassportFaceMatch(passportFaceMatchRequest2);
+            app.print("response");
+            app.print(response);
+            app.print(response.code());
+            app.print(response.body());
 
             if (response.isSuccessful()) {
                 if (response.body().getDescription().equals("The ID provided is invalid")) {
+                    app.print("response body");
+                    app.print(response);
+                    app.print(response.body());
+                    app.print("VerifyInternationalPassport to Verifyme Response Description: " + response.body().getDescription());
                     return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                             false, null);
                 } else {
@@ -216,15 +253,14 @@ public class KYCService {
                         kyc.setIdImage(savedIdImageUrl);
                         kycRepository.save(kyc);
                         // Upgrade User KYC level to tear 2
-                        user.setKycLevel(3);
                         userRepository.save(user);
 
                         // Send Email to User
-                        sendKycEmailUser(user, "kyc.verification.email.not.verified", "Photo Verification Update");
+                        sendKycEmailUser(user, "kyc.verification.email.not.verified", "ID Verification Update");
                         // Send sms to user
                         sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.not.verified");
 
-                        return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                        return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                                 true, "Verification Sent for manual approval");
                     }
                 }
@@ -260,7 +296,9 @@ public class KYCService {
             votersCardFaceMatchRequest.setSelfieToDatabaseMatch(true);
             votersCardFaceMatchRequest.setVerificationType("VIN-FACE-MATCH-VERIFICATION");
 
+            app.print("Voters Card Face Match Request: " + votersCardFaceMatchRequest);
             Response<VotersCardFaceMatchResponse> response = getVotersCardFaceMatch(votersCardFaceMatchRequest);
+            app.print("Voters Card Face Match Response: " + response);
             if (response.isSuccessful()) {
                 if (response.body().getDescription().equals("The ID provided is invalid")) {
                     return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
@@ -353,16 +391,25 @@ public class KYCService {
             int maxNumber = 10003430;
             int randomNumber = rand.nextInt(maxNumber) + 1;
 
+            Date dateOfBirth = user.getDateOfBirth();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String dateOfBirthString = formatter.format(dateOfBirth);
 
             DriversLicenceFaceMatchRequest driversLicenceFaceMatchRequest = new DriversLicenceFaceMatchRequest();
-            driversLicenceFaceMatchRequest.setDob(verifyKycRequest.getDob());
+            driversLicenceFaceMatchRequest.setDob(dateOfBirthString);
             driversLicenceFaceMatchRequest.setFirstname(user.getFirstName());
             driversLicenceFaceMatchRequest.setIdBase64String(idImageBase64);
             driversLicenceFaceMatchRequest.setSurname(user.getLastName());
             driversLicenceFaceMatchRequest.setIdNo(verifyKycRequest.getIdNumber());
             driversLicenceFaceMatchRequest.setPassportBase64String(selfieImageBase64);
 
+            app.print(driversLicenceFaceMatchRequest);
             Response<DriversLicenceFaceMatchResponse> response = getDriverLicenseFaceMatch(driversLicenceFaceMatchRequest);
+            app.print("response");
+            app.print(response);
+            app.print(response.code());
+            app.print(response.body());
+            app.print(response.message());
             if (response.isSuccessful()) {
 
                 Kyc kyc = new Kyc();
@@ -444,22 +491,10 @@ public class KYCService {
             String selfieImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
             String idImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
 
+
             Random rand = new Random();
             int maxNumber = 10003430;
             int randomNumber = rand.nextInt(maxNumber) + 1;
-
-            IdentityBiometricsRequest identityBiometricsRequest = new IdentityBiometricsRequest();
-            identityBiometricsRequest.setIdType("nin");
-            identityBiometricsRequest.setPhoto("@your_photo.jpg");
-            identityBiometricsRequest.setPhotoUrl("<your_image.com>");
-            identityBiometricsRequest.setIdNumber(verifyKycRequest.getIdNumber());
-            Response<VerifyMeResponse> response = this.getIdentityBiometrics(identityBiometricsRequest);
-
-            if (!response.isSuccessful())
-                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                        false, "Details Provided is invalid");
-
-            Kyc kyc = new Kyc();
 
             app.print("Uploading user selfie....");
             String selfieFileName = "selfie-" + randomNumber + "-" + user.getUuid() + ".jpg";
@@ -470,6 +505,26 @@ public class KYCService {
             String idFileName = "id-" + randomNumber + "-" + user.getUuid() + ".jpg";
             String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
             app.print("Uploaded... " + savedSelfieUrl);
+
+            IdentityBiometricsRequest identityBiometricsRequest = new IdentityBiometricsRequest();
+            identityBiometricsRequest.setIdType("nin");
+            identityBiometricsRequest.setPhoto(savedSelfieUrl);
+            identityBiometricsRequest.setPhotoUrl(savedIdImageUrl);
+            identityBiometricsRequest.setIdNumber(verifyKycRequest.getIdNumber());
+            app.print(identityBiometricsRequest);
+            Response<VerifyMeResponse> response = this.getIdentityBiometrics(identityBiometricsRequest);
+            app.print("response");
+            app.print(response);
+            app.print(response.body());
+            app.print(response.message());
+            app.print(response.errorBody());
+            if (!response.isSuccessful())
+                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+                        false, "Details Provided is invalid");
+
+            Kyc kyc = new Kyc();
+
+
 
 
             if (response.body().getStatus().contains("success")) {
@@ -520,7 +575,14 @@ public class KYCService {
 
     public Response<VerifyMeAddressVerificationResponse> getAddressVerification(AddressVerificationRequestVerifyme request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
-        return kycServiceInterface.getAddressVerification(token, request).execute();
+        app.print(request);
+        Response<VerifyMeAddressVerificationResponse> response = kycServiceInterface.getAddressVerification(token, request).execute();
+        app.print("response");
+        app.print(response);
+        app.print(response.body());
+        app.print(response.message());
+        app.print(response.errorBody());
+        return response;
     }
 
     public void sendKycEmailUser(User user, String msg, String subject) {
