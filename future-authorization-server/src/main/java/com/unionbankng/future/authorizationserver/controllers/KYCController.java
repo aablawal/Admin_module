@@ -1,12 +1,9 @@
 package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
-import com.unionbankng.future.authorizationserver.entities.KycBVNVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.enums.VerificationStatus;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
-import com.unionbankng.future.authorizationserver.repositories.KycBVNRepository;
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.services.KYCService;
@@ -22,11 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 
 @RestController
@@ -38,7 +33,6 @@ public class KYCController {
     private final WalletService walletService;
     private final KycRepository kycRepository;
     private final KycAddressRepository kycAddressRepository;
-    private final KycBVNRepository kycBVNRepository;
     private final UserRepository userRepository;
     private final App app;
 
@@ -74,17 +68,14 @@ public class KYCController {
 
             user.setBvn(bvn);
             user.setKycLevel(1);
-            userRepository.save(user);
-
-            KycBVNVerification kycBVNVerification = new KycBVNVerification();
-            kycBVNVerification.setBvn(bvn);
-            kycBVNVerification.setDob(dob);
-            kycBVNVerification.setUserUuid(user.getUuid());
-            kycBVNVerification.setUserId(user.getId());
-            kycBVNVerification.setFirstname(user.getFirstName());
-            kycBVNVerification.setLastname(user.getLastName());
-            kycBVNVerification.setStatus(VerificationStatus.VERIFIED);
-            kycBVNRepository.save(kycBVNVerification);
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
+                Date dateOfBirth = formatter.parse(dob);
+                user.setDateOfBirth(dateOfBirth);
+                userRepository.save(user);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
 
 
@@ -107,33 +98,34 @@ public class KYCController {
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
         if(user!=null) {
-
+            app.print("user: " + user);
             if (user.getKycLevel() >=2) {
                 return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                         false, null);
             }
 
-            KycBVNVerification kycBVNVerification = kycBVNRepository.findByUserId(user.getId()).orElse(null);
-            if(kycBVNVerification!=null && kycBVNVerification.getStatus()==VerificationStatus.VERIFIED) {
-                verifyKycRequest.setDob(kycBVNVerification.getDob());
-            }
-
-            if(user.getGender() == null) {
+            if(user.getGender() == null && verifyKycRequest.getGender()!=null) {
                 user.setGender(verifyKycRequest.getGender());
-                userRepository.save(user);
             }
+            if(user.getGender() != null && user.getGender().startsWith("M") || user.getGender().startsWith("m")) {
+                user.setGender("Male");
+            }else if (user.getGender() != null && user.getGender().startsWith("F") || user.getGender().startsWith("f")){
+                user.setGender("Female");
+            }
+            userRepository.save(user);
 
-            if (verifyKycRequest.getIdType().equals("INTERNATIONAL-PASSPORT")) {
-                return kycService.VerifyInternationalPassport(verifyKycRequest,selfieImage, idImage,user);
-            } else if (verifyKycRequest.getIdType().equals("VOTERS-CARD")) {
-                return kycService.VerifyVotersCard(verifyKycRequest, selfieImage, idImage,user);
-            } else if (verifyKycRequest.getIdType().equals("DRIVERS-LICENSE")) {
-                return kycService.VerifyDriverLicence(verifyKycRequest,selfieImage, idImage, user);
-            } else if (verifyKycRequest.getIdType().equals("NATIONAL-IDENTITY")) {
-                return kycService.VerifyNIN(verifyKycRequest,selfieImage, idImage, user);
-            } else {
-                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                        false, "The detail you provide is invalid");
+            switch (verifyKycRequest.getIdType()) {
+                case "INTERNATIONAL-PASSPORT":
+                    return kycService.VerifyInternationalPassport(verifyKycRequest, selfieImage, idImage, user);
+                case "VOTERS-CARD":
+                    return kycService.VerifyVotersCard(verifyKycRequest, selfieImage, idImage, user);
+                case "DRIVERS-LICENSE":
+                    return kycService.VerifyDriverLicence(verifyKycRequest, selfieImage, idImage, user);
+                case "NATIONAL-IDENTITY":
+                    return kycService.VerifyNIN(verifyKycRequest, selfieImage, idImage, user);
+                default:
+                    return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+                            false, "The detail you provide is invalid");
             }
         }else{
             return new APIResponse<>("Authentication Failed",
@@ -154,19 +146,19 @@ public class KYCController {
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                             false,  "User Already verified");
 
-        KycBVNVerification kycBVNVerification = kycBVNRepository.findByUserId(user.getId()).orElse(null);
+//        KycBVNVerification kycBVNVerification = kycBVNRepository.findByUserId(user.getId()).orElse(null);
 
-        if(kycBVNVerification!=null && kycBVNVerification.getStatus()==VerificationStatus.VERIFIED) {
-            addressVerificationRequestVerifyme.getApplicant().setDob(kycBVNVerification.getDob());
-            addressVerificationRequestVerifyme.getApplicant().setPhone(user.getPhoneNumber());
-        }
+//        if(kycBVNVerification!=null && kycBVNVerification.getStatus()==VerificationStatus.VERIFIED) {
+//            addressVerificationRequestVerifyme.getApplicant().setDob(kycBVNVerification.getDob());
+//            addressVerificationRequestVerifyme.getApplicant().setPhone(user.getPhoneNumber());
+//        }
 
         String idType = "KYC";
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String currentData = sdf.format(addressVerificationRequestVerifyme.getApplicant().getDob());
+        String currentData = sdf.format(user.getDateOfBirth());
 
         // format the phone number
-        String phoneNumber = addressVerificationRequestVerifyme.getApplicant().getPhone();
+        String phoneNumber = user.getPhoneNumber();
         String userPhone = app.toPhoneNumber(phoneNumber);
         
         Applicant applicant = new Applicant();
