@@ -51,7 +51,7 @@ public class PortfolioItemsController {
     }
 
     @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience(@Nullable  @RequestPart("file") MultipartFile file, @Valid @RequestBody PortfolioItemRequest request)
+    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience(@Nullable  @RequestParam("file") MultipartFile file, @Valid @RequestParam PortfolioItemRequest request)
             throws IOException {
 
         PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(

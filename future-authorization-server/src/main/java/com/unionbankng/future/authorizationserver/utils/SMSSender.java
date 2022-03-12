@@ -11,11 +11,13 @@ public class SMSSender {
 
     private static final String SMS_DESTINATION = "kulasmsqueue";
     private final JmsTemplate jmsTemplate;
+
     public void sendSMS(SMS smsBody){
         try {
             CachingConnectionFactory connectionFactory = (CachingConnectionFactory) jmsTemplate.getConnectionFactory();
             connectionFactory.setCacheProducers(false);
             jmsTemplate.convertAndSend(SMS_DESTINATION, smsBody);
+            System.out.println("SMS successfully sent");
         }catch (Exception ex){
             System.out.println("Unable to send SMS");
             ex.printStackTrace();

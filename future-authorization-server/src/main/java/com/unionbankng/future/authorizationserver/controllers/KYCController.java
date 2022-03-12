@@ -104,7 +104,7 @@ public class KYCController {
                         false, null);
             }
 
-            if(user.getGender() == null && verifyKycRequest.getGender()!=null) {
+            if(user.getGender() == null && verifyKycRequest.getGender()!=null && !verifyKycRequest.getGender().isEmpty()) {
                 user.setGender(verifyKycRequest.getGender());
             }
             if(user.getGender() != null && user.getGender().startsWith("M") || user.getGender().startsWith("m")) {
@@ -146,12 +146,6 @@ public class KYCController {
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                             false,  "User Already verified");
 
-//        KycBVNVerification kycBVNVerification = kycBVNRepository.findByUserId(user.getId()).orElse(null);
-
-//        if(kycBVNVerification!=null && kycBVNVerification.getStatus()==VerificationStatus.VERIFIED) {
-//            addressVerificationRequestVerifyme.getApplicant().setDob(kycBVNVerification.getDob());
-//            addressVerificationRequestVerifyme.getApplicant().setPhone(user.getPhoneNumber());
-//        }
 
         String idType = "KYC";
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
