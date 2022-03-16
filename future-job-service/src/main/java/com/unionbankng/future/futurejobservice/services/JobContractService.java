@@ -1515,12 +1515,18 @@ public class JobContractService implements Serializable {
                         app.print("###################################");
                         app.print("Escrow URL: "+baseURL);
                         app.print("Escrow Token: "+token);
+
+
                         //start to release escrow amount to freelancer
-                        HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                        ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
+                        String uri=baseURL + "/Transaction/release?appid=" + appId
                                 + "&referenceid=" + milestone.getMilestoneReference()
                                 + "&user_email=" + contract.getUserEmail()
-                                + "&reasons=Milestone Completed", HttpMethod.POST, entity, String.class);
+                                + "&reasons=Milestone Completed";
+
+                        app.print("Request:");
+                        app.print(uri);
+                        HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
+                        ResponseEntity<String> response = rest.exchange(uri, HttpMethod.POST, entity, String.class);
                         //done
                         if (response.getStatusCode().is2xxSuccessful()) {
 
