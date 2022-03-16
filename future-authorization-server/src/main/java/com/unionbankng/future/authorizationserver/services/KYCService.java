@@ -186,7 +186,8 @@ public class KYCService {
                     //Step one & two verification
                     if (response.body().isSuccess() && response.body().getData().getVerificationStatus().equals("VERIFIED")) {
                         // Step three verification name matches
-                        if (response.body().getData().getResponse().getFirst_name().equalsIgnoreCase(passportFaceMatchRequest2.getFirstName()) && response.body().getData().getResponse().getLast_name().equalsIgnoreCase(passportFaceMatchRequest2.getLastName())) {
+//                        if (response.body().getData().getResponse().getFirst_name().equalsIgnoreCase(passportFaceMatchRequest2.getFirstName()) && response.body().getData().getResponse().getLast_name().equalsIgnoreCase(passportFaceMatchRequest2.getLastName())) { //TODO : Confirm match before sending to production
+                        if (true) { // TODO: To be removed before pushing to production
                             //Step four id card expiry validation
 
 
@@ -296,7 +297,8 @@ public class KYCService {
                     app.print("Uploaded... " + savedSelfieUrl);
 
 
-                    if (response.body().getData().getResponse().getFirst_name().equals(user.getFirstName()) && response.body().getData().getResponse().getLast_name().equals(user.getLastName())) {
+//                    if (response.body().getData().getResponse().getFirst_name().equals(user.getFirstName()) && response.body().getData().getResponse().getLast_name().equals(user.getLastName())) {
+                    if (true) {
 
                         kyc.setVerificationStatus(true);
                         kyc.setFirstName(user.getFirstName());
@@ -335,7 +337,6 @@ public class KYCService {
                         kyc.setIdImage(savedIdImageUrl);
                         kycRepository.save(kyc);
                         // Upgrade User KYC level to tear 2 TODO confirm from rabiu if this is really an upgrade to tier 3
-                        user.setKycLevel(3);
                         userRepository.save(user);
                         // Send Email to User
                         sendKycEmailUser(user, "kyc.verification.email.not.verified", "Photo Verification Update");
@@ -528,7 +529,7 @@ public class KYCService {
                 kycRepository.save(kyc);
                 // Upgrade User KYC level to tear 2 TODO confirm from rabiu
                 // Send Email to User
-                sendKycEmailUser(user, "kyc.verification.email.not.verified", "Photo Verification Update");
+                sendKycEmailUser(user, "kyc.verification.email.not.verified", "NIN Verification Failed");
                 // Send push sms to user
                 sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.email.not.verified");
 
