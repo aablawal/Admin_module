@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.PortfolioItem;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
+import com.unionbankng.future.authorizationserver.pojos.VerifyKycRequest;
 import com.unionbankng.future.authorizationserver.services.PortfolioItemService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
@@ -44,19 +45,19 @@ public class PortfolioItemsController {
     public ResponseEntity<APIResponse<PortfolioItem>> addNewPortfolioItem
             (@Nullable  @RequestParam("img") MultipartFile img,
              @Nullable  @RequestParam("video") MultipartFile video,
-             @Valid @RequestParam PortfolioItemRequest request) throws IOException {
+             @RequestParam String request) throws IOException {
         app.print(" ###### Adding portfolio");
         app.print(request);
-        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(img, video, request,new PortfolioItem());
+        PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
+        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(img, video, portfolioItemRequest,new PortfolioItem());
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
-
     }
 
     @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
     public ResponseEntity<APIResponse<PortfolioItem>> updateExperience
             (@Nullable  @RequestParam("img") MultipartFile img,
              @Nullable  @RequestParam("video") MultipartFile video,
-             @Valid @RequestParam PortfolioItemRequest request) throws IOException {
+             @RequestParam PortfolioItemRequest request) throws IOException {
 
         app.print(" ###### Editing portfolio");
         app.print(request);

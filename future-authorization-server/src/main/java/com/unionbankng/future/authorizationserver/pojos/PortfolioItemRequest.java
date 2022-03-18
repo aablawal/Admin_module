@@ -21,6 +21,4 @@ public class PortfolioItemRequest {
     private String description;
 
     private String link;
-
-    private String media;
 }

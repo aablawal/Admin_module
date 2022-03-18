@@ -109,7 +109,6 @@ public class PortfolioItemsControllerTest extends AbstractTest {
         portfolioItemRequest.setDescription("Development specialist at UBN");
         portfolioItemRequest.setTitle("Development Specialist");
         portfolioItemRequest.setProfileId(testProfileId);
-        portfolioItemRequest.setMedia("http://localhost:8080/filename.txt");
         portfolioItemRequest.setLink("http://localhost:8080");
         portfolioItemRequest.setPortfolioItemId(portfolioItem.getId());
 
