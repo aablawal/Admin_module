@@ -57,16 +57,17 @@ public class PortfolioItemsController {
     public ResponseEntity<APIResponse<PortfolioItem>> updateExperience
             (@Nullable  @RequestParam("img") MultipartFile img,
              @Nullable  @RequestParam("video") MultipartFile video,
-             @RequestParam PortfolioItemRequest request) throws IOException {
+             @RequestParam String request) throws IOException {
 
         app.print(" ###### Editing portfolio");
         app.print(request);
+        PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
 
-        PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(
+        PortfolioItem portfolioItem = portfolioItemService.findById(portfolioItemRequest.getPortfolioItemId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "PortfolioItem not found")
         );
 
-        portfolioItem = portfolioItemService.saveFromRequest(img, video, request, portfolioItem);
+        portfolioItem = portfolioItemService.saveFromRequest(img, video, portfolioItemRequest, portfolioItem);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
 
