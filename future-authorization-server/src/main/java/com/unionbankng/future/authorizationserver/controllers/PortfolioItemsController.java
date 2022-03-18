@@ -41,24 +41,31 @@ public class PortfolioItemsController {
 
 
     @PostMapping(value = "/v1/portfolio_items/create_new")
-    public ResponseEntity<APIResponse<PortfolioItem>> addNewPortfolioItem(@Valid @RequestBody PortfolioItemRequest request) throws IOException {
+    public ResponseEntity<APIResponse<PortfolioItem>> addNewPortfolioItem
+            (@Nullable  @RequestParam("img") MultipartFile img,
+             @Nullable  @RequestParam("video") MultipartFile video,
+             @Valid @RequestParam PortfolioItemRequest request) throws IOException {
         app.print(" ###### Adding portfolio");
         app.print(request);
-        app.print(request.getFiles());
-        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(request.getFiles(),request,new PortfolioItem());
+        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(img, video, request,new PortfolioItem());
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
 
     }
 
     @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience(@Nullable  @RequestParam("file") MultipartFile file, @Valid @RequestParam PortfolioItemRequest request)
-            throws IOException {
+    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience
+            (@Nullable  @RequestParam("img") MultipartFile img,
+             @Nullable  @RequestParam("video") MultipartFile video,
+             @Valid @RequestParam PortfolioItemRequest request) throws IOException {
+
+        app.print(" ###### Editing portfolio");
+        app.print(request);
 
         PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "PortfolioItem not found")
         );
 
-        portfolioItem = portfolioItemService.saveFromRequest((List<MultipartFile>) file,request,portfolioItem);
+        portfolioItem = portfolioItemService.saveFromRequest(img, video, request, portfolioItem);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
 

@@ -23,6 +23,4 @@ public class PortfolioItemRequest {
     private String link;
 
     private String media;
-
-    private List<MultipartFile> files;
 }
