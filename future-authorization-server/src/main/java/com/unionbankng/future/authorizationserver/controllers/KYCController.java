@@ -55,7 +55,6 @@ public class KYCController {
 
         if(user != null && app.validBvn(bvn)) {
 
-
             APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getUuid()), user.getFirstName() + " " + user.getLastName(), bvn);
             app.print("walletResponse: " + walletResponse);
             if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {

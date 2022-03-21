@@ -168,9 +168,11 @@ public class QualificationsController {
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
         );
 
+
         List<Training> trainings = trainingService.
                 findAllByProfileId(profile.getId(), Sort.by("createdAt").ascending());
 
+        app.print("trainings");
         app.print(trainings);
         List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();
 

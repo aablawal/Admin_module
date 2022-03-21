@@ -58,25 +58,23 @@ public class PortfolioItemService {
         portfolioItemRepository.deleteById(id);
     }
 
-    public PortfolioItem saveFromRequest (List<MultipartFile> files, PortfolioItemRequest request, PortfolioItem portfolioItem) throws IOException {
+    public PortfolioItem saveFromRequest (MultipartFile img, MultipartFile video, PortfolioItemRequest request, PortfolioItem portfolioItem) throws IOException {
 
         Long profileId = profileRepository.findByUserId(request.getUserId()).get().getId();
         portfolioItem.setProfileId(profileId);
         portfolioItem.setTitle(request.getTitle());
         portfolioItem.setDescription(request.getDescription());
         portfolioItem.setLink(request.getLink());
-        if (files != null && files.size() > 1) {
-            if (files.get(0) != null) {
+            if (video != null) {
                 app.print("Saving Video");
-                String source = fileStorageService.storeFile(files.get(0), request.getProfileId(), BlobType.VIDEO);
+                String source = fileStorageService.storeFile(video, request.getProfileId(), BlobType.VIDEO);
                 portfolioItem.setPortfolioVideoMedia(source);
             }
-            if (files.get(1) != null) {
+            if (img != null) {
                 app.print("Saving Image");
-                String source = fileStorageService.storeFile(files.get(1), request.getProfileId(), BlobType.IMAGE);
+                String source = fileStorageService.storeFile(img, request.getProfileId(), BlobType.IMAGE);
                 portfolioItem.setPortfolioImageMedia(source);
             }
-        }
 
         app.print(portfolioItem);
 

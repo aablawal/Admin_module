@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.PortfolioItem;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
+import com.unionbankng.future.authorizationserver.pojos.VerifyKycRequest;
 import com.unionbankng.future.authorizationserver.services.PortfolioItemService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
@@ -41,24 +42,32 @@ public class PortfolioItemsController {
 
 
     @PostMapping(value = "/v1/portfolio_items/create_new")
-    public ResponseEntity<APIResponse<PortfolioItem>> addNewPortfolioItem(@Valid @RequestBody PortfolioItemRequest request) throws IOException {
+    public ResponseEntity<APIResponse<PortfolioItem>> addNewPortfolioItem
+            (@Nullable  @RequestParam("img") MultipartFile img,
+             @Nullable  @RequestParam("video") MultipartFile video,
+             @RequestParam String request) throws IOException {
         app.print(" ###### Adding portfolio");
         app.print(request);
-        app.print(request.getFiles());
-        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(request.getFiles(),request,new PortfolioItem());
+        PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
+        PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(img, video, portfolioItemRequest,new PortfolioItem());
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
-
     }
 
     @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience(@Nullable  @RequestParam("file") MultipartFile file, @Valid @RequestParam PortfolioItemRequest request)
-            throws IOException {
+    public ResponseEntity<APIResponse<PortfolioItem>> updateExperience
+            (@Nullable  @RequestParam("img") MultipartFile img,
+             @Nullable  @RequestParam("video") MultipartFile video,
+             @RequestParam String request) throws IOException {
 
-        PortfolioItem portfolioItem = portfolioItemService.findById(request.getPortfolioItemId()).orElseThrow(
+        app.print(" ###### Editing portfolio");
+        app.print(request);
+        PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
+
+        PortfolioItem portfolioItem = portfolioItemService.findById(portfolioItemRequest.getPortfolioItemId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "PortfolioItem not found")
         );
 
-        portfolioItem = portfolioItemService.saveFromRequest((List<MultipartFile>) file,request,portfolioItem);
+        portfolioItem = portfolioItemService.saveFromRequest(img, video, portfolioItemRequest, portfolioItem);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
 
