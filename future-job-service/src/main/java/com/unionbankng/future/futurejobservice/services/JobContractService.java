@@ -76,8 +76,7 @@ public class JobContractService implements Serializable {
 
     public HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setCacheControl("no-cache");
         headers.add("Token", token);
         return headers;
