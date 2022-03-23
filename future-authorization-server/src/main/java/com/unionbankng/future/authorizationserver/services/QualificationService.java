@@ -28,12 +28,12 @@ public class QualificationService {
     private final ProfileRepository profileRepository;
     private final FileStorageService fileStorageService;
 
-    @Cacheable(value = "qualifications_by_profile", key="#profileId")
+//    @Cacheable(value = "qualifications_by_profile", key="#profileId")
     public List<Qualification> findAllByProfileId(Long profileId, Sort sort){
         return qualificationRepository.findAllByProfileId(profileId,sort);
     }
 
-    @Cacheable(value = "qualifications_by_user", key="#userId")
+//    @Cacheable(value = "qualifications_by_user", key="#userId")
     public List<Qualification> findAllByUserId(Long userId, Sort sort){
         Profile profile = profileRepository.findByUserId(userId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
