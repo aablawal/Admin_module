@@ -98,11 +98,7 @@ public class AuthenticationService {
                 String otp = this.app.generateOTP().toString();
                 memcachedHelperService.save(user.getUuid(), otp, tokenExpiryInMinute * 60);
 
-
-                String mobileNumber = user.getPhoneNumber();
-                if (mobileNumber.startsWith("0"))
-                    mobileNumber = mobileNumber.replaceFirst("0", "234");
-
+                String mobileNumber = app.toPhoneNumber(user.getPhoneNumber());
                 app.print(mobileNumber);
                 app.print("Sending OTP.....");
 
@@ -210,6 +206,56 @@ public class AuthenticationService {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new APIResponse<>("Unable to Create your Transaction Pin", false, null));
         }
 
+    }
+
+    public APIResponse validatePhoneNumber(OAuth2Authentication authentication, String phone) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+        if (user != null) {
+            if(phone!=null) {
+                Long otp = app.generateOTP();
+                String phoneNumber=app.toPhoneNumber(phone);
+                memcachedHelperService.save(phoneNumber,otp.toString(),0);
+
+                SMS smsBody= new SMS();
+                smsBody.setRecipient(phoneNumber);
+                smsBody.setMessage("Your OTP is " + otp);
+
+                app.print("Sending SMS OTP:");
+                app.print(smsBody);
+
+                smsSender.sendSMS(smsBody);
+                return new APIResponse<>("OTP Sent to your phone number", true, phoneNumber);
+            }else{
+                return new APIResponse<>("Phone number required", false, null);
+            }
+        } else {
+            return new APIResponse<>("Unable to fetch authentication details", false, null);
+        }
+    }
+
+    public APIResponse verifyPhoneNumber(OAuth2Authentication authentication, String phone, Long otp) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+
+        app.print("Verifying phone number");
+        app.print(phone);
+
+        String phoneNumber = app.toPhoneNumber(phone);
+        String memoryOTP = memcachedHelperService.getValueByKey(phoneNumber);
+        app.print("Memcached Value:" + memoryOTP);
+
+        if (memoryOTP == null)
+            return new APIResponse("OTP expired or not found", false, null);
+
+        if(memoryOTP.equals(otp)) {
+            user.setPhoneNumber(phoneNumber);
+            memcachedHelperService.clear(phoneNumber);
+            userRepository.save(user);
+            return new APIResponse<>("Phone number added successfully", true, user);
+        }else{
+            return new APIResponse("Invalid OTP", false, null);
+        }
     }
 }
 

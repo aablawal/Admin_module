@@ -22,23 +22,24 @@ public class NotificationSender {
 
     public void pushNotification(NotificationBody notificationBody){
         try {
-            jmsTemplate.convertAndSend(NOTIFICATION_DESTINATION, notificationBody);
-
             //send an email for priority notifications
             if(notificationBody.getPriority().equals("YES")){
-                app.print("Sending Notification to Email.....");
+                app.print("Sending Priority Notification to Email.....");
                 app.print(notificationBody);
                 EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody()
                         ).sender(EmailAddress.builder().displayName("Kula Team").email("hello@kula.work").build()).subject(notificationBody.getSubject())
                         .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(notificationBody.getRecipientEmail()).displayName(notificationBody.getRecipientName()).build())).build();
 
                  APIResponse apiResponse=ubnEmailService.sendEmail(emailBody);
-                app.print("Message Queued successfully");
+                app.print("Email sent successfully");
                 app.print(apiResponse);
             }else{
                 app.print("Notification not a Priority one");
                 app.print(notificationBody);
             }
+
+            jmsTemplate.convertAndSend(NOTIFICATION_DESTINATION, notificationBody);
+
         }catch (Exception ex){
             ex.printStackTrace();
         }

@@ -8,7 +8,6 @@ import retrofit2.http.POST;
 
 public interface UBNEmailServiceInterface {
 
-    @POST("emailservice-api/secured/sendemail")
+    @POST("emailservice-api/secured/sendemailsync")
     Call<UbnEmailResponse> sendEmail(@Header("Authorization") String authorization, @Body EmailBody body);
-
 }
