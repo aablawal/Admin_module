@@ -243,12 +243,13 @@ public class AuthenticationService {
 
         String phoneNumber = app.toPhoneNumber(phone);
         String memoryOTP = memcachedHelperService.getValueByKey(phoneNumber);
-        app.print("Memcached Value:" + memoryOTP);
+        app.print("System OTP Value:" + memoryOTP);
+        app.print("User OTP Value:");
 
         if (memoryOTP == null)
             return new APIResponse("OTP expired or not found", false, null);
 
-        if(memoryOTP.equals(otp)) {
+        if(memoryOTP.equals(String.valueOf(otp).trim())) {
             user.setPhoneNumber(phoneNumber);
             memcachedHelperService.clear(phoneNumber);
             userRepository.save(user);
