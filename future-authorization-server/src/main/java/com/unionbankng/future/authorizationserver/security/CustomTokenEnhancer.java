@@ -19,6 +19,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         additionalInfo.put("userId", user.getId());
         additionalInfo.put("userUUID", user.getUuid());
         additionalInfo.put("userEmail", user.getEmail());
+        additionalInfo.put("userPhone", user.getPhoneNumber());
         additionalInfo.put("userImg", user.getImg());
         additionalInfo.put("userFullName", user.getFirstName()+" "+user.getLastName());
         additionalInfo.put("isEnabled", user.getIsEnabled());
