@@ -50,12 +50,12 @@ public class AuthenticationController {
 
 
     @PostMapping("/v1/verification/validate_phonenumber")
-    public ResponseEntity<APIResponse> veifyPhoneNumber(OAuth2Authentication authentication, @RequestParam String phone){
+    public ResponseEntity<APIResponse> validatePhoneNumber(OAuth2Authentication authentication, @RequestParam String phone){
         return ResponseEntity.ok().body(authenticationService.validatePhoneNumber(authentication, phone));
     }
 
     @PostMapping("/v1/verification/verify_phonenumber")
-    public ResponseEntity<APIResponse> veifyPhoneNumber(OAuth2Authentication authentication, @RequestParam String phone, @RequestParam Long otp){
+    public ResponseEntity<APIResponse> verifyPhoneNumber(OAuth2Authentication authentication, @RequestParam String phone, @RequestParam Long otp){
         return ResponseEntity.ok().body(authenticationService.verifyPhoneNumber(authentication, phone, otp));
     }
 
