@@ -166,7 +166,6 @@ public class JobContractService implements Serializable {
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
             String contractReferenceId = app.makeUIID();
             String paymentReferenceId = app.makeUIID();
-
             contract.setPeppfees(0); //set peprest charges to zero
             contract.setContractReference(contractReferenceId);
             contract.setInitialPaymentReferenceA(paymentReferenceId);
