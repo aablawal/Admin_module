@@ -29,7 +29,7 @@ public class AuthenticationController {
 
 
     @PostMapping("v1/pin/reset-pin")
-    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPinRequest request){
+    public ResponseEntity<?> resetPin(@RequestBody @Valid ResetPinRequest request){
         return authenticationService.resetPin(request.getToken(), request.getNewPin());
     }
 
@@ -38,10 +38,12 @@ public class AuthenticationController {
         return ResponseEntity.ok().body(authenticationService.verifyPin(authentication, pin));
     }
 
+
     @PostMapping("/v1/otp/generate")
     public ResponseEntity<APIResponse> generateOTP(OAuth2Authentication authentication){
         return ResponseEntity.ok().body(authenticationService.generateOTP(authentication));
     }
+
 
     @PostMapping("/v1/otp/verify")
     public ResponseEntity<APIResponse> verifyOTP(OAuth2Authentication authentication, @RequestParam String otp){

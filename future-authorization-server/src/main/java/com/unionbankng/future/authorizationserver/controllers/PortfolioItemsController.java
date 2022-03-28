@@ -1,9 +1,11 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
 import com.unionbankng.future.authorizationserver.entities.PortfolioItem;
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.PortfolioItemRequest;
 import com.unionbankng.future.authorizationserver.pojos.VerifyKycRequest;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.services.PortfolioItemService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import java.util.List;
 public class PortfolioItemsController {
 
     private final PortfolioItemService portfolioItemService;
+    private final ProfileRepository profileRepository;
     private final App app;
 
     @GetMapping("/v1/portfolio_items/find_by_profile_id/{userId}")
@@ -48,7 +51,15 @@ public class PortfolioItemsController {
              @RequestParam String request) throws IOException {
         app.print(" ###### Adding portfolio");
         app.print(request);
+        app.print("img");
+        app.print(img != null ? img.getOriginalFilename() : "null");
+        app.print("video");
+        app.print(video != null ? video.getOriginalFilename() : "null");
         PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
+        Profile profile = profileRepository.findByUserId(portfolioItemRequest.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found")
+        );
+        portfolioItemRequest.setProfileId(profile.getId());
         PortfolioItem portfolioItem = portfolioItemService.saveFromRequest(img, video, portfolioItemRequest,new PortfolioItem());
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
     }
@@ -62,6 +73,11 @@ public class PortfolioItemsController {
         app.print(" ###### Editing portfolio");
         app.print(request);
         PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
+
+        Profile profile = profileRepository.findByUserId(portfolioItemRequest.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found")
+        );
+        portfolioItemRequest.setProfileId(profile.getId());
 
         PortfolioItem portfolioItem = portfolioItemService.findById(portfolioItemRequest.getPortfolioItemId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "PortfolioItem not found")
