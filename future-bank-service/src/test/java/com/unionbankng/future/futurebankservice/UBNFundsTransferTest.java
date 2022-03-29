@@ -27,20 +27,20 @@ public class UBNFundsTransferTest extends AbstractTest {
         transfer.setAmount("20");
         transfer.setCurrency("NGN");
         transfer.setPaymentReference(System.currentTimeMillis()+"");
-        transfer.setInitBranchCode("682");
+        transfer.setInitBranchCode("000");
 
         //credit
         transfer.setCreditAccountName("DEDICATED NEFT O A");
         transfer.setCreditAccountNumber("0055982543");
         transfer.setCreditAccountBankCode("032");
-        transfer.setCreditAccountBranchCode("682");
+        transfer.setCreditAccountBranchCode("000");
         transfer.setCreditAccountType("CASA");
         transfer.setCreditNarration("Testing naration");
 
         //debit
         transfer.setDebitAccountName("OLANLOKUN LANRE A");
         transfer.setDebitAccountNumber("0040553624");
-        transfer.setDebitAccountBranchCode("682");
+        transfer.setDebitAccountBranchCode("000");
         transfer.setDebitAccountType("CASA");
         transfer.setDebitNarration("Testing naration 2");
 

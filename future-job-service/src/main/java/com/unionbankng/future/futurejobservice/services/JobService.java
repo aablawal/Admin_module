@@ -116,7 +116,7 @@ public class JobService {
                                         proposal.setAccountName(teamMember.getAccountName());
                                         proposal.setAccountNumber(teamMember.getAccountNumber());
                                         proposal.setAccountType(teamMember.getAccountType());
-                                        proposal.setBranchCode(teamMember.getBranchCode());
+                                        proposal.setBranchCode("000");
                                         proposal.setWorkMethod("Overall");
                                         proposal.setPreparedCurrency("NGN");
                                         proposal.setBidAmount(Long.valueOf(money));

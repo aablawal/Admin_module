@@ -63,7 +63,7 @@ public class UBNBankTransferService {
         request.setDebitAccountNumber(transfer.getDebitAccountNumber());
         request.setDebitNarration(transfer.getDebitNarration());
         request.setDebitAccountType(transfer.getDebitAccountType());
-        request.setInitBranchCode(transfer.getInitBranchCode());
+        request.setInitBranchCode("000");
         request.setChannelCode("1");
         request.setValueDate("2020-12-04");
         request.setPaymentTypeCode("FT");
