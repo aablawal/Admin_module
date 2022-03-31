@@ -64,7 +64,7 @@ public class PortfolioItemsController {
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true,portfolioItem));
     }
 
-    @PostMapping(value = "/v1/portfolio_items/update_existing",consumes = { "multipart/form-data" })
+    @PostMapping(value = "/v1/portfolio_items/update_existing")
     public ResponseEntity<APIResponse<PortfolioItem>> updateExperience
             (@Nullable  @RequestParam("img") MultipartFile img,
              @Nullable  @RequestParam("video") MultipartFile video,
@@ -72,6 +72,10 @@ public class PortfolioItemsController {
 
         app.print(" ###### Editing portfolio");
         app.print(request);
+        app.print("img");
+        app.print(img != null ? img.getOriginalFilename() : "null");
+        app.print("video");
+        app.print(video != null ? video.getOriginalFilename() : "null");
         PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
 
         Profile profile = profileRepository.findByUserId(portfolioItemRequest.getUserId()).orElseThrow(
