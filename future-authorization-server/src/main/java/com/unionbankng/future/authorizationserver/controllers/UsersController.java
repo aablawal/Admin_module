@@ -120,8 +120,9 @@ public class UsersController {
                                                                     @Nullable @RequestPart("coverImg") MultipartFile coverImg)
             throws IOException {
         app.print("Uploading user Cover image");
-        app.print(coverImg.getOriginalFilename());
-        app.print(coverImg.getName());
+        if (coverImg != null) {
+            app.print(coverImg.getOriginalFilename());
+        }
         User user = userService.updateProfile(userId,coverImg,null,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }

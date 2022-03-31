@@ -23,20 +23,20 @@ class BankTransferServiceTest {
         transfer.setAmount(1);
         transfer.setCurrency("NGN");
         transfer.setPaymentReference("j2hyewd798hsoqg2t8179qw8o");
-        transfer.setInitBranchCode("682");
+        transfer.setInitBranchCode("000");
 
         //credit
         transfer.setCreditAccountName("DEDICATED NEFT O A");
         transfer.setCreditAccountNumber("0055982543");
         transfer.setCreditAccountBankCode("032");
-        transfer.setCreditAccountBranchCode("682");
+        transfer.setCreditAccountBranchCode("000");
         transfer.setCreditAccountType("CASA");
         transfer.setCreditNarration("New Narration");
 
         //debit
         transfer.setDebitAccountName("OLANLOKUN LANRE A");
         transfer.setDebitAccountNumber("0040553624");
-        transfer.setDebitAccountBranchCode("682");
+        transfer.setDebitAccountBranchCode("000");
         transfer.setDebitAccountType("CASA");
         transfer.setDebitNarration("New Naration");
 

@@ -1,24 +1,21 @@
 
 package com.unionbankng.future.authorizationserver.services;
-import com.unionbankng.future.authorizationserver.entities.Login;
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.*;
-import com.unionbankng.future.authorizationserver.repositories.LoginRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.utils.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.UUID;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +28,13 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final CryptoService cryptoService;
     private final MemcachedHelperService memcachedHelperService;
+    private final MessageSource messageSource;
+    private final EmailSender emailSender;
     private final SMSSender smsSender;
+    @Value("${forgot.pin.url}")
+    private String forgotPinURL;
+    @Value("${email.sender}")
+    private String emailSenderAddress;
     private final App app;
 
 
@@ -95,11 +98,7 @@ public class AuthenticationService {
                 String otp = this.app.generateOTP().toString();
                 memcachedHelperService.save(user.getUuid(), otp, tokenExpiryInMinute * 60);
 
-
-                String mobileNumber = user.getPhoneNumber();
-                if (mobileNumber.startsWith("0"))
-                    mobileNumber = mobileNumber.replaceFirst("0", "234");
-
+                String mobileNumber = app.toPhoneNumber(user.getPhoneNumber());
                 app.print(mobileNumber);
                 app.print("Sending OTP.....");
 
@@ -146,4 +145,132 @@ public class AuthenticationService {
             return new APIResponse<>(ex.getMessage(), false, null);
         }
     }
+
+    public APIResponse<String> initiateForgotPin(String email) {
+
+        app.print("#########Initiating forgot pin");
+        app.print(email);
+        Optional<User> emailOwner = userRepository.findByEmailOrUsername(email,email);
+
+        if(emailOwner.isEmpty()){
+            return new APIResponse<>("This email is not registered", false, null);
+        }
+        User user = emailOwner.get();
+
+        String token = UUID.randomUUID().toString();
+
+        app.print("#### Pin Reset");
+        app.print(user);
+        app.print(token);
+
+        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
+        String generatedURL = String.format("%s?token=%s",forgotPinURL,token);
+
+        app.print("Reset Password Token:");
+        app.print(generatedURL);
+
+        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.pin", new String[]{generatedURL,
+                        Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
+                ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Reset Your Kula Pin")
+                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).
+                        email(user.getEmail()).displayName(user.toString()).build())).build();
+
+        emailSender.sendEmail(emailBody);
+
+        APIResponse<String> response = new APIResponse<>("Pin Reset Email Sent", true, null);
+
+        return response;
+    }
+
+    public ResponseEntity<?> resetPin(String token, String newPin) {
+
+        app.print("Resetting user pin");
+        app.print(token);
+
+        String userEmail = memcachedHelperService.getValueByKey(token);
+        app.print("Memcached Value:"+userEmail);
+
+        if(userEmail == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new APIResponse("Token expired or not found",false,null));
+
+        User user  = userRepository.findByEmail(userEmail).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+
+        String encrypted = cryptoService.encrypt(newPin, encryptionKey);
+        if (encrypted != null) {
+            user.setPin(encrypted);
+            memcachedHelperService.clear(token);
+            return ResponseEntity.status(HttpStatus.OK).body(new APIResponse<>("Pin reset Successfully", true, userRepository.save(user)));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new APIResponse<>("Unable to Create your Transaction Pin", false, null));
+        }
+
+    }
+
+    public APIResponse validatePhoneNumber(OAuth2Authentication authentication, String phone) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+        if (user != null) {
+            if(phone!=null) {
+                Long otp = app.generateOTP();
+                String phoneNumber=app.toPhoneNumber(phone);
+                memcachedHelperService.save(phoneNumber,otp.toString(),0);
+
+                SMS smsBody= new SMS();
+                smsBody.setRecipient(phoneNumber);
+                smsBody.setMessage("Your OTP is " + otp);
+
+                app.print("Sending SMS OTP:");
+                app.print(smsBody);
+
+                smsSender.sendSMS(smsBody);
+                return new APIResponse<>("OTP Sent to your phone number", true, phoneNumber);
+            }else{
+                return new APIResponse<>("Phone number required", false, null);
+            }
+        } else {
+            return new APIResponse<>("Unable to fetch authentication details", false, null);
+        }
+    }
+
+    public APIResponse verifyPhoneNumber(OAuth2Authentication authentication, String phone, Long otp) {
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+
+        app.print("Verifying phone number");
+        app.print(phone);
+
+        String phoneNumber = app.toPhoneNumber(phone);
+        String memoryOTP = memcachedHelperService.getValueByKey(phoneNumber);
+        app.print("System OTP Value:" + memoryOTP);
+        app.print("User OTP Value:");
+
+        if (memoryOTP == null)
+            return new APIResponse("OTP expired or not found", false, null);
+
+        if(memoryOTP.equals(String.valueOf(otp).trim())) {
+            user.setPhoneNumber(phoneNumber);
+            memcachedHelperService.clear(phoneNumber);
+            userRepository.save(user);
+            return new APIResponse<>("Phone number added successfully", true, user);
+        }else{
+            return new APIResponse("Invalid OTP", false, null);
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

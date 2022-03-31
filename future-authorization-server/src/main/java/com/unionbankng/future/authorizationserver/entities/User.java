@@ -109,6 +109,7 @@ public class User implements Serializable {
         this.uuid = user.getUuid();
         this.authProvider = user.getAuthProvider();
         this.email = user.getEmail();
+        this.phoneNumber=user.getPhoneNumber();
         this.password = user.getPassword();
         this.kycLevel=user.getKycLevel();
         this.dateOfBirth=user.getDateOfBirth();

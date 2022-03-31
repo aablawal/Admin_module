@@ -11,7 +11,7 @@ public @Data class UBNOpenAccountExistingCustomerRequest {
 	private String city;
 	private String initiatorID; //WEBSVCS
 	private String verifierID; //WEBSVCS
-	private String accountBranchCode; //682;
+	private String accountBranchCode; //000;
 	private String ccyCode;
 	private String customerId;
 	private String productCode;
