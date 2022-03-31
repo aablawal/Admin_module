@@ -102,6 +102,6 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
-    wallet-service:
+    dv-shared-wallet:
       path: /walletserv/**
       url: http://dv-shared-wallet
