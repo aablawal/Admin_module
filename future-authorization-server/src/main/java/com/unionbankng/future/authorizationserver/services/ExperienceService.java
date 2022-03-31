@@ -58,9 +58,11 @@ public class ExperienceService {
     public void deleteById (Long id){
 
         Experience experience = experienceRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience Not Found"));
-        int status = fileStorageService.deleteFileFromStorage(experience.getMedia(),BlobType.IMAGE);
-        if(status != 200)
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+        if(experience.getMedia() != null) {
+            int status = fileStorageService.deleteFileFromStorage(experience.getMedia(), BlobType.IMAGE);
+            if (status != 200)
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+        }
 
         experienceRepository.deleteById(id);
     }
