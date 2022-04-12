@@ -198,7 +198,7 @@ public class QualificationsController {
 
 
     @GetMapping(value = "/v1/qualification/training/{trainingId}")
-    public ResponseEntity<APIResponse<List<?>>> deleteTrainingById(@PathVariable Long trainingId) {
+    public ResponseEntity<APIResponse> deleteTrainingById(@PathVariable Long trainingId) {
 
         app.print("Qualification Controller: deleting training by id");
 
