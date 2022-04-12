@@ -68,9 +68,10 @@ public class QualificationsController {
 
     }
 
-    @DeleteMapping("/v1/qualifications/delete/{photoId}")
-    public ResponseEntity<APIResponse> deletePhoto(@PathVariable Long photoId){
-        qualificationService.deleteById(photoId);
+
+    @DeleteMapping("/v1/qualifications/delete/{qualificationId}")
+    public ResponseEntity<APIResponse> deleteQualification(@PathVariable Long qualificationId){
+        qualificationService.deleteById(qualificationId);
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,null));
     }
 
@@ -158,8 +159,7 @@ public class QualificationsController {
 
 
     @GetMapping(value = "/v1/qualification/training/{userId}")
-    public ResponseEntity<APIResponse<List<?>>> getAllTrainingByUserId(@PathVariable Long userId)
-            throws IOException {
+    public ResponseEntity<APIResponse<List<?>>> getAllTrainingByUserId(@PathVariable Long userId) {
 
         app.print("Qualification Controller: fetching all users training");
         app.print(userId);
@@ -193,6 +193,18 @@ public class QualificationsController {
         app.print(educationAndTrainingRequests);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, educationAndTrainingRequests) );
+
+    }
+
+
+    @GetMapping(value = "/v1/qualification/training/{trainingId}")
+    public ResponseEntity<APIResponse<List<?>>> deleteTrainingById(@PathVariable Long trainingId) {
+
+        app.print("Qualification Controller: deleting training by id");
+
+        trainingService.deleteById(trainingId);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, null) );
 
     }
 
@@ -248,5 +260,6 @@ public class QualificationsController {
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );
 
     }
+
 
 }
