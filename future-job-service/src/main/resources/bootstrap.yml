@@ -33,10 +33,11 @@ spring:
       label: staging
 azure:
   keyvault:
-      client-id: ${KEY_VAULT_CLIENT_ID}
-      client-key: ${KEY_VAULT_CLIENT_KEY}
-      tenant-id: ${KEY_VAULT_TENANT_ID}
-      uri: ${KEY_VAULT_URL}
+    client-id: ${KEY_VAULT_CLIENT_ID}
+    client-key: ${KEY_VAULT_CLIENT_KEY}
+    enabled: true
+    tenant-id: ${KEY_VAULT_TENANT_ID}
+    uri: ${KEY_VAULT_URL}
 ---
 
 spring:
