@@ -42,7 +42,7 @@ public class UBNEmailService {
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ubnBaseURL)
                 .build();
-        app.print("UBN Base URL for Email Service:" + ubnBaseURL);
+        app.print("UBN Base URL for Email Service: " + ubnBaseURL);
         ubnEmailServiceInterface = retrofit.create(UBNEmailServiceInterface.class);
     }
 
