@@ -30,7 +30,7 @@ public class UBNEmailService {
     private UBNEmailServiceInterface ubnEmailServiceInterface;
     private final UBNEmailAuthService ubnEmailAuthService;
     private final App app;
-    @Value("${unionbankng.base.url}")
+    @Value("${production.unionbankng.base.url}")
     private String ubnBaseURL;
     private final TemplateEngine templateEngine;
 
