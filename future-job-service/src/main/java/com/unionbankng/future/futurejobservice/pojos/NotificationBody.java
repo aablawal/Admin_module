@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 
-public @Data
+@Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-class NotificationBody implements Serializable {
+public class NotificationBody implements Serializable {
 
     private static final long serialVersionUID = -295422703255886286L;
     protected String body;
