@@ -12,6 +12,7 @@ import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import com.unionbankng.future.futurejobservice.util.SMSSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +42,7 @@ public class AppController {
     }
 
     @PostMapping("/v1/test")
-    public ResponseEntity<APIResponse<Test>> testService(){
+    public ResponseEntity<APIResponse<Test>> testService(@Nullable @RequestParam String email){
         NotificationBody body = new NotificationBody();
         body.setBody("Hello Test!, your job CYX has been published on Kula");
         body.setSubject("Job Posted Successfully");
@@ -51,7 +52,7 @@ public class AppController {
         body.setChannel("S");
         body.setPriority("YES");
         body.setRecipient(1l);
-        body.setRecipientEmail("net.rabiualiyu@gmail.com");
+        body.setRecipientEmail(email == null ? "net.rabiualiyu@gmail.com" : email);
         body.setRecipientName("Rabiu Aliyu");
         notificationSender.pushNotification(body);
         app.print("Notification fired");
@@ -60,7 +61,7 @@ public class AppController {
     }
 
     @PostMapping("/v1/notification/test")
-    public ResponseEntity<APIResponse<String>> testNotificationService(OAuth2Authentication authentication){
+    public ResponseEntity<APIResponse<String>> testNotificationService(@Nullable @RequestParam String email,  OAuth2Authentication authentication){
         NotificationBody body = new NotificationBody();
         body.setBody("Testing notification");
         body.setSubject("Test");
@@ -69,7 +70,7 @@ public class AppController {
         body.setTopic("Job");
         body.setChannel("S");
         body.setPriority("YES");
-        body.setRecipientEmail("net.rabiualiyu@gmail.com");
+        body.setRecipientEmail(email == null ? "net.rabiualiyu@gmail.com" : email);
         body.setRecipientName("Rabiu Aliyu");
         body.setRecipient(1l);
 

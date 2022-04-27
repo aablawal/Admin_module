@@ -28,11 +28,10 @@ import java.util.Calendar;
 public class UBNEmailService {
 
     private UBNEmailServiceInterface ubnEmailServiceInterface;
-    private final UBNAuthService ubnAuthService;
+    private final UBNEmailAuthService ubnEmailAuthService;
     private final App app;
-    @Value("${unionbankng.base.url}")
+    @Value("${production.unionbankng.base.url}")
     private String ubnBaseURL;
-    private final MessageSource messageSource;
     private final TemplateEngine templateEngine;
 
 
@@ -43,6 +42,7 @@ public class UBNEmailService {
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ubnBaseURL)
                 .build();
+        app.print("UBN Base URL for Email Service: " + ubnBaseURL);
         ubnEmailServiceInterface = retrofit.create(UBNEmailServiceInterface.class);
     }
 
@@ -50,7 +50,7 @@ public class UBNEmailService {
         try {
             app.print("Sending Email...");
             app.print(body);
-            String authorization = String.format("Bearer %s", ubnAuthService.getUBNAuthServerToken().getAccess_token());
+            String authorization = String.format("Bearer %s", ubnEmailAuthService.getUBNAuthServerToken().getAccess_token());
             app.print(authorization);
             Response<UbnEmailResponse> responseCall = ubnEmailServiceInterface.sendEmail(authorization, processEmailTemplate(body)).execute();
             UbnEmailResponse response = responseCall.body();

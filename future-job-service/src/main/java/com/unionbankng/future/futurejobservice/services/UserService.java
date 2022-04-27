@@ -28,15 +28,15 @@ public class UserService {
             user.setFullName(response.getFullName());
             user.setCountry(response.getCountry());
             user.setAddress(response.getAddress());
-            user.setEmail(user.getEmail());
+            user.setEmail(response.getEmail());
             user.setPhoneNumber(response.getPhoneNumber());
             user.setStateOfResidence(response.getStateOfResidence());
-            user.setUsername(user.getUsername());
-            user.setImg(user.getImg());
-            user.setAccountName(user.getAccountName());
-            user.setAccountNumber(user.getAccountNumber());
-            user.setIsEnabled(user.getIsEnabled());
-            user.setCreatedAt(user.getCreatedAt());
+            user.setUsername(response.getUsername());
+            user.setImg(response.getImg());
+            user.setAccountName(response.getAccountName());
+            user.setAccountNumber(response.getAccountNumber());
+            user.setIsEnabled(response.getIsEnabled());
+            user.setCreatedAt(response.getCreatedAt());
 
             return user;
         }catch (Exception e){

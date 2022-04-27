@@ -54,6 +54,7 @@ public class UBNEmailService {
             app.print(authorization);
             Response<UbnEmailResponse> responseCall = ubnEmailServiceInterface.sendEmail(authorization, processEmailTemplate(body)).execute();
             UbnEmailResponse response = responseCall.body();
+            app.print("Email Response StatusCode: " + responseCall.code());
             app.print("Response:");
             app.print(response);
 

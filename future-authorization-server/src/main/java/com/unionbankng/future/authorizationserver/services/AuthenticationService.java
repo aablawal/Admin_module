@@ -1,19 +1,14 @@
 
 package com.unionbankng.future.authorizationserver.services;
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -146,67 +141,33 @@ public class AuthenticationService {
         }
     }
 
-    public APIResponse<String> initiateForgotPin(String email) {
 
-        app.print("#########Initiating forgot pin");
-        app.print(email);
-        Optional<User> emailOwner = userRepository.findByEmailOrUsername(email,email);
+    public APIResponse resetPin(OAuth2Authentication authentication, String newPin) {
 
-        if(emailOwner.isEmpty()){
-            return new APIResponse<>("This email is not registered", false, null);
-        }
-        User user = emailOwner.get();
-
-        String token = UUID.randomUUID().toString();
-
-        app.print("#### Pin Reset");
+        System.out.println("###########Resetting PIN");
+        System.out.println("Key:" + encryptionKey);
+        System.out.println("Pin:" + newPin);
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        app.print(currentUser);
+        User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
         app.print(user);
-        app.print(token);
-
-        memcachedHelperService.save(token,user.getEmail(),tokenExpiryInMinute * 60);
-        String generatedURL = String.format("%s?token=%s",forgotPinURL,token);
-
-        app.print("Reset Password Token:");
-        app.print(generatedURL);
-
-        EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.pin", new String[]{generatedURL,
-                        Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
-                ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Reset Your Kula Pin")
-                .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).
-                        email(user.getEmail()).displayName(user.toString()).build())).build();
-
-        emailSender.sendEmail(emailBody);
-
-        APIResponse<String> response = new APIResponse<>("Pin Reset Email Sent", true, null);
-
-        return response;
-    }
-
-    public ResponseEntity<?> resetPin(String token, String newPin) {
-
-        app.print("Resetting user pin");
-        app.print(token);
-
-        String userEmail = memcachedHelperService.getValueByKey(token);
-        app.print("Memcached Value:"+userEmail);
-
-        if(userEmail == null)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new APIResponse("Token expired or not found",false,null));
-
-        User user  = userRepository.findByEmail(userEmail).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
-
-        String encrypted = cryptoService.encrypt(newPin, encryptionKey);
-        if (encrypted != null) {
-            user.setPin(encrypted);
-            memcachedHelperService.clear(token);
-            return ResponseEntity.status(HttpStatus.OK).body(new APIResponse<>("Pin reset Successfully", true, userRepository.save(user)));
+        if (user != null) {
+            if (user.getPin() != null) {
+                String encrypted = cryptoService.encrypt(newPin, encryptionKey);
+                if (encrypted != null) {
+                    user.setPin(encrypted);
+                    return new APIResponse<>("Pin Added Successfully", true, userRepository.save(user));
+                } else {
+                    return new APIResponse<>("Unable to Create your Transaction Pin", false, null);
+                }
+            } else {
+                return new APIResponse<>("You have not added a Transaction Pin to your Account", false, null);
+            }
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new APIResponse<>("Unable to Create your Transaction Pin", false, null));
+            return new APIResponse<>("Unable to fetch authentication details", false, null);
         }
-
     }
+
 
     public APIResponse validatePhoneNumber(OAuth2Authentication authentication, String phone) {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
