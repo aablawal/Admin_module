@@ -76,8 +76,7 @@ public class App {
         return matcher.matches();
     }
     public ObjectMapper getMapper(){
-        ObjectMapper mapper= new ObjectMapper();
-        return mapper;
+        return new ObjectMapper();
     }
 
     public Long generateOTP(){
