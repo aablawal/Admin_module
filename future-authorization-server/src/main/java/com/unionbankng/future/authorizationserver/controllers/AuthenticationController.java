@@ -22,15 +22,10 @@ public class AuthenticationController {
         return ResponseEntity.ok().body(authenticationService.createPin(authentication, pin));
     }
 
-    @PostMapping("v1/pin/initiate-forgot-pin")
-    public ResponseEntity<?> initiateForgotPin(@RequestParam String email){
-        return ResponseEntity.ok().body(authenticationService.initiateForgotPin(email));
-    }
-
 
     @PostMapping("v1/pin/reset-pin")
-    public ResponseEntity<?> resetPin(@RequestBody @Valid ResetPinRequest request){
-        return authenticationService.resetPin(request.getToken(), request.getNewPin());
+    public ResponseEntity<?> resetPin(OAuth2Authentication authentication, @RequestBody @Valid ResetPinRequest request){
+        return ResponseEntity.ok().body(authenticationService.resetPin(authentication, request.getNewPin()));
     }
 
     @PostMapping("/v1/pin/verify")

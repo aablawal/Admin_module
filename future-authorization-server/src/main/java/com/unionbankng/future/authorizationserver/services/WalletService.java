@@ -48,6 +48,7 @@ public class WalletService implements Serializable {
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(walletBaseURL)
                 .build();
+        app.print("walletBaseURL");
         app.print(walletBaseURL);
         walletServiceInterface = retrofit.create(WalletServiceInterface.class);
     }

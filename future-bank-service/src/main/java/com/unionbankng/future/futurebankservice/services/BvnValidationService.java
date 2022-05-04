@@ -60,7 +60,7 @@ public class BvnValidationService {
 
         app.print("API Response:");
         app.print(response);
-        app.print("RESPONSE BODY: " + response.body().toString());
+        app.print("RESPONSE BODY: " + (response.body() != null ? response.body().toString() : "is null"));
         if (response.isSuccessful() && response.body().getData()!=null) {
             app.print("Success block");
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));

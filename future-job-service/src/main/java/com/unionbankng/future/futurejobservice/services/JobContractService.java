@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,7 @@ public class JobContractService implements Serializable {
     private  String VATAccountNumber;
     private  String pepperestIncomeAccountName; //CASA
     private  String pepperestIncomeAccountNumber;
+    private MessageSource messageSource;
     private  Logger logger = LoggerFactory.getLogger(JobContractService.class);
 
 
@@ -326,7 +329,7 @@ public class JobContractService implements Serializable {
                         body.setAction("/job/ongoing/details/" + proposal.getJobId());
                         body.setTopic("'Job'");
                         body.setChannel("S");
-                        body.setPriority("YES");
+                        body.setPriority("NORMAL");
                         body.setRecipient(proposal.getEmployerId());
                         body.setRecipientEmail(currentUser.getUserEmail());
                         body.setRecipientName(currentUser.getUserFullName());
@@ -371,8 +374,10 @@ public class JobContractService implements Serializable {
                         app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
                         //fire notifications
                         NotificationBody body1 = new NotificationBody();
-                        body1.setBody("Your " + contract.getAmount() + " deducted is currently in our Escrow, it will only be released to the freelancer when you confirm that the job done is okay by you.");
-                        body1.setSubject("Contract Amount is in Escrow");
+                        String[] params = {String.valueOf(contract.getAmount()), job.getTitle()};
+                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider", params, LocaleContextHolder.getLocale());
+                        body1.setBody(message);
+                        body1.setSubject("Job Proposal Approved");
                         body1.setActionType("REDIRECT");
                         body1.setAction("/job/ongoing/details/" + proposal.getJobId());
                         body1.setTopic("'Job'");
@@ -386,7 +391,9 @@ public class JobContractService implements Serializable {
                         User user =userService.getUserById(proposal.getUserId());
                         if(user!=null) {
                             NotificationBody body2 = new NotificationBody();
-                            body2.setBody(currentUser.getUserFullName() + " approved your contract and credited our escrow with the sum of " + proposal.getBidAmount());
+                            String[] params1 = {currentUser.getFirstName(), job.getTitle(), String.valueOf(contract.getAmount())};
+                            String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
+                            body2.setBody(message1);
                             body2.setSubject("Proposal Approval");
                             body2.setActionType("REDIRECT");
                             body2.setAction("/job/ongoing/details/" + proposal.getJobId());
@@ -758,7 +765,9 @@ public class JobContractService implements Serializable {
             if (currentJob != null && employer!=null) {
                 app.print("Its here 2");
                 NotificationBody body = new NotificationBody();
-                body.setBody(currentUser.getUserFullName() + " submitted " + currentJob.getTitle() + " for your review and approval");
+                String[] params = {currentJob.getTitle(), currentUser.getUserFullName()};
+                String message = messageSource.getMessage("submit-job.email-body", params, LocaleContextHolder.getLocale());
+                body.setBody(message);
                 body.setSubject("Project Review");
                 body.setActionType("REDIRECT");
                 body.setAction("/job/ongoing/details/" + request.getJobId());

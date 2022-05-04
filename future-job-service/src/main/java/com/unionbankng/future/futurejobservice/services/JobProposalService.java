@@ -18,6 +18,8 @@ import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -42,6 +44,7 @@ public class JobProposalService  implements Serializable {
     private final JobRepository jobRepository;
     private Logger logger = LoggerFactory.getLogger(JobProposalService.class);
     private final NotificationSender notificationSender;
+    private final MessageSource messageSource;
     private  final AppLogger appLogger;
 
 
@@ -102,8 +105,10 @@ public class JobProposalService  implements Serializable {
                         Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
                         User employer =userService.getUserById(proposal.getEmployerId());
                         if (currentJob != null && employer!=null ) {
+                            String[] params = {currentJob.getTitle()};
+                            String message = messageSource.getMessage("proposal.submission.successful.email-body", params, LocaleContextHolder.getLocale());
                             NotificationBody body = new NotificationBody();
-                            body.setBody("You have new proposal for " + currentJob.getTitle());
+                            body.setBody(message);
                             body.setSubject("New Proposal");
                             body.setActionType("REDIRECT");
                             body.setAction("/my-job/proposals/" + proposal.getJobId());
