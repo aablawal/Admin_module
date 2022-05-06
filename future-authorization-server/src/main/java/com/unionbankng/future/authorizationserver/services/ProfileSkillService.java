@@ -60,7 +60,6 @@ public class ProfileSkillService {
 
     public void saveProfileSkills(ProfileSkillRequest request) {
         app.print("Profile Skill Service: Saving Skills");
-        app.print(request);
 
         Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
@@ -72,7 +71,6 @@ public class ProfileSkillService {
             profileSkillRepository.save(profileSkill);
             profile.getSkills().add(profileSkill);
             profileRepository.save(profile);
-            app.print(profileSkill);
         }
 
     }
@@ -80,7 +78,6 @@ public class ProfileSkillService {
 
     public List<String> getProfileSkills(Long userId) {
         app.print("Profile Skill Service: Getting Skills");
-        app.print(userId);
 
         Profile profile = profileRepository.findByUserId(userId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));

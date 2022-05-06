@@ -50,11 +50,6 @@ public class PortfolioItemsController {
              @Nullable  @RequestParam("video") MultipartFile video,
              @RequestParam String request) throws IOException {
         app.print(" ###### Adding portfolio");
-        app.print(request);
-        app.print("img");
-        app.print(img != null ? img.getOriginalFilename() : "null");
-        app.print("video");
-        app.print(video != null ? video.getOriginalFilename() : "null");
         PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
         Profile profile = profileRepository.findByUserId(portfolioItemRequest.getUserId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found")
@@ -71,11 +66,6 @@ public class PortfolioItemsController {
              @RequestParam String request) throws IOException {
 
         app.print(" ###### Editing portfolio");
-        app.print(request);
-        app.print("img");
-        app.print(img != null ? img.getOriginalFilename() : "null");
-        app.print("video");
-        app.print(video != null ? video.getOriginalFilename() : "null");
         PortfolioItemRequest portfolioItemRequest = app.getMapper().readValue(request, PortfolioItemRequest.class);
 
         Profile profile = profileRepository.findByUserId(portfolioItemRequest.getUserId()).orElseThrow(

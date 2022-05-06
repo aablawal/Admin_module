@@ -54,7 +54,6 @@ public class ExperiencesController {
             throws IOException {
 
         app.print("Experience Controller: Printing Experience Request");
-        app.print(request);
 
         Experience experience = experienceService.saveFromRequest(null,request,new Experience());
         return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));

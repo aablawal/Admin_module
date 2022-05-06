@@ -24,12 +24,9 @@ public class ProxyController {
     @GetMapping("/v1/proxy/user/get_by_id/{userId}")
     public ApiResponseProxy<User> getUserById(@PathVariable String userId) {
         app.print("ProxyController.getUserById()");
-        app.print("userId: " + userId);
 
         User user = userService.findByUuid(userId).orElse(null);
-        app.print("user: " + user);
         if (user != null) {
-            app.print("Success block for user: " + user);
             return new ApiResponseProxy<>("Request successful", true, "01", user);
         } else {
             return new ApiResponseProxy<>("User not found", false, "02", null);
