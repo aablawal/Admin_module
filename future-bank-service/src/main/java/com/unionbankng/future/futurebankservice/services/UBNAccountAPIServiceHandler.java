@@ -161,8 +161,6 @@ public class UBNAccountAPIServiceHandler {
         if(response == null)
             return null;
         Response<UBNFundTransferResponse> responseResponse=  ubnAccountAPIService.fundsTransferUBN(response.getAccess_token(),request).execute();
-        app.print("Response:");
-        app.print(responseResponse.body());
         return  responseResponse;
     }
 

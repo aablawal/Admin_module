@@ -408,14 +408,12 @@ public class UBNAccountOpeningController {
 
         Response<UBNCompleteAccountPaymentResponse> responseResponse = ubnNewAccountOpeningAPIServiceHandler.completeUBNAccountCreation(ubnAccountCreationRequest);
         app.print("Response:");
-        app.print(responseResponse.body()!=null?responseResponse.body():"Response body is Null");
 
         if (request.getCustomerRecordId() != null) {
             Response<UBNAccountDataResponse> dataResponseResponse = ubnNewAccountOpeningAPIServiceHandler
                     .getUBNAccountDetails(request.getCustomerRecordId());
 
             app.print("Response:");
-            app.print(dataResponseResponse.body());
             app.print("Data Get Response Code: " + dataResponseResponse.isSuccessful());
 
             if (!dataResponseResponse.isSuccessful())
