@@ -44,27 +44,18 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             thirdPartyOauthToken = map.get("oauth_token");
         }
 
-        this.logger.info(String.format("token is : %s",thirdPartyOauthToken));
+//        this.logger.info(String.format("token is : %s",thirdPartyOauthToken));
         String username = auth.getPrincipal() == null ? "NONE_PROVIDED" : auth.getName();
-        app.print("username:"+username);
         boolean cacheWasUsed = true;
         FutureDAOUserDetails user = (FutureDAOUserDetails)this.getUserCache().getUserFromCache(username);
 
-        app.print(this.getUserCache().getUserFromCache(username));
         if(user == null) {
             cacheWasUsed =false;
 
-            app.print(auth.getName());
             user = (FutureDAOUserDetails) this.retrieveUser(auth.getName(),
                     (UsernamePasswordAuthenticationToken) auth);
         }
 
-        app.print(user);
-
-
-
-        app.print("Login user object:");
-        app.print(user);
         ErrorResponse errorResponse = new ErrorResponse();
         if(!user.getIsEnabled()){
             userConfirmationTokenService.sendConfirmationToken(user);
@@ -83,7 +74,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         loginHistory.setIpAddress("Not Detected");
         loginHistory.setLoginDate(new Date());
         app.print("########New Login Detected!");
-        app.print(loginHistory);
 
         if(user.getPassword()!=null) {
             if(auth.getCredentials() == null && thirdPartyOauthToken != null)

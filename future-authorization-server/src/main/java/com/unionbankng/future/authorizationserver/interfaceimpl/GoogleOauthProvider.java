@@ -33,20 +33,14 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
     public ThirdPartyOauthResponse authentcate(String idToken)  {
 
         GoogleIdToken googleIdToken = null;
-        logger.info("Starting : {}",googleClientId);
 
 
         app.print("before");
         try {
-            app.print("in try before");
             googleIdToken = getGoogleIdToken(idToken,googleClientId);
-            app.print("in try");
         } catch (Exception e) {
-            app.print("in catch");
-            logger.info("Google Auth error: {}",e.getLocalizedMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         }
-        logger.info("Here : {}",idToken);
         GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
         ThirdPartyOauthResponse thirdPartyOauthResponse = new ThirdPartyOauthResponse();
@@ -55,14 +49,11 @@ public class GoogleOauthProvider implements ThirdPartyOauthProvider {
         thirdPartyOauthResponse.setLastName((String) payload.get("family_name"));
         thirdPartyOauthResponse.setImage((String) payload.get("picture"));
 
-        logger.info("Google Auth response: {}", thirdPartyOauthResponse);
         //Check if user exist
         return thirdPartyOauthResponse;
     }
 
     private GoogleIdToken getGoogleIdToken(String googleIdTokenString, String clientId) throws GeneralSecurityException, IOException {
-        app.print("token:"+googleIdTokenString);
-        app.print("clientId:"+clientId);
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jacksonFactory)
                 // Specify the CLIENT_ID of the app that accesses the backend:
                 .setAudience(Collections.singletonList(clientId))

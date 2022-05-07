@@ -50,7 +50,6 @@ public class SecurityService {
     public ResponseEntity<?> initiateForgotPassword(String identifier){
 
         app.print("#########Initiating forgot password");
-        app.print(identifier);
         Optional<User> emailOwner = userService.findByEmailOrUsername(identifier,identifier);
 
         if(emailOwner.isEmpty()){
@@ -61,14 +60,11 @@ public class SecurityService {
         String token = UUID.randomUUID().toString();
 
         app.print("#### Password Reset");
-        app.print(user);
-        app.print(token);
 
         memcachedHelperService.save(token,user.getEmail(),0);
         String generatedURL = String.format("%s?token=%s",forgotPasswordURL,token);
 
         app.print("Reset Password Token:");
-        app.print(generatedURL);
 
         EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("forgot.password", new String[]{generatedURL,
                 Utility.convertMinutesToWords(tokenExpiryInMinute)}, LocaleContextHolder.getLocale())
@@ -91,12 +87,9 @@ public class SecurityService {
 
     public ResponseEntity resetPassword(String token, String password){
         app.print("Resetting user password");
-        app.print(token);
-
 
         String userEmail = memcachedHelperService.getValueByKey(token);
-        app.print("Memcached Value:"+userEmail);
-      
+
         if(userEmail == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new APIResponse("Token expired or not found",false,null));

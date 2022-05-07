@@ -35,12 +35,10 @@ public class AuthenticationService {
 
     public APIResponse createPin(OAuth2Authentication authentication, String pin) {
         System.out.println("###########Creating PIN");
-        System.out.println("Key:" + encryptionKey);
-        System.out.println("Pin:" + pin);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        app.print(currentUser);
+        
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
-        app.print(user);
+        
         if (user != null) {
             if (user.getPin() == null) {
                 String encrypted = cryptoService.encrypt(pin, encryptionKey);
@@ -61,14 +59,12 @@ public class AuthenticationService {
     public APIResponse verifyPin(OAuth2Authentication authentication, String pin) {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
-        app.print(user);
+        
         if (user != null) {
             if(user.getPin()!=null) {
                 String existingPin = cryptoService.decrypt(user.getPin(), encryptionKey);
                 String providedPin = pin;
                 System.out.println("##########Pin Verification started");
-                System.out.println("Existing:" + existingPin);
-                System.out.println("Provided:" + pin);
                 if (existingPin.equals(providedPin)) {
                     return new APIResponse<>("Verification Successful", true, user);
                 } else {
@@ -88,20 +84,17 @@ public class AuthenticationService {
             app.print("############GENERATING OTP");
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
-            app.print(user);
+            
             if (user != null) {
                 String otp = this.app.generateOTP().toString();
                 memcachedHelperService.save(user.getUuid(), otp, tokenExpiryInMinute * 60);
 
                 String mobileNumber = app.toPhoneNumber(user.getPhoneNumber());
-                app.print(mobileNumber);
                 app.print("Sending OTP.....");
 
                 SMS sms = new SMS();
                 sms.setMessage("Your OTP is " + otp);
                 sms.setRecipient(mobileNumber);
-                app.print("Request:");
-                app.print(sms);
                 smsSender.sendSMS(sms);
                 app.print("OTP sent successfully");
                 return new APIResponse<>("OTP Sent Successfully", true, mobileNumber);
@@ -145,12 +138,10 @@ public class AuthenticationService {
     public APIResponse resetPin(OAuth2Authentication authentication, String newPin) {
 
         System.out.println("###########Resetting PIN");
-        System.out.println("Key:" + encryptionKey);
-        System.out.println("Pin:" + newPin);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        app.print(currentUser);
+
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
-        app.print(user);
+        
         if (user != null) {
             if (user.getPin() != null) {
                 String encrypted = cryptoService.encrypt(newPin, encryptionKey);
@@ -183,7 +174,6 @@ public class AuthenticationService {
                 smsBody.setMessage("Your OTP is " + otp);
 
                 app.print("Sending SMS OTP:");
-                app.print(smsBody);
 
                 smsSender.sendSMS(smsBody);
                 return new APIResponse<>("OTP Sent to your phone number", true, phoneNumber);
@@ -200,11 +190,9 @@ public class AuthenticationService {
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
 
         app.print("Verifying phone number");
-        app.print(phone);
 
         String phoneNumber = app.toPhoneNumber(phone);
         String memoryOTP = memcachedHelperService.getValueByKey(phoneNumber);
-        app.print("System OTP Value:" + memoryOTP);
         app.print("User OTP Value:");
 
         if (memoryOTP == null)

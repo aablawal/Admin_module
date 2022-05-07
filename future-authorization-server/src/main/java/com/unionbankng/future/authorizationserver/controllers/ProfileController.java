@@ -52,8 +52,6 @@ public class ProfileController {
         Profile profile = profileService.findById(profileId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
 
-        app.print(profile);
-
         RepresentationModel representationModel = RepresentationModel.of(profile);
         Link experiencesLink = linkTo(methodOn(ExperiencesController.class)
                 .findExperienceByProfileId(profile.getId())).withRel("experiences");
@@ -89,14 +87,12 @@ public class ProfileController {
     public ResponseEntity<APIResponse<Profile>> updateProfileByUserId(@PathVariable Long userId, @Valid @RequestBody ProfileUpdateRequest request) throws IOException {
 
         app.print("Updating user profile by Id with request: ");
-        app.print(request);
         Long profileId = profileRepository.findByUserId(userId).get().getId();
 
         app.print("Profile Id is "+ profileId.toString());
 
         Profile profile = profileService.updateProfile(profileId, request);
         app.print("Finished updating user profile");
-        app.print(profile);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,profile));
     }
 

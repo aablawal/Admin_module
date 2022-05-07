@@ -542,13 +542,7 @@ public class KYCService {
 
     public Response<VerifyMeAddressVerificationResponse> getAddressVerification(AddressVerificationRequestVerifyme request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
-        app.print(request);
         Response<VerifyMeAddressVerificationResponse> response = kycServiceInterface.getAddressVerification(token, request).execute();
-        app.print("response");
-        app.print(response);
-        app.print(response.body());
-        app.print(response.message());
-        app.print(response.errorBody());
         return response;
     }
 
