@@ -26,7 +26,6 @@ public class NotificationSender {
             //send an email for priority notifications
             if(notificationBody.getPriority().equalsIgnoreCase("YES")){
                 app.print("Sending Priority Notification to Email.....");
-                app.print(notificationBody);
                 EmailBody emailBody = EmailBody.builder().body(notificationBody.getBody())
                         .sender(EmailAddress.builder().displayName("Kula Team").email("hello@kula.work").build()).subject(notificationBody.getSubject())
                         .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO)
