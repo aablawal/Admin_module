@@ -41,9 +41,7 @@ public class UBNFundstransferController {
 
     @PostMapping("/v1/ubn_funds/bulk_transfer")
     public ResponseEntity<APIResponse<UBNBulkFundTransferResponse>> transferBulkFundsUBN(@RequestBody UBNBulkFundTransferRequest request) throws IOException {
-        app.print(request);
         Response<UBNBulkFundTransferResponse> responseResponse = ubnAccountAPIServiceHandler.transferBulkFundsUBN(request);
-        app.print(responseResponse);
         if(responseResponse==null){
             if(responseResponse.body()==null){
                 if(!responseResponse.body().getCode().equals("00")){
@@ -69,8 +67,6 @@ public class UBNFundstransferController {
             return ResponseEntity.status(responseResponse.code()).body(new APIResponse<>(responseResponse.message(), false, null));
 
         //update customer details with account number
-        app.print("Response:");
-        app.print(responseResponse.body());
 
         return ResponseEntity.ok().body(new APIResponse<>("Request successful", true, responseResponse.body().getAccount()));
 

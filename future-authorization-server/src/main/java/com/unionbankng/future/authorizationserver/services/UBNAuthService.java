@@ -43,7 +43,7 @@ public class UBNAuthService {
         Call<UBNAuthServerTokenResponse> responseCall = ubnAuthAPIServiceInterface.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
         UBNAuthServerTokenResponse response=  responseCall.execute().body();
-        app.print("/authserv/oauth/token is :"+response.getAccess_token());
+//        app.print("/authserv/oauth/token is :"+response.getAccess_token());
         return response;
     }
 

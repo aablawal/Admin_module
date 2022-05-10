@@ -49,14 +49,12 @@ public class UBNEmailService {
     public APIResponse sendEmail(EmailBody body) {
         try {
             app.print("Sending Email...");
-            app.print(body);
             String authorization = String.format("Bearer %s", ubnAuthService.getUBNAuthServerToken().getAccess_token());
-            app.print(authorization);
+            // app.print(authorization);
             Response<UbnEmailResponse> responseCall = ubnEmailServiceInterface.sendEmail(authorization, processEmailTemplate(body)).execute();
             UbnEmailResponse response = responseCall.body();
             app.print("Email Response StatusCode: " + responseCall.code());
-            app.print("Response:");
-            app.print(response);
+//            app.print(response);
 
             return new APIResponse(responseCall.message(), responseCall.isSuccessful(), response);
         } catch (Exception ex) {

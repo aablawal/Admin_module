@@ -22,7 +22,6 @@ public class SocialLinkController {
 
         app.print("Adding Social link to user profile");
         socialLinkService.saveSocialLinkFromRequest(userSocialLink);
-        app.print(userSocialLink);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful"));
 
@@ -35,8 +34,6 @@ public class SocialLinkController {
         app.print("Fetching user social links");
 
         UserSocialLink userSocialLink = socialLinkService.findUserSocialLinks(userId);
-
-        app.print(userSocialLink);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, userSocialLink));
 
