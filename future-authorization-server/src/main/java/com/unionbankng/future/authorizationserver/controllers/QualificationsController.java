@@ -86,7 +86,6 @@ public class QualificationsController {
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
         );
         request.setProfileId(profile.getId());
-        app.print(request);
 
         if(request.getSchool() != null && !request.getSchool().isBlank()){
             app.print("Qualification Controller: Adding new qualification");
@@ -99,7 +98,6 @@ public class QualificationsController {
             qualificationRequest.setStartYear(request.getStartYear());
             qualificationRequest.setEndYear(request.getEndYear());
             Qualification qualification = qualificationService.saveFromRequest(null, qualificationRequest, new Qualification());
-            app.print(qualification);
         }
 
 
@@ -115,7 +113,6 @@ public class QualificationsController {
             trainingRequest.setYearAwarded(request.getTrainingYearAwarded());
 
             Training training = trainingService.saveFromRequest(trainingRequest, new Training());
-            app.print(training);
         }
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );
@@ -151,7 +148,6 @@ public class QualificationsController {
         }
 
         app.print("Qualification Controller: fetching all users qualification completed");
-        app.print(educationAndTrainingRequests);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, educationAndTrainingRequests) );
 
@@ -162,7 +158,6 @@ public class QualificationsController {
     public ResponseEntity<APIResponse<List<?>>> getAllTrainingByUserId(@PathVariable Long userId) {
 
         app.print("Qualification Controller: fetching all users training");
-        app.print(userId);
 
         Profile profile = profileRepository.findByUserId(userId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
@@ -173,7 +168,6 @@ public class QualificationsController {
                 findAllByProfileId(profile.getId(), Sort.by("createdAt").ascending());
 
         app.print("trainings");
-        app.print(trainings);
         List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();
 
 
@@ -190,7 +184,6 @@ public class QualificationsController {
         }
 
         app.print("Qualification Controller: fetching all users training completed");
-        app.print(educationAndTrainingRequests);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, educationAndTrainingRequests) );
 
@@ -220,7 +213,6 @@ public class QualificationsController {
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
         );
         request.setProfileId(profile.getId());
-        app.print(request);
 
         if(request.getSchool() != null && !request.getSchool().isBlank()){
             app.print("Qualification Controller: Editing qualification");
@@ -236,7 +228,6 @@ public class QualificationsController {
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Qualification not found")
             );
             Qualification updatedQualification = qualificationService.saveFromRequest(null, qualificationRequest, qualification);
-            app.print(updatedQualification);
         }
 
 
@@ -254,7 +245,6 @@ public class QualificationsController {
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Training not found")
             );
             Training updatedTraining = trainingService.saveFromRequest(trainingRequest, training);
-            app.print(updatedTraining);
         }
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );

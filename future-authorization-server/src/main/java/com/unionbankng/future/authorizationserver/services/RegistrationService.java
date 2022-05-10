@@ -52,7 +52,6 @@ public class RegistrationService {
             );
 
             app.print("User found: ");
-            app.print(existingUser);
             ErrorResponse errorResponse = new ErrorResponse();
             if(existingUser.getIsEnabled()) {
                 errorResponse.setCode("00");
@@ -83,7 +82,7 @@ public class RegistrationService {
 
         user = userService.save(user);
         app.print("Saved user");
-        app.print(user);
+
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();
         profileService.save(profile);
@@ -104,8 +103,6 @@ public class RegistrationService {
 
 
         app.print("##############LOGIN WITH GOOGLE");
-        app.print("Request:");
-        app.print(request);
         // generate uuid for user
         ThirdPartyOauthResponse thirdPartyOauthResponse = googleOauthProvider.authentcate(request.getThirdPartyToken());
         if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername())) {
@@ -137,7 +134,7 @@ public class RegistrationService {
 
         user = userService.save(user);
         app.print("Saved user:");
-        app.print(user);
+
 
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();

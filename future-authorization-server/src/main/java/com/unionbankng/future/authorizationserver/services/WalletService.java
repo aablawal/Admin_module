@@ -48,15 +48,12 @@ public class WalletService implements Serializable {
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(walletBaseURL)
                 .build();
-        app.print("walletBaseURL");
-        app.print(walletBaseURL);
         walletServiceInterface = retrofit.create(WalletServiceInterface.class);
     }
 
 
     private String computeBasicAuthorization(){
         String details=username+":"+password;
-        app.print(details);
         return "Basic " +Base64.getEncoder().encodeToString(details.getBytes());
     }
 
@@ -64,16 +61,7 @@ public class WalletService implements Serializable {
         try {
             app.print("Generating Wallet access token ....");
             String  basicAuth=computeBasicAuthorization();
-            app.print("basicAuth");
-            app.print(basicAuth);
-            app.print(walletBaseURL);
-            app.print(username);
-            app.print(password);
             Response<WalletAuthResponse> response = walletServiceInterface.getWalletServiceToken("password",username,password,basicAuth).execute();
-            app.print("Response:");
-            app.print(response);
-            app.print(response.body());
-            app.print(response.code());
             if (response.isSuccessful()) {
                 return response.body();
             } else {
@@ -87,26 +75,13 @@ public class WalletService implements Serializable {
 
     public APIResponse<Map<String, String>> createWallet(String userId, String customerName, String bvn) {
         try {
-            app.print("Creating new Wallet....");
-            app.print("userId:");
-            app.print(userId);
-            app.print("customerName:");
-            app.print(customerName);
-            app.print("bvn:");
-            app.print(bvn);
 
             WalletAuthResponse auth= getAuth();
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
-                app.print("wallet auth token:");
-                app.print(token);
                 app.print("##### Creating new Wallet....");
                 CreateWalletRequest createWalletRequest = new CreateWalletRequest(userId, customerName, bvn);
                 Response<Map<String, String>> response = walletServiceInterface.createWallet(token, createWalletRequest).execute();
-                app.print("Response:");
-                app.print(response);
-                app.print(response.body());
-                app.print(response.code());
                 if (response.isSuccessful()) {
                     return  new APIResponse("Request Successful",true, response.body());
 
