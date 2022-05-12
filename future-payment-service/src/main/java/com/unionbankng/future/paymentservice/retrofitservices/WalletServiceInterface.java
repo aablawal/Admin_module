@@ -32,12 +32,12 @@ public interface WalletServiceInterface {
     Call<WalletGenericResponse> debitWallet(@Header("Authorization") String authorization, @Body WalletDebitRequest request);
 
 
-    @POST("api/v1/interswitch/verify/{transactionId}")
+    @POST("api/v1/interswitch/verify/{transactionRef}")
     @Headers({
             "Accept: application/json"
     })
     Call<ApiResponse<VerifyTransactionResponse>> verifyInterswitchTransaction(@Header("Authorization") String authorization,
-                                                                 @Path("transactionId") String transactionId);
+                                                                 @Path("transactionRef") String transactionRef);
 
 
     @GET("api/v1/interswitch/resolve-bank-account")

@@ -1,5 +1,6 @@
 package com.unionbankng.future.paymentservice.controllers;
 
+import com.google.gson.Gson;
 import com.unionbankng.future.paymentservice.pojos.*;
 import com.unionbankng.future.paymentservice.services.WalletService;
 import com.unionbankng.future.paymentservice.utils.App;
@@ -24,10 +25,11 @@ public class WalletController {
         return "Hello World";
     }
 
-    @PostMapping("/verify-interswitch-transaction/{transactionId}")
-    public ApiResponse<VerifyTransactionResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionId)  {
-        app.print("VerifyInterswitch Transaction: " + transactionId);
-        return walletService.verifyTransaction(transactionId);
+    @PostMapping("/v1/interswitch/verify/{transactionId}")
+    public ApiResponse<VerifyTransactionResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionId, @RequestBody InterswitchSDKResponse request)  {
+        app.print("Interswitch Verify Transaction : " + transactionId);
+        return walletService.verifyTransaction(request);
+
     }
 
     @PostMapping("/debit-wallet")
