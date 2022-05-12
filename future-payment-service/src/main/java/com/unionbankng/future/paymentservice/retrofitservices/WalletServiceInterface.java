@@ -37,7 +37,8 @@ public interface WalletServiceInterface {
             "Accept: application/json"
     })
     Call<ApiResponse<VerifyTransactionResponse>> verifyInterswitchTransaction(@Header("Authorization") String authorization,
-                                                                 @Path("transactionRef") String transactionRef);
+                                                                 @Path("transactionRef") String transactionRef,
+                                                                              @Body InterswitchSDKResponse request);
 
 
     @GET("api/v1/interswitch/resolve-bank-account")
