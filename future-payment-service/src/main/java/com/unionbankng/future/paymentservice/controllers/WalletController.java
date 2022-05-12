@@ -25,9 +25,9 @@ public class WalletController {
         return "Hello World";
     }
 
-    @PostMapping("/v1/interswitch/verify/{transactionId}")
-    public ApiResponse<VerifyTransactionResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionId, @RequestBody InterswitchSDKResponse request)  {
-        app.print("Interswitch Verify Transaction : " + transactionId);
+    @PostMapping("/v1/interswitch/verify/{transactionRef}")
+    public ApiResponse<VerifyTransactionResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionRef, @RequestBody InterswitchSDKResponse request)  {
+        app.print("Interswitch Verify Transaction : " + transactionRef);
         return walletService.verifyTransaction(request);
 
     }
