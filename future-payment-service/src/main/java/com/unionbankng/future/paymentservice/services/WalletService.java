@@ -258,7 +258,7 @@ public class WalletService implements Serializable {
             WalletAuthResponse auth = getAuth();
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
-                Response<ApiResponse<?>> response = walletServiceInterface.initiateWalletFunding(token, request).execute();
+                Response<ApiResponse> response = walletServiceInterface.initiateWalletFunding(token, request).execute();
                 app.print("Response:");
                 app.print(response.code());
                 if (response.isSuccessful()) {
