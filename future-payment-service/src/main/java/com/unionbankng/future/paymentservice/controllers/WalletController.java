@@ -26,11 +26,10 @@ public class WalletController {
     }
 
     @PostMapping("/verify-interswitch-transaction/{transactionRef}")
-    public ApiResponse<VerifyTransactionResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionRef, @RequestBody InterswitchSDKResponse request)  {
+    public ApiResponse<WalletGenericResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionRef, @RequestBody InterswitchSDKResponse request)  {
         app.print("Interswitch Verify Transaction : " + transactionRef);
         request.setTxnref(transactionRef);
         return walletService.verifyTransaction(request);
-
     }
 
     @PostMapping("/debit-wallet")

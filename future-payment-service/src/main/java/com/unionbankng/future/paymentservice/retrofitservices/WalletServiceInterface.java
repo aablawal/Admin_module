@@ -36,7 +36,7 @@ public interface WalletServiceInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<ApiResponse<VerifyTransactionResponse>> verifyInterswitchTransaction(@Header("Authorization") String authorization,
+    Call<ApiResponse<WalletGenericResponse>> verifyInterswitchTransaction(@Header("Authorization") String authorization,
                                                                  @Path("transactionRef") String transactionRef,
                                                                               @Body InterswitchSDKResponse request);
 
