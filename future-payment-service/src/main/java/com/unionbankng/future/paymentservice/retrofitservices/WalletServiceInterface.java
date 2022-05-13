@@ -37,7 +37,7 @@ public interface WalletServiceInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<ApiResponse<?>> initiateWalletFunding(@Header("Authorization") String authorization,
+    Call<ApiResponse> initiateWalletFunding(@Header("Authorization") String authorization,
                                                                               @Body InitiateFundingRequest request);
 
 
