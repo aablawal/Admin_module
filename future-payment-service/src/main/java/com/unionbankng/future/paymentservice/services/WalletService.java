@@ -137,7 +137,7 @@ public class WalletService implements Serializable {
             WalletAuthResponse auth= getAuth();
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
-                Response<ApiResponse<VerifyTransactionResponse>> response = walletServiceInterface.verifyInterswitchTransaction(token, interswitchSDKResponse.getTxnref(), null).execute();
+                Response<ApiResponse<VerifyTransactionResponse>> response = walletServiceInterface.verifyInterswitchTransaction(token, interswitchSDKResponse.getTxnref(), new InterswitchSDKResponse()).execute();
                 app.print("Response:");
                 app.print(response.code());
                 if (response.isSuccessful()) {
