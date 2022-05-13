@@ -3,7 +3,7 @@ package com.unionbankng.future.paymentservice.pojos;
 import lombok.Data;
 
 @Data
-public class InterswitchSDKRequest {
+public class InitiateFundingRequest {
 
     private String merchantCode;
 

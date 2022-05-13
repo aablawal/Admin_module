@@ -251,4 +251,27 @@ public class WalletService implements Serializable {
             return new ApiResponse<>("Something went wrong",false, "101", null);
         }
     }
+
+    public ApiResponse<?> initiateWalletFunding(InitiateFundingRequest request) {
+        try {
+            app.print("Initiating wallet funding....");
+            WalletAuthResponse auth = getAuth();
+            if(auth!=null) {
+                String token = "Bearer " + auth.getAccess_token();
+                Response<ApiResponse<?>> response = walletServiceInterface.initiateWalletFunding(token, request).execute();
+                app.print("Response:");
+                app.print(response.code());
+                if (response.isSuccessful()) {
+                    return response.body();
+                } else {
+                    return new ApiResponse<>(response.message(), false, "101", null);
+                }
+            }else{
+                return new ApiResponse<>("Unable to authenticate with wallet service",false, "101", null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ApiResponse<>("Something went wrong",false, "101", null);
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package com.unionbankng.future.paymentservice.controllers;
 
-import com.google.gson.Gson;
 import com.unionbankng.future.paymentservice.pojos.*;
 import com.unionbankng.future.paymentservice.services.WalletService;
 import com.unionbankng.future.paymentservice.utils.App;
@@ -24,6 +23,14 @@ public class WalletController {
         System.out.println("test");
         return "Hello World";
     }
+
+    @PostMapping("/v1/wallet/initiate-wallet-funding")
+    public ApiResponse<?> initiateWalletFunding(@RequestBody InitiateFundingRequest request)  {
+        app.print("Initiating wallet funding : ");
+        app.print(request);
+        return walletService.initiateWalletFunding(request);
+    }
+
 
     @PostMapping("/verify-interswitch-transaction/{transactionRef}")
     public ApiResponse<WalletGenericResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionRef, @RequestBody InterswitchSDKResponse request)  {
