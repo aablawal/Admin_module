@@ -24,7 +24,7 @@ public class WalletController {
         return "Hello World";
     }
 
-    @PostMapping("/v1/wallet/initiate-wallet-funding")
+    @PostMapping("/initiate-wallet-funding")
     public ApiResponse<?> initiateWalletFunding(@RequestBody InitiateFundingRequest request)  {
         app.print("Initiating wallet funding : ");
         app.print(request);
