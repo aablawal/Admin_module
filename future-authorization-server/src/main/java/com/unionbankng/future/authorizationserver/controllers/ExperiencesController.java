@@ -54,7 +54,6 @@ public class ExperiencesController {
             throws IOException {
 
         app.print("Experience Controller: Printing Experience Request");
-        app.print(request);
 
         Experience experience = experienceService.saveFromRequest(null,request,new Experience());
         return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
@@ -63,15 +62,15 @@ public class ExperiencesController {
 
 
 
-    @PostMapping(value = "/v1/experiences/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Experience>> updateExperience(@Nullable @RequestPart("file") MultipartFile file,@Valid @RequestPart ExperienceRequest request)
+    @PostMapping(value = "/v1/experiences/update_existing")
+    public ResponseEntity<APIResponse<Experience>> updateExperience(@Valid @RequestBody ExperienceRequest request)
             throws IOException {
 
         Experience experience = experienceService.findById(request.getExperienceId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience not found")
         );
 
-        experience = experienceService.saveFromRequest(file,request,experience);
+        experience = experienceService.saveFromRequest(null, request, experience);
         return ResponseEntity.ok().body(new APIResponse<Experience>("Request Successful",true,experience));
     }
 

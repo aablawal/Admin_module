@@ -24,9 +24,7 @@ public class SwaggerRegister implements SwaggerResourcesProvider {
 		resources.add(swaggerResource("payment-service", "/paymentserv/v2/api-docs", "0.0.1"));
 		resources.add(swaggerResource("bank-service", "/bankserv/v2/api-docs", "0.0.1"));
 		resources.add(swaggerResource("messaging-service", "/messageserv/v2/api-docs", "0.0.1"));
-
-
-
+		resources.add(swaggerResource("wallet-service", "/walletserv/v2/api-docs", "0.0.1"));
 		return resources;
 	}
 

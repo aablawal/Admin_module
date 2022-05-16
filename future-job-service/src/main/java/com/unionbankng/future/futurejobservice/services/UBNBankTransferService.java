@@ -24,8 +24,8 @@ public class UBNBankTransferService {
     private BankServiceInterface bankServiceInterface;
     private final App app;
 
-//    @Value("${kula.bankService.baseURL}")
-    private String bankServiceBaseURL = "http://localhost:8080";
+    @Value("${kula.bankService.baseURL}")
+    private String bankServiceBaseURL;
 
 
     @PostConstruct
@@ -46,6 +46,37 @@ public class UBNBankTransferService {
 
 
     public PaymentResponse transferUBNtoUBN(String authToken, JobPayment transfer) throws IOException {
+
+        PaymentResponse apiResponseBody = new PaymentResponse();
+
+        if(transfer.getDebitAccountType().equals("CASA")) {
+
+            //Fetch account branch code
+            UbnCustomerEnquiryRequest enquiryRequest = new UbnCustomerEnquiryRequest();
+            enquiryRequest.setAccountType(transfer.getCreditAccountType());
+            enquiryRequest.setAccountNumber(transfer.getDebitAccountNumber());
+
+            app.print("Fetching branch code Request >>>");
+            app.print(enquiryRequest);
+
+            Response<APIResponse<UbnAccountEnquiryResponse>> apiResponse = bankServiceInterface.accountInquiry(authToken, enquiryRequest).execute();
+            if (apiResponse.isSuccessful() && apiResponse.body().getPayload() != null) {
+                UbnAccountEnquiryResponse response = apiResponse.body().getPayload();
+
+                app.print("Response >>>");
+                app.print(response);
+
+                if (response.getAccountBranchCode() != null)
+                    transfer.setDebitAccountBranchCode(response.getAccountBranchCode());
+            } else {
+                apiResponseBody.setCode(String.valueOf(apiResponse.code()));
+                apiResponseBody.setMessage("Unable to fetch account branch code");
+
+                return apiResponseBody;
+            }
+        }
+
+
         app.print("Transfer Request >>>");
         app.print(transfer);
         UBNFundTransferRequest request = new UBNFundTransferRequest();
@@ -63,24 +94,25 @@ public class UBNBankTransferService {
         request.setDebitAccountNumber(transfer.getDebitAccountNumber());
         request.setDebitNarration(transfer.getDebitNarration());
         request.setDebitAccountType(transfer.getDebitAccountType());
-        request.setInitBranchCode(transfer.getInitBranchCode());
+        request.setInitBranchCode("000");
         request.setChannelCode("1");
         request.setValueDate("2020-12-04");
         request.setPaymentTypeCode("FT");
         request.setPaymentReference(transfer.getPaymentReference());
+
+
         Response<APIResponse<UBNFundTransferResponse>> apiResponse = bankServiceInterface.transferFunds(authToken, request).execute();
 
-        PaymentResponse response = new PaymentResponse();
         if(apiResponse.isSuccessful() && apiResponse.body().getPayload()!=null) {
-            response.setCode(apiResponse.body().getPayload().getCode());
-            response.setMessage(jobPaymentResponseService.getResponseMessage(apiResponse.body().getPayload().getCode(), apiResponse.body().getPayload().getMessage()));
-            response.setReference(apiResponse.body().getPayload().getReference());
+            apiResponseBody.setCode(apiResponse.body().getPayload().getCode());
+            apiResponseBody.setMessage(jobPaymentResponseService.getResponseMessage(apiResponse.body().getPayload().getCode(), apiResponse.body().getPayload().getMessage()));
+            apiResponseBody.setReference(apiResponse.body().getPayload().getReference());
 
         }else{
-            response.setCode(String.valueOf(apiResponse.code()));
-            response.setMessage(apiResponse.message());
+            apiResponseBody.setCode(String.valueOf(apiResponse.code()));
+            apiResponseBody.setMessage(apiResponse.message());
         }
-        return response;
+        return apiResponseBody;
     }
 
     public PaymentResponse transferBulkUBNtoUBN(String authToken, UBNBulkFundTransferRequest paymentRequest) throws IOException {

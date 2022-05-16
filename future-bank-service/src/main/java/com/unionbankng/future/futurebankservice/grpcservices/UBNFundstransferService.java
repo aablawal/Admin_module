@@ -29,7 +29,7 @@ public class UBNFundstransferService extends UBNFundsTransferServiceGrpc.UBNFund
         transfer.setAmount(Double.toString(request.getAmount()));
         transfer.setCurrency(request.getCurrency());
         transfer.setPaymentReference(request.getPaymentReference());
-        transfer.setInitBranchCode(request.getInitBranchCode());
+        transfer.setInitBranchCode("000");
         transfer.setCreditAccountName(request.getCreditAccountName());
         transfer.setCreditAccountNumber(request.getCreditAccountNumber());
         transfer.setCreditAccountBankCode(request.getCreditAccountBankCode());
@@ -79,8 +79,7 @@ public class UBNFundstransferService extends UBNFundsTransferServiceGrpc.UBNFund
         UBNBulkFundTransferRequest transfer = new UBNBulkFundTransferRequest();
         transfer.setCurrency(request.getCurrency());
         transfer.setPaymentReference(request.getPaymentReference());
-        transfer.setInitBranchCode(request.getInitBranchCode());
-        transfer.setInitBranchCode(request.getInitBranchCode());
+        transfer.setInitBranchCode("000");
         transfer.setPaymentReference(request.getPaymentReference());
         transfer.setTransactionDate(request.getTransactionDate());
         transfer.setExternalSystemReference(request.getExternalSystemReference());

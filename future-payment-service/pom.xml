@@ -18,7 +18,7 @@
 		<java.version>11</java.version>
 		<jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
 		<spring-cloud.version>Hoxton.SR7</spring-cloud.version>
-		<keycloak.version>12.0.1</keycloak.version>
+<!--		<keycloak.version>12.0.1</keycloak.version>-->
 	</properties>
 
 	<dependencies>
@@ -42,19 +42,19 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.keycloak</groupId>
-			<artifactId>keycloak-spring-boot-starter</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.keycloak</groupId>-->
+<!--			<artifactId>keycloak-spring-boot-starter</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<!-- Spring cloud Auth-->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-oauth2</artifactId>
@@ -63,6 +63,12 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-jwt</artifactId>
 			<version>1.1.1.RELEASE</version>
+		</dependency>
+		<!--Azure-->
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>azure-spring-boot-starter-keyvault-secrets</artifactId>
+			<version>3.2.0</version>
 		</dependency>
 		<!--Test-->
 		<dependency>
@@ -127,6 +133,18 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 			<version>2.4.0</version>
 		</dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-gson</artifactId>
+            <version>2.9.0</version>
+            <scope>compile</scope>
+        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.uuid</groupId>
+			<artifactId>java-uuid-generator</artifactId>
+			<version>3.1.4</version>
+			<scope>compile</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -139,13 +157,13 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.keycloak.bom</groupId>
-				<artifactId>keycloak-adapter-bom</artifactId>
-				<version>${keycloak.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+<!--			<dependency>-->
+<!--				<groupId>org.keycloak.bom</groupId>-->
+<!--				<artifactId>keycloak-adapter-bom</artifactId>-->
+<!--				<version>${keycloak.version}</version>-->
+<!--				<type>pom</type>-->
+<!--				<scope>import</scope>-->
+<!--			</dependency>-->
 		</dependencies>
 	</dependencyManagement>
 
@@ -221,7 +239,7 @@
 	<repositories>
 			<repository>
 				<id>maven-group</id>
-				<url>http://168.63.73.171:8081/nexus/content/groups/maven-group/</url>
+				<url>http://40.69.37.139:8081/nexus/content/groups/maven-group/</url>
 			</repository>
 	</repositories>
 

@@ -15,10 +15,13 @@ import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,7 @@ public class JobContractService implements Serializable {
     private  String VATAccountNumber;
     private  String pepperestIncomeAccountName; //CASA
     private  String pepperestIncomeAccountNumber;
+    private MessageSource messageSource;
     private  Logger logger = LoggerFactory.getLogger(JobContractService.class);
 
 
@@ -75,8 +79,7 @@ public class JobContractService implements Serializable {
 
     public HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setCacheControl("no-cache");
         headers.add("Token", token);
         return headers;
@@ -166,7 +169,6 @@ public class JobContractService implements Serializable {
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
             String contractReferenceId = app.makeUIID();
             String paymentReferenceId = app.makeUIID();
-
             contract.setPeppfees(0); //set peprest charges to zero
             contract.setContractReference(contractReferenceId);
             contract.setInitialPaymentReferenceA(paymentReferenceId);
@@ -327,7 +329,7 @@ public class JobContractService implements Serializable {
                         body.setAction("/job/ongoing/details/" + proposal.getJobId());
                         body.setTopic("'Job'");
                         body.setChannel("S");
-                        body.setPriority("YES");
+                        body.setPriority("NORMAL");
                         body.setRecipient(proposal.getEmployerId());
                         body.setRecipientEmail(currentUser.getUserEmail());
                         body.setRecipientName(currentUser.getUserFullName());
@@ -337,30 +339,34 @@ public class JobContractService implements Serializable {
                     app.print("Creating Escrow Request###################################");
                     app.print("Escrow URL: "+baseURL);
                     app.print("Escrow Token: "+token);
-                    HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    String request=baseURL + "/Transaction/create?appid=" + appId
-                            + "&referenceid=" + contract.getContractReference()
-                            + "&user_email=" + contract.getUserEmail()
-                            + "&amount=" + contract.getAmount()
-                            + "&country=" + contract.getCountry()
-                            + "&currency=" + contract.getCurrency()
-                            + "&customer_email=" + contract.getFreelancerEmailAddress()
-                            + "&merchant_email=" + contract.getEmployerEmailAddress()
-                            + "&customer_account_number=" + contract.getFreelancerAccountNumber()
-                            + "&merchant_account_number=" + contract.getEmployerAccountNumber()
-                            + "&customer_bank_code=032"
-                            + "&merchant_bank_code=032"
-                            + "&customer_name=" + contract.getFreelancerAccountName()
-                            + "&merchant_name=" + contract.getEmployerAccountName()
-                            + "&customer_phone=" + contract.getFreelancerPhoneNumber()
-                            + "&merchant_phone=" + contract.getEmployerPhoneNumber()
-                            + "&peppfees=" + contract.getPeppfees()
-                            + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate())
-                            + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate())
-                            + "&transfer_reference_id=" + contract.getReversalPaymentReferenceA();
 
-                    app.print(request);
-                    ResponseEntity<String> response = rest.exchange(request, HttpMethod.POST, entity, String.class);
+                    JSONObject requestPayload = new JSONObject();
+                    requestPayload.put("appid",appId);
+                    requestPayload.put("referenceid",contract.getContractReference());
+                    requestPayload.put("user_email",contract.getUserEmail());
+                    requestPayload.put("amount",contract.getAmount());
+                    requestPayload.put("country",contract.getCountry());
+                    requestPayload.put("currency",contract.getCurrency());
+                    requestPayload.put("customer_email",contract.getFreelancerEmailAddress());
+                    requestPayload.put("merchant_email",contract.getEmployerEmailAddress());
+                    requestPayload.put("customer_account_number",contract.getFreelancerAccountNumber());
+                    requestPayload.put("merchant_account_number",contract.getEmployerAccountNumber());
+                    requestPayload.put("customer_bank_code","032");
+                    requestPayload.put("merchant_bank_code","032");
+                    requestPayload.put("customer_name",contract.getFreelancerAccountName());
+                    requestPayload.put("merchant_name",contract.getEmployerAccountName());
+                    requestPayload.put("customer_phone",contract.getFreelancerPhoneNumber());
+                    requestPayload.put("merchant_phone",contract.getEmployerPhoneNumber());
+                    requestPayload.put("peppfees",contract.getPeppfees());
+                    requestPayload.put("startdate",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate()));
+                    requestPayload.put("enddate", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate()));
+                    requestPayload.put("transfer_reference_id",contract.getContractReference() );
+
+                    app.print("Request Body");
+                    app.print(requestPayload);
+                    String endpoint=baseURL + "/Transaction/create";
+                    HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
+                    ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
                     if (response.getStatusCode().is2xxSuccessful()) {
                         status = 1;
                         remark = "success";
@@ -368,8 +374,10 @@ public class JobContractService implements Serializable {
                         app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
                         //fire notifications
                         NotificationBody body1 = new NotificationBody();
-                        body1.setBody("Your " + contract.getAmount() + " deducted is currently in our Escrow, it will only be released to the freelancer when you confirm that the job done is okay by you.");
-                        body1.setSubject("Contract Amount is in Escrow");
+                        String[] params = {String.valueOf(contract.getAmount()), job.getTitle()};
+                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider", params, LocaleContextHolder.getLocale());
+                        body1.setBody(message);
+                        body1.setSubject("Job Proposal Approved");
                         body1.setActionType("REDIRECT");
                         body1.setAction("/job/ongoing/details/" + proposal.getJobId());
                         body1.setTopic("'Job'");
@@ -383,7 +391,9 @@ public class JobContractService implements Serializable {
                         User user =userService.getUserById(proposal.getUserId());
                         if(user!=null) {
                             NotificationBody body2 = new NotificationBody();
-                            body2.setBody(currentUser.getUserFullName() + " approved your contract and credited our escrow with the sum of " + proposal.getBidAmount());
+                            String[] params1 = {currentUser.getFirstName(), job.getTitle(), String.valueOf(contract.getAmount())};
+                            String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
+                            body2.setBody(message1);
                             body2.setSubject("Proposal Approval");
                             body2.setActionType("REDIRECT");
                             body2.setAction("/job/ongoing/details/" + proposal.getJobId());
@@ -631,13 +641,20 @@ public class JobContractService implements Serializable {
                     app.print("Escrow URL: "+baseURL);
                     app.print("Escrow Token: "+token);
                     //start to extend escrow live
-                    HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                    response = rest.exchange(baseURL + "/Transaction/reqExtension?appid=" + appId
-                            + "&referenceid=" + contract.getContractReference()
-                            + "&user_email=" + contract.getUserEmail()
-                            + "&reasons=" + extension.getReason()
-                            + "&new_date=" + extension.getDate().toString()
-                            + "&action=" + "accept", HttpMethod.POST, entity, String.class);
+
+                    JSONObject requestPayload = new JSONObject();
+                    requestPayload.put("appid",appId);
+                    requestPayload.put("referenceid",contract.getContractReference());
+                    requestPayload.put("user_email",contract.getUserEmail());
+                    requestPayload.put("new_date", extension.getDate().toString() );
+                    requestPayload.put("action","accept");
+                    requestPayload.put("reasons",extension.getReason() );
+
+                    app.print("Request Body");
+                    app.print(requestPayload);
+                    String endpoint=baseURL + "/Transaction/reqExtension";
+                    HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
+                    response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
                     //done
                     if (response.getStatusCode().is2xxSuccessful()) {
                         app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
@@ -748,7 +765,9 @@ public class JobContractService implements Serializable {
             if (currentJob != null && employer!=null) {
                 app.print("Its here 2");
                 NotificationBody body = new NotificationBody();
-                body.setBody(currentUser.getUserFullName() + " submitted " + currentJob.getTitle() + " for your review and approval");
+                String[] params = {currentJob.getTitle(), currentUser.getUserFullName()};
+                String message = messageSource.getMessage("submit-job.email-body", params, LocaleContextHolder.getLocale());
+                body.setBody(message);
                 body.setSubject("Project Review");
                 body.setActionType("REDIRECT");
                 body.setAction("/job/ongoing/details/" + request.getJobId());
@@ -813,12 +832,19 @@ public class JobContractService implements Serializable {
             app.print("###################################");
             app.print("Escrow URL: "+baseURL);
             app.print("Escrow Token: "+token);
-            HttpEntity<String> entity = new HttpEntity<>(this.getHeaders());
-            response = rest.exchange(baseURL + "/Dispute/reportDispute?appid=" + appId
-                    + "&referenceid=" + request.getReferenceId()
-                    + "&dispute_referenceid=" + request.getContractReference()
-                    + "&dispute_category=contract-" + request.getContractId().toString()
-                    + "&dispute_description=" + request.getDescription(), HttpMethod.POST, entity, String.class);
+
+            JSONObject requestPayload = new JSONObject();
+            requestPayload.put("appid",appId);
+            requestPayload.put("referenceid",request.getReferenceId());
+            requestPayload.put("dispute_referenceid",request.getContractReference());
+            requestPayload.put("dispute_category", "contract-" + request.getContractId().toString());
+            requestPayload.put("dispute_description",request.getDescription());
+
+            app.print("Request Body");
+            app.print(requestPayload);
+            String endpoint=baseURL + "/Dispute/reportDispute";
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
+            response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
             //done
             if (response.getStatusCode().is2xxSuccessful()) {
                 //fire notification
@@ -1018,11 +1044,18 @@ public class JobContractService implements Serializable {
                             app.print("Escrow URL: "+baseURL);
                             app.print("Escrow Token: "+token);
                             //start to release escrow amount to freelancer
-                            HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                            ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
-                                    + "&referenceid=" + contract.getContractReference()
-                                    + "&user_email=" + contract.getUserEmail()
-                                    + "&reasons=Job Completed", HttpMethod.POST, entity, String.class);
+
+                            JSONObject requestPayload = new JSONObject();
+                            requestPayload.put("appid",appId);
+                            requestPayload.put("referenceid",contract.getContractReference());
+                            requestPayload.put("user_email",contract.getUserEmail());
+                            requestPayload.put("reasons", "Job Completed");
+
+                            app.print("Request Body");
+                            app.print(requestPayload);
+                            String endpoint=baseURL + "/Transaction/release";
+                            HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
+                            ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
                             //done
 
                             if (response.getStatusCode().is2xxSuccessful()) {
@@ -1327,28 +1360,34 @@ public class JobContractService implements Serializable {
                                 app.print("Escrow URL: "+baseURL);
                                 app.print("Escrow Token: "+token);
 
-                                //set milestone amount to the escrow
-                                HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                                ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/create?appid=" + appId
-                                        + "&referenceid=" + milestone.getMilestoneReference()
-                                        + "&user_email=" + contract.getUserEmail()
-                                        + "&amount=" + milestone.getAmount()
-                                        + "&country=" + contract.getCountry()
-                                        + "&currency=" + contract.getCurrency()
-                                        + "&customer_email=" + contract.getFreelancerEmailAddress()
-                                        + "&merchant_email=" + contract.getEmployerEmailAddress()
-                                        + "&customer_account_number=" + contract.getFreelancerAccountNumber()
-                                        + "&merchant_account_number=" + contract.getEmployerAccountNumber()
-                                        + "&customer_bank_code=032"
-                                        + "&merchant_bank_code=032"
-                                        + "&customer_name=" + contract.getFreelancerAccountName()
-                                        + "&merchant_name=" + contract.getEmployerAccountName()
-                                        + "&customer_phone=" + contract.getFreelancerPhoneNumber()
-                                        + "&merchant_phone=" + contract.getEmployerPhoneNumber()
-                                        + "&peppfees=" + contract.getPeppfees()
-                                        + "&startdate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getStartDate())
-                                        + "&enddate=" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(milestone.getEndDate())
-                                        + "&transfer_reference_id=" + milestone.getMilestoneReference(), HttpMethod.POST, entity, String.class);
+                                JSONObject requestPayload = new JSONObject();
+                                requestPayload.put("appid",appId);
+                                requestPayload.put("referenceid",milestone.getMilestoneReference());
+                                requestPayload.put("user_email",contract.getUserEmail());
+                                requestPayload.put("amount",milestone.getAmount());
+                                requestPayload.put("country",contract.getCountry());
+                                requestPayload.put("currency",contract.getCurrency());
+                                requestPayload.put("customer_email",contract.getFreelancerEmailAddress());
+                                requestPayload.put("merchant_email",contract.getEmployerEmailAddress());
+                                requestPayload.put("customer_account_number",contract.getFreelancerAccountNumber());
+                                requestPayload.put("merchant_account_number",contract.getEmployerAccountNumber());
+                                requestPayload.put("customer_bank_code","032");
+                                requestPayload.put("merchant_bank_code","032");
+                                requestPayload.put("customer_name",contract.getFreelancerAccountName());
+                                requestPayload.put("merchant_name",contract.getEmployerAccountName());
+                                requestPayload.put("customer_phone",contract.getFreelancerPhoneNumber());
+                                requestPayload.put("merchant_phone",contract.getEmployerPhoneNumber());
+                                requestPayload.put("peppfees",contract.getPeppfees());
+                                requestPayload.put("startdate",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate()));
+                                requestPayload.put("enddate", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate()));
+                                requestPayload.put("transfer_reference_id",milestone.getMilestoneReference() );
+
+                                app.print("Request Body");
+                                app.print(requestPayload);
+                                String endpoint=baseURL + "/Transaction/create";
+                                HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
+                                ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
+
                                 if (response.getStatusCode().is2xxSuccessful()) {
                                     jobRepository.save(job);
                                     jobProposalRepository.save(proposal);
@@ -1515,12 +1554,19 @@ public class JobContractService implements Serializable {
                         app.print("###################################");
                         app.print("Escrow URL: "+baseURL);
                         app.print("Escrow Token: "+token);
-                        //start to release escrow amount to freelancer
-                        HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
-                        ResponseEntity<String> response = rest.exchange(baseURL + "/Transaction/release?appid=" + appId
-                                + "&referenceid=" + milestone.getMilestoneReference()
-                                + "&user_email=" + contract.getUserEmail()
-                                + "&reasons=Milestone Completed", HttpMethod.POST, entity, String.class);
+
+
+                        JSONObject requestPayload = new JSONObject();
+                        requestPayload.put("appid",appId);
+                        requestPayload.put("referenceid",milestone.getMilestoneReference());
+                        requestPayload.put("user_email",contract.getUserEmail());
+                        requestPayload.put("reasons", "Milestone Completed");
+
+                        app.print("Request Body");
+                        app.print(requestPayload);
+                        String endpoint=baseURL + "/Transaction/release";
+                        HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
+                        ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
                         //done
                         if (response.getStatusCode().is2xxSuccessful()) {
 

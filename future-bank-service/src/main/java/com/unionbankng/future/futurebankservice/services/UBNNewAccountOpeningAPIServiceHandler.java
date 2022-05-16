@@ -56,16 +56,10 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
 
-        app.print("Credentials:");
-        app.print(credentials);
         Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
 
         Response<UBNAuthServerTokenResponse> response =  responseCall.execute();
-
-        app.print("Response");
-        app.print(response);
-        app.print(response.body());
 
         return  response.body();
 
@@ -76,12 +70,10 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
 
-        logger.info("access token is : {}",response.getAccess_token());
+//        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getSupportedIdCardTypes(authorization,"01").execute();
@@ -91,22 +83,13 @@ public class UBNNewAccountOpeningAPIServiceHandler {
     public Response<AccountProductTypeResponse> getAccountProductTypes(AccountProductTypeRequest request) throws IOException {
 
         app.print("Getting account types... ");
-        app.print("Request:");
-        app.print(request);
-
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
-
-        logger.info("Auth token response is : {}",response);
 
         if(response == null)
             return null;
 
-        logger.info("access token is : {}",response.getAccess_token());
-
         String authorization = String.format("Bearer %s",response.getAccess_token());
         Response<AccountProductTypeResponse>  responseResponse= ubnAccountAPIService.getProductTypes(authorization,"01",request).execute();
-        app.print(responseResponse);
-        app.print(responseResponse.body());
         app.print(responseResponse.code());
         return  responseResponse;
     }
@@ -115,12 +98,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getProductDetails(
@@ -132,12 +111,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getCountriesForAccount(
@@ -149,12 +124,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getStatesByCountryForAccount(
@@ -166,12 +137,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getCitiesByCountryAndStateForAccount(
@@ -183,12 +150,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getUBNBranches(
@@ -200,12 +163,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getUBNGenders(
@@ -217,12 +176,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getMaritalStatus(
@@ -234,12 +189,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getCustomerTypes(
@@ -251,12 +202,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getUBNAccountTypes(
@@ -268,12 +215,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getCustomersSegment(
@@ -285,12 +228,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getSourceOfFund(
@@ -303,12 +242,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         app.print("#################################Account Opening initiated");
 
@@ -317,14 +252,10 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         request.setSourceOfIncome("work");
         request.setProductCode("SA_040");
 
-        app.print("Request is:");
-        app.print(request);
         Response<UBNCreateAccountNewCustomerResponse> responseData=ubnAccountAPIService.createUBNNewCustomerAccount(
                 authorization,"01",request).execute();
 
-        app.print("Response is:");
         app.print(responseData.message());
-        app.print(responseData.body());
         app.print(responseData.isSuccessful());
 
         app.print("Done");
@@ -336,12 +267,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getDocumentTypes(
@@ -353,13 +280,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
-
 
         RequestBody requestFile =
                 RequestBody.create(MediaType.get(file.getContentType()),
@@ -380,13 +302,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
-
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.submitDocumentsForAccount(
@@ -398,13 +315,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
-
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.accountPaymentUBN1(
@@ -416,13 +328,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
-
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.accountPaymentUBN2(
@@ -434,13 +341,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
-
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.confirmUBNPaymentStatus(
@@ -452,16 +354,11 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
 
-        logger.info("access token is : {}",response.getAccess_token());
-
         app.print("@ACCOUNT OPENING");
         app.print("Request:");
-        app.print(request);
 
         try {
             String authorization = String.format("Bearer %s", response.getAccess_token());
@@ -484,13 +381,8 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
         UBNAuthServerTokenResponse response = getUBNAccountServerToken();
 
-        logger.info("Auth token response is : {}",response);
-
         if(response == null)
             return null;
-
-        logger.info("access token is : {}",response.getAccess_token());
-
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getUBNAccountDetails(

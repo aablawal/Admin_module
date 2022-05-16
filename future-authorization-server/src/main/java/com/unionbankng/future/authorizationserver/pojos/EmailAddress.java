@@ -1,5 +1,4 @@
 package com.unionbankng.future.authorizationserver.pojos;
-
 import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import lombok.Builder;
 import lombok.Data;

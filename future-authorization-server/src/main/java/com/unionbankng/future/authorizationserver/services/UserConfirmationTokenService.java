@@ -60,8 +60,8 @@ public class UserConfirmationTokenService {
             URL url = new URL(generatedURL);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 
-            logger.info("Sending confirmation to {}", user);
-            logger.info("Activation Link:" +  uri.toASCIIString());
+//            logger.info("Sending confirmation to {}", user);
+//            logger.info("Activation Link:" +  uri.toASCIIString());
 
             EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{ uri.toASCIIString()}, LocaleContextHolder.getLocale())
                     ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
@@ -78,7 +78,7 @@ public class UserConfirmationTokenService {
     public TokenConfirm confirmUserAccountByToken(String token) {
 
         logger.info("=============================");
-        logger.info("Token: "+token);
+//        logger.info("Token: "+token);
 
         TokenConfirm tokenConfirm = new TokenConfirm();
         String userEmail = memcachedHelperService.getValueByKey(token);

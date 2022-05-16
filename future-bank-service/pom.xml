@@ -101,6 +101,11 @@
 			<artifactId>azure-servicebus-jms-spring-boot-starter</artifactId>
 			<version>2.1.7</version>
 		</dependency>
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>azure-spring-boot-starter-keyvault-secrets</artifactId>
+			<version>3.2.0</version>
+		</dependency>
 		<!--Api optimization-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -242,7 +247,7 @@
 	<repositories>
 		<repository>
 			<id>maven-group</id>
-			<url>http://168.63.73.171:8081/nexus/content/groups/maven-group/</url>
+			<url>http://40.69.37.139:8081/nexus/content/groups/maven-group/</url>
 		</repository>
 	</repositories>
 

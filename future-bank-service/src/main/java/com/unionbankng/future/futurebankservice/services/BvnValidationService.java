@@ -27,16 +27,7 @@ public class BvnValidationService {
         request.setAccountTier("SA_040");
         request.setDob(dob);
 
-        app.print("###Validating customer BVN");
-        app.print("Request:");
-        app.print(request);
-
         Response<BVNValidationResponse> response = ubnAccountAPIServiceHandler.validateCustomerBVN(request);
-
-        logger.info("status: "+response.isSuccessful());
-        logger.info("message: "+response.message());
-        app.print("API Response:");
-        app.print(response);
         app.print("RESPONSE BODY: " + (response.body() != null ? response.body().getStatusMessage() : "Response body is null"));
 
         if (response.isSuccessful()) {
@@ -56,15 +47,8 @@ public class BvnValidationService {
         request.setOtp(otp);
 
         app.print("###Verifying customer BVN");
-        app.print("Request:");
-        app.print(request);
         Response<BVNVerificationResponse> response = ubnAccountAPIServiceHandler.verifyCustomerBVN(request);
 
-        logger.info("status: " + response.isSuccessful());
-        logger.info("message: " + response.message());
-        app.print("API Response:");
-        app.print(response);
-        app.print("RESPONSE BODY: " + response.body().toString());
         if (response.isSuccessful() && response.body().getData()!=null) {
             app.print("Success block");
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));

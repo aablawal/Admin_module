@@ -35,7 +35,6 @@ public class RegistrationController {
     @PostMapping("/v1/registration/register")
     public ResponseEntity<APIResponse> register(@Valid @RequestBody RegistrationRequest request){
         app.print("Registration Process begin");
-        app.print(request);
         if(request.getAuthProvider().equals(AuthProvider.GOOGLE))
             return registrationService.googleRegistration(request);
 

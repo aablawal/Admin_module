@@ -76,24 +76,32 @@ public class App {
         return matcher.matches();
     }
     public ObjectMapper getMapper(){
-        ObjectMapper mapper= new ObjectMapper();
-        return mapper;
+        return new ObjectMapper();
     }
 
     public Long generateOTP(){
         Random rnd = new Random();
-        Long number = Long.valueOf(rnd.nextInt(999999));
-        return  number;
+        String number = String.valueOf(rnd.nextInt(999999));
+        if(number.length()<6){
+            if(number.length()==5)
+                number=number+"9";
+            if(number.length()==4)
+                number=number+"99";
+            if(number.length()==3)
+                number=number+"999";
+        }
+        return  Long.valueOf(number);
     }
+
     public String toPhoneNumber(String phoneNumber) {
         String userPhone = phoneNumber;
-        if (phoneNumber.startsWith("234") || phoneNumber.startsWith("+234")) {
-            if (phoneNumber.length() == 13) {
-                String str_getMOBILE = phoneNumber.substring(3);
-                userPhone = "0" + str_getMOBILE;
-            } else if (phoneNumber.length() == 14) {
-                String str_getMOBILE = phoneNumber.substring(4);
-                userPhone = "0" + str_getMOBILE;
+        if (phoneNumber.startsWith("+234")) {
+            userPhone = phoneNumber.substring(1);
+        } else {
+            if (phoneNumber.startsWith("0")) {
+                userPhone = "234" + phoneNumber.substring(1);
+            } else {
+                userPhone = "234" + phoneNumber;
             }
         }
         return userPhone;

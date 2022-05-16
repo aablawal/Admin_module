@@ -39,8 +39,6 @@ public class CustomerBankAccountController {
         bankAccount.setAccountStatus(AccountStatus.PAYMENT_CONFIRMED);
         bankAccount.setUserUUID(jwtUserDetail.getUserUUID());
 
-        app.print(bankAccount);
-
         CustomerBankAccount savedAccount= customerBankAccountService.save(bankAccount);
         if(savedAccount!=null)
           return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, savedAccount));

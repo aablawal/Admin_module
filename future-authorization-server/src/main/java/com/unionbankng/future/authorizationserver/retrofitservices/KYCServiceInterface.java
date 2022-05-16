@@ -26,19 +26,19 @@ public interface KYCServiceInterface {
 
 
     @POST(PASSPORT_FACEMATCH)
-    Call<PassportFaceMatchResponse> getpassportFaceMatch(@Header("Authorization") String authorization, @Body PassportFaceMatchRequest passportFaceMatchRequest);
+    Call<KycApiResponse<PassportFaceMatchResponse>> getPassportFaceMatch(@Header("Authorization") String authorization, @Body PassportFaceMatchRequest passportFaceMatchRequest);
 
     @POST(VOTERS_CARD_FACEMATCH)
-    Call<VotersCardFaceMatchResponse> getVotersCardFaceMatch(@Header("Authorization") String authorization, @Body VotersCardFaceMatchRequest votersCardFaceMatchRequest);
+    Call<KycApiResponse<VotersCardFaceMatchResponse>> getVotersCardFaceMatch(@Header("Authorization") String authorization, @Body VotersCardFaceMatchRequest votersCardFaceMatchRequest);
 
-    @POST(DRIVERS_LICENSE_FACEMATCH)
-    Call<DriversLicenceFaceMatchResponse> getDriverLicenseFaceMatch(@Header("Authorization") String authorization, @Body DriversLicenceFaceMatchRequest driversLicenceFaceMatchRequest);
+    @POST(IDENTITY_BIOMETRICS)
+    Call<KycApiResponse<DriversLicenceFaceMatchResponse>> getDriverLicenseFaceMatch(@Header("Authorization") String authorization, @Body DriversLicenceFaceMatchRequest driversLicenceFaceMatchRequest);
 
     @POST(NIN_FACEMATCH)
     Call<DriversLicenceFaceMatchResponse> getNinFaceMatch(@Header("Authorization") String authorization, @Body AddressVerificationRequest addressVerificationRequest);
 
     @POST(IDENTITY_BIOMETRICS)
-    Call<VerifyMeResponse> getIdentityBiometrics(@Header("Authorization") String authorization, @Body IdentityBiometricsRequest identityBiometricsRequest);
+    Call<KycApiResponse<VerifyMeResponse>> getIdentityBiometrics(@Header("Authorization") String authorization, @Body IdentityBiometricsRequest identityBiometricsRequest);
 
     @POST(ADDRESS_VERIFICATION)
     Call<VerifyMeAddressVerificationResponse> getAddressVerification(@Header("Authorization") String authorization, @Body AddressVerificationRequestVerifyme addressVerificationRequestVerifyme);

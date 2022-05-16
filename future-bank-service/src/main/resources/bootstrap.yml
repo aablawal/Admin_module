@@ -26,13 +26,13 @@ spring:
     config:
       uri: http://localhost:8082
       label: develop
-azure:
-  keyvault:
-    client-id: 4bb3e1f9-374c-4668-a223-269379512081
-    client-key: p~8TRFlUw~PN7zOGlTlaXHrnYgCB9QwdcP
-    enabled: true
-    tenant-id: 679a7b5d-668c-49de-901c-71c1cade6959
-    uri: https://key-vault-dv-dev.vault.azure.net/
+#azure:
+#  keyvault:
+#    client-id: 4bb3e1f9-374c-4668-a223-269379512081
+#    client-key: p~8TRFlUw~PN7zOGlTlaXHrnYgCB9QwdcP
+#    enabled: true
+#    tenant-id: 679a7b5d-668c-49de-901c-71c1cade6959
+#    uri: https://key-vault-dv-dev.vault.azure.net/
 ---
 spring:
   profiles: staging
@@ -40,6 +40,13 @@ spring:
     config:
       uri: http://future-config-server
       label: staging
+azure:
+  keyvault:
+    client-id: ${KEY_VAULT_CLIENT_ID}
+    client-key: ${KEY_VAULT_CLIENT_KEY}
+    enabled: true
+    tenant-id: ${KEY_VAULT_TENANT_ID}
+    uri: ${KEY_VAULT_URL}
 ---
 
 spring:
@@ -48,3 +55,10 @@ spring:
     config:
       uri: http://future-config-server
       label: master
+azure:
+  keyvault:
+    client-id: ${KEY_VAULT_CLIENT_ID}
+    client-key: ${KEY_VAULT_CLIENT_KEY}
+    enabled: true
+    tenant-id: ${KEY_VAULT_TENANT_ID}
+    uri: ${KEY_VAULT_URL}

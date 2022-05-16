@@ -1,11 +1,13 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.entities.Training;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.EducationAndTrainingRequest;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.pojos.TrainingRequest;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.services.QualificationService;
 import com.unionbankng.future.authorizationserver.services.TrainingService;
 import com.unionbankng.future.authorizationserver.utils.App;
@@ -30,6 +32,7 @@ public class QualificationsController {
 
     private final QualificationService qualificationService;
     private final TrainingService trainingService;
+    private final ProfileRepository profileRepository;
     private final App app;
 
     @GetMapping("/v1/qualifications/find_by_profile_id/{profileId}")
@@ -52,8 +55,8 @@ public class QualificationsController {
 
     }
 
-    @PostMapping(value = "/v1/qualifications/update_existing",consumes = { "multipart/form-data" })
-    public ResponseEntity<APIResponse<Qualification>> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestBody QualificationRequest request)
+    @PostMapping(value = "/v1/qualifications/update_existing")//,consumes = { "multipart/form-data" }
+    public ResponseEntity<APIResponse<Qualification>> updateQualification(@Nullable  @RequestPart("file") MultipartFile file,@Valid @RequestPart QualificationRequest request)
             throws IOException {
 
         Qualification qualification = qualificationService.findById(request.getQualificationId()).orElseThrow(
@@ -65,9 +68,10 @@ public class QualificationsController {
 
     }
 
-    @DeleteMapping("/v1/qualifications/delete/{photoId}")
-    public ResponseEntity<APIResponse> deletePhoto(@PathVariable Long photoId){
-        qualificationService.deleteById(photoId);
+
+    @DeleteMapping("/v1/qualifications/delete/{qualificationId}")
+    public ResponseEntity<APIResponse> deleteQualification(@PathVariable Long qualificationId){
+        qualificationService.deleteById(qualificationId);
         return ResponseEntity.ok().body(new APIResponse("Request Successful",true,null));
     }
 
@@ -77,11 +81,16 @@ public class QualificationsController {
             throws IOException {
 
         app.print("Qualification Controller: Adding new qualification/training");
-        app.print(request);
+
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        request.setProfileId(profile.getId());
 
         if(request.getSchool() != null && !request.getSchool().isBlank()){
             app.print("Qualification Controller: Adding new qualification");
             QualificationRequest qualificationRequest = new QualificationRequest();
+            qualificationRequest.setProfileId(request.getProfileId());
             qualificationRequest.setUserId(request.getUserId());
             qualificationRequest.setSchool(request.getSchool());
             qualificationRequest.setCountry(request.getCountry());
@@ -89,7 +98,6 @@ public class QualificationsController {
             qualificationRequest.setStartYear(request.getStartYear());
             qualificationRequest.setEndYear(request.getEndYear());
             Qualification qualification = qualificationService.saveFromRequest(null, qualificationRequest, new Qualification());
-            app.print(qualification);
         }
 
 
@@ -105,7 +113,6 @@ public class QualificationsController {
             trainingRequest.setYearAwarded(request.getTrainingYearAwarded());
 
             Training training = trainingService.saveFromRequest(trainingRequest, new Training());
-            app.print(training);
         }
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );
@@ -120,8 +127,12 @@ public class QualificationsController {
 
         app.print("Qualification Controller: fetching all users qualification");
 
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+
         List<Qualification> qualifications = qualificationService.
-                findAllByUserId(userId,Sort.by("createdAt").ascending());
+                findAllByProfileId(profile.getId(), Sort.by("createdAt").ascending());
 
         List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();
 
@@ -137,7 +148,6 @@ public class QualificationsController {
         }
 
         app.print("Qualification Controller: fetching all users qualification completed");
-        app.print(educationAndTrainingRequests);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, educationAndTrainingRequests) );
 
@@ -145,16 +155,19 @@ public class QualificationsController {
 
 
     @GetMapping(value = "/v1/qualification/training/{userId}")
-    public ResponseEntity<APIResponse<List<?>>> getAllTrainingByUserId(@PathVariable Long userId)
-            throws IOException {
+    public ResponseEntity<APIResponse<List<?>>> getAllTrainingByUserId(@PathVariable Long userId) {
 
         app.print("Qualification Controller: fetching all users training");
-        app.print(userId);
+
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+
 
         List<Training> trainings = trainingService.
-                findAllByUserId(userId,Sort.by("createdAt").ascending());
+                findAllByProfileId(profile.getId(), Sort.by("createdAt").ascending());
 
-        app.print(trainings);
+        app.print("trainings");
         List<EducationAndTrainingRequest> educationAndTrainingRequests = new ArrayList<>();
 
 
@@ -171,10 +184,72 @@ public class QualificationsController {
         }
 
         app.print("Qualification Controller: fetching all users training completed");
-        app.print(educationAndTrainingRequests);
 
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, educationAndTrainingRequests) );
 
     }
+
+
+    @DeleteMapping(value = "/v1/qualification/training/{trainingId}")
+    public ResponseEntity<APIResponse> deleteTrainingById(@PathVariable Long trainingId) {
+
+        app.print("Qualification Controller: deleting training by id");
+
+        trainingService.deleteById(trainingId);
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, null) );
+
+    }
+
+
+
+    @PutMapping(value = "/v1/qualification")
+    public ResponseEntity<APIResponse<String>> editQualificationAndTraining(@Valid @RequestBody EducationAndTrainingRequest request)
+            throws IOException {
+
+        app.print("Qualification Controller: editing qualification/training");
+
+        Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+        request.setProfileId(profile.getId());
+
+        if(request.getSchool() != null && !request.getSchool().isBlank()){
+            app.print("Qualification Controller: Editing qualification");
+            QualificationRequest qualificationRequest = new QualificationRequest();
+            qualificationRequest.setProfileId(request.getProfileId());
+            qualificationRequest.setUserId(request.getUserId());
+            qualificationRequest.setSchool(request.getSchool());
+            qualificationRequest.setCountry(request.getCountry());
+            qualificationRequest.setDegree(request.getDegree());
+            qualificationRequest.setStartYear(request.getStartYear());
+            qualificationRequest.setEndYear(request.getEndYear());
+            Qualification qualification = qualificationService.findById(request.getQualificationId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Qualification not found")
+            );
+            Qualification updatedQualification = qualificationService.saveFromRequest(null, qualificationRequest, qualification);
+        }
+
+
+        if(request.getTrainingTitle() != null && !request.getTrainingTitle().isBlank()){
+            app.print("Qualification Controller: Editing Training");
+            TrainingRequest trainingRequest = new TrainingRequest();
+            trainingRequest.setUserId(request.getUserId());
+            trainingRequest.setProfileId(request.getProfileId());
+            trainingRequest.setTitle(request.getTrainingTitle());
+            trainingRequest.setOrganization(request.getTrainingOrganization());
+            trainingRequest.setLinkOrId(request.getTrainingLinkOrId());
+            trainingRequest.setDescription(request.getTrainingDescription());
+            trainingRequest.setYearAwarded(request.getTrainingYearAwarded());
+            Training training = trainingService.findById(request.getTrainingId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Training not found")
+            );
+            Training updatedTraining = trainingService.saveFromRequest(trainingRequest, training);
+        }
+
+        return ResponseEntity.ok().body(new APIResponse<>("Request Successful",true, "Request Successful") );
+
+    }
+
 
 }

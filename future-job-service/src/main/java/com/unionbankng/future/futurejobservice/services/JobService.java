@@ -14,6 +14,8 @@ import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class JobService {
     private final JobTeamRepository teamRepository;
     private final NotificationSender notificationSender;
     private  final  JobTeamDetailsRepository jobTeamDetailsRepository;
+    private final MessageSource messageSource;
     private final App app;
     private final AppLogger appLogger;
     private Logger logger = LoggerFactory.getLogger(JobService.class);
@@ -116,7 +120,7 @@ public class JobService {
                                         proposal.setAccountName(teamMember.getAccountName());
                                         proposal.setAccountNumber(teamMember.getAccountNumber());
                                         proposal.setAccountType(teamMember.getAccountType());
-                                        proposal.setBranchCode(teamMember.getBranchCode());
+                                        proposal.setBranchCode("000");
                                         proposal.setWorkMethod("Overall");
                                         proposal.setPreparedCurrency("NGN");
                                         proposal.setBidAmount(Long.valueOf(money));
@@ -164,9 +168,10 @@ public class JobService {
                     //fire notification
                     Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
                     if (currentJob != null) {
-
+                        String[] params = {currentJob.getTitle()};
+                        String message = messageSource.getMessage("post.job.successful.email-body", params, LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
-                        body.setBody("Your job for " + currentJob.getTitle() + " has been published");
+                        body.setBody(message);
                         body.setSubject("Job Published");
                         body.setActionType("REDIRECT");
                         body.setAction("/job/details/" + savedJob.getId());
@@ -174,7 +179,7 @@ public class JobService {
                         body.setChannel("S");
                         body.setPriority("YES");
                         body.setRecipient(savedJob.getOid());
-                        body.setRecipientEmail(currentUser.getUserFullName());
+                        body.setRecipientEmail(currentUser.getUserEmail());
                         body.setRecipientName(currentUser.getUserFullName());
                         notificationSender.pushNotification(body);
                         logger.info("Notification fired");
@@ -245,7 +250,7 @@ public class JobService {
             body.setChannel("S");
             body.setPriority("NORMAL");
             body.setRecipient(job.getOid());
-            body.setRecipientEmail(currentUser.getUserFullName());
+            body.setRecipientEmail(currentUser.getUserEmail());
             body.setRecipientName(currentUser.getUserFullName());
             notificationSender.pushNotification(body);
             logger.info("Notification fired");
@@ -304,7 +309,7 @@ public class JobService {
                 body.setChannel("S");
                 body.setPriority("NORMAL");
                 body.setRecipient(job.getOid());
-                body.setRecipientEmail(currentUser.getUserFullName());
+                body.setRecipientEmail(currentUser.getUserEmail());
                 body.setRecipientName(currentUser.getUserFullName());
                 notificationSender.pushNotification(body);
             }

@@ -75,7 +75,7 @@ zuul:
       url: http://future-messaging-service
     wallet-service:
       path: /walletserv/**
-      url: http://wallet-service
+      url: http://dv-shared-wallet
 
 ---
 spring:
@@ -102,6 +102,6 @@ zuul:
     messaging-service:
       path: /messageserv/**
       url: http://future-messaging-service
-    wallet-service:
+    dv-shared-wallet:
       path: /walletserv/**
-      url: http://wallet-service
+      url: http://dv-shared-wallet

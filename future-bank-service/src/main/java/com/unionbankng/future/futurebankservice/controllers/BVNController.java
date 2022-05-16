@@ -1,3 +1,34 @@
+//package com.unionbankng.future.futurebankservice.controllers;
+//
+//import com.unionbankng.future.futurebankservice.pojos.*;
+//import com.unionbankng.future.futurebankservice.services.BvnValidationService;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.*;
+//
+//import java.io.IOException;
+//
+//
+//@RestController
+//@RequiredArgsConstructor
+//@RequestMapping(path = "api")
+//public class BVNController {
+//
+//    private final BvnValidationService bvnValidationService;
+//
+//    @PostMapping("/v1/bvn/validate_bvn")
+//    public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
+//       return bvnValidationService.validateCustomerBVN(bvn,dob);
+//    }
+//
+//    @PostMapping("/v1/bvn/verify_bvn")
+//    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestParam String bvn, @RequestParam String otp) throws IOException {
+//        return bvnValidationService.verifyCustomerBVN(bvn,otp);
+//    }
+//
+//}
+
+
 package com.unionbankng.future.futurebankservice.controllers;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
@@ -20,11 +51,13 @@ public class BVNController {
     @PostMapping("/v1/bvn/validate_bvn")
     public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
        return bvnValidationService.validateCustomerBVN(bvn,dob);
+//       return ResponseEntity.ok().body(new APIResponse<>( "Response body is null", true, new BVNValidationResponse("00", "", "")));
     }
 
     @PostMapping("/v1/bvn/verify_bvn")
     public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestParam String bvn, @RequestParam String otp) throws IOException {
         return bvnValidationService.verifyCustomerBVN(bvn,otp);
+//        return ResponseEntity.ok().body(new APIResponse<>( "Response body is null", true, new BVNVerificationResponse("00", "", new ValidateBvnResponse(), "")));
     }
 
 }

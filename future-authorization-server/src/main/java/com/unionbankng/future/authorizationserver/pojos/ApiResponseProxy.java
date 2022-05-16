@@ -7,15 +7,15 @@ public @Data class ApiResponseProxy<T> {
 	private String message;
 	private String code;
 	private boolean success;
-	private T data;
+	private T payload;
 
 
-	public ApiResponseProxy(String message, boolean success, String code, T data) {
+	public ApiResponseProxy(String message, boolean success, String code, T payload) {
 		super();
 		this.message = message;
 		this.success = success;
 		this.code = code;
-		this.data = data;
+		this.payload = payload;
 	}
 
      

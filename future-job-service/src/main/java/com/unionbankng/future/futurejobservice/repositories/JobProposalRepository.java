@@ -12,6 +12,8 @@ public interface JobProposalRepository extends JpaRepository<JobProposal, Long> 
     Page<JobProposal> findByUserId(Pageable pageable, Long userid);
     @Query(value = "SELECT * FROM job_proposals p where p.user_id=:userid and status not in ('WP','PS','CO')", nativeQuery = true)
     Page<JobProposal> findProposalsByUserId(Pageable pageable, Long userid);
+    @Query(value = "SELECT count(*) FROM job_proposals p where p.user_id=:userid and status not in ('WP','PS','CO')", nativeQuery = true)
+    Long findNoOfProposalsByUserId(Long userid);
     @Query(value = "SELECT count(*) FROM job_proposals p where p.job_id=:jobId", nativeQuery = true)
     Long getCountByJobId(Long jobId);
     @Query(value = "SELECT top(1) * FROM job_proposals p where p.job_id=:jobId and (p.user_id=:userId or p.employer_id=:userId ) and status not in('CA','IA') order by id desc", nativeQuery = true)

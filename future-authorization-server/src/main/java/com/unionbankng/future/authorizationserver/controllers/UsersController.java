@@ -38,7 +38,7 @@ public class UsersController {
     public ResponseEntity<APIResponse<User>> getUserById(@PathVariable Long userId) {
 
         User user = userService.findById(userId).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
+        app.print("User found");
         return ResponseEntity.ok().body(new APIResponse<>("Request successful",true,user));
     }
 
@@ -107,8 +107,6 @@ public class UsersController {
                                                                 @Nullable @RequestPart("img") MultipartFile img)
             throws IOException {
         app.print("Uploading user profile picture");
-        app.print(img.getOriginalFilename());
-        app.print(img.getName());
         User user = userService.updateProfile(userId,null,img,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
@@ -118,9 +116,6 @@ public class UsersController {
     public ResponseEntity<APIResponse<User>> uploadUserCoverImage(@PathVariable Long userId,
                                                                     @Nullable @RequestPart("coverImg") MultipartFile coverImg)
             throws IOException {
-        app.print("Uploading user Cover image");
-        app.print(coverImg.getOriginalFilename());
-        app.print(coverImg.getName());
         User user = userService.updateProfile(userId,coverImg,null,null);
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,user));
     }
