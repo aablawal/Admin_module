@@ -300,7 +300,7 @@
 	<repositories>
 		<repository>
 			<id>maven-group</id>
-			<url>http://168.63.73.171:8081/nexus/content/groups/maven-group/</url>
+			<url>http://40.69.37.139:8081/nexus/content/groups/maven-group/</url>
 		</repository>
 	</repositories>
 </project>
