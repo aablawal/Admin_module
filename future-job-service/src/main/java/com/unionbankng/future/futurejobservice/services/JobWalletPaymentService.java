@@ -57,7 +57,7 @@ public class JobWalletPaymentService implements Serializable {
             transaction.setExecutedByUsername(paymentRequest.getExecutedByUsername());
             transaction.setCreatedAt(new Date());
             //save the payment history
-            walletTransactionRepository.save(transaction);
+//          //walletTransactionRepository.save(transaction);
             logger.info("JOBSERVICE: Payment successful via wallet");
             return new APIResponse("Payment Successful", true, transaction.getPaymentReference());
         } else {
