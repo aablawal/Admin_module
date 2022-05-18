@@ -383,6 +383,8 @@ public class KYCService {
 
             app.print(driversLicenceFaceMatchRequest);
             Response<KycApiResponse<DriversLicenceFaceMatchResponse>> response = getDriverLicenseFaceMatch(driversLicenceFaceMatchRequest);
+            app.print("DriversLicenceFaceMatchResponse VERIFICATION RESPONSE");
+            app.print(response.body());
             if (response.isSuccessful()) {
 
                 Kyc kyc = new Kyc();
@@ -396,6 +398,7 @@ public class KYCService {
                 String idFileName = "id-" + randomNumber + "-" + user.getUuid() + ".jpg";
                 String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
                 app.print("Uploaded... " + savedSelfieUrl);
+
 
                 if (response.body() != null && response.body().isSuccess()) {
 
