@@ -446,7 +446,7 @@ public class KYCService {
                     // Send push sms to user
                     sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.not.verified");
 
-                    return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                    return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                             true, "Verification Sent for manual approval");
                 }
             } else {
@@ -536,7 +536,7 @@ public class KYCService {
                 // Send push sms to user
                 sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.email.not.verified");
 
-                return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                         true, "Verification Sent for manual approval");
             }
         }
