@@ -163,25 +163,30 @@ public class AuthenticationService {
     public APIResponse validatePhoneNumber(OAuth2Authentication authentication, String phone) {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
-        if (user != null) {
-            if(phone!=null) {
-                Long otp = app.generateOTP();
-                String phoneNumber=app.toPhoneNumber(phone);
-                memcachedHelperService.save(phoneNumber,otp.toString(),0);
+        String phoneNumber=app.toPhoneNumber(phone);
+        List<User> users=userRepository.findAllByPhoneNumber(phoneNumber).orElse(null);
+        if(users==null) {
+            if (user != null) {
+                if (phone != null) {
+                    Long otp = app.generateOTP();
+                    memcachedHelperService.save(phoneNumber, otp.toString(), 0);
 
-                SMS smsBody= new SMS();
-                smsBody.setRecipient(phoneNumber);
-                smsBody.setMessage("Your OTP is " + otp);
+                    SMS smsBody = new SMS();
+                    smsBody.setRecipient(phoneNumber);
+                    smsBody.setMessage("Your OTP is " + otp);
 
-                app.print("Sending SMS OTP:");
+                    app.print("Sending SMS OTP:");
 
-                smsSender.sendSMS(smsBody);
-                return new APIResponse<>("OTP Sent to your phone number", true, phoneNumber);
-            }else{
-                return new APIResponse<>("Phone number required", false, null);
+                    smsSender.sendSMS(smsBody);
+                    return new APIResponse<>("OTP Sent to your phone number", true, phoneNumber);
+                } else {
+                    return new APIResponse<>("Phone number required", false, null);
+                }
+            } else {
+                return new APIResponse<>("Unable to fetch authentication details", false, null);
             }
-        } else {
-            return new APIResponse<>("Unable to fetch authentication details", false, null);
+        }else{
+            return new APIResponse<>("Phone number already exist on Kula", false, null);
         }
     }
 
