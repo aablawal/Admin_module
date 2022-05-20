@@ -1,6 +1,7 @@
 package com.unionbankng.future.authorizationserver.utils;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -41,8 +42,13 @@ public class UnsafeOkHttpClient {
             builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
             builder.hostnameVerifier((hostname, session) -> true);
 
+            //Add logging as necessary to troubleshoot issues
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
             OkHttpClient okHttpClient = builder.connectTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).build();
+                    .writeTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(interceptor).build();
             return okHttpClient;
         } catch (Exception e) {
             throw new RuntimeException(e);
