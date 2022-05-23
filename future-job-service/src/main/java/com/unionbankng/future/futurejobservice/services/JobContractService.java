@@ -51,7 +51,6 @@ public class JobContractService implements Serializable {
     private  String VATAccountNumber;
     private  String pepperestIncomeAccountName; //CASA
     private  String pepperestIncomeAccountNumber;
-    private MessageSource messageSource;
     private  Logger logger = LoggerFactory.getLogger(JobContractService.class);
 
 
@@ -71,7 +70,8 @@ public class JobContractService implements Serializable {
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
     private final JobContractDisputeRepository jobContractDisputeRepository;
     private final NotificationSender notificationSender;
-    private  final UserService userService;
+    private final MessageSource messageSource;
+    private final UserService userService;
     private final AppLogger appLogger;
     private final App app;
 
