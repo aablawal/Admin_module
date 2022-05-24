@@ -1,4 +1,5 @@
 package com.unionbankng.future.authorizationserver.services;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.*;
@@ -105,16 +106,21 @@ public class KYCService {
 
     public Response<KycApiResponse<PassportFaceMatchResponse>> getPassportFaceMatch(PassportFaceMatchRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getPassportFaceMatch(token, request).execute();
     }
 
     public Response<KycApiResponse<VotersCardFaceMatchResponse>> getVotersCardFaceMatch(VotersCardFaceMatchRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print("request: " + request);
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getVotersCardFaceMatch(token, request).execute();
     }
 
     public Response<KycApiResponse<DriversLicenceFaceMatchResponse>> getDriverLicenseFaceMatch(DriversLicenceFaceMatchRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print("request: " + request);
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getDriverLicenseFaceMatch(token, request).execute();
     }
 
@@ -125,6 +131,8 @@ public class KYCService {
 
     public Response<KycApiResponse<VerifyMeResponse>> getIdentityBiometrics(IdentityBiometricsRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print("request: " + request);
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getIdentityBiometrics(token, request).execute();
     }
 
@@ -142,7 +150,7 @@ public class KYCService {
 
         } else {
             String selfieImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(selfieImage.getBytes());
-            String idImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
+            String idImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(idImage.getBytes());
             Date dateOfBirth = user.getDateOfBirth();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             String dateOfBirthString = formatter.format(dateOfBirth);
@@ -189,7 +197,6 @@ public class KYCService {
 //                        if (response.body().getData().getResponse().getFirst_name().equalsIgnoreCase(passportFaceMatchRequest2.getFirstName()) && response.body().getData().getResponse().getLast_name().equalsIgnoreCase(passportFaceMatchRequest2.getLastName())) { //TODO : Confirm match before sending to production
                         if (true) { // TODO: To be removed before pushing to production
                             //Step four id card expiry validation
-
 
                             Kyc kyc = new Kyc();
                             kyc.setVerificationStatus(true);
@@ -385,7 +392,7 @@ public class KYCService {
             Response<KycApiResponse<DriversLicenceFaceMatchResponse>> response = getDriverLicenseFaceMatch(driversLicenceFaceMatchRequest);
             app.print("DriversLicenceFaceMatchResponse VERIFICATION RESPONSE");
             app.print(response.body());
-            if (response.isSuccessful()) {
+            if (response.body().isSuccess()) {
 
                 Kyc kyc = new Kyc();
 
