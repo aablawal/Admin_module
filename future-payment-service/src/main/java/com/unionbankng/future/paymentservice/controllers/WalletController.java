@@ -24,10 +24,19 @@ public class WalletController {
         return "Hello World";
     }
 
-    @PostMapping("/verify-interswitch-transaction/{transactionId}")
-    public ApiResponse<VerifyTransactionResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionId)  {
-        app.print("VerifyInterswitch Transaction: " + transactionId);
-        return walletService.verifyTransaction(transactionId);
+    @PostMapping("/initiate-wallet-funding")
+    public ApiResponse<?> initiateWalletFunding(@RequestBody InitiateFundingRequest request)  {
+        app.print("Initiating wallet funding : ");
+        app.print(request);
+        return walletService.initiateWalletFunding(request);
+    }
+
+
+    @PostMapping("/verify-interswitch-transaction/{transactionRef}")
+    public ApiResponse<WalletGenericResponse> handleInterswitchVerifyTransaction(@Valid @PathVariable String transactionRef, @RequestBody InterswitchSDKResponse request)  {
+        app.print("Interswitch Verify Transaction : " + transactionRef);
+        request.setTxnref(transactionRef);
+        return walletService.verifyTransaction(request);
     }
 
     @PostMapping("/debit-wallet")

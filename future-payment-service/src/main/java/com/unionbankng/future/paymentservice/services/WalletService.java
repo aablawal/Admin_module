@@ -131,16 +131,19 @@ public class WalletService implements Serializable {
         }
     }
 
-    public ApiResponse<VerifyTransactionResponse> verifyTransaction(String transactionId) {
+    public ApiResponse<WalletGenericResponse> verifyTransaction(InterswitchSDKResponse interswitchSDKResponse) {
         try {
             app.print("Verifying transaction....");
             WalletAuthResponse auth= getAuth();
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
-                Response<ApiResponse<VerifyTransactionResponse>> response = walletServiceInterface.verifyInterswitchTransaction(token, transactionId).execute();
+                Response<ApiResponse<WalletGenericResponse>> response = walletServiceInterface.verifyInterswitchTransaction(token, interswitchSDKResponse.getTxnref(), interswitchSDKResponse).execute();
                 app.print("Response:");
+                app.print(response.body());
                 app.print(response.code());
                 if (response.isSuccessful()) {
+                    app.print("verifyTransaction successful");
+                    app.print(response.body());
                     return response.body();
 
                 } else {
@@ -233,6 +236,29 @@ public class WalletService implements Serializable {
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
                 Response<ApiResponse<InterswitchBankResponse>> response = walletServiceInterface.getBankInterswitchList(token).execute();
+                app.print("Response:");
+                app.print(response.code());
+                if (response.isSuccessful()) {
+                    return response.body();
+                } else {
+                    return new ApiResponse<>(response.message(), false, "101", null);
+                }
+            }else{
+                return new ApiResponse<>("Unable to authenticate with wallet service",false, "101", null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ApiResponse<>("Something went wrong",false, "101", null);
+        }
+    }
+
+    public ApiResponse<?> initiateWalletFunding(InitiateFundingRequest request) {
+        try {
+            app.print("Initiating wallet funding....");
+            WalletAuthResponse auth = getAuth();
+            if(auth!=null) {
+                String token = "Bearer " + auth.getAccess_token();
+                Response<ApiResponse> response = walletServiceInterface.initiateWalletFunding(token, request).execute();
                 app.print("Response:");
                 app.print(response.code());
                 if (response.isSuccessful()) {
