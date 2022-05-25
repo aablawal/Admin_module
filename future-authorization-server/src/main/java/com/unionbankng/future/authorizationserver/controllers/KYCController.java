@@ -1,4 +1,5 @@
 package com.unionbankng.future.authorizationserver.controllers;
+
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
@@ -19,9 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
 
 import javax.validation.Valid;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -41,43 +42,39 @@ public class KYCController {
     public APIResponse<?> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam String dob){
 
         app.print("initiateKYC");
-
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
+        if(user == null)
+            return new APIResponse("User not found", false, null);
+
         if(bvn==null || !app.validBvn(bvn))
-            return new APIResponse("Provide user verified BVN Number",
-                    false, null);
+            return new APIResponse("Provide user verified BVN Number", false, null);
 
-        if(user != null && app.validBvn(bvn)) {
+        return walletService.createWallet(user, bvn, dob);
 
-            APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getUuid()), user.getFirstName() + " " + user.getLastName(), bvn);
-            if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {
-                app.print("Wallet created successfully");
-                user.setWalletId(walletResponse.getPayload().get("walletId"));
-            }else {
-                return new APIResponse<>("Sorry, Wallet creation failed at this time, try again soon!", false, null);
-            }
-
-            user.setBvn(bvn);
-            user.setKycLevel(1);
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
-                Date dateOfBirth = formatter.parse(dob);
-                user.setDateOfBirth(dateOfBirth);
-                userRepository.save(user);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-
-            return new APIResponse<>("BVN Added",
-                    true, user);
-        }else{
-            return new APIResponse("Invalid BVN Number",
-                    false, null);
-        }
+//            APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getUuid()), user.getFirstName() + " " + user.getLastName(), bvn);
+//            if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {
+//                app.print("Wallet created successfully");
+//                user.setWalletId(walletResponse.getPayload().get("walletId"));
+//            }else {
+//                return new APIResponse<>("Sorry, Wallet creation failed at this time, try again soon!", false, null);
+//            }
+//
+//            user.setBvn(bvn);
+//            user.setKycLevel(1);
+//            try {
+//                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
+//                Date dateOfBirth = formatter.parse(dob);
+//                user.setDateOfBirth(dateOfBirth);
+//                userRepository.save(user);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//                app.print("Exception message: " + e.getMessage());
+//            }
+//
+//            return new APIResponse<>("BVN Added",
+//                    true, user);
 
     }
 
@@ -86,6 +83,7 @@ public class KYCController {
             @Valid @RequestParam(value = "data") String bioData,
             @RequestParam(value = "selfieImage") MultipartFile selfieImage,
             @RequestParam(value = "idImage") MultipartFile idImage,OAuth2Authentication authentication) throws Exception {
+
 
         VerifyKycRequest verifyKycRequest = app.getMapper().readValue(bioData, VerifyKycRequest.class);
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);

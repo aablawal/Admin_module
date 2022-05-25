@@ -44,10 +44,10 @@ spring:
     config:
       uri: http://future-config-server
       label: master
-azure:
-  keyvault:
-    client-id: ${KEY_VAULT_CLIENT_ID}
-    client-key: ${KEY_VAULT_CLIENT_KEY}
-    enabled: true
-    tenant-id: ${KEY_VAULT_TENANT_ID}
-    uri: ${KEY_VAULT_URL}
+#azure:
+#  keyvault:
+#    client-id: ${KEY_VAULT_CLIENT_ID}
+#    client-key: ${KEY_VAULT_CLIENT_KEY}
+#    enabled: true
+#    tenant-id: ${KEY_VAULT_TENANT_ID}
+#    uri: ${KEY_VAULT_URL}

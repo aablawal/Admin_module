@@ -8,15 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.util.Base64;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -81,16 +72,18 @@ public class App {
 
     public Long generateOTP(){
         Random rnd = new Random();
-        String number = String.valueOf(rnd.nextInt(999999));
-        if(number.length()<6){
-            if(number.length()==5)
-                number=number+"9";
-            if(number.length()==4)
-                number=number+"99";
-            if(number.length()==3)
-                number=number+"999";
-        }
-        return  Long.valueOf(number);
+//        String number = String.valueOf(rnd.nextInt(999999));
+//        if(number.length()<6){
+//            if(number.length()==5)
+//                number=number+"9";
+//            if(number.length()==4)
+//                number=number+"99";
+//            if(number.length()==3)
+//                number=number+"999";
+//        }
+//        return  Long.valueOf(number);
+        return Long.valueOf(100000 + rnd.nextInt(900000));
+
     }
 
     public String toPhoneNumber(String phoneNumber) {
