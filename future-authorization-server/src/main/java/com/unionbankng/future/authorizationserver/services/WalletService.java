@@ -99,7 +99,7 @@ public class WalletService implements Serializable {
             app.print("##### Creating new Wallet....");
             CreateWalletRequest createWalletRequest = new CreateWalletRequest(userId, customerName, bvn);
             Response<Map<String, String>> response = walletServiceInterface.createWallet(token, createWalletRequest).execute();
-
+            app.print("##### Response...." + response.body());
             if (!response.isSuccessful())
                 return new APIResponse(response.message(), false, null);
 
