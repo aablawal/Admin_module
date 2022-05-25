@@ -1,6 +1,10 @@
 package com.unionbankng.future.authorizationserver.services;
 
-import com.unionbankng.future.authorizationserver.pojos.*;
+import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.pojos.APIResponse;
+import com.unionbankng.future.authorizationserver.pojos.CreateWalletRequest;
+import com.unionbankng.future.authorizationserver.pojos.WalletAuthResponse;
+import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +16,14 @@ import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -24,6 +32,7 @@ public class WalletService implements Serializable {
 
     private Logger logger = LoggerFactory.getLogger(WalletService.class);
     private WalletServiceInterface walletServiceInterface;
+    private final UserRepository userRepository;
     private final App app;
 
 
@@ -52,16 +61,16 @@ public class WalletService implements Serializable {
     }
 
 
-    private String computeBasicAuthorization(){
-        String details=username+":"+password;
-        return "Basic " +Base64.getEncoder().encodeToString(details.getBytes());
+    private String computeBasicAuthorization() {
+        String details = username + ":" + password;
+        return "Basic " + Base64.getEncoder().encodeToString(details.getBytes());
     }
 
     public WalletAuthResponse getAuth() {
         try {
             app.print("Generating Wallet access token ....");
-            String  basicAuth=computeBasicAuthorization();
-            Response<WalletAuthResponse> response = walletServiceInterface.getWalletServiceToken("password",username,password,basicAuth).execute();
+            String basicAuth = computeBasicAuthorization();
+            Response<WalletAuthResponse> response = walletServiceInterface.getWalletServiceToken("password", username, password, basicAuth).execute();
             if (response.isSuccessful()) {
                 return response.body();
             } else {
@@ -73,28 +82,43 @@ public class WalletService implements Serializable {
         }
     }
 
-    public APIResponse<Map<String, String>> createWallet(String userId, String customerName, String bvn) {
+    public APIResponse<Map<String, String>> createWallet(User user, String bvn, String dob) {
+        if (bvn == null || !app.validBvn(bvn))
+            return new APIResponse("Provide user verified BVN Number", false, null);
+
+        String userId = user.getUuid();
+        String customerName = user.getFirstName() + " " + user.getLastName();
+
         try {
+            WalletAuthResponse auth = getAuth();
 
-            WalletAuthResponse auth= getAuth();
-            if(auth!=null) {
-                String token = "Bearer " + auth.getAccess_token();
-                app.print("##### Creating new Wallet....");
-                CreateWalletRequest createWalletRequest = new CreateWalletRequest(userId, customerName, bvn);
-                Response<Map<String, String>> response = walletServiceInterface.createWallet(token, createWalletRequest).execute();
-                if (response.isSuccessful()) {
-                    return  new APIResponse("Request Successful",true, response.body());
+            if (auth == null)
+                return new APIResponse("Sorry, we are unable to generate wallet auth token", false, null);
 
-                } else {
-                    return  new APIResponse(response.message(),false,null);
-                }
-            }else{
-                return  new APIResponse("Sorry, we are unable to generate wallet auth token",false,null);
+            String token = "Bearer " + auth.getAccess_token();
+            app.print("##### Creating new Wallet....");
+            CreateWalletRequest createWalletRequest = new CreateWalletRequest(userId, customerName, bvn);
+            Response<Map<String, String>> response = walletServiceInterface.createWallet(token, createWalletRequest).execute();
+            app.print("##### Response...." + response.body());
+            if (!response.isSuccessful())
+                return new APIResponse(response.message(), false, null);
+
+            if (response.isSuccessful() && response.body() != null && Objects.equals(response.body().get("code"), "000")) {
+                app.print("Wallet created successfully");
+                user.setWalletId(response.body().get("walletId"));
+                user.setBvn(bvn);
+                user.setKycLevel(1);
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
+                Date dateOfBirth = formatter.parse(dob);
+                user.setDateOfBirth(dateOfBirth);
+                userRepository.save(user);
+                return new APIResponse("BVN Added", true, user);
+            } else {
+                return new APIResponse<>("Sorry, Wallet creation failed at this time, try again soon!", false, null);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return  new APIResponse("Something went wrong",false,null);
-
+            return new APIResponse("Something went wrong", false, null);
         }
     }
 
