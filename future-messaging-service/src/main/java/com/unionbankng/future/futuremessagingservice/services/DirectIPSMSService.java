@@ -38,6 +38,10 @@ public class DirectIPSMSService {
     }
 
     public APIResponse sendSMS(SMS sms){
+        if(sms.getRecipient().startsWith("234234")){
+            String recipient=sms.getRecipient().replaceFirst("234234","234");
+            sms.setRecipient(recipient);
+        }
         app.print("Sending SMS to "+sms.getRecipient());
         app.print(sms);
         HttpEntity<String> entity = new HttpEntity<String>(this.getHeaders());
