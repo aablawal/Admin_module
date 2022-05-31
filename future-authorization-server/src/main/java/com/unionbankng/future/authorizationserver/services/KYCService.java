@@ -190,7 +190,6 @@ public class KYCService {
                     String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
                     app.print("Uploaded... " + savedIdImageUrl);
 
-
                     //Step one & two verification
                     if (response.body().isSuccess() && response.body().getData().getVerificationStatus().equals("VERIFIED")) {
                         // Step three verification name matches
