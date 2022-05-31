@@ -1,9 +1,9 @@
-package com.unionbankng.future.futuremessagingservice.services;
-import com.unionbankng.future.futuremessagingservice.pojos.UBNAuthServerTokenResponse;
-import com.unionbankng.future.futuremessagingservice.retrofitservices.UBNAuthAPIServiceInterface;
-import com.unionbankng.future.futuremessagingservice.util.App;
-import com.unionbankng.future.futuremessagingservice.util.CryptoService;
-import com.unionbankng.future.futuremessagingservice.util.UnsafeOkHttpClient;
+package com.unionbankng.future.futurebankservice.services;
+import com.unionbankng.future.futurebankservice.pojos.UBNAuthServerTokenResponse;
+import com.unionbankng.future.futurebankservice.retrofitservices.UBNAuthAPIServiceInterface;
+import com.unionbankng.future.futurebankservice.util.App;
+import com.unionbankng.future.futurebankservice.util.CryptoService;
+import com.unionbankng.future.futurebankservice.util.UnsafeOkHttpClient;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,6 @@ public class UBNAuthService {
     private final App app;
     @Value("${unionbankng.base.url}")
     private String ubnBaseURL;
-
     @Value("${unionbankng.clientId}")
     private String clientId;
     @Value("${unionbankng.clientSecret}")
