@@ -33,6 +33,14 @@ public class CustomerBankAccountController {
     @Value("${unionbankng.base.url}")
     private String ubnBaseURL;
 
+    @Value("${sidekiq.jwt.signing_key}")
+    private String jwtSigningKey;
+
+    @Value("${unionbankng.clientId}")
+    private String clientId;
+    @Value("${unionbankng.clientSecret}")
+    private String clientSecret;
+
 
     @PostMapping("/v1/ubn-account/add_bank_account")
     public ResponseEntity<APIResponse<CustomerBankAccount>> addBankAccount(OAuth2Authentication authentication, @RequestBody CustomerBankAccount bankAccount) {
@@ -57,6 +65,12 @@ public class CustomerBankAccountController {
         app.print("Getting Customer Accounts");
         app.print("Base URL");
         app.print(ubnBaseURL);
+        app.print("JWT Signing Key");
+        app.print(jwtSigningKey);
+        app.print("Client ID");
+        app.print(clientId);
+        app.print("Client Secret");
+        app.print(clientSecret);
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         List<CustomerBankAccount> accountList = customerBankAccountService.findAllByUserUUID(jwtUserDetail.getUserUUID());
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, accountList));
