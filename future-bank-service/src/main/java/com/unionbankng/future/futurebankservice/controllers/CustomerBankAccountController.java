@@ -8,6 +8,7 @@ import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHan
 import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,11 @@ public class CustomerBankAccountController {
 
     private final CustomerBankAccountService customerBankAccountService;
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
+
     private final App app;
+
+    @Value("${unionbankng.base.url}")
+    private String ubnBaseURL;
 
 
     @PostMapping("/v1/ubn-account/add_bank_account")
@@ -49,6 +54,9 @@ public class CustomerBankAccountController {
 
     @GetMapping("/v1/ubn-account/get_customer_bank_accounts")
     public ResponseEntity<APIResponse<List<CustomerBankAccount>>> getCustomerAccounts(@ApiIgnore OAuth2Authentication authentication) {
+        app.print("Getting Customer Accounts");
+        app.print("Base URL");
+        app.print(ubnBaseURL);
         JwtUserDetail jwtUserDetail = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         List<CustomerBankAccount> accountList = customerBankAccountService.findAllByUserUUID(jwtUserDetail.getUserUUID());
         return ResponseEntity.ok().body(new APIResponse<>("Request Successful", true, accountList));
