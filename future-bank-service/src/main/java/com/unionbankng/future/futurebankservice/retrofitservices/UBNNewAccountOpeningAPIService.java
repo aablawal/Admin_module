@@ -8,10 +8,6 @@ import retrofit2.http.*;
 
 public interface UBNNewAccountOpeningAPIService {
 
-    @POST("authserv/oauth/token")
-    Call<UBNAuthServerTokenResponse> getAuthServerToken(@Query("username") String username, @Query("password") String password,
-                                                        @Query("client_secret") String clientSecret, @Query("grant_type") String grantType,
-                                                        @Query("client_id") String clientId);
     @GET("account-service/account/id-card/type")
     Call<AccountIdTypesResponse> getSupportedIdCardTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 

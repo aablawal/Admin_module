@@ -8,6 +8,7 @@ import com.unionbankng.future.futurebankservice.services.UBNAccountAPIServiceHan
 import com.unionbankng.future.futurebankservice.util.App;
 import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class CustomerBankAccountController {
 
     private final CustomerBankAccountService customerBankAccountService;
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
+
     private final App app;
 
 
