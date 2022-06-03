@@ -91,6 +91,7 @@ public class AuthenticationService {
 
                 String mobileNumber = app.toPhoneNumber(user.getPhoneNumber());
                 app.print("Sending OTP.....");
+                app.print("Your OTP is " + otp);
 
                 SMS sms = new SMS();
                 sms.setMessage("Your OTP is " + otp);
