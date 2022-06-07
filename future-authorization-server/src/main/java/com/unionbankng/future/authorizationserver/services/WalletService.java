@@ -83,6 +83,17 @@ public class WalletService implements Serializable {
     }
 
     public APIResponse<Map<String, String>> createWallet(User user, String bvn, String dob) {
+
+        if(user.getBvn() != null && !user.getBvn().equalsIgnoreCase(bvn)){
+            return new APIResponse("BVN provided does not  match that associated with this account", false, null);
+        }
+
+        User testUser = userRepository.findByBvn(bvn).orElse(null);
+
+        if(testUser != null && !testUser.equals(user)){
+            return new APIResponse("BVN provided is associated to another account", false, null);
+        }
+
         if (bvn == null || !app.validBvn(bvn))
             return new APIResponse("Provide user verified BVN Number", false, null);
 
@@ -103,7 +114,7 @@ public class WalletService implements Serializable {
             if (!response.isSuccessful())
                 return new APIResponse(response.message(), false, null);
 
-            if (response.isSuccessful() && response.body() != null && Objects.equals(response.body().get("code"), "000")) {
+            if (response.body() != null && Objects.equals(response.body().get("code"), "000")) {
                 app.print("Wallet created successfully");
                 user.setWalletId(response.body().get("walletId"));
                 user.setBvn(bvn);
