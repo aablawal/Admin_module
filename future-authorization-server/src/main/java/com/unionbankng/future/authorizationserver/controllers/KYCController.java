@@ -177,12 +177,12 @@ public class KYCController {
             User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
             if (user != null) {
 
-                if (verifymeWebhook.getData().getStatus().getStatus().contains("VERIFIED") && verifymeWebhook.getData().getStatus().getStatus().contains("VERIFIED")) {
-//            Update Kyc detail address
+                if (verifymeWebhook.getData().getStatus().getStatus().contains("VERIFIED")) {
+//                  Update Kyc detail address
                     kycAddressVerification.setStatus(verifymeWebhook.getData().getStatus().getStatus());
                     kycAddressVerification.setSubStatus(verifymeWebhook.getData().getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
-//            Update user kyc level
+//                  Update user kyc level
                     user.setKycLevel(3);
                     userRepository.save(user);
 
