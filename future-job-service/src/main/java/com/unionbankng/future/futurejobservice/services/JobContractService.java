@@ -373,20 +373,20 @@ public class JobContractService implements Serializable {
 
                         app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
                         //fire notifications
-//                        NotificationBody body1 = new NotificationBody();
-//                        String[] params = {String.valueOf(contract.getAmount()), job.getTitle()};
-//                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider", params, LocaleContextHolder.getLocale());
-//                        body1.setBody(message);
-//                        body1.setSubject("Job Proposal Approved");
-//                        body1.setActionType("REDIRECT");
-//                        body1.setAction("/job/ongoing/details/" + proposal.getJobId());
-//                        body1.setTopic("'Job'");
-//                        body1.setChannel("S");
-//                        body1.setPriority("YES");
-//                        body1.setRecipient(proposal.getEmployerId());
-//                        body1.setRecipientEmail(currentUser.getUserEmail());
-//                        body1.setRecipientName(currentUser.getUserFullName());
-//                        notificationSender.pushNotification(body1);
+                        NotificationBody body1 = new NotificationBody();
+                        String[] params = {String.valueOf(contract.getAmount()), job.getTitle()};
+                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider", params, LocaleContextHolder.getLocale());
+                        body1.setBody(message);
+                        body1.setSubject("Job Proposal Approved");
+                        body1.setActionType("REDIRECT");
+                        body1.setAction("/job/ongoing/details/" + proposal.getJobId());
+                        body1.setTopic("'Job'");
+                        body1.setChannel("S");
+                        body1.setPriority("YES");
+                        body1.setRecipient(proposal.getEmployerId());
+                        body1.setRecipientEmail(currentUser.getUserEmail());
+                        body1.setRecipientName(currentUser.getUserFullName());
+                        notificationSender.pushNotification(body1);
 
                         User user =userService.getUserById(proposal.getUserId());
                         if(user!=null) {
