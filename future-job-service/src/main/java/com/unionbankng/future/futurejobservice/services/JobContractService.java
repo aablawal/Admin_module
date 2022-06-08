@@ -373,37 +373,38 @@ public class JobContractService implements Serializable {
 
                         app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
                         //fire notifications
-                        NotificationBody body1 = new NotificationBody();
-                        String[] params = {String.valueOf(contract.getAmount()), job.getTitle()};
-                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider", params, LocaleContextHolder.getLocale());
-                        body1.setBody(message);
-                        body1.setSubject("Job Proposal Approved");
-                        body1.setActionType("REDIRECT");
-                        body1.setAction("/job/ongoing/details/" + proposal.getJobId());
-                        body1.setTopic("'Job'");
-                        body1.setChannel("S");
-                        body1.setPriority("YES");
-                        body1.setRecipient(proposal.getEmployerId());
-                        body1.setRecipientEmail(currentUser.getUserEmail());
-                        body1.setRecipientName(currentUser.getUserFullName());
-                        notificationSender.pushNotification(body1);
+//                        NotificationBody body1 = new NotificationBody();
+//                        String[] params = {String.valueOf(contract.getAmount()), job.getTitle()};
+//                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider", params, LocaleContextHolder.getLocale());
+//                        body1.setBody(message);
+//                        body1.setSubject("Job Proposal Approved");
+//                        body1.setActionType("REDIRECT");
+//                        body1.setAction("/job/ongoing/details/" + proposal.getJobId());
+//                        body1.setTopic("'Job'");
+//                        body1.setChannel("S");
+//                        body1.setPriority("YES");
+//                        body1.setRecipient(proposal.getEmployerId());
+//                        body1.setRecipientEmail(currentUser.getUserEmail());
+//                        body1.setRecipientName(currentUser.getUserFullName());
+//                        notificationSender.pushNotification(body1);
 
                         User user =userService.getUserById(proposal.getUserId());
+                        app.print("freelancer>>>> "+user);
                         if(user!=null) {
-//                            NotificationBody body2 = new NotificationBody();
-//                            String[] params1 = {currentUser.getFirstName(), job.getTitle(), String.valueOf(contract.getAmount())};
-//                            String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
-//                            body2.setBody(message1);
-//                            body2.setSubject("Proposal Approval");
-//                            body2.setActionType("REDIRECT");
-//                            body2.setAction("/job/ongoing/details/" + proposal.getJobId());
-//                            body2.setTopic("'Job'");
-//                            body2.setChannel("S");
-//                            body2.setPriority("YES");
-//                            body2.setRecipient(proposal.getUserId());
-//                            body2.setRecipientEmail(user.getEmail());
-//                            body2.setRecipientName(user.getFullName());
-//                            notificationSender.pushNotification(body2);
+                            NotificationBody body2 = new NotificationBody();
+                            String[] params1 = {currentUser.getFirstName(), job.getTitle(), String.valueOf(contract.getAmount())};
+                            String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
+                            body2.setBody(message1);
+                            body2.setSubject("Proposal Approval");
+                            body2.setActionType("REDIRECT");
+                            body2.setAction("/job/ongoing/details/" + proposal.getJobId());
+                            body2.setTopic("'Job'");
+                            body2.setChannel("S");
+                            body2.setPriority("YES");
+                            body2.setRecipient(proposal.getUserId());
+                            body2.setRecipientEmail(user.getEmail());
+                            body2.setRecipientName(user.getFullName());
+                            notificationSender.pushNotification(body2);
                         }
 
                         //end
