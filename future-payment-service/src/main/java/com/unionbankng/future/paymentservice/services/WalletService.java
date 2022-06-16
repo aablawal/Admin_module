@@ -16,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import javax.annotation.PostConstruct;
 import javax.net.ssl.TrustManager;
 import java.io.Serializable;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -88,7 +89,22 @@ public class WalletService implements Serializable {
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory(sslSocketFactory);
+            builder.sslSocketFactory(sslSocketFactory, new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new java.security.cert.X509Certificate[]{};
+                }
+            });
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
