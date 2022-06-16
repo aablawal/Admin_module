@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
+import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.enums.PaymentMethod;
 import com.unionbankng.future.futurejobservice.enums.Status;
-import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.repositories.*;
 import com.unionbankng.future.futurejobservice.util.App;
@@ -27,8 +27,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.Serializable;
-import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -389,21 +389,22 @@ public class JobContractService implements Serializable {
 //                        notificationSender.pushNotification(body1);
 
                         User user =userService.getUserById(proposal.getUserId());
+                        app.print("freelancer>>>> "+user);
                         if(user!=null) {
-//                            NotificationBody body2 = new NotificationBody();
-//                            String[] params1 = {currentUser.getFirstName(), job.getTitle(), String.valueOf(contract.getAmount())};
-//                            String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
-//                            body2.setBody(message1);
-//                            body2.setSubject("Proposal Approval");
-//                            body2.setActionType("REDIRECT");
-//                            body2.setAction("/job/ongoing/details/" + proposal.getJobId());
-//                            body2.setTopic("'Job'");
-//                            body2.setChannel("S");
-//                            body2.setPriority("YES");
-//                            body2.setRecipient(proposal.getUserId());
-//                            body2.setRecipientEmail(user.getEmail());
-//                            body2.setRecipientName(user.getFullName());
-//                            notificationSender.pushNotification(body2);
+                            NotificationBody body2 = new NotificationBody();
+                            String[] params1 = {currentUser.getFirstName(), job.getTitle(), String.valueOf(contract.getAmount())};
+                            String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
+                            body2.setBody(message1);
+                            body2.setSubject("Proposal Approval");
+                            body2.setActionType("REDIRECT");
+                            body2.setAction("/job/ongoing/details/" + proposal.getJobId());
+                            body2.setTopic("'Job'");
+                            body2.setChannel("S");
+                            body2.setPriority("YES");
+                            body2.setRecipient(proposal.getUserId());
+                            body2.setRecipientEmail(user.getEmail());
+                            body2.setRecipientName(user.getFullName());
+                            notificationSender.pushNotification(body2);
                         }
 
                         //end

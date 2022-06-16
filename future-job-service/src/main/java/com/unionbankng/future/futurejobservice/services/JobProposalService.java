@@ -51,6 +51,7 @@ public class JobProposalService  implements Serializable {
     public JobProposal applyJob(OAuth2Authentication authentication, String applicationData, MultipartFile[] supporting_files) {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         try {
+            app.print(applicationData);
             JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
 
             String supporting_file_names = null;

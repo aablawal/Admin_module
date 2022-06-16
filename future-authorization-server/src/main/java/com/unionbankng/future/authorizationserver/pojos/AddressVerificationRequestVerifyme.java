@@ -9,7 +9,4 @@ public class AddressVerificationRequestVerifyme {
     private String state;
     private String landmark;
     private Applicant applicant;
-//    private String docType;
-//    private String idImage;
-//    private String reference;
 }
