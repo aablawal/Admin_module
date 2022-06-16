@@ -17,10 +17,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import retrofit2.Response;
 
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,87 +100,23 @@ public class KYCController {
 
     @PostMapping("/v1/kyc/address_verification")
     public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequestVerifyme addressVerificationRequestVerifyme, OAuth2Authentication authentication) throws Exception {
-//        String[] params = new String[]{userid, "User"};
-        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
-
-        assert user != null;
-        if (user.getKycLevel() == 3 || user.getKycLevel() == 5) //Todo: Ask Rabiu what KYC level 5 is
-            return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                    false, "User Already verified");
-
-
-        String idType = "KYC";
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String currentData = sdf.format(user.getDateOfBirth());
-
-        // format the phone number
-        String phoneNumber = user.getPhoneNumber();
-        String userPhone = app.toPhoneNumber(phoneNumber);
-
-        Applicant applicant = new Applicant();
-        applicant.setDob(currentData);
-        applicant.setLastname(user.getLastName());
-        applicant.setIdNumber(userPhone);
-        applicant.setFirstname(user.getFirstName());
-        applicant.setIdType(idType); //Todo: Confirm what is the id type of "KYC"
-        applicant.setPhone(userPhone);
-
-        AddressVerificationRequestVerifyme addressVerificationRequestVerifyme1 = new AddressVerificationRequestVerifyme();
-        addressVerificationRequestVerifyme1.setApplicant(applicant);
-        addressVerificationRequestVerifyme1.setLga(addressVerificationRequestVerifyme.getLga());
-        addressVerificationRequestVerifyme1.setState(addressVerificationRequestVerifyme.getState());
-        addressVerificationRequestVerifyme1.setStreet(addressVerificationRequestVerifyme.getStreet());
-        addressVerificationRequestVerifyme1.setLandmark(addressVerificationRequestVerifyme.getLandmark());
-
-        Response<VerifyMeAddressVerificationResponse> response = kycService.getAddressVerification(addressVerificationRequestVerifyme1);
-        if (!response.isSuccessful())
-            return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                    false, "Details Provided is invalid");
-
-        KycAddressVerification kycAddressVerification = new KycAddressVerification();
-        kycAddressVerification.setUserId(user.getUuid());
-        kycAddressVerification.setBirthdate(response.body().getData().getApplicant().getBirthdate());
-        kycAddressVerification.setFirstname(response.body().getData().getApplicant().getFirstname());
-        kycAddressVerification.setLastname(response.body().getData().getApplicant().getLastname());
-        kycAddressVerification.setGender(response.body().getData().getApplicant().getGender());
-        kycAddressVerification.setMiddlename(response.body().getData().getApplicant().getMiddlename());
-        kycAddressVerification.setPhone(response.body().getData().getApplicant().getPhone());
-        kycAddressVerification.setIdType(response.body().getData().getApplicant().getIdType());
-        kycAddressVerification.setIdNumber(response.body().getData().getApplicant().getIdNumber());
-        kycAddressVerification.setPhoto(response.body().getData().getApplicant().getPhoto());
-
-        kycAddressVerification.setResID(Long.valueOf(response.body().getData().getId()));
-        kycAddressVerification.setCountry(response.body().getData().getCountry());
-        kycAddressVerification.setCity(response.body().getData().getCity());
-        kycAddressVerification.setLga(response.body().getData().getLga());
-        kycAddressVerification.setStreet(response.body().getData().getStreet());
-        kycAddressVerification.setLattitude(response.body().getData().getLattitude());
-        kycAddressVerification.setLongitude(response.body().getData().getLongitude());
-        kycAddressVerification.setState(response.body().getData().getState());
-        kycAddressVerification.setReference(response.body().getData().getReference());
-        kycAddressVerification.setStatus(response.body().getData().getStatus().getStatus());
-        kycAddressVerification.setSubStatus(response.body().getData().getStatus().getSubStatus());
-
-        kycAddressRepository.save(kycAddressVerification);
-        return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
-                true, "Address verification Request Submitted.");
+        return kycService.VerifyAddress(addressVerificationRequestVerifyme, authentication);
     }
 
     @PostMapping("/v1/kyc/verifyme/webhook")
-    public APIResponse<String> verifyId(@RequestBody VerifymeWebhook verifymeWebhook) {
-        if (verifymeWebhook != null) {
-            Long id = Long.valueOf(verifymeWebhook.getData().getId());
+    public APIResponse<String> verifyId(@RequestBody AddressVerificationWebhookRequest addressVerificationWebhookRequest) {
+        if (addressVerificationWebhookRequest != null) {
+            Long id = Long.valueOf(addressVerificationWebhookRequest.getData().getId());
             KycAddressVerification kycAddressVerification = kycAddressRepository.findByResID(id).orElseThrow(null);
             User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
             if (user != null) {
 
-                if (verifymeWebhook.getData().getStatus().getStatus().contains("VERIFIED") && verifymeWebhook.getData().getStatus().getStatus().contains("VERIFIED")) {
-//            Update Kyc detail address
-                    kycAddressVerification.setStatus(verifymeWebhook.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(verifymeWebhook.getData().getStatus().getStatus());
+                if (addressVerificationWebhookRequest.getData().getStatus().getStatus().contains("VERIFIED")) {
+//                  Update Kyc detail address
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
-//            Update user kyc level
+//                  Update user kyc level
                     user.setKycLevel(3);
                     userRepository.save(user);
 
@@ -192,12 +126,9 @@ public class KYCController {
                             true, "Address verification Completed");
                 } else {
                     // Update Kyc detail address
-                    kycAddressVerification.setStatus(verifymeWebhook.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(verifymeWebhook.getData().getStatus().getStatus());
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
-                    user.setKycLevel(3);
-                    userRepository.save(user);
-                    // Send Email User
                     kycService.sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "KYC Upgrade Status");
                     // Send SMS User
                     kycService.sendSMS(kycAddressVerification.getPhone(), "kyc.verification.sms.level.two.upgraded");
