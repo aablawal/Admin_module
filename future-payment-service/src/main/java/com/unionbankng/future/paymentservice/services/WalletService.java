@@ -54,8 +54,8 @@ public class WalletService implements Serializable {
                 .readTimeout(50, TimeUnit.SECONDS)
                 .build();
 
-        Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
-                .client(getUnsafeOkHttpClient())
+        Retrofit retrofit = new Retrofit.Builder().client(getUnsafeOkHttpClient())
+                .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(walletBaseURL)
                 .build();
         walletServiceInterface = retrofit.create(WalletServiceInterface.class);
