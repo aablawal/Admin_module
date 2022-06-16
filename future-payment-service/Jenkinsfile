@@ -9,7 +9,7 @@ pipeline {
     }
 
     tools {
-                   jdk "jdk-14"
+                   jdk "jdk-8"
                 }
 
     stages {
