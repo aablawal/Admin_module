@@ -1,4 +1,5 @@
 package com.unionbankng.future.authorizationserver.controllers;
+
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
@@ -16,12 +17,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import retrofit2.Response;
 
 import javax.validation.Valid;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -38,46 +37,19 @@ public class KYCController {
 
 
     @PostMapping("/v1/kyc/initiation")
-    public APIResponse<?> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam String dob){
+    public APIResponse<?> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam String dob) {
 
         app.print("initiateKYC");
-
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
+        User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
-        if(bvn==null || !app.validBvn(bvn))
-            return new APIResponse("Provide user verified BVN Number",
-                    false, null);
+        if (user == null)
+            return new APIResponse("User not found", false, null);
 
-        if(user != null && app.validBvn(bvn)) {
+        if (bvn == null || !app.validBvn(bvn))
+            return new APIResponse("Provide user verified BVN Number", false, null);
 
-            APIResponse<Map<String, String>> walletResponse = walletService.createWallet(String.valueOf(user.getUuid()), user.getFirstName() + " " + user.getLastName(), bvn);
-            if (walletResponse.isSuccess() && walletResponse.getPayload() != null && Objects.equals(walletResponse.getPayload().get("code"), "000")) {
-                app.print("Wallet created successfully");
-                user.setWalletId(walletResponse.getPayload().get("walletId"));
-            }else {
-                return new APIResponse<>("Sorry, Wallet creation failed at this time, try again soon!", false, null);
-            }
-
-            user.setBvn(bvn);
-            user.setKycLevel(1);
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
-                Date dateOfBirth = formatter.parse(dob);
-                user.setDateOfBirth(dateOfBirth);
-                userRepository.save(user);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-
-            return new APIResponse<>("BVN Added",
-                    true, user);
-        }else{
-            return new APIResponse("Invalid BVN Number",
-                    false, null);
-        }
+        return walletService.createWallet(user, bvn, dob);
 
     }
 
@@ -85,131 +57,66 @@ public class KYCController {
     public APIResponse<String> verifyId(
             @Valid @RequestParam(value = "data") String bioData,
             @RequestParam(value = "selfieImage") MultipartFile selfieImage,
-            @RequestParam(value = "idImage") MultipartFile idImage,OAuth2Authentication authentication) throws Exception {
+            @RequestParam(value = "idImage") MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
 
         VerifyKycRequest verifyKycRequest = app.getMapper().readValue(bioData, VerifyKycRequest.class);
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
-        if(user!=null) {
-            if (user.getKycLevel() >=2) {
+        User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
+
+        if (user == null)
+            return new APIResponse<>("Authentication Failed", false, null);
+
+        if (user.getKycLevel() >= 2)
+            return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()), false, null);
+
+
+        if (user.getGender() == null && verifyKycRequest.getGender() != null && !verifyKycRequest.getGender().isEmpty())
+            user.setGender(verifyKycRequest.getGender());
+
+        if (user.getGender() != null && user.getGender().startsWith("M") || user.getGender().startsWith("m")) {
+            user.setGender("Male");
+        } else if (user.getGender() != null && user.getGender().startsWith("F") || user.getGender().startsWith("f")) {
+            user.setGender("Female");
+        }
+
+        userRepository.save(user);
+
+        switch (verifyKycRequest.getIdType()) {
+            case "INTERNATIONAL-PASSPORT":
+                return kycService.VerifyInternationalPassport(verifyKycRequest, selfieImage, idImage, user);
+            case "VOTERS-CARD":
+                return kycService.VerifyVotersCard(verifyKycRequest, selfieImage, idImage, user);
+            case "DRIVERS-LICENSE":
+                return kycService.VerifyDriverLicence(verifyKycRequest, selfieImage, idImage, user);
+            case "NATIONAL-IDENTITY":
+                return kycService.VerifyNIN(verifyKycRequest, selfieImage, idImage, user);
+            default:
                 return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                        false, null);
-            }
-
-            if(user.getGender() == null && verifyKycRequest.getGender()!=null && !verifyKycRequest.getGender().isEmpty()) {
-                user.setGender(verifyKycRequest.getGender());
-            }
-            if(user.getGender() != null && user.getGender().startsWith("M") || user.getGender().startsWith("m")) {
-                user.setGender("Male");
-            }else if (user.getGender() != null && user.getGender().startsWith("F") || user.getGender().startsWith("f")){
-                user.setGender("Female");
-            }
-            userRepository.save(user);
-
-            switch (verifyKycRequest.getIdType()) {
-                case "INTERNATIONAL-PASSPORT":
-                    return kycService.VerifyInternationalPassport(verifyKycRequest, selfieImage, idImage, user);
-                case "VOTERS-CARD":
-                    return kycService.VerifyVotersCard(verifyKycRequest, selfieImage, idImage, user);
-                case "DRIVERS-LICENSE":
-                    return kycService.VerifyDriverLicence(verifyKycRequest, selfieImage, idImage, user);
-                case "NATIONAL-IDENTITY":
-                    return kycService.VerifyNIN(verifyKycRequest, selfieImage, idImage, user);
-                default:
-                    return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                            false, "The detail you provide is invalid");
-            }
-        }else{
-            return new APIResponse<>("Authentication Failed",
-                    false, null);
+                        false, "The detail you provide is invalid");
         }
 
     }
 
 
     @PostMapping("/v1/kyc/address_verification")
-    public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequestVerifyme addressVerificationRequestVerifyme,OAuth2Authentication authentication) throws Exception {
-//        String[] params = new String[]{userid, "User"};
-        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
-        User user =userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
-
-        assert user != null;
-        if(user.getKycLevel()==3 || user.getKycLevel()==5) //Todo: Ask Rabiu what KYC level 5 is
-            return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                            false,  "User Already verified");
-
-
-        String idType = "KYC";
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String currentData = sdf.format(user.getDateOfBirth());
-
-        // format the phone number
-        String phoneNumber = user.getPhoneNumber();
-        String userPhone = app.toPhoneNumber(phoneNumber);
-        
-        Applicant applicant = new Applicant();
-        applicant.setDob(currentData);
-        applicant.setLastname(user.getLastName());
-        applicant.setIdNumber(userPhone);
-        applicant.setFirstname(user.getFirstName());
-        applicant.setIdType(idType); //Todo: Confirm what is the id type of "KYC"
-        applicant.setPhone(userPhone);
-
-        AddressVerificationRequestVerifyme addressVerificationRequestVerifyme1 = new AddressVerificationRequestVerifyme();
-        addressVerificationRequestVerifyme1.setApplicant(applicant);
-        addressVerificationRequestVerifyme1.setLga(addressVerificationRequestVerifyme.getLga());
-        addressVerificationRequestVerifyme1.setState(addressVerificationRequestVerifyme.getState());
-        addressVerificationRequestVerifyme1.setStreet(addressVerificationRequestVerifyme.getStreet());
-        addressVerificationRequestVerifyme1.setLandmark(addressVerificationRequestVerifyme.getLandmark());
-
-        Response<VerifyMeAddressVerificationResponse> response = kycService.getAddressVerification(addressVerificationRequestVerifyme1);
-        if (!response.isSuccessful())
-            return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                    false, "Details Provided is invalid");
-
-        KycAddressVerification kycAddressVerification = new KycAddressVerification();
-        kycAddressVerification.setUserId(user.getUuid());
-        kycAddressVerification.setBirthdate(response.body().getData().getApplicant().getBirthdate());
-        kycAddressVerification.setFirstname(response.body().getData().getApplicant().getFirstname());
-        kycAddressVerification.setLastname(response.body().getData().getApplicant().getLastname());
-        kycAddressVerification.setGender(response.body().getData().getApplicant().getGender());
-        kycAddressVerification.setMiddlename(response.body().getData().getApplicant().getMiddlename());
-        kycAddressVerification.setPhone(response.body().getData().getApplicant().getPhone());
-        kycAddressVerification.setIdType(response.body().getData().getApplicant().getIdType());
-        kycAddressVerification.setIdNumber(response.body().getData().getApplicant().getIdNumber());
-        kycAddressVerification.setPhoto(response.body().getData().getApplicant().getPhoto());
-
-        kycAddressVerification.setResID(Long.valueOf(response.body().getData().getId()));
-        kycAddressVerification.setCountry(response.body().getData().getCountry());
-        kycAddressVerification.setCity(response.body().getData().getCity());
-        kycAddressVerification.setLga(response.body().getData().getLga());
-        kycAddressVerification.setStreet(response.body().getData().getStreet());
-        kycAddressVerification.setLattitude(response.body().getData().getLattitude());
-        kycAddressVerification.setLongitude(response.body().getData().getLongitude());
-        kycAddressVerification.setState(response.body().getData().getState());
-        kycAddressVerification.setReference(response.body().getData().getReference());
-        kycAddressVerification.setStatus(response.body().getData().getStatus().getStatus());
-        kycAddressVerification.setSubStatus(response.body().getData().getStatus().getSubStatus());
-
-        kycAddressRepository.save(kycAddressVerification);
-        return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
-                true,  "Address verification Request Submitted.");
+    public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequestVerifyme addressVerificationRequestVerifyme, OAuth2Authentication authentication) throws Exception {
+        return kycService.VerifyAddress(addressVerificationRequestVerifyme, authentication);
     }
 
     @PostMapping("/v1/kyc/verifyme/webhook")
-    public APIResponse<String> verifyId(@RequestBody VerifymeWebhook verifymeWebhook) {
-        if (verifymeWebhook != null) {
-            Long id = Long.valueOf(verifymeWebhook.getData().getId());
+    public APIResponse<String> verifyId(@RequestBody AddressVerificationWebhookRequest addressVerificationWebhookRequest) {
+        if (addressVerificationWebhookRequest != null) {
+            Long id = Long.valueOf(addressVerificationWebhookRequest.getData().getId());
             KycAddressVerification kycAddressVerification = kycAddressRepository.findByResID(id).orElseThrow(null);
             User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
             if (user != null) {
 
-                if (verifymeWebhook.getData().getStatus().getStatus().contains("VERIFIED") && verifymeWebhook.getData().getStatus().getStatus().contains("VERIFIED")) {
-//            Update Kyc detail address
-                    kycAddressVerification.setStatus(verifymeWebhook.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(verifymeWebhook.getData().getStatus().getStatus());
+                if (addressVerificationWebhookRequest.getData().getStatus().getStatus().contains("VERIFIED")) {
+//                  Update Kyc detail address
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
-//            Update user kyc level
+//                  Update user kyc level
                     user.setKycLevel(3);
                     userRepository.save(user);
 
@@ -219,12 +126,9 @@ public class KYCController {
                             true, "Address verification Completed");
                 } else {
                     // Update Kyc detail address
-                    kycAddressVerification.setStatus(verifymeWebhook.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(verifymeWebhook.getData().getStatus().getStatus());
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
-                    user.setKycLevel(3);
-                    userRepository.save(user);
-                    // Send Email User
                     kycService.sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "KYC Upgrade Status");
                     // Send SMS User
                     kycService.sendSMS(kycAddressVerification.getPhone(), "kyc.verification.sms.level.two.upgraded");
@@ -237,7 +141,7 @@ public class KYCController {
                 return new APIResponse<>("Account doesn't exist",
                         false, "User not found");
             }
-        }else{
+        } else {
             return new APIResponse<>("Webhook Data not Found",
                     false, "Address verification failed");
         }
@@ -246,12 +150,11 @@ public class KYCController {
     @GetMapping("/v1/kyc/id_verified_users")
     public List<Kyc> verifiedUsers() {
         return kycRepository.findAll();
-
     }
 
     @GetMapping("/v1/kyc/address_verified_users")
     public List<KycAddressVerification> addressVerifiedUsers() {
-        return  kycAddressRepository.findAll();
+        return kycAddressRepository.findAll();
     }
 
     @GetMapping("/v1/kyc/user/{userId}")
@@ -262,8 +165,8 @@ public class KYCController {
     @PostMapping("/v1/kyc/user/verify")
     public APIResponse<String> verifyKYC(@RequestBody AdminKycRequest adminKycRequest) throws Exception {
         String userid = adminKycRequest.getUserid();
-        User user =userRepository.findByUuid(userid).orElse(null);
-        if(user!=null) {
+        User user = userRepository.findByUuid(userid).orElse(null);
+        if (user != null) {
             // approved or reject user verification
 
             if (adminKycRequest.getStatus().equals("APPROVE")) {
@@ -318,7 +221,7 @@ public class KYCController {
                             true, "Address Verification rejected");
                 }
             }
-        }else{
+        } else {
             return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
                     true, "Address Verification rejected");
         }

@@ -33,12 +33,12 @@ public class UBNNewAccountOpeningAPIServiceHandler {
     @Value("${unionbankng.base.url}")
     private String ubnBaseURL;
 
-    @Value("#{${unionbankng.credentials}}")
-    private Map<String, String> credentials;
-
     private UBNNewAccountOpeningAPIService ubnAccountAPIService;
     @Autowired
     private  App app;
+    @Autowired
+    private  UBNAuthService authService;
+
     OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
 
     @PostConstruct
@@ -51,24 +51,11 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         ubnAccountAPIService= retrofit.create(UBNNewAccountOpeningAPIService.class);
 
     }
-
-
-
-    public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
-
-        Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
-                credentials.get("grantType"),credentials.get("clientId"));
-
-        Response<UBNAuthServerTokenResponse> response =  responseCall.execute();
-
-        return  response.body();
-
-    }
-
+    
 
     public Response<AccountIdTypesResponse> getSupportedIdTypesForAccount() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -83,7 +70,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
     public Response<AccountProductTypeResponse> getAccountProductTypes(AccountProductTypeRequest request) throws IOException {
 
         app.print("Getting account types... ");
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -96,7 +83,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<ProductDetailsResponse> getAccountProductDetails(String productCode) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -109,7 +96,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNCountryResponse> getCountriesForAccount() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -122,7 +109,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNStateByCountryResponse> getStatesByCountryForAccount(String countryCode) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -135,7 +122,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNCitiesResponse> getCitiesByCountryAndStateForAccount(String countryCode, String stateCode) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -148,7 +135,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNBranchesResponse> getUBNBranches() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -161,7 +148,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<AccountProductTypeResponse> getUBNGenders() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -174,7 +161,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<AccountProductTypeResponse> getMaritalStatus() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -187,7 +174,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNCustomerTypeRequest> getCustomerTypes() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -200,7 +187,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNAccountTypeResponse> getUBNAccountTypes() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -213,7 +200,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNCustomerSegmentResponse> getCustomersSegment() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -226,7 +213,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNCustomerTypeRequest> getSourceOfFund() throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -240,7 +227,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNCreateAccountNewCustomerResponse> createUBNNewCustomerAccount(UBNCreateAccountNewCustomerRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -265,7 +252,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<AccountProductTypeResponse> getDocumentTypes(String productCode) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -278,7 +265,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNGenericResponse> uploadDocumentForAccount(Long recordId, Integer type, MultipartFile file) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -300,7 +287,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNGenericResponse> submitDocumentsForAccount(Long recordId, String bvn) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -313,7 +300,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNAccountPaymentResponse> accountPaymentUBN1(Long customerId, Boolean isReactivated, UBNAccountPaymentRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -326,7 +313,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNAccountPaymentResponse> accountPaymentUBN2(Long customerId, String oldAccount, UBNAccountPaymentRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -339,7 +326,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNGenericResponse> confirmUBNPaymentStatus(Long customerId) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -352,7 +339,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNCompleteAccountPaymentResponse> completeUBNAccountCreation(UBNAccountCreationRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -379,7 +366,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
 
     public Response<UBNAccountDataResponse> getUBNAccountDetails(Long accountId) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;

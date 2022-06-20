@@ -1,12 +1,16 @@
 package com.unionbankng.future.authorizationserver.services;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.*;
+import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.retrofitservices.KYCServiceInterface;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
 import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.JWTUserDetailsExtractor;
 import com.unionbankng.future.authorizationserver.utils.SMSSender;
 import com.unionbankng.future.authorizationserver.utils.UnsafeOkHttpClient;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
@@ -17,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -44,6 +50,7 @@ public class KYCService {
     private final MessageSource messageSource;
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
+    private final KycAddressRepository kycAddressRepository;
     private final App app;
     OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
 
@@ -105,16 +112,21 @@ public class KYCService {
 
     public Response<KycApiResponse<PassportFaceMatchResponse>> getPassportFaceMatch(PassportFaceMatchRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getPassportFaceMatch(token, request).execute();
     }
 
     public Response<KycApiResponse<VotersCardFaceMatchResponse>> getVotersCardFaceMatch(VotersCardFaceMatchRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print("request: " + request);
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getVotersCardFaceMatch(token, request).execute();
     }
 
     public Response<KycApiResponse<DriversLicenceFaceMatchResponse>> getDriverLicenseFaceMatch(DriversLicenceFaceMatchRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print("request: " + request);
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getDriverLicenseFaceMatch(token, request).execute();
     }
 
@@ -125,6 +137,8 @@ public class KYCService {
 
     public Response<KycApiResponse<VerifyMeResponse>> getIdentityBiometrics(IdentityBiometricsRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+        app.print("request: " + request);
+        app.print(new Gson().toJson(request));
         return kycServiceInterface.getIdentityBiometrics(token, request).execute();
     }
 
@@ -142,7 +156,7 @@ public class KYCService {
 
         } else {
             String selfieImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(selfieImage.getBytes());
-            String idImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
+            String idImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(idImage.getBytes());
             Date dateOfBirth = user.getDateOfBirth();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             String dateOfBirthString = formatter.format(dateOfBirth);
@@ -182,14 +196,12 @@ public class KYCService {
                     String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
                     app.print("Uploaded... " + savedIdImageUrl);
 
-
                     //Step one & two verification
                     if (response.body().isSuccess() && response.body().getData().getVerificationStatus().equals("VERIFIED")) {
                         // Step three verification name matches
 //                        if (response.body().getData().getResponse().getFirst_name().equalsIgnoreCase(passportFaceMatchRequest2.getFirstName()) && response.body().getData().getResponse().getLast_name().equalsIgnoreCase(passportFaceMatchRequest2.getLastName())) { //TODO : Confirm match before sending to production
                         if (true) { // TODO: To be removed before pushing to production
                             //Step four id card expiry validation
-
 
                             Kyc kyc = new Kyc();
                             kyc.setVerificationStatus(true);
@@ -383,7 +395,9 @@ public class KYCService {
 
             app.print(driversLicenceFaceMatchRequest);
             Response<KycApiResponse<DriversLicenceFaceMatchResponse>> response = getDriverLicenseFaceMatch(driversLicenceFaceMatchRequest);
-            if (response.isSuccessful()) {
+            app.print("DriversLicenceFaceMatchResponse VERIFICATION RESPONSE");
+            app.print(response.body());
+            if (response.body().isSuccess()) {
 
                 Kyc kyc = new Kyc();
 
@@ -396,6 +410,7 @@ public class KYCService {
                 String idFileName = "id-" + randomNumber + "-" + user.getUuid() + ".jpg";
                 String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
                 app.print("Uploaded... " + savedSelfieUrl);
+
 
                 if (response.body() != null && response.body().isSuccess()) {
 
@@ -443,7 +458,7 @@ public class KYCService {
                     // Send push sms to user
                     sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.not.verified");
 
-                    return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                    return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                             true, "Verification Sent for manual approval");
                 }
             } else {
@@ -533,7 +548,7 @@ public class KYCService {
                 // Send push sms to user
                 sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.email.not.verified");
 
-                return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                         true, "Verification Sent for manual approval");
             }
         }
@@ -564,5 +579,115 @@ public class KYCService {
         sms.setMessage(message);
         sms.setRecipient(recipient);
         smsSender.sendSMS(sms);
+    }
+
+    public APIResponse<String> VerifyAddress(AddressVerificationRequestVerifyme addressVerificationRequestVerifyme, OAuth2Authentication authentication) {
+        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
+
+        assert user != null;
+        if (user.getKycLevel() == 3 || user.getKycLevel() == 5) //Todo: Ask Rabiu what KYC level 5 is
+            return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+                    false, "User Already verified");
+
+
+        String idType = "KYC";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String currentData = sdf.format(user.getDateOfBirth());
+
+        // format the phone number
+        String phoneNumber = user.getPhoneNumber();
+        String userPhone = app.toPhoneNumber(phoneNumber);
+
+        Applicant applicant = new Applicant();
+        applicant.setDob(currentData);
+        applicant.setLastname(user.getLastName());
+        applicant.setIdNumber(userPhone);
+        applicant.setFirstname(user.getFirstName());
+        applicant.setIdType(idType);
+        applicant.setPhone(userPhone);
+
+        AddressVerificationRequestVerifyme addressVerificationRequestVerifyme1 = new AddressVerificationRequestVerifyme();
+        addressVerificationRequestVerifyme1.setApplicant(applicant);
+        addressVerificationRequestVerifyme1.setLga(addressVerificationRequestVerifyme.getLga());
+        addressVerificationRequestVerifyme1.setState(addressVerificationRequestVerifyme.getState());
+        addressVerificationRequestVerifyme1.setStreet(addressVerificationRequestVerifyme.getStreet());
+        addressVerificationRequestVerifyme1.setLandmark(addressVerificationRequestVerifyme.getLandmark());
+
+        Response<VerifyMeAddressVerificationResponse> response = null;
+        try {
+            response = getAddressVerification(addressVerificationRequestVerifyme1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (!response.isSuccessful())
+            return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+                    false, "Request Failed");
+
+        KycAddressVerification kycAddressVerification = new KycAddressVerification();
+        kycAddressVerification.setUserId(user.getUuid());
+        kycAddressVerification.setBirthdate(response.body() != null ? response.body().getData().getApplicant().getBirthdate() : null);
+        kycAddressVerification.setFirstname(response.body().getData().getApplicant().getFirstname());
+        kycAddressVerification.setLastname(response.body().getData().getApplicant().getLastname());
+        kycAddressVerification.setGender(response.body().getData().getApplicant().getGender());
+        kycAddressVerification.setMiddlename(response.body().getData().getApplicant().getMiddlename());
+        kycAddressVerification.setPhone(response.body().getData().getApplicant().getPhone());
+        kycAddressVerification.setIdType(response.body().getData().getApplicant().getIdType());
+        kycAddressVerification.setIdNumber(response.body().getData().getApplicant().getIdNumber());
+        kycAddressVerification.setPhoto(response.body().getData().getApplicant().getPhoto());
+
+        kycAddressVerification.setResID(Long.valueOf(response.body().getData().getId()));
+        kycAddressVerification.setCountry(response.body().getData().getCountry());
+        kycAddressVerification.setCity(response.body().getData().getCity());
+        kycAddressVerification.setLga(response.body().getData().getLga());
+        kycAddressVerification.setStreet(response.body().getData().getStreet());
+        kycAddressVerification.setLattitude(response.body().getData().getLattitude());
+        kycAddressVerification.setLongitude(response.body().getData().getLongitude());
+        kycAddressVerification.setState(response.body().getData().getState());
+        kycAddressVerification.setReference(response.body().getData().getReference());
+        kycAddressVerification.setStatus(response.body().getData().getStatus().getStatus());
+        kycAddressVerification.setSubStatus(response.body().getData().getStatus().getSubStatus());
+
+        kycAddressRepository.save(kycAddressVerification);
+        return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                true, "Address verification Request Submitted.");
+    }
+
+    public APIResponse<String> processWebhookRequest(@RequestBody AddressVerificationWebhookRequest addressVerificationWebhookRequest) {
+        if (addressVerificationWebhookRequest != null) {
+            Long id = Long.valueOf(addressVerificationWebhookRequest.getData().getId());
+            KycAddressVerification kycAddressVerification = kycAddressRepository.findByResID(id).orElseThrow(null);
+            User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
+            if (user != null) {
+                if (addressVerificationWebhookRequest.getData().getStatus().getStatus().contains("VERIFIED")) {
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressRepository.save(kycAddressVerification);
+                    user.setKycLevel(3);
+                    userRepository.save(user);
+
+                    // Send Email User
+                    sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "KYC Upgrade Status");
+                    return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                            true, "Address verification Completed");
+                } else {
+                    // Update Kyc detail address
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressRepository.save(kycAddressVerification);
+                    sendKycEmailUser(user, "kyc.verification.email.level.two.failed.upgrade", "KYC Upgrade Status");
+                    // Send SMS User
+                    sendSMS(kycAddressVerification.getPhone(), "kyc.verification.sms.level.two.failed.upgrade");
+                    return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+                            false, "Error validating address, Please try again later");
+                }
+            } else {
+                return new APIResponse<>("Account doesn't exist",
+                        false, "User not found");
+            }
+        } else {
+            return new APIResponse<>("Webhook Data not Found",
+                    false, "Address verification failed");
+        }
     }
 }

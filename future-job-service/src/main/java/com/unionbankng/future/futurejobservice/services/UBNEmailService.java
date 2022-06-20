@@ -28,9 +28,9 @@ import java.util.Calendar;
 public class UBNEmailService {
 
     private UBNEmailServiceInterface ubnEmailServiceInterface;
-    private final UBNEmailAuthService ubnEmailAuthService;
+    private final UBNAuthService authService;
     private final App app;
-    @Value("${production.unionbankng.base.url}")
+    @Value("${unionbankng.base.url}")
     private String ubnBaseURL;
     private final TemplateEngine templateEngine;
 
@@ -48,7 +48,7 @@ public class UBNEmailService {
     public APIResponse sendEmail(EmailBody body) {
         try {
             app.print("Sending Email...");
-            String authorization = String.format("Bearer %s", ubnEmailAuthService.getUBNAuthServerToken().getAccess_token());
+            String authorization = String.format("Bearer %s", authService.getUBNAuthServerToken().getAccess_token());
             // app.print(authorization);
             Response<UbnEmailResponse> responseCall = ubnEmailServiceInterface.sendEmail(authorization, processEmailTemplate(body)).execute();
             UbnEmailResponse response = responseCall.body();

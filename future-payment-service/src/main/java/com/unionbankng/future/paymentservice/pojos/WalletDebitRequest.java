@@ -13,6 +13,8 @@ public @Data class WalletDebitRequest {
 	private String creditAccountType;
 	private String creditAccountName;
 	private String creditAccountNumber;
+	private String creditAccountBankCode;
+	private String creditAccountBankName;
 	private String creditAccountBranch;
 	private String transactionType;
 	private String naration;

@@ -29,16 +29,12 @@ public class UBNAccountAPIServiceHandler {
 
     Logger logger = LoggerFactory.getLogger(UBNAccountAPIServiceHandler.class);
 
-   @Value("${unionbankng.base.url}")
+    @Value("${unionbankng.base.url}")
     private String ubnBaseURL;
-
-   @Value("#{${unionbankng.credentials}}")
-    private Map<String, String> credentials;
-
-
 
     private UBNAccountAPIService ubnAccountAPIService;
     private final App app;
+    private  final  UBNAuthService authService;
 
     OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
 
@@ -50,38 +46,12 @@ public class UBNAccountAPIServiceHandler {
         ubnAccountAPIService= retrofit.create(UBNAccountAPIService.class);
     }
 
-
-       public UBNAuthServerTokenResponse getUBNAuthServerToken() throws IOException {
-        logger.info("Fetching Auth Server Token");
-
-        Call<UBNAuthServerTokenResponse> responseCall = ubnAccountAPIService.getAuthServerToken(credentials.get("username"),
-                credentials.get("password"),credentials.get("clientSecret"), credentials.get("grantType"),
-                credentials.get("clientId"));
-
-
-        UBNAuthServerTokenResponse response=  responseCall.execute().body();
-        app.print("/authserv/oauth/token is :"+ (response != null ? "fetched" : "null"));
-        return response;
-    }
-
-    public UBNAuthServerTokenResponse getUBNAccountServerToken() throws IOException {
-
-
-        logger.info("Fetching Account Server Token");
-
-
-        Call<UBNAuthServerTokenResponse> responseCall =  ubnAccountAPIService.getAccountServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
-                credentials.get("grantType"),credentials.get("clientId"));
-        UBNAuthServerTokenResponse response=  responseCall.execute().body();
-        app.print("/ubnmiserv/oauth/token is :"+ (response != null ? "fetched" : null));
-        return  response;
-    }
     
     public Response<BVNValidationResponse> validateCustomerBVN(ValidateBvnRequest request) throws IOException {
 
         logger.info("Fetching BVN Validation");
 
-        UBNAuthServerTokenResponse response = getUBNAuthServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAuthServerToken();
 
         logger.info("Auth token response is : {}",response == null ? "null" : "fetched");
         if(response == null)
@@ -95,7 +65,7 @@ public class UBNAccountAPIServiceHandler {
 
     public Response<BVNVerificationResponse> verifyCustomerBVN(VerifyBvnRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAuthServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAuthServerToken();
 
         logger.info("Auth token response is : {}",response == null ? "null" : "fetched");
         if(response == null)
@@ -110,7 +80,7 @@ public class UBNAccountAPIServiceHandler {
 
    public Response<UBNGetAccountsResponse> getAccountsByMobileNumber(UBNGetAccountsRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -127,7 +97,7 @@ public class UBNAccountAPIServiceHandler {
 
     public Response<UBNCreateAccountResponse> openAccountForNewCustomer(UBNCreateAccountNewCustomerRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         logger.info("Auth token response is : {}",response == null ? "null" : "fetched");
 
@@ -142,7 +112,7 @@ public class UBNAccountAPIServiceHandler {
 
     public Response<UBNCreateAccountResponse> openAccountForExistingCustomer(UBNOpenAccountExistingCustomerRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         logger.info("Auth token response is : {}",response == null ? "null" : "fetched");
 
@@ -156,7 +126,7 @@ public class UBNAccountAPIServiceHandler {
     }
 
     public Response<UBNFundTransferResponse> transferFundsUBN(UBNFundTransferRequest request) throws IOException {
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
         app.print("############Funds Transfer Started");
         if(response == null)
             return null;
@@ -165,7 +135,7 @@ public class UBNAccountAPIServiceHandler {
     }
 
     public Response<UBNBulkFundTransferResponse> transferBulkFundsUBN(UBNBulkFundTransferRequest request) throws IOException {
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
         if(response == null)
             return null;
         Response<UBNBulkFundTransferResponse> responseResponse= ubnAccountAPIService.bulkFundsTransferUBN(response.getAccess_token(),request).execute();
@@ -175,7 +145,7 @@ public class UBNAccountAPIServiceHandler {
 
     public Response<UbnCustomerAccountEnquiryResponse> accountEnquiry(UbnCustomerEnquiryRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;
@@ -186,7 +156,7 @@ public class UBNAccountAPIServiceHandler {
 
     public Response<UBNAccountStatementResponse> accountStatement(UBNAccountStatementRequest request) throws IOException {
 
-        UBNAuthServerTokenResponse response = getUBNAccountServerToken();
+        UBNAuthServerTokenResponse response = authService.getUBNAccountServerToken();
 
         if(response == null)
             return null;

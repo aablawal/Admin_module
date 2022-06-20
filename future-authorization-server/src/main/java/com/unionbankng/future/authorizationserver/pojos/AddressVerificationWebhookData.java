@@ -3,7 +3,7 @@ package com.unionbankng.future.authorizationserver.pojos;
 import lombok.Data;
 
 @Data
-public class VerifymeWebhookData {
+public class AddressVerificationWebhookData {
     private String id;
     private VerfiymeWebHookApplicant applicant;
     private String createdAt;

@@ -30,8 +30,9 @@ public class EmailService {
 
 
     public void sendEmail(EmailMessage message) {
-      EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{message.getBody()}, LocaleContextHolder.getLocale())
-        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(message.getSubject())
+
+      EmailBody emailBody = EmailBody.builder().body(message.getBody())
+              .sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject(message.getSubject())
                 .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(message.getRecipient()).displayName(message.getRecipient()).build())).build();
 
        emailSender.sendEmail(emailBody);

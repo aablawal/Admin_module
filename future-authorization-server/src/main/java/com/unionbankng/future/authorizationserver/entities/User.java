@@ -43,7 +43,7 @@ public class User implements Serializable {
     @Column(length=50, nullable = false, unique = true)
     private String uuid;
 
-    @Column(length=50)
+    @Column(length=50, unique = true)
     private String bvn;
 
     @Column(columnDefinition="TEXT")
