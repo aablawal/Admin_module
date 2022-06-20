@@ -97,10 +97,21 @@ public class WalletService implements Serializable {
         if (bvn == null || !app.validBvn(bvn))
             return new APIResponse("Provide user verified BVN Number", false, null);
 
+
         String userId = user.getUuid();
         String customerName = user.getFirstName() + " " + user.getLastName();
 
         try {
+
+            user.setBvn(bvn);
+            user.setKycLevel(1);
+            user.setBvn(bvn);
+            user.setKycLevel(1);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
+            Date dateOfBirth = formatter.parse(dob);
+            user.setDateOfBirth(dateOfBirth);
+            userRepository.save(user);
+
             WalletAuthResponse auth = getAuth();
 
             if (auth == null)
@@ -117,11 +128,6 @@ public class WalletService implements Serializable {
             if (response.body() != null && Objects.equals(response.body().get("code"), "000")) {
                 app.print("Wallet created successfully");
                 user.setWalletId(response.body().get("walletId"));
-                user.setBvn(bvn);
-                user.setKycLevel(1);
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
-                Date dateOfBirth = formatter.parse(dob);
-                user.setDateOfBirth(dateOfBirth);
                 userRepository.save(user);
                 return new APIResponse("BVN Added", true, user);
             } else {

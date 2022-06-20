@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 
@@ -18,6 +19,8 @@ public class BvnValidationService {
     Logger logger = LoggerFactory.getLogger(BvnValidationService.class);
     private final App app;
     private final UBNAccountAPIServiceHandler ubnAccountAPIServiceHandler;
+
+    private final FutureAuthServiceHandler futureAuthServiceHandler;
 
 
     public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
@@ -40,7 +43,7 @@ public class BvnValidationService {
         }
     }
 
-    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(String bvn,String otp) throws IOException {
+    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(String authToken, String bvn, String otp, String dob) throws IOException {
 
         VerifyBvnRequest request = new VerifyBvnRequest();
         request.setBvn(bvn);
@@ -51,10 +54,16 @@ public class BvnValidationService {
 
         if (response.isSuccessful() && response.body().getData()!=null) {
             app.print("Success block");
+            initiateKYC(authToken, bvn, dob);
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
             app.print("Failure block");
             return ResponseEntity.ok().body(new APIResponse<>(response.body()!=null?response.body().getStatusMessage():"Unable to Verify BVN", false, null));
         }
+    }
+
+    @Async("initiateKycExecutor")
+    void initiateKYC(String authToken, String bvn, String dob)  {
+        futureAuthServiceHandler.initiateKYC(authToken, bvn, dob);
     }
 }

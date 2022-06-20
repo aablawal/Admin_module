@@ -51,13 +51,11 @@ public class BVNController {
     @PostMapping("/v1/bvn/validate_bvn")
     public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(@RequestParam String bvn, @RequestParam String dob) throws IOException {
        return bvnValidationService.validateCustomerBVN(bvn,dob);
-//       return ResponseEntity.ok().body(new APIResponse<>( "Response body is null", true, new BVNValidationResponse("00", "", "")));
     }
 
     @PostMapping("/v1/bvn/verify_bvn")
-    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestParam String bvn, @RequestParam String otp) throws IOException {
-        return bvnValidationService.verifyCustomerBVN(bvn,otp);
-//        return ResponseEntity.ok().body(new APIResponse<>( "Response body is null", true, new BVNVerificationResponse("00", "", new ValidateBvnResponse(), "")));
+    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestHeader(value="Authorization") String authorization, @RequestParam String bvn, @RequestParam String otp, @RequestParam String dob) throws IOException {
+        return bvnValidationService.verifyCustomerBVN(authorization, bvn,otp, dob);
     }
 
 }
