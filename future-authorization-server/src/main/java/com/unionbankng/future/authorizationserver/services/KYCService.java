@@ -586,7 +586,7 @@ public class KYCService {
         User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
         assert user != null;
-        if (user.getKycLevel() == 3 || user.getKycLevel() == 5) //Todo: Ask Rabiu what KYC level 5 is
+        if (user.getKycLevel() == 3)
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                     false, "User Already verified");
 
