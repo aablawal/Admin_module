@@ -38,6 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import retrofit2.Response;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 
@@ -54,7 +55,7 @@ public class BVNController {
     }
 
     @PostMapping("/v1/bvn/verify_bvn")
-    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestHeader(value="Authorization") String authorization, @RequestParam String bvn, @RequestParam String otp, @RequestParam String dob) throws IOException {
+    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestHeader(value="Authorization") String authorization, @RequestParam String bvn, @RequestParam String otp, @RequestParam(required = false) String dob) throws IOException {
         return bvnValidationService.verifyCustomerBVN(authorization, bvn,otp, dob);
     }
 
