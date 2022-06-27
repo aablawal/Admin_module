@@ -38,7 +38,7 @@ public class KYCController {
 
 
     @PostMapping("/v1/kyc/initiation")
-    public APIResponse<Map<String, String>> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam String dob) {
+    public APIResponse<Map<String, String>> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam(required = false) String dob) {
 
         app.print("initiateKYC");
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);

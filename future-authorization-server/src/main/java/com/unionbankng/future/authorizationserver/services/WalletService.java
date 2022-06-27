@@ -108,8 +108,10 @@ public class WalletService implements Serializable {
             user.setBvn(bvn);
             user.setKycLevel(1);
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
-            Date dateOfBirth = formatter.parse(dob);
-            user.setDateOfBirth(dateOfBirth);
+            if(dob != null){
+                Date dateOfBirth = formatter.parse(dob);
+                user.setDateOfBirth(dateOfBirth);
+            }
             userRepository.save(user);
 
             WalletAuthResponse auth = getAuth();
