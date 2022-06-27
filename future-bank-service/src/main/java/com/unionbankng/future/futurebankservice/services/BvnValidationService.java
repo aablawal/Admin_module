@@ -64,6 +64,10 @@ public class BvnValidationService {
 
     @Async("initiateKycExecutor")
     void initiateKYC(String authToken, String bvn, String dob)  {
+        app.print("###Async Initiating KYC");
+        app.print("###Auth Token: " + authToken);
+        app.print("###BVN: " + bvn);
+        app.print("###DOB: " + (dob == null ? "null" : dob));
         futureAuthServiceHandler.initiateKYC(authToken, bvn, dob);
     }
 }
