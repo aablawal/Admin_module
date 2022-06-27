@@ -43,7 +43,7 @@ public class FutureAuthServiceHandler {
             authServiceInterface.initiateKYC(authToken, bvn, dob).execute();
         } catch (IOException e) {
             app.print("Unable to initiate KYC");
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
     }
 
