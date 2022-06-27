@@ -62,7 +62,7 @@ public class BvnValidationService {
         }
     }
 
-    @Async("initiateKycExecutor")
+//    @Async("initiateKycExecutor")
     void initiateKYC(String authToken, String bvn, String dob)  {
         app.print("###Async Initiating KYC");
         app.print("###Auth Token: " + authToken);
