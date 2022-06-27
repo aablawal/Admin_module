@@ -39,6 +39,7 @@ public class FutureAuthServiceHandler {
 
     public void initiateKYC(String authToken, String bvn, String dob){
         try {
+            app.print("Calling Future Auth Service to initiate KYC");
             authServiceInterface.initiateKYC(authToken, bvn, dob).execute();
         } catch (IOException e) {
             app.print("Unable to initiate KYC");
