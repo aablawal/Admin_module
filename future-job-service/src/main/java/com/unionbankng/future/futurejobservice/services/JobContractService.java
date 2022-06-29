@@ -166,7 +166,13 @@ public class JobContractService implements Serializable {
     public APIResponse approveJobProposal(String authToken,JwtUserDetail currentUser, JobContract contract) {
         try {
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
+            if(Objects.isNull(proposal))
+                return new APIResponse("Proposal not found", false, null);
+
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
+            if(Objects.isNull(job))
+                return new APIResponse("Job not found", false, null);
+
             String contractReferenceId = app.makeUIID();
             String paymentReferenceId = app.makeUIID();
             contract.setPeppfees(0); //set peprest charges to zero
@@ -197,7 +203,7 @@ public class JobContractService implements Serializable {
                 status = 1;
                 //fire notification
                 User user =userService.getUserById(proposal.getUserId());
-                if (job != null && user!=null) {
+                if (user!=null) {
                     NotificationBody body = new NotificationBody();
                     body.setBody(currentUser.getUserFullName() + " approved your contract and the amount will be paid to you base on the milestone you complete");
                     body.setSubject("Proposal Approval");

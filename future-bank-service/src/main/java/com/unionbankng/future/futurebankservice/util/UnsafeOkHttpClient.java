@@ -45,7 +45,6 @@ public class UnsafeOkHttpClient {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-
             OkHttpClient okHttpClient = builder.connectTimeout(10, TimeUnit.SECONDS)
                     .writeTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(interceptor).build();

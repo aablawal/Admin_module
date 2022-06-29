@@ -18,12 +18,6 @@ public class WalletController {
     private final App app;
 
 
-    @GetMapping("/test")
-    public String test() {
-        System.out.println("test");
-        return "Hello World";
-    }
-
     @PostMapping("/initiate-wallet-funding")
     public ApiResponse<?> initiateWalletFunding(@RequestBody InitiateFundingRequest request)  {
         app.print("Initiating wallet funding : ");
