@@ -43,6 +43,13 @@ public class UBNAccountAPIServiceHandler {
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ubnBaseURL)
                 .build();
+        app.print("####UBNAccountAPIServiceHandler ubnBaseURL");
+        app.print("####UBNAccountAPIServiceHandler ubnBaseURL");
+        app.print("####UBNAccountAPIServiceHandler ubnBaseURL");
+        app.print("####UBNAccountAPIServiceHandler ubnBaseURL");
+        app.print("####UBNAccountAPIServiceHandler ubnBaseURL");
+        app.print("####UBNAccountAPIServiceHandler ubnBaseURL");
+        app.print(ubnBaseURL);
         ubnAccountAPIService= retrofit.create(UBNAccountAPIService.class);
     }
 
