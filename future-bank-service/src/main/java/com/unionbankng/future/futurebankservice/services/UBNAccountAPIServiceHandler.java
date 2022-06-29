@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@RefreshScope
+//@RefreshScope
 @Service
 @RequiredArgsConstructor
 public class UBNAccountAPIServiceHandler {
