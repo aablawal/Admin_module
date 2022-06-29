@@ -48,6 +48,7 @@ public class UnsafeOkHttpClient {
             OkHttpClient okHttpClient = builder.connectTimeout(10, TimeUnit.SECONDS)
                     .writeTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(interceptor).build();
+
             return okHttpClient;
         } catch (Exception e) {
             throw new RuntimeException(e);
