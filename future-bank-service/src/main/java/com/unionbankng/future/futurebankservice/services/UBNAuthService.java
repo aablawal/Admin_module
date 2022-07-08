@@ -49,6 +49,7 @@ public class UBNAuthService {
         Map<String, String> credentials = new HashMap<>();
 
         try {
+            app.print("Decrypting UBN Auth Server Token");
             String client=cryptoService.decrypt(clientId, clientSecret);
             credentials = app.getMapper().readValue(client, Map.class);
         }catch (Exception ex){
@@ -57,6 +58,7 @@ public class UBNAuthService {
         }
         app.print("Credentials Username:");
         app.print(credentials.get("username"));
+        app.print(credentials.keySet());
 
         Call<UBNAuthServerTokenResponse> responseCall = ubnAuthAPIServiceInterface.getAuthServerToken(credentials.get("username"),credentials.get("password"),credentials.get("clientSecret"),
                 credentials.get("grantType"),credentials.get("clientId"));
@@ -69,6 +71,7 @@ public class UBNAuthService {
         app.print("########Generating Access token:");
         Map<String, String> credentials = new HashMap<>();
         try {
+            app.print("Decrypting UBN Auth Server Token");
             String client=cryptoService.decrypt(clientId, clientSecret);
             credentials = app.getMapper().readValue(client, Map.class);
         }catch (Exception ex){
@@ -77,6 +80,7 @@ public class UBNAuthService {
         }
         app.print("Credentials Username:");
         app.print(credentials.get("username"));
+        app.print(credentials.keySet());
 
         Call<UBNAuthServerTokenResponse> responseCall = ubnAuthAPIServiceInterface.getAccountServerToken(credentials.get("username"), credentials.get("password"), credentials.get("clientSecret"),
                 credentials.get("grantType"), credentials.get("clientId"));

@@ -127,6 +127,7 @@ public class JobProposalService  implements Serializable {
 
                     try {
                         //############### Activity Logging ###########
+                        app.print("Applied for "+job.getTitle()+ " and forward to event bus");
                         ActivityLog log = new ActivityLog();
                         log.setDescription("Applied for "+job.getTitle());
                         log.setRequestObject(app.toString(application));
@@ -134,6 +135,7 @@ public class JobProposalService  implements Serializable {
                         log.setUsername(currentUser.getUserEmail());
                         log.setUserId(currentUser.getUserUUID());
                         appLogger.log(log);
+                        app.print("Sending Job Activity log to Service Bus "+ job);
                         //#########################################
                     }catch (Exception ex){
                         ex.printStackTrace();

@@ -41,6 +41,7 @@ public class KYCService {
     private String baseURL;
     @Value("#{${kyc.service.credentials}}")
     private Map<String, String> credentials;
+
     private KYCServiceInterface kycServiceInterface;
     private String accessTokenForKycService;
     private Date tokenExpiryTime;
@@ -586,7 +587,7 @@ public class KYCService {
         User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
         assert user != null;
-        if (user.getKycLevel() == 3 || user.getKycLevel() == 5) //Todo: Ask Rabiu what KYC level 5 is
+        if (user.getKycLevel() == 3)
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                     false, "User Already verified");
 
@@ -596,8 +597,9 @@ public class KYCService {
         String currentData = sdf.format(user.getDateOfBirth());
 
         // format the phone number
-        String phoneNumber = user.getPhoneNumber();
-        String userPhone = app.toPhoneNumber(phoneNumber);
+        String userPhone = user.getPhoneNumber();
+        userPhone = app.toPhoneNumber(userPhone).replaceFirst("234", "0");
+
 
         Applicant applicant = new Applicant();
         applicant.setDob(currentData);
@@ -616,6 +618,19 @@ public class KYCService {
 
         Response<VerifyMeAddressVerificationResponse> response = null;
         try {
+
+            //TEST DATA
+            addressVerificationRequestVerifyme1.setLandmark("Beside GTbank");
+            addressVerificationRequestVerifyme1.setStreet("270 Murtala Muhammed Way, Alagomeji. Yaba");
+            addressVerificationRequestVerifyme1.setLga("surulere");
+            addressVerificationRequestVerifyme1.setState("lagos");
+            addressVerificationRequestVerifyme1.getApplicant().setIdNumber("08121234567");
+            addressVerificationRequestVerifyme1.getApplicant().setFirstname("john");
+            addressVerificationRequestVerifyme1.getApplicant().setLastname("doe");
+            addressVerificationRequestVerifyme1.getApplicant().setPhone("08121234567");
+            addressVerificationRequestVerifyme1.getApplicant().setDob("04-04-1944");
+            addressVerificationRequestVerifyme1.getApplicant().setIdType("KYC");
+
             response = getAddressVerification(addressVerificationRequestVerifyme1);
         } catch (Exception e) {
             throw new RuntimeException(e);
