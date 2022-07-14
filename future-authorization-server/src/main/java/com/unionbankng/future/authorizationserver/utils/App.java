@@ -99,4 +99,11 @@ public class App {
         }
         return userPhone;
     }
+
+    public String getClientDevice() {
+        return "Google Chrome";
+    }
+    public String getClientMACAddress(){
+        return "172.17.255.255";
+    }
 }

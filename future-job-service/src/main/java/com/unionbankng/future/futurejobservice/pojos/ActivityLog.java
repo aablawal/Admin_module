@@ -20,4 +20,5 @@ class ActivityLog implements Serializable {
     protected String device;
     protected String ipAddress;
     protected String description;
+    protected String date;
 }

@@ -199,15 +199,15 @@ public class JobService {
                         ex.printStackTrace();
                     }
 
-
                     try {
                         //############### Activity Logging ###########
                         ActivityLog log = new ActivityLog();
                         log.setDescription("Created new Job");
-                        log.setRequestObject(app.toString(job));
-                        log.setRequestObject(app.toString(savedJob));
-                        log.setUsername(currentUser.getUserEmail());
-                        log.setUserId(currentUser.getUserUUID());
+                        log.setRequestObject("Job creation request: " + app.toString(job));
+                        log.setResponseObject("Saved job: " + app.toString(savedJob));
+                        log.setUsername("User Email: " + currentUser.getUserEmail());
+                        log.setUserId("User ID" + currentUser.getUserUUID());
+                        log.setDate("Date and Time: " + new Date());
                         appLogger.log(log);
                         //#########################################
                     } catch (Exception ex) {
