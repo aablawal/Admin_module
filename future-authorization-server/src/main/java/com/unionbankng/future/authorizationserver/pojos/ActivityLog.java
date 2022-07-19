@@ -1,8 +1,14 @@
-package com.unionbankng.future.futurejobservice.pojos;
+package com.unionbankng.future.authorizationserver.pojos;
 
-import com.unionbankng.future.futurejobservice.enums.LoggingOwner;
-import lombok.*;
+import com.unionbankng.future.authorizationserver.enums.LoggingOwner;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serializable;
 
 public @Data
@@ -11,7 +17,9 @@ public @Data
 @RequiredArgsConstructor
 class ActivityLog implements Serializable {
 
-    private static final long serialVersionUID = -295422703255886286L;
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    Long id;
     protected LoggingOwner owner;
     protected String requestObject;
     protected String responseObject;

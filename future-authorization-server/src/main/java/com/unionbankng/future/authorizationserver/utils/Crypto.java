@@ -4,23 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
 
 public class Crypto {
-
-<<<<<<< HEAD
-    public static  void main(String args[]) throws JsonProcessingException {
+    public static void main(String args[]) throws JsonProcessingException {
         CryptoService cryptoService = new CryptoService();
         App app = new App();
 
-        String data="{\"clientSecret\":\"KULAUSERCLIENT\", \"clientId\": \"KULAUSER\",\"grantType\":\"password\",\"username\":\"kulasuser\",\"password\":\"KULig2qwkOQBMgXHjvI\"}";
-        String accessKey="KULAJLkwxFqcj5ojGqdjHdSYaFWdBprD";
-        String cypher="J0unJIaBwVXt/YMQUi/aKtwQkQnKO21kfVBSHn3VYHpzwRpysIyzhAWcfKxOS4BzVR6pRFZ5SDyf3yhCL5M5K9JoSpQmJVUc2fjZFC8yXUGKsOwfXDa21dLaC/khcXHUpBvz47mTyQEOVUZUAq3FQGj9pXnoBQQs3ZEMLGwXg/9onYYZmPG+IRrFoyhJsrWn";
-        String encrypted= cryptoService.decrypt(cypher,accessKey);
-      Map<String, String> cypherO = app.getMapper().readValue(encrypted, Map.class);
+        String data = "{\"clientSecret\":\"KULAUSERCLIENT\", \"clientId\": \"KULAUSER\",\"grantType\":\"password\",\"username\":\"kulasuser\",\"password\":\"KULig2qwkOQBMgXHjvI\"}";
+        String accessKey = "KULAJLkwxFqcj5ojGqdjHdSYaFWdBprD";
+        String cypher = "J0unJIaBwVXt/YMQUi/aKtwQkQnKO21kfVBSHn3VYHpzwRpysIyzhAWcfKxOS4BzVR6pRFZ5SDyf3yhCL5M5K9JoSpQmJVUc2fjZFC8yXUGKsOwfXDa21dLaC/khcXHUpBvz47mTyQEOVUZUAq3FQGj9pXnoBQQs3ZEMLGwXg/9onYYZmPG+IRrFoyhJsrWn";
+        String encrypted = cryptoService.decrypt(cypher, accessKey);
+        Map<String, String> cypherO = app.getMapper().readValue(encrypted, Map.class);
 //
         app.print(cypherO);
 
 //        try {
 //            String cypher=cryptoService.decrypt(encrypted, accessKey);
-=======
 //    public static  void main(String args[]) throws JsonProcessingException {
 //        CryptoService cryptoService = new CryptoService();
 //        App app = new App();
@@ -32,7 +29,6 @@ public class Crypto {
 ////        Map<String, String> cypherO = app.getMapper().readValue(encrypted, Map.class);
 ////
 //        app.print(encrypted);
->>>>>>> 43cccda3bfe6566f2803e52042aa9bbad43e164b
 //
 ////        try {
 ////            String cypher=cryptoService.decrypt(encrypted, accessKey);
@@ -46,4 +42,5 @@ public class Crypto {
 //
 //
 //    }
+    }
 }

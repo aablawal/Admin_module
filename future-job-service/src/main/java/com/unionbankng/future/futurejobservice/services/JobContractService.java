@@ -476,8 +476,9 @@ public class JobContractService implements Serializable {
                     log.setDescription("Contract Approved Successfully for job "+job.getTitle());
                     log.setRequestObject(app.toString(contract));
                     log.setResponseObject(app.toString(savedContract));
-                    log.setUsername(currentUser.getUserEmail());
-                    log.setUserId(currentUser.getUserUUID());
+                    log.setUsername("User Email: " + currentUser.getUserEmail());
+                    log.setUserId("User ID: " + currentUser.getUserUUID());
+                    log.setDate("Date and Time: " + new Date());
                     appLogger.log(log);
                     //#########################################
                 }catch (Exception ex){
