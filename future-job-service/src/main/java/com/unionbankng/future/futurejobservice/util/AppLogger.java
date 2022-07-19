@@ -1,7 +1,6 @@
 package com.unionbankng.future.futurejobservice.util;
 import com.unionbankng.future.futurejobservice.enums.LoggingOwner;
 import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
-import com.unionbankng.future.futurejobservice.pojos.EmailBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;

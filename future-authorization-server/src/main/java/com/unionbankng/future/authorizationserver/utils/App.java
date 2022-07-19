@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -104,6 +107,17 @@ public class App {
         return "Google Chrome";
     }
     public String getClientMACAddress(){
-        return "172.17.255.255";
+        HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.
+                        currentRequestAttributes()).
+                        getRequest();
+
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+
+//        return "172.17.255.255";
+        return ipAddress;
     }
 }

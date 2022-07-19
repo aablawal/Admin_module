@@ -2,7 +2,6 @@ package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
-import com.unionbankng.future.futurejobservice.enums.LoggingOwner;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.pojos.*;
