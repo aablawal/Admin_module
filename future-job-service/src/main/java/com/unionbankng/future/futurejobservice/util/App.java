@@ -1,5 +1,4 @@
 package com.unionbankng.future.futurejobservice.util;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.uuid.Generators;
@@ -9,9 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
