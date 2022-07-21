@@ -42,6 +42,9 @@ public class KYCService {
     @Value("#{${kyc.service.credentials}}")
     private Map<String, String> credentials;
 
+    @Value("${kula.kyc.address.webhook}")
+    private String kulaAddressWebhook;
+
     private KYCServiceInterface kycServiceInterface;
     private String accessTokenForKycService;
     private Date tokenExpiryTime;
@@ -176,6 +179,7 @@ public class KYCService {
             passportFaceMatchRequest2.setVerificationType("PASSPORT-FACE-MATCH-VERIFICATION");
 
             app.print("Verify International Passport with PassportFaceMatch");
+            app.print("Verify International Passport with PassportFaceMatch request body"+ passportFaceMatchRequest2);
 
             Response<KycApiResponse<PassportFaceMatchResponse>> response = getPassportFaceMatch(passportFaceMatchRequest2);
 
@@ -620,6 +624,7 @@ public class KYCService {
         try {
 
             //TEST DATA
+            addressVerificationRequestVerifyme1.setCallbackUrl(kulaAddressWebhook);
             addressVerificationRequestVerifyme1.setLandmark("Beside GTbank");
             addressVerificationRequestVerifyme1.setStreet("270 Murtala Muhammed Way, Alagomeji. Yaba");
             addressVerificationRequestVerifyme1.setLga("surulere");

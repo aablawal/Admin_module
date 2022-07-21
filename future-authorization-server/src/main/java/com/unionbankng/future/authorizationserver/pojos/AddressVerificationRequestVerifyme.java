@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class AddressVerificationRequestVerifyme {
+    private String callbackUrl;
     private String street;
     private String lga;
     private String state;

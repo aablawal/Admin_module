@@ -7,7 +7,7 @@ import retrofit2.http.*;
 public interface KYCServiceInterface {
     String OAUTH_URL = "kycserv/oauth/token";
     String NIN_FULL_DETAIL = "kycserv/api/v1/kyc/ninfull";
-    String VOTERS_CARD_FACEMATCH = "kycserv/api/v1/kyc/voterscardFacematch";
+    String VOTERS_CARD_FACEMATCH = "kycserv/api/v1/kyc/verify_id_with_seamfix";
     String DRIVERS_LICENSE_FACEMATCH = "kycserv/api/v1/kyc/driversLicenseFacematch";
     String ID_VERIFICATION = "kycserv/api/v1/kyc/id_verification";
     String NIN_BOOLEAN = "kycserv/api/v1/kyc/ninfullboolenMatch";
