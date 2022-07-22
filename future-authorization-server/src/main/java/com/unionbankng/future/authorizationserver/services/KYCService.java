@@ -186,7 +186,8 @@ public class KYCService {
             if (response.isSuccessful()) {
 //                if (response.body().getDescription().equals("The ID provided is invalid")) {
                 if (response.body() == null || !response.body().isSuccess()) {
-                    return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+                    sendKycEmailUser(user, "kyc.picture.verification.email.body", "KYC Upgrade Status");
+                    return new APIResponse<>(messageSource.getMessage("kyc.picture.verification.failed.response", null, LocaleContextHolder.getLocale()),
                             false, null);
                 } else {
 
@@ -227,7 +228,7 @@ public class KYCService {
                             userRepository.save(user);
 
                             // Send Email User
-                            sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "KYC Upgrade Status");
+                            sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "kyc.wallet.upgrade.email.subject");
                             // Send SMS User
                             sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.level.one.upgraded");
 
@@ -253,7 +254,7 @@ public class KYCService {
 
 
                         // Send Email to User
-                        sendKycEmailUser(user, "kyc.verification.email.not.verified", "ID Verification Update");
+                        sendKycEmailUser(user, "kyc.verification.email.not.verified", "kyc.wallet.upgrade.email.subject");
                         // Send sms to user
                         sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.not.verified");
 
@@ -264,7 +265,10 @@ public class KYCService {
 
 
             } else {
-                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+
+                sendKycEmailUser(user, "kyc.id.verification.failed.body", "KYC Upgrade Status");
+
+                return new APIResponse<>(messageSource.getMessage("kyc.id.verification.failed.response", null, LocaleContextHolder.getLocale()),
                         false, "The detail you provide is invalid");
             }
         }
@@ -334,7 +338,7 @@ public class KYCService {
                         user.setKycLevel(2);
                         userRepository.save(user);
                         // Send Email User
-                        sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "KYC Upgrade Status");
+                        sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "kyc.wallet.upgrade.email.subject");
                         // Send SMS User
                         sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.level.one.upgraded");
                         return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
@@ -356,7 +360,7 @@ public class KYCService {
                         // Upgrade User KYC level to tear 2 TODO confirm from rabiu if this is really an upgrade to tier 3
                         userRepository.save(user);
                         // Send Email to User
-                        sendKycEmailUser(user, "kyc.verification.email.not.verified", "Photo Verification Update");
+                        sendKycEmailUser(user, "kyc.verification.email.not.verified", "kyc.wallet.upgrade.email.subject");
                         // Send sms to user
                         sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.not.verified");
                         return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
@@ -437,7 +441,7 @@ public class KYCService {
                     userRepository.save(user);
 
                     // Send Email User
-                    sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "KYC Upgrade Status");
+                    sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "kyc.wallet.upgrade.email.subject");
                     // Send SMS User
                     sendSMS(user.getPhoneNumber(), "kyc.verification.sms.level.one.upgraded");
                     return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
@@ -459,7 +463,7 @@ public class KYCService {
 //                    user.setKycLevel(3); //TODO confirm from Rabiu
                     userRepository.save(user);
                     // Send Email to User
-                    sendKycEmailUser(user, "kyc.verification.email.not.verified", "Photo Verification Update");
+                    sendKycEmailUser(user, "kyc.verification.email.not.verified", "kyc.wallet.upgrade.email.subject");
                     // Send push sms to user
                     sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.sms.not.verified");
 
@@ -532,7 +536,7 @@ public class KYCService {
                 userRepository.save(user);
 
                 // Send Email User
-                sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "KYC Upgrade Status");
+                sendKycEmailUser(user, "kyc.verification.email.level.one.upgraded", "kyc.wallet.upgrade.email.subject");
                 // Send SMS User
                 sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.email.level.one.upgraded");
                 return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
@@ -549,7 +553,7 @@ public class KYCService {
                 kycRepository.save(kyc);
                 // Upgrade User KYC level to tear 2 TODO confirm from rabiu
                 // Send Email to User
-                sendKycEmailUser(user, "kyc.verification.email.not.verified", "NIN Verification Failed");
+                sendKycEmailUser(user, "kyc.verification.email.not.verified", "kyc.wallet.upgrade.email.subject");
                 // Send push sms to user
                 sendSMS(verifyKycRequest.getPhoneNumber(), "kyc.verification.email.not.verified");
 
@@ -567,7 +571,7 @@ public class KYCService {
     }
 
     public void sendKycEmailUser(User user, String msg, String subject) {
-        String[] params = new String[]{"Kula", "KYC - VERIFICATION"};
+        String[] params = new String[]{user.getFirstName(), "KYC - VERIFICATION"};
         String body = messageSource.getMessage(msg, params, LocaleContextHolder.getLocale());
         EmailMessage message = new EmailMessage();
         message.setBody(body);
@@ -687,7 +691,7 @@ public class KYCService {
                     userRepository.save(user);
 
                     // Send Email User
-                    sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "KYC Upgrade Status");
+                    sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "kyc.wallet.upgrade.email.subject");
                     return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
                             true, "Address verification Completed");
                 } else {
@@ -695,7 +699,7 @@ public class KYCService {
                     kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
                     kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
-                    sendKycEmailUser(user, "kyc.verification.email.level.two.failed.upgrade", "KYC Upgrade Status");
+                    sendKycEmailUser(user, "kyc.verification.email.level.two.failed.upgrade", "kyc.wallet.upgrade.email.subject");
                     // Send SMS User
                     sendSMS(kycAddressVerification.getPhone(), "kyc.verification.sms.level.two.failed.upgrade");
                     return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
