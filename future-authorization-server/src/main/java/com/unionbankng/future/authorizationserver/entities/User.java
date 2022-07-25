@@ -1,14 +1,11 @@
 package com.unionbankng.future.authorizationserver.entities;
 
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
-import com.unionbankng.future.authorizationserver.enums.ProfileType;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -69,6 +66,7 @@ public class User implements Serializable {
     private String accountName;
     private String userAddress;
     private String gender;
+
     @Column(length = 5)
     private int kycLevel;
 
