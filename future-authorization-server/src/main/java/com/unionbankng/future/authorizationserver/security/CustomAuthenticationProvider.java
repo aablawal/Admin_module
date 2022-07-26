@@ -36,6 +36,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     @Autowired
     private  LoginRepository loginRepository;
 
+    @Autowired
     private AppLogger appLogger;
 
     @Override
