@@ -177,6 +177,7 @@ public class KYCService {
             passportFaceMatchRequest2.setSelfieToDatabaseMatch("true");
             passportFaceMatchRequest2.setTransactionReference(String.valueOf(randomNumber));
             passportFaceMatchRequest2.setVerificationType("PASSPORT-FACE-MATCH-VERIFICATION");
+            passportFaceMatchRequest2.setCountry("NG");
 
             app.print("Verify International Passport with PassportFaceMatch");
             app.print("Verify International Passport with PassportFaceMatch request body"+ passportFaceMatchRequest2);
@@ -190,8 +191,6 @@ public class KYCService {
                     return new APIResponse<>(messageSource.getMessage("kyc.picture.verification.failed.response", null, LocaleContextHolder.getLocale()),
                             false, null);
                 } else {
-
-
                     app.print("Uploading user selfie....");
                     String selfieFileName = "selfie-" + randomNumber + "-" + user.getUuid() + ".jpg";
                     String savedSelfieUrl = fileStorageService.storeFile(selfieImage, selfieFileName, BlobType.IMAGE);
@@ -262,8 +261,6 @@ public class KYCService {
                                 true, "Verification Sent for manual approval");
                     }
                 }
-
-
             } else {
 
                 sendKycEmailUser(user, "kyc.id.verification.failed.body", "KYC Upgrade Status");
