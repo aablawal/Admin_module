@@ -206,7 +206,6 @@ public class JobService {
                         log.setResponseObject(app.toString(savedJob));
                         log.setUsername(currentUser.getUserEmail());
                         log.setUserId(currentUser.getUserUUID());
-                        log.setDate("Date and Time: " + new Date());
                         appLogger.log(log);
                         //#########################################
                     } catch (Exception ex) {

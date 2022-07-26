@@ -107,9 +107,10 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             //############### Activity Logging ###########
             ActivityLog log = new ActivityLog();
             log.setDescription("User logged in");
-            log.setUsername("Username: " + user.getUsername());
-            log.setUserId("User ID: " + user.getUuid());
-            log.setDate("Date and Time: " + new Date());
+            log.setRequestObject("USER ID: " + user.getUuid());
+//            log.setResponseObject();
+            log.setUsername(user.getUsername());
+            log.setUserId(user.getUuid());
             appLogger.log(log);
             //#########################################
         } catch (Exception ex) {
