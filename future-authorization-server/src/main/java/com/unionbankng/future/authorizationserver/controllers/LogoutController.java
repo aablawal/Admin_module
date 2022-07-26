@@ -37,10 +37,10 @@ public class LogoutController {
         try {
             //############### Activity Logging ##########
             ActivityLog log = new ActivityLog();
+            log.setResponseObject("Logout Successful");
             log.setDescription("User logged out");
-            log.setUsername("Username: " + currentUser.getUserFullName() + "Email: " + currentUser.getUserEmail());
-            log.setUserId("User ID: " + currentUser.getUserUUID());
-            log.setDate("Date and Time: " + new Date());
+            log.setUsername(currentUser.getUserFullName());
+            log.setUserId(currentUser.getUserUUID());
             appLogger.log(log);
             //#########################################
         } catch (Exception ex) {
