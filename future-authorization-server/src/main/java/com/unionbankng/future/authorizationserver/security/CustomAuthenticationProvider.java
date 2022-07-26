@@ -102,6 +102,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         }
 
         try {
+            logger.info("ACTIVITY LOGS FOR LOG IN STARTED!");
             //############### Activity Logging ###########
             ActivityLog log = new ActivityLog();
             log.setDescription("User logged in");

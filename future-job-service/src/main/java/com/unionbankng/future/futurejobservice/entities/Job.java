@@ -39,6 +39,8 @@ public class Job implements Serializable {
     @NotNull
     @Column(nullable=false)
     private String categories;
+//    private String category;
+//    private String subCategory;
     private String invitationId;
     private String duration;
     @NotNull
@@ -67,6 +69,7 @@ public class Job implements Serializable {
     private Boolean terms;
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+//    private String deliveryType;
 
     @PrePersist
     public void setCreatedAt() {
