@@ -511,11 +511,15 @@ public class KYCService {
             if (response.body() != null && response.body().isSuccess()) {
 
                 kyc.setVerificationStatus(true);
+                kyc.setFirstName(user.getFirstName());
+                kyc.setLastName(user.getLastName());
+                kyc.setIdExpiry("null");
+                kyc.setDob(verifyKycRequest.getDob());
                 kyc.setIdType(verifyKycRequest.getIdType());
                 kyc.setUserId(user.getUuid());
                 kyc.setIdNUmber(verifyKycRequest.getIdNumber());
-                kyc.setScore(response.body().getData().getData().getPhotoMatching().getMatchScore());
-                kyc.setVerdict(response.body().getData().getData().getPhotoMatching().getMatch());
+//                kyc.setScore(response.body().getData().getData().getPhotoMatching().getMatchScore());
+//                kyc.setVerdict(response.body().getData().getData().getPhotoMatching().getMatch());
                 kyc.setSelfieImage(savedSelfieUrl);
                 kyc.setIdImage(savedIdImageUrl);
                 kycRepository.save(kyc);
