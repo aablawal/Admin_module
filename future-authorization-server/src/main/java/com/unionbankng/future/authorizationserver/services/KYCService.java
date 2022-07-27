@@ -127,7 +127,7 @@ public class KYCService {
         return kycServiceInterface.getVotersCardFaceMatch(token, request).execute();
     }
 
-    public Response<KycApiResponse<DriversLicenceFaceMatchResponse>> getDriverLicenseFaceMatch(DriversLicenceFaceMatchRequest request) throws Exception {
+    public Response<KycApiResponse<DriversLicenceFaceMatchResponse>> getDriverLicenseFaceMatch(IdentityBiometricsRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
         app.print("request: " + request);
         app.print(new Gson().toJson(request));
@@ -391,20 +391,18 @@ public class KYCService {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             String dateOfBirthString = formatter.format(dateOfBirth);
 
-            DriversLicenceFaceMatchRequest driversLicenceFaceMatchRequest = new DriversLicenceFaceMatchRequest();
-            driversLicenceFaceMatchRequest.setDob(dateOfBirthString);
-            driversLicenceFaceMatchRequest.setFirstname(user.getFirstName());
-            driversLicenceFaceMatchRequest.setIdBase64String(idImageBase64);
-            driversLicenceFaceMatchRequest.setSurname(user.getLastName());
-            driversLicenceFaceMatchRequest.setIdNo(verifyKycRequest.getIdNumber());
-            driversLicenceFaceMatchRequest.setPassportBase64String(selfieImageBase64);
 
-            app.print(driversLicenceFaceMatchRequest);
-            Response<KycApiResponse<DriversLicenceFaceMatchResponse>> response = getDriverLicenseFaceMatch(driversLicenceFaceMatchRequest);
+            IdentityBiometricsRequest identityBiometricsRequest = new IdentityBiometricsRequest();
+            identityBiometricsRequest.setIdType("frsc");
+            identityBiometricsRequest.setPhoto(selfieImageBase64);
+            identityBiometricsRequest.setIdNumber(verifyKycRequest.getIdNumber());
+            identityBiometricsRequest.setPhotoUrl(idImageBase64);
+
+            app.print(identityBiometricsRequest);
+            Response<KycApiResponse<DriversLicenceFaceMatchResponse>> response = getDriverLicenseFaceMatch(identityBiometricsRequest);
             app.print("DriversLicenceFaceMatchResponse VERIFICATION RESPONSE");
             app.print(response.body());
             if (response.body().isSuccess()) {
-
                 Kyc kyc = new Kyc();
 
                 app.print("Uploading user selfie....");
@@ -416,7 +414,6 @@ public class KYCService {
                 String idFileName = "id-" + randomNumber + "-" + user.getUuid() + ".jpg";
                 String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
                 app.print("Uploaded... " + savedSelfieUrl);
-
 
                 if (response.body() != null && response.body().isSuccess()) {
 
@@ -486,11 +483,21 @@ public class KYCService {
             String selfieImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
             String idImageBase64 = Base64.getEncoder().encodeToString(selfieImage.getBytes());
 
-
             Random rand = new Random();
             int maxNumber = 10003430;
             int randomNumber = rand.nextInt(maxNumber) + 1;
 
+            IdentityBiometricsRequest identityBiometricsRequest = new IdentityBiometricsRequest();
+            identityBiometricsRequest.setIdType("nin");
+            identityBiometricsRequest.setPhoto(selfieImageBase64);
+            identityBiometricsRequest.setPhotoUrl(idImageBase64);
+            identityBiometricsRequest.setIdNumber(verifyKycRequest.getIdNumber());
+            Response<KycApiResponse<VerifyMeResponse>> response = this.getIdentityBiometrics(identityBiometricsRequest);
+            if (!response.isSuccessful())
+                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
+                        false, "Details Provided is invalid");
+
+            Kyc kyc = new Kyc();
             app.print("Uploading user selfie....");
             String selfieFileName = "selfie-" + randomNumber + "-" + user.getUuid() + ".jpg";
             String savedSelfieUrl = fileStorageService.storeFile(selfieImage, selfieFileName, BlobType.IMAGE);
@@ -500,21 +507,6 @@ public class KYCService {
             String idFileName = "id-" + randomNumber + "-" + user.getUuid() + ".jpg";
             String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
             app.print("Uploaded... " + savedSelfieUrl);
-
-            IdentityBiometricsRequest identityBiometricsRequest = new IdentityBiometricsRequest();
-            identityBiometricsRequest.setIdType("nin");
-            identityBiometricsRequest.setPhoto(savedSelfieUrl);
-            identityBiometricsRequest.setPhotoUrl(savedIdImageUrl);
-            identityBiometricsRequest.setIdNumber(verifyKycRequest.getIdNumber());
-            Response<KycApiResponse<VerifyMeResponse>> response = this.getIdentityBiometrics(identityBiometricsRequest);
-            if (!response.isSuccessful())
-                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                        false, "Details Provided is invalid");
-
-            Kyc kyc = new Kyc();
-
-
-
 
             if (response.body() != null && response.body().getData().getStatus().contains("success")) {
 

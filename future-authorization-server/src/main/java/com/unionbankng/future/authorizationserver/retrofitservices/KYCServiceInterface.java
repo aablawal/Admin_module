@@ -32,7 +32,7 @@ public interface KYCServiceInterface {
     Call<KycApiResponse<VotersCardFaceMatchResponse>> getVotersCardFaceMatch(@Header("Authorization") String authorization, @Body VotersCardFaceMatchRequest votersCardFaceMatchRequest);
 
     @POST(IDENTITY_BIOMETRICS)
-    Call<KycApiResponse<DriversLicenceFaceMatchResponse>> getDriverLicenseFaceMatch(@Header("Authorization") String authorization, @Body DriversLicenceFaceMatchRequest driversLicenceFaceMatchRequest);
+    Call<KycApiResponse<DriversLicenceFaceMatchResponse>> getDriverLicenseFaceMatch(@Header("Authorization") String authorization, @Body IdentityBiometricsRequest identityBiometricsRequest);
 
     @POST(NIN_FACEMATCH)
     Call<DriversLicenceFaceMatchResponse> getNinFaceMatch(@Header("Authorization") String authorization, @Body AddressVerificationRequest addressVerificationRequest);
