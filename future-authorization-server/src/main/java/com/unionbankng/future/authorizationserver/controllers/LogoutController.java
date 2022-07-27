@@ -26,7 +26,7 @@ public class LogoutController {
     private final AppLogger appLogger;
     @PostMapping("/v1/logout/logout")
     public ResponseEntity<APIResponse> revokeToken(OAuth2Authentication auth) {
-
+        System.out.println("LOGOUT END POINT CALLED!");
         //Get details of user that wants to logout
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(auth);
 
@@ -36,6 +36,7 @@ public class LogoutController {
 
         try {
             //############### Activity Logging ##########
+            System.out.println("ACTIVITY LOGS FOR LOGOUT STARTED!");
             ActivityLog log = new ActivityLog();
             log.setResponseObject("Logout Successful");
             log.setDescription("User logged out");
