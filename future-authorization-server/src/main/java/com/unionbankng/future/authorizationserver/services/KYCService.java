@@ -508,7 +508,7 @@ public class KYCService {
             String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
             app.print("Uploaded... " + savedSelfieUrl);
 
-            if (response.body() != null && response.body().getData().getStatus().contains("success")) {
+            if (response.body() != null && response.body().isSuccess()) {
 
                 kyc.setVerificationStatus(true);
                 kyc.setIdType(verifyKycRequest.getIdType());
