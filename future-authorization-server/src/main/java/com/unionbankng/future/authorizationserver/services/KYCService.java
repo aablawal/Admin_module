@@ -559,6 +559,7 @@ public class KYCService {
 
     public Response<VerifyMeAddressVerificationResponse> getAddressVerification(AddressVerificationRequestVerifyme request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
+
         Response<VerifyMeAddressVerificationResponse> response = kycServiceInterface.getAddressVerification(token, request).execute();
         return response;
     }
@@ -583,7 +584,7 @@ public class KYCService {
         smsSender.sendSMS(sms);
     }
 
-    public APIResponse<String> VerifyAddress(AddressVerificationRequestVerifyme addressVerificationRequestVerifyme, OAuth2Authentication authentication) {
+    public APIResponse<String> VerifyAddress(AddressVerificationRequest addressVerificationRequest, OAuth2Authentication authentication) {
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
@@ -592,48 +593,48 @@ public class KYCService {
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                     false, "User Already verified");
 
-
         String idType = "KYC";
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String currentData = sdf.format(user.getDateOfBirth());
+        String dateOfBirth = sdf.format(user.getDateOfBirth());
 
         // format the phone number
         String userPhone = user.getPhoneNumber();
         userPhone = app.toPhoneNumber(userPhone).replaceFirst("234", "0");
 
-
         Applicant applicant = new Applicant();
-        applicant.setDob(currentData);
+        applicant.setDob(dateOfBirth);
         applicant.setLastname(user.getLastName());
         applicant.setIdNumber(userPhone);
         applicant.setFirstname(user.getFirstName());
         applicant.setIdType(idType);
         applicant.setPhone(userPhone);
 
-        AddressVerificationRequestVerifyme addressVerificationRequestVerifyme1 = new AddressVerificationRequestVerifyme();
-        addressVerificationRequestVerifyme1.setApplicant(applicant);
-        addressVerificationRequestVerifyme1.setLga(addressVerificationRequestVerifyme.getLga());
-        addressVerificationRequestVerifyme1.setState(addressVerificationRequestVerifyme.getState());
-        addressVerificationRequestVerifyme1.setStreet(addressVerificationRequestVerifyme.getStreet());
-        addressVerificationRequestVerifyme1.setLandmark(addressVerificationRequestVerifyme.getLandmark());
+        AddressVerificationRequestVerifyme addressVerificationRequestVerifyme = new AddressVerificationRequestVerifyme();
+        addressVerificationRequestVerifyme.setCallbackUrl(kulaAddressWebhook);
+        addressVerificationRequestVerifyme.setApplicant(applicant);
+        addressVerificationRequestVerifyme.setLga(addressVerificationRequest.getLga());
+        addressVerificationRequestVerifyme.setState(addressVerificationRequest.getState());
+        addressVerificationRequestVerifyme.setStreet(addressVerificationRequest.getStreet());
+        addressVerificationRequestVerifyme.setLandmark(addressVerificationRequest.getLandmark());
+        addressVerificationRequestVerifyme.setUserId(user.getUuid());
+
 
         Response<VerifyMeAddressVerificationResponse> response = null;
         try {
 
             //TEST DATA
-            addressVerificationRequestVerifyme1.setCallbackUrl(kulaAddressWebhook);
-            addressVerificationRequestVerifyme1.setLandmark("Beside GTbank");
-            addressVerificationRequestVerifyme1.setStreet("270 Murtala Muhammed Way, Alagomeji. Yaba");
-            addressVerificationRequestVerifyme1.setLga("surulere");
-            addressVerificationRequestVerifyme1.setState("lagos");
-            addressVerificationRequestVerifyme1.getApplicant().setIdNumber("08121234567");
-            addressVerificationRequestVerifyme1.getApplicant().setFirstname("john");
-            addressVerificationRequestVerifyme1.getApplicant().setLastname("doe");
-            addressVerificationRequestVerifyme1.getApplicant().setPhone("08121234567");
-            addressVerificationRequestVerifyme1.getApplicant().setDob("04-04-1944");
-            addressVerificationRequestVerifyme1.getApplicant().setIdType("KYC");
-
-            response = getAddressVerification(addressVerificationRequestVerifyme1);
+            addressVerificationRequestVerifyme.setLandmark("Beside GTbank");
+            addressVerificationRequestVerifyme.setStreet("270 Murtala Muhammed Way, Alagomeji. Yaba");
+            addressVerificationRequestVerifyme.setLga("surulere");
+            addressVerificationRequestVerifyme.setState("lagos");
+            addressVerificationRequestVerifyme.getApplicant().setIdNumber("08121234567");
+            addressVerificationRequestVerifyme.getApplicant().setFirstname("john");
+            addressVerificationRequestVerifyme.getApplicant().setLastname("doe");
+            addressVerificationRequestVerifyme.getApplicant().setPhone("08121234567");
+            addressVerificationRequestVerifyme.getApplicant().setDob("04-04-1944");
+            addressVerificationRequestVerifyme.getApplicant().setIdType("KYC");
+            app.print("addressVerificationRequestVerifyMe request body: " + addressVerificationRequestVerifyme);
+            response = getAddressVerification(addressVerificationRequestVerifyme);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -670,15 +671,15 @@ public class KYCService {
                 true, "Address verification Request Submitted.");
     }
 
-    public APIResponse<String> processWebhookRequest(@RequestBody AddressVerificationWebhookRequest addressVerificationWebhookRequest) {
+    public APIResponse<String> processWebhookRequest(@RequestBody AddressVerificationWebhookData addressVerificationWebhookRequest) {
         if (addressVerificationWebhookRequest != null) {
-            Long id = Long.valueOf(addressVerificationWebhookRequest.getData().getId());
+            Long id = Long.valueOf(addressVerificationWebhookRequest.getId());
             KycAddressVerification kycAddressVerification = kycAddressRepository.findByResID(id).orElseThrow(null);
             User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
             if (user != null) {
-                if (addressVerificationWebhookRequest.getData().getStatus().getStatus().contains("VERIFIED")) {
-                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                if (addressVerificationWebhookRequest.getStatus().getStatus().contains("VERIFIED")) {
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
                     user.setKycLevel(3);
                     userRepository.save(user);
@@ -689,8 +690,8 @@ public class KYCService {
                             true, "Address verification Completed");
                 } else {
                     // Update Kyc detail address
-                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
+                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getStatus().getStatus());
+                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getStatus().getStatus());
                     kycAddressRepository.save(kycAddressVerification);
                     sendKycEmailUser(user, "kyc.verification.email.level.two.failed.upgrade", "kyc.wallet.upgrade.email.subject");
                     // Send SMS User

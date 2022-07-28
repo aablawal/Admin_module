@@ -10,4 +10,6 @@ public class AddressVerificationRequestVerifyme {
     private String state;
     private String landmark;
     private Applicant applicant;
+    private String userId;
+    private String idImage;
 }
