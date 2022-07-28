@@ -13,6 +13,7 @@ public class AddressVerificationRequest {
     private String buildingNumber;
     private String street;
     private String landmark;
+    private String lga;
     private String state;
     private String city;
     private String country;
