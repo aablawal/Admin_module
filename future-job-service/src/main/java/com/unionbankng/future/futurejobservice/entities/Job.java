@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.entities;
+import com.unionbankng.future.futurejobservice.enums.DeliveryType;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import lombok.*;
@@ -39,8 +40,6 @@ public class Job implements Serializable {
     @NotNull
     @Column(nullable=false)
     private String categories;
-//    private String category;
-//    private String subCategory;
     private String invitationId;
     private String duration;
     @NotNull
@@ -69,7 +68,9 @@ public class Job implements Serializable {
     private Boolean terms;
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-//    private String deliveryType;
+    private String category;
+    private String subCategory;
+    private DeliveryType deliveryType;
 
     @PrePersist
     public void setCreatedAt() {
