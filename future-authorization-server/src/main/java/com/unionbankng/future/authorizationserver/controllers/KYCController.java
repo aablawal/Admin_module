@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.IdType;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
@@ -82,19 +83,7 @@ public class KYCController {
 
         userRepository.save(user);
 
-        switch (verifyKycRequest.getIdType()) {
-            case "INTERNATIONAL-PASSPORT":
-                return kycService.VerifyInternationalPassport(verifyKycRequest, selfieImage, idImage, user);
-            case "VOTERS-CARD":
-                return kycService.VerifyVotersCard(verifyKycRequest, selfieImage, idImage, user);
-            case "DRIVERS-LICENSE":
-                return kycService.VerifyDriverLicence(verifyKycRequest, selfieImage, idImage, user);
-            case "NATIONAL-IDENTITY":
-                return kycService.VerifyNIN(verifyKycRequest, selfieImage, idImage, user);
-            default:
-                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                        false, "The detail you provide is invalid");
-        }
+        return kycService.kycVerifyId(verifyKycRequest, selfieImage, idImage, user);
 
     }
 

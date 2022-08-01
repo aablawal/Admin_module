@@ -12,6 +12,7 @@ public interface KYCServiceInterface {
     String ID_VERIFICATION = "kycserv/api/v1/kyc/id_verification";
     String NIN_BOOLEAN = "kycserv/api/v1/kyc/ninfullboolenMatch";
     String PASSPORT_FACEMATCH = "kycserv/api/v1/kyc/passportFacematch";
+    String ID_FACEMATCH = "kycserv/api/v1/kyc/id";
     String NIN_FACEMATCH = "kycserv/api/v1/kyc/ninFacematch";
     String IDENTITY_BIOMETRICS = "kycserv/api/v1/kyc/identityBiometrics";
     String ADDRESS_VERIFICATION = "kycserv/api/v1/kyc/submitAddress";
@@ -27,6 +28,9 @@ public interface KYCServiceInterface {
 
     @POST(PASSPORT_FACEMATCH)
     Call<KycApiResponse<PassportFaceMatchResponse>> getPassportFaceMatch(@Header("Authorization") String authorization, @Body PassportFaceMatchRequest passportFaceMatchRequest);
+
+    @POST(ID_FACEMATCH)
+    Call<KycApiResponse<VerifiedResponseId>> getIdFaceMatch(@Header("Authorization") String authorization, @Body IdRequest request);
 
     @POST(VOTERS_CARD_FACEMATCH)
     Call<KycApiResponse<VotersCardFaceMatchResponse>> getVotersCardFaceMatch(@Header("Authorization") String authorization, @Body VotersCardFaceMatchRequest votersCardFaceMatchRequest);
