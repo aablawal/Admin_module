@@ -1129,8 +1129,10 @@ public class JobContractService implements Serializable {
                                     Job currentJob = jobRepository.findById(jobId).orElse(null);
                                     User freelancer =userService.getUserById(proposal.getUserId());
                                     if (currentJob != null && freelancer!=null) {
+                                        String[] params = {freelancer.getFullName(),currentUser.getUserFullName(),currentJob.getTitle(),String.valueOf(contract.getAmount())};
+                                        String message = messageSource.getMessage("job.submission.acceptance.email.body",params,LocaleContextHolder.getLocale());
                                         NotificationBody body = new NotificationBody();
-                                        body.setBody(currentUser.getUserFullName() + " ended your contract and release the sum of " + proposal.getBidAmount() + " to your bank account");
+                                        body.setBody(message);
                                         body.setSubject("Contract Ended");
                                         body.setActionType("REDIRECT");
                                         body.setAction("/job/ongoing/details/" + jobId);
