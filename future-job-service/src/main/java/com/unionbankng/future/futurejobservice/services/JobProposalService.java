@@ -106,7 +106,7 @@ public class JobProposalService  implements Serializable {
                         Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
                         User employer =userService.getUserById(proposal.getEmployerId());
                         if (currentJob != null && employer!=null ) {
-                            String[] params = {currentJob.getTitle()};
+                            String[] params = {employer.getFullName(),currentJob.getTitle()};
                             String message = messageSource.getMessage("proposal.submission.successful.email-body", params, LocaleContextHolder.getLocale());
                             NotificationBody body = new NotificationBody();
                             body.setBody(message);
