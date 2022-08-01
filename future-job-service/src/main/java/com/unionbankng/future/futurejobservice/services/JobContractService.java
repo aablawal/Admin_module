@@ -328,7 +328,7 @@ public class JobContractService implements Serializable {
                 if(isPaid){
 
                    if (job != null) {
-                        String[] params = {currentUser.getUserFullName(),String.valueOf(contract.getAmount()),job.getTitle()};
+                        String[] params = {String.valueOf(contract.getAmount()),job.getTitle()};
                         String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);
@@ -519,7 +519,7 @@ public class JobContractService implements Serializable {
                     Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
                     User employer =userService.getUserById(extension.getEmployerId());
                     if (currentJob != null && employer!=null) {
-                        String[] params = {employer.getFullName(),currentUser.getUserFullName(),currentJob.getTitle(),String.valueOf(extensionRequest.getApprovedDate())};
+                        String[] params = {currentUser.getUserFullName(),currentJob.getTitle(),String.valueOf(extensionRequest.getDate())};
                         String message = messageSource.getMessage("extension.request.email.body",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);
@@ -586,7 +586,7 @@ public class JobContractService implements Serializable {
                     Job currentJob = jobRepository.findById(newMilestone.getJobId()).orElse(null);
                     User employer =userService.getUserById(newMilestone.getEmployerId());
                     if (currentJob != null && employer!=null) {
-                        String[] params = {employer.getFullName(),currentUser.getUserFullName()};
+                        String[] params = {currentUser.getUserFullName(),currentJob.getTitle()};
                         String message = messageSource.getMessage("milestone.created.email.body.gig-provider",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);
@@ -699,7 +699,7 @@ public class JobContractService implements Serializable {
                         Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
                         User freelancer=userService.getUserById(extension.getUserId());
                         if (proposal != null && currentJob != null && freelancer!=null) {
-                            String[] params = {freelancer.getFullName(),currentJob.getTitle(),currentUser.getUserFullName(),String.valueOf(extension.getApprovedDate())};
+                            String[] params = {currentJob.getTitle(),currentUser.getUserFullName(),String.valueOf(extension.getApprovedDate())};
                             String message = messageSource.getMessage("extension.request.approved.email.body",params,LocaleContextHolder.getLocale());
                             NotificationBody body = new NotificationBody();
                             body.setBody(message);
@@ -781,6 +781,7 @@ public class JobContractService implements Serializable {
                 app.print("Its here 2");
                 NotificationBody body = new NotificationBody();
                 String[] params = {employer.getFullName(),currentJob.getTitle(),currentUser.getUserFullName()};
+                logger.info("The current user -->" + currentUser.getUserFullName());
                 String message = messageSource.getMessage("submit-job.email-body", params, LocaleContextHolder.getLocale());
                 body.setBody(message);
                 body.setSubject("Project Review");
@@ -2027,7 +2028,7 @@ public class JobContractService implements Serializable {
                             User freelancer = userService.getUserById(proposal.getUserId());
 
                             if(freelancer!=null) {
-                                String[] params = {currentUser.getUserFullName(),String.valueOf(milestone.getAmount()),freelancer.getFullName(),job.getTitle()};
+                                String[] params = {String.valueOf(milestone.getAmount()),freelancer.getFullName(),job.getTitle()};
                                 String message = messageSource.getMessage("payment.for.milestone.successful.email.body",params,LocaleContextHolder.getLocale());
                                 NotificationBody body = new NotificationBody();
                                 body.setBody(message);
