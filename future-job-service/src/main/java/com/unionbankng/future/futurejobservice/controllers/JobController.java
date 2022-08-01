@@ -41,6 +41,13 @@ public class JobController {
             return ResponseEntity.ok().body(service.addJob(authentication,jobData,teamData,supportingFiles,ndaFiles));
     }
 
+    @PostMapping(value="/v2/job/add",consumes = "multipart/form-data")
+    public ResponseEntity<APIResponse> postAJob(OAuth2Authentication authentication, @Valid @RequestParam(value = "data", required=true) String jobData,
+                                              @RequestParam(value = "supportingFiles", required = false) MultipartFile[] supportingFiles) throws IOException {
+
+        return ResponseEntity.ok().body(service.postAJob(authentication,jobData,supportingFiles));
+    }
+
     @PutMapping("/v1/job/close")
     public  ResponseEntity<APIResponse> closeJobById(OAuth2Authentication authentication,@RequestParam Long id, @RequestParam int state){
         Job job=service.closeJobById(authentication, id,state);

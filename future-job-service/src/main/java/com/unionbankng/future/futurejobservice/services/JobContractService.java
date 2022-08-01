@@ -328,8 +328,10 @@ public class JobContractService implements Serializable {
                 if(isPaid){
 
                    if (job != null) {
+                        String[] params = {currentUser.getUserFullName(),String.valueOf(contract.getAmount()),job.getTitle()};
+                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
-                        body.setBody("Your payment of " + contract.getAmount() + " has been successful");
+                        body.setBody(message);
                         body.setSubject("Payment Successful");
                         body.setActionType("REDIRECT");
                         body.setAction("/job/ongoing/details/" + proposal.getJobId());
@@ -398,7 +400,7 @@ public class JobContractService implements Serializable {
                         app.print("freelancer>>>> "+user);
                         if(user!=null) {
                             NotificationBody body2 = new NotificationBody();
-                            String[] params1 = {currentUser.getFirstName(), job.getTitle(), String.valueOf(contract.getAmount())};
+                            String[] params1 = {currentUser.getUserFullName(),user.getFullName(),job.getTitle(),String.valueOf(contract.getAmount())};
                             String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
                             body2.setBody(message1);
                             body2.setSubject("Proposal Approval");
@@ -476,8 +478,9 @@ public class JobContractService implements Serializable {
                     log.setDescription("Contract Approved Successfully for job "+job.getTitle());
                     log.setRequestObject(app.toString(contract));
                     log.setResponseObject(app.toString(savedContract));
-                    log.setUsername(currentUser.getUserEmail());
-                    log.setUserId(currentUser.getUserUUID());
+                    log.setUsername("User Email: " + currentUser.getUserEmail());
+                    log.setUserId("User ID: " + currentUser.getUserUUID());
+                    log.setDate("Date and Time: " + new Date());
                     appLogger.log(log);
                     //#########################################
                 }catch (Exception ex){
@@ -516,8 +519,10 @@ public class JobContractService implements Serializable {
                     Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
                     User employer =userService.getUserById(extension.getEmployerId());
                     if (currentJob != null && employer!=null) {
+                        String[] params = {employer.getFullName(),currentUser.getUserFullName(),currentJob.getTitle(),String.valueOf(extensionRequest.getApprovedDate())};
+                        String message = messageSource.getMessage("extension.request.email.body",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getUserFullName() + " want you to help extend delivery date for " + currentJob.getTitle() + " to " + extension.getDate().toString());
+                        body.setBody(message);
                         body.setSubject("Contract Extension");
                         body.setActionType("REDIRECT");
                         body.setAction("/job/ongoing/details/" + extension.getJobId());
@@ -581,8 +586,10 @@ public class JobContractService implements Serializable {
                     Job currentJob = jobRepository.findById(newMilestone.getJobId()).orElse(null);
                     User employer =userService.getUserById(newMilestone.getEmployerId());
                     if (currentJob != null && employer!=null) {
+                        String[] params = {employer.getFullName(),currentUser.getUserFullName()};
+                        String message = messageSource.getMessage("milestone.created.email.body.gig-provider",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getUserFullName() + " created new milestone on " + currentJob.getTitle() + " for your review and approval");
+                        body.setBody(message);
                         body.setSubject("New Milestone");
                         body.setActionType("REDIRECT");
                         body.setAction("/my-job/contract/milestones/" + newMilestone.getJobId() + "/" + newMilestone.getProposalId());
@@ -692,9 +699,10 @@ public class JobContractService implements Serializable {
                         Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
                         User freelancer=userService.getUserById(extension.getUserId());
                         if (proposal != null && currentJob != null && freelancer!=null) {
+                            String[] params = {freelancer.getFullName(),currentJob.getTitle(),currentUser.getUserFullName(),String.valueOf(extension.getApprovedDate())};
+                            String message = messageSource.getMessage("extension.request.approved.email.body",params,LocaleContextHolder.getLocale());
                             NotificationBody body = new NotificationBody();
-                            body.setBody(currentUser.getUserFullName() + "  approved  your request for the delivery date extension as requested");
-                            body.setSubject("Contract Extension Approved");
+                            body.setBody(message);
                             body.setActionType("REDIRECT");
                             body.setAction("/job/ongoing/details/" + extension.getJobId());
                             body.setTopic("'Job'");
@@ -772,7 +780,7 @@ public class JobContractService implements Serializable {
             if (currentJob != null && employer!=null) {
                 app.print("Its here 2");
                 NotificationBody body = new NotificationBody();
-                String[] params = {currentJob.getTitle(), currentUser.getUserFullName()};
+                String[] params = {employer.getFullName(),currentJob.getTitle(),currentUser.getUserFullName()};
                 String message = messageSource.getMessage("submit-job.email-body", params, LocaleContextHolder.getLocale());
                 body.setBody(message);
                 body.setSubject("Project Review");
@@ -917,12 +925,14 @@ public class JobContractService implements Serializable {
             request.setStatus(Status.RE);
             request.setRemark(rejectionRequest.getReason());
 
-
+            Job job = jobRepository.findById(jobId).orElse(null);
             User freelancer=userService.getUserById(request.getUserId());
             if(freelancer!=null) {
                 //fire notification
+                String[] params = {freelancer.getFullName(),currentUser.getUserFullName(),job.getTitle(),rejectionRequest.getReason()};
+                String message = messageSource.getMessage("job.submission.rejection.email.body",params,LocaleContextHolder.getLocale());
                 NotificationBody body = new NotificationBody();
-                body.setBody("Job that you submitted has been rejected by the employer");
+                body.setBody(message);
                 body.setSubject("Project Rejected");
                 body.setActionType("REDIRECT");
                 body.setAction("/job/ongoing/details/" + request.getJobId());
@@ -1119,8 +1129,10 @@ public class JobContractService implements Serializable {
                                     Job currentJob = jobRepository.findById(jobId).orElse(null);
                                     User freelancer =userService.getUserById(proposal.getUserId());
                                     if (currentJob != null && freelancer!=null) {
+                                        String[] params = {freelancer.getFullName(),currentUser.getUserFullName(),currentJob.getTitle(),String.valueOf(contract.getAmount())};
+                                        String message = messageSource.getMessage("job.submission.acceptance.email.body",params,LocaleContextHolder.getLocale());
                                         NotificationBody body = new NotificationBody();
-                                        body.setBody(currentUser.getUserFullName() + " ended your contract and release the sum of " + proposal.getBidAmount() + " to your bank account");
+                                        body.setBody(message);
                                         body.setSubject("Contract Ended");
                                         body.setActionType("REDIRECT");
                                         body.setAction("/job/ongoing/details/" + jobId);
@@ -1608,8 +1620,10 @@ public class JobContractService implements Serializable {
                                 Job currentJob = jobRepository.findById(project.getJobId()).orElse(null);
                                 User freelancer=userService.getUserById(project.getUserId());
                                 if (currentJob != null) {
+                                    String[] params = {freelancer.getFullName(), milestone.getMilestoneReference(),currentJob.getTitle(),currentUser.getUserFullName()};
+                                    String message = messageSource.getMessage("milestone.complete.email.body", params, LocaleContextHolder.getLocale());
                                     NotificationBody body = new NotificationBody();
-                                    body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for " + currentJob.getTitle() + ", and the sum of " + milestone.getAmount()+ " has been released to your account");
+                                    body.setBody(message);
                                     body.setSubject("Milestone Completed");
                                     body.setActionType("REDIRECT");
                                     body.setAction("/my-job/contract/milestones/" + project.getJobId() + "/" + project.getProposalId());
@@ -2013,8 +2027,10 @@ public class JobContractService implements Serializable {
                             User freelancer = userService.getUserById(proposal.getUserId());
 
                             if(freelancer!=null) {
+                                String[] params = {currentUser.getUserFullName(),String.valueOf(milestone.getAmount()),freelancer.getFullName(),job.getTitle()};
+                                String message = messageSource.getMessage("payment.for.milestone.successful.email.body",params,LocaleContextHolder.getLocale());
                                 NotificationBody body = new NotificationBody();
-                                body.setBody("Payment of NGN" + freelancerIncomeAmount + " has successfully  been released to the bank account of " + freelancer.getFullName());
+                                body.setBody(message);
                                 body.setSubject("Payment Released to Freelancer");
                                 body.setActionType("INFORMATION");
                                 body.setTopic("'Job'");

@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.IdType;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
@@ -82,70 +83,20 @@ public class KYCController {
 
         userRepository.save(user);
 
-        switch (verifyKycRequest.getIdType()) {
-            case "INTERNATIONAL-PASSPORT":
-                return kycService.VerifyInternationalPassport(verifyKycRequest, selfieImage, idImage, user);
-            case "VOTERS-CARD":
-                return kycService.VerifyVotersCard(verifyKycRequest, selfieImage, idImage, user);
-            case "DRIVERS-LICENSE":
-                return kycService.VerifyDriverLicence(verifyKycRequest, selfieImage, idImage, user);
-            case "NATIONAL-IDENTITY":
-                return kycService.VerifyNIN(verifyKycRequest, selfieImage, idImage, user);
-            default:
-                return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                        false, "The detail you provide is invalid");
-        }
+        return kycService.kycVerifyId(verifyKycRequest, selfieImage, idImage, user);
 
     }
 
 
     @PostMapping("/v1/kyc/address_verification")
-    public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequestVerifyme addressVerificationRequestVerifyme, OAuth2Authentication authentication) throws Exception {
-        return kycService.VerifyAddress(addressVerificationRequestVerifyme, authentication);
+    public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequest addressVerificationRequest, OAuth2Authentication authentication) throws Exception {
+        return kycService.VerifyAddress(addressVerificationRequest, authentication);
     }
 
     @PostMapping("/v1/kyc/verifyme/webhook")
-    public APIResponse<String> verifyId(@RequestBody AddressVerificationWebhookRequest addressVerificationWebhookRequest) {
-        if (addressVerificationWebhookRequest != null) {
-            Long id = Long.valueOf(addressVerificationWebhookRequest.getData().getId());
-            KycAddressVerification kycAddressVerification = kycAddressRepository.findByResID(id).orElseThrow(null);
-            User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
-            if (user != null) {
-
-                if (addressVerificationWebhookRequest.getData().getStatus().getStatus().contains("VERIFIED")) {
-//                  Update Kyc detail address
-                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
-                    kycAddressRepository.save(kycAddressVerification);
-//                  Update user kyc level
-                    user.setKycLevel(3);
-                    userRepository.save(user);
-
-                    // Send Email User
-                    kycService.sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "KYC Upgrade Status");
-                    return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
-                            true, "Address verification Completed");
-                } else {
-                    // Update Kyc detail address
-                    kycAddressVerification.setStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
-                    kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getData().getStatus().getStatus());
-                    kycAddressRepository.save(kycAddressVerification);
-                    kycService.sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "KYC Upgrade Status");
-                    // Send SMS User
-                    kycService.sendSMS(kycAddressVerification.getPhone(), "kyc.verification.sms.level.two.upgraded");
-                    return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
-                            false, "Error validating address, Please try again later");
-
-                }
-
-            } else {
-                return new APIResponse<>("Account doesn't exist",
-                        false, "User not found");
-            }
-        } else {
-            return new APIResponse<>("Webhook Data not Found",
-                    false, "Address verification failed");
-        }
+    public APIResponse<String> verifyId(@RequestBody AddressVerificationWebhookData addressVerificationWebhookRequest) {
+        app.print("Webhook received: " + addressVerificationWebhookRequest.toString());
+        return kycService.processWebhookRequest(addressVerificationWebhookRequest);
     }
 
     @GetMapping("/v1/kyc/id_verified_users")

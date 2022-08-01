@@ -7,6 +7,7 @@ import com.unionbankng.future.authorizationserver.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 
@@ -148,6 +149,11 @@ public class AuthenticationService {
                 String encrypted = cryptoService.encrypt(newPin, encryptionKey);
                 if (encrypted != null) {
                     user.setPin(encrypted);
+
+                    String mailSubject = messageSource.getMessage("kula.pin.change.success.subject", null, LocaleContextHolder.getLocale());
+                    String[] mailBodyArgs = {user.getFirstName()};
+                    String mailBody = messageSource.getMessage("kula.pin.change.success.body", mailBodyArgs, LocaleContextHolder.getLocale());
+                    emailSender.sendEmail(user.getEmail(), user.getFirstName(), mailSubject, mailBody, "hello@kula.work");
                     return new APIResponse<>("Pin Added Successfully", true, userRepository.save(user));
                 } else {
                     return new APIResponse<>("Unable to Create your Transaction Pin", false, null);

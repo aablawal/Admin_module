@@ -3,10 +3,12 @@ package com.unionbankng.future.authorizationserver.security;
 import com.unionbankng.future.authorizationserver.entities.Login;
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.interfaceimpl.GoogleOauthProvider;
+import com.unionbankng.future.authorizationserver.pojos.ActivityLog;
 import com.unionbankng.future.authorizationserver.pojos.ErrorResponse;
 import com.unionbankng.future.authorizationserver.repositories.LoginRepository;
 import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.AppLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -33,6 +35,9 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     private App app;
     @Autowired
     private  LoginRepository loginRepository;
+
+    @Autowired
+    private AppLogger appLogger;
 
     @Override
     public Authentication authenticate(Authentication auth)
@@ -95,6 +100,21 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
         if (!cacheWasUsed) {
             this.getUserCache().putUserInCache(user);
+        }
+
+        try {
+            logger.info("ACTIVITY LOGS FOR LOG IN STARTED!");
+            //############### Activity Logging ###########
+            ActivityLog log = new ActivityLog();
+            log.setDescription("User logged in");
+            log.setRequestObject("USER ID: " + user.getUuid());
+//            log.setResponseObject();
+            log.setUsername(user.getUsername());
+            log.setUserId(user.getUuid());
+            appLogger.log(log);
+            //#########################################
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         this.getPostAuthenticationChecks().check(user);

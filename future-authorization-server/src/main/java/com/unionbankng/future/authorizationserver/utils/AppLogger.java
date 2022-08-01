@@ -1,6 +1,7 @@
-package com.unionbankng.future.futurejobservice.util;
-import com.unionbankng.future.futurejobservice.enums.LoggingOwner;
-import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
+package com.unionbankng.future.authorizationserver.utils;
+
+import com.unionbankng.future.authorizationserver.enums.LoggingOwner;
+import com.unionbankng.future.authorizationserver.pojos.ActivityLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class AppLogger {
 
     public void log(ActivityLog log){
         try {
-            log.setOwner(LoggingOwner.JOB_SERVICE);
+            log.setOwner(LoggingOwner.AUTH_SERVICE);
             log.setDevice(app.getClientDevice());
             log.setIpAddress(app.getClientMACAddress());
             jmsTemplate.convertAndSend(LOGGING_QUEUE_NAME, log);
