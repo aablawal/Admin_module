@@ -781,6 +781,7 @@ public class JobContractService implements Serializable {
                 app.print("Its here 2");
                 NotificationBody body = new NotificationBody();
                 String[] params = {employer.getFullName(),currentJob.getTitle(),currentUser.getUserFullName()};
+                logger.info("The current user -->" + currentUser.getUserFullName());
                 String message = messageSource.getMessage("submit-job.email-body", params, LocaleContextHolder.getLocale());
                 body.setBody(message);
                 body.setSubject("Project Review");
