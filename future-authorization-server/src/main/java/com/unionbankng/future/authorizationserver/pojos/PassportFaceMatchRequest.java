@@ -15,4 +15,5 @@ public class PassportFaceMatchRequest {
     private String phone;
     private String selfie;
     private String selfieToDatabaseMatch;
+    private String country;
 }

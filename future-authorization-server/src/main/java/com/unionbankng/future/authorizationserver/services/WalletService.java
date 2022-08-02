@@ -7,11 +7,14 @@ import com.unionbankng.future.authorizationserver.pojos.WalletAuthResponse;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -33,6 +36,10 @@ public class WalletService implements Serializable {
     private Logger logger = LoggerFactory.getLogger(WalletService.class);
     private WalletServiceInterface walletServiceInterface;
     private final UserRepository userRepository;
+
+    private final EmailSender emailSender;
+
+    private final MessageSource messageSource;
     private final App app;
 
 
@@ -131,6 +138,12 @@ public class WalletService implements Serializable {
                 app.print("Wallet created successfully");
                 user.setWalletId(response.body().get("walletId"));
                 userRepository.save(user);
+
+                String mailSubject = messageSource.getMessage("Kula Wallet Creation", null, LocaleContextHolder.getLocale());
+                String[] mailBodyArgs = {user.getFirstName(),response.body().get("walletId")};
+                String mailBody = messageSource.getMessage("kula.wallet.creation.success.body", mailBodyArgs, LocaleContextHolder.getLocale());
+                emailSender.sendEmail(user.getEmail(), user.getFirstName(), mailSubject, mailBody, "hello@kula.work");
+
                 return new APIResponse("BVN Added", true, user);
             } else {
                 return new APIResponse<>("Sorry, Wallet creation failed at this time, try again soon!", false, null);
