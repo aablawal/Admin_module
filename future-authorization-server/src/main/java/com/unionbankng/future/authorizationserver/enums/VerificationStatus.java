@@ -7,4 +7,6 @@ public enum VerificationStatus {
     EXPIRED,
     INVALID,
     UNVERIFIED,
+    FAILED,
+    SUCCESSFUL,
 }

@@ -30,7 +30,7 @@ public interface KYCServiceInterface {
     Call<KycApiResponse<PassportFaceMatchResponse>> getPassportFaceMatch(@Header("Authorization") String authorization, @Body PassportFaceMatchRequest passportFaceMatchRequest);
 
     @POST(ID_FACEMATCH)
-    Call<KycApiResponse<VerifiedResponseId>> getIdFaceMatch(@Header("Authorization") String authorization, @Body IdRequest request);
+    Call<KycApiResponse<VerifiedIdResponse>> getIdFaceMatch(@Header("Authorization") String authorization, @Body IdRequest request);
 
     @POST(VOTERS_CARD_FACEMATCH)
     Call<KycApiResponse<VotersCardFaceMatchResponse>> getVotersCardFaceMatch(@Header("Authorization") String authorization, @Body VotersCardFaceMatchRequest votersCardFaceMatchRequest);
