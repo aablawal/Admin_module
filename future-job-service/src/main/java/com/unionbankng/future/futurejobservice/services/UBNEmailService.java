@@ -66,7 +66,6 @@ public class UBNEmailService {
         try {
             Context ctx = new Context(LocaleContextHolder.getLocale());
             if (emailBody.getRecipients().size() == 1) {
-                ctx.setVariable("name", "Dear " + emailBody.getRecipients().get(0).getDisplayName()+ ",");
                 ctx.setVariable("footname", emailBody.getRecipients().get(0).getDisplayName());
                 ctx.setVariable("year", Calendar.getInstance().get(Calendar.YEAR));
             } else {
