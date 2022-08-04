@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.controllers;
 import com.unionbankng.future.futurejobservice.entities.JobCategory;
+import com.unionbankng.future.futurejobservice.entities.JobSubcategory;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobCategoryService;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,20 @@ public class JobCategoryController {
     @GetMapping("/v1/job/categories")
     public ResponseEntity<APIResponse> findLatestCategories(){
         return ResponseEntity.ok().body(jobCategoryService.findTopCategories());
+    }
+
+    @PostMapping("/v1/job/subcategory/add")
+    public ResponseEntity<APIResponse> addNewSubcategory(@RequestBody JobSubcategory jobSubcategory){
+        return ResponseEntity.ok().body(jobCategoryService.addSubcategory(jobSubcategory));
+    }
+
+    @GetMapping("/v1/job/subcategory/search")
+    public ResponseEntity<APIResponse> findSubcategoryBySearch(@RequestParam String q){
+        return ResponseEntity.ok().body(jobCategoryService.findSubcategoryBySearch(q));
+    }
+
+    @GetMapping("/v1/job/subcategories")
+    public ResponseEntity<APIResponse> findLatestSubcategories() {
+        return ResponseEntity.ok().body(jobCategoryService.findTopSubcategories());
     }
 }
