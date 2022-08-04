@@ -167,7 +167,7 @@ public class JobService {
                     //fire notification
                     Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
                     if (currentJob != null) {
-                        String[] params = {currentJob.getTitle()};
+                        String[] params = {currentUser.getUserFullName(),currentJob.getTitle()};
                         String message = messageSource.getMessage("post.job.successful.email-body", params, LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);
@@ -202,11 +202,100 @@ public class JobService {
                         //############### Activity Logging ###########
                         ActivityLog log = new ActivityLog();
                         log.setDescription("Created new Job");
-                        log.setRequestObject("Job creation request: " + app.toString(job));
-                        log.setResponseObject("Saved job: " + app.toString(savedJob));
-                        log.setUsername("User Email: " + currentUser.getUserEmail());
-                        log.setUserId("User ID" + currentUser.getUserUUID());
-                        log.setDate("Date and Time: " + new Date());
+                        log.setRequestObject(app.toString(job));
+                        log.setResponseObject(app.toString(savedJob));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        //#########################################
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                    return  new APIResponse("Request Successful",true, savedJob);
+
+                } else {
+                    logger.info("JOBSERVICE: Unable to save Job");
+                    return  new APIResponse("Unable to create Job",false, null);
+                }
+            }else{
+                return  new APIResponse("Job Budget can't be less than 1,000 Naira",false, null);
+            }
+        }catch ( Exception e){
+            e.printStackTrace();
+            return  new APIResponse(e.getMessage(),false, null);
+        }
+    }
+
+
+    public APIResponse postAJob(OAuth2Authentication authentication, String jobData, MultipartFile[] supporting_files) throws IOException {
+        try {
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+            String supporting_file_names = null;
+            Job job = app.getMapper().readValue(jobData, Job.class);
+            job.setStatus(Status.AC);
+
+
+            app.print("Job Request:");
+            app.print(job);
+
+            if(job.getBudget()>=1000) {
+
+                app.print("Attached Files");
+                app.print("Supporting Files:" + supporting_files.length);
+                //save files if not null
+                if (supporting_files.length > 0)
+                    supporting_file_names = this.fileStoreService.storeFiles(supporting_files, "kula");
+
+                //cross verify if attached files processed
+                if (supporting_file_names != null)
+                    job.setSupportingFiles(supporting_file_names);
+
+                Job savedJob = jobRepository.save(job);
+                if (savedJob != null) {
+
+                    //fire notification
+                    Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
+                    if (currentJob != null) {
+                        String[] params = {currentUser.getUserFullName(),currentJob.getTitle()};
+                        String message = messageSource.getMessage("post.job.successful.email-body", params, LocaleContextHolder.getLocale());
+                        NotificationBody body = new NotificationBody();
+                        body.setBody(message);
+                        body.setSubject("Job Published");
+                        body.setActionType("REDIRECT");
+                        body.setAction("/job/details/" + savedJob.getId());
+                        body.setTopic("'Job'");
+                        body.setChannel("S");
+                        body.setPriority("YES");
+                        body.setRecipient(savedJob.getOid());
+                        body.setRecipientEmail(currentUser.getUserEmail());
+                        body.setRecipientName(currentUser.getUserFullName());
+                        notificationSender.pushNotification(body);
+                        logger.info("Notification fired");
+                    } else {
+                        logger.info("Unable to fire notifications");
+                    }
+                    //end
+
+                    try {
+                        //update configurations table
+                        Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS);
+                        if (existingConfig != null)
+                            configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
+                        else
+                            configService.updateConfig(ConfigReference.TOTAL_JOBS, String.valueOf(1));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Created new Job");
+                        log.setRequestObject(app.toString(job));
+                        log.setResponseObject(app.toString(savedJob));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
                         appLogger.log(log);
                         //#########################################
                     } catch (Exception ex) {

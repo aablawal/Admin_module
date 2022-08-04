@@ -4,6 +4,7 @@ import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.entities.JobPayment;
 import com.unionbankng.future.futurejobservice.retrofitservices.BankServiceInterface;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.UnsafeOkHttpClient;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,8 @@ public class UBNBankTransferService {
     private final UBNTransferResponseService jobPaymentResponseService;
     private BankServiceInterface bankServiceInterface;
     private final App app;
+    OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
+
 
     @Value("${kula.bankService.baseURL}")
     private String bankServiceBaseURL;
@@ -30,13 +33,6 @@ public class UBNBankTransferService {
 
     @PostConstruct
     public void init() {
-
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(50, TimeUnit.SECONDS)
-                .build();
-
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(bankServiceBaseURL)
                 .build();
@@ -119,6 +115,7 @@ public class UBNBankTransferService {
         app.print("Bulk Transfer Request >>>");
          //fire the request
         Response<APIResponse<UBNBulkFundTransferResponse>> apiResponse = bankServiceInterface.transferBulkFund(authToken, paymentRequest).execute();
+        app.print("API RESPONSE from ");
         PaymentResponse response = new PaymentResponse();
         if(apiResponse.isSuccessful() && apiResponse.body().getPayload()!=null) {
             response.setCode(apiResponse.body().getPayload().getCode());

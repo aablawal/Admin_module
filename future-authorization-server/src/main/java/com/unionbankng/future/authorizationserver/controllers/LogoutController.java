@@ -3,6 +3,7 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ActivityLog;
 import com.unionbankng.future.authorizationserver.pojos.JwtUserDetail;
+import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.authorizationserver.utils.AppLogger;
 import com.unionbankng.future.authorizationserver.utils.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,12 +23,14 @@ import java.util.Date;
 @RequestMapping(path = "api")
 public class LogoutController {
 
+    private final App app;
+
     private final ConsumerTokenServices tokenServices;
 
     private final AppLogger appLogger;
     @PostMapping("/v1/logout/logout")
     public ResponseEntity<APIResponse> revokeToken(OAuth2Authentication auth) {
-
+        System.out.println("LOGOUT END POINT CALLED!");
         //Get details of user that wants to logout
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(auth);
 
@@ -36,11 +40,12 @@ public class LogoutController {
 
         try {
             //############### Activity Logging ##########
+            System.out.println("ACTIVITY LOGS FOR LOGOUT STARTED!");
             ActivityLog log = new ActivityLog();
+            log.setResponseObject("Logout Successful");
             log.setDescription("User logged out");
-            log.setUsername("Username: " + currentUser.getUserFullName() + "Email: " + currentUser.getUserEmail());
-            log.setUserId("User ID: " + currentUser.getUserUUID());
-            log.setDate("Date and Time: " + new Date());
+            log.setUsername(currentUser.getUserFullName());
+            log.setUserId(currentUser.getUserUUID());
             appLogger.log(log);
             //#########################################
         } catch (Exception ex) {
