@@ -167,7 +167,7 @@ public class JobService {
                     //fire notification
                     Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
                     if (currentJob != null) {
-                        String[] params = {currentJob.getTitle(),currentUser.getUserFullName()};
+                        String[] params = {currentUser.getUserFullName(),currentJob.getTitle()};
                         String message = messageSource.getMessage("post.job.successful.email-body", params, LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);
@@ -257,7 +257,7 @@ public class JobService {
                     //fire notification
                     Job currentJob = jobRepository.findById(savedJob.getId()).orElse(null);
                     if (currentJob != null) {
-                        String[] params = {currentJob.getTitle()};
+                        String[] params = {currentUser.getUserFullName(),currentJob.getTitle()};
                         String message = messageSource.getMessage("post.job.successful.email-body", params, LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);

@@ -115,6 +115,7 @@ public class UBNBankTransferService {
         app.print("Bulk Transfer Request >>>");
          //fire the request
         Response<APIResponse<UBNBulkFundTransferResponse>> apiResponse = bankServiceInterface.transferBulkFund(authToken, paymentRequest).execute();
+        app.print("API RESPONSE from ");
         PaymentResponse response = new PaymentResponse();
         if(apiResponse.isSuccessful() && apiResponse.body().getPayload()!=null) {
             response.setCode(apiResponse.body().getPayload().getCode());

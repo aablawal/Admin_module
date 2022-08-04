@@ -519,7 +519,7 @@ public class JobContractService implements Serializable {
                     Job currentJob = jobRepository.findById(extension.getJobId()).orElse(null);
                     User employer =userService.getUserById(extension.getEmployerId());
                     if (currentJob != null && employer!=null) {
-                        String[] params = {employer.getFullName(),currentUser.getUserFullName(),currentJob.getTitle(),String.valueOf(extensionRequest.getApprovedDate())};
+                        String[] params = {employer.getFullName(),currentUser.getUserFullName(),currentJob.getTitle(),String.valueOf(extensionRequest.getDate())};
                         String message = messageSource.getMessage("extension.request.email.body",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);
@@ -586,7 +586,7 @@ public class JobContractService implements Serializable {
                     Job currentJob = jobRepository.findById(newMilestone.getJobId()).orElse(null);
                     User employer =userService.getUserById(newMilestone.getEmployerId());
                     if (currentJob != null && employer!=null) {
-                        String[] params = {employer.getFullName(),currentUser.getUserFullName()};
+                        String[] params = {employer.getFullName(),currentUser.getUserFullName(),currentJob.getTitle()};
                         String message = messageSource.getMessage("milestone.created.email.body.gig-provider",params,LocaleContextHolder.getLocale());
                         NotificationBody body = new NotificationBody();
                         body.setBody(message);
@@ -692,7 +692,7 @@ public class JobContractService implements Serializable {
                         extension.setStatus(Status.AC);
                         extension.setLastModifiedBy(currentUser.getUserEmail());
                         extension.setLastModifiedDate(new Date());
-                        extension.setApprovedDate(new Date());
+                        extension.setApprovedDate(extension.getDate());
                         jobContractExtensionRepository.save(extension);
 
                         //fire notification
@@ -703,6 +703,7 @@ public class JobContractService implements Serializable {
                             String message = messageSource.getMessage("extension.request.approved.email.body",params,LocaleContextHolder.getLocale());
                             NotificationBody body = new NotificationBody();
                             body.setBody(message);
+                            body.setSubject("Extension Request Approved");
                             body.setActionType("REDIRECT");
                             body.setAction("/job/ongoing/details/" + extension.getJobId());
                             body.setTopic("'Job'");
@@ -781,7 +782,8 @@ public class JobContractService implements Serializable {
                 app.print("Its here 2");
                 NotificationBody body = new NotificationBody();
                 String[] params = {employer.getFullName(),currentJob.getTitle(),currentUser.getUserFullName()};
-                String message = messageSource.getMessage("submit-job.email-body", params, LocaleContextHolder.getLocale());
+                String message = messageSource.getMessage("submit.job.email-body",params,LocaleContextHolder.getLocale());
+                logger.info("THE GENERATED MESSAGE IS ==> " + message);
                 body.setBody(message);
                 body.setSubject("Project Review");
                 body.setActionType("REDIRECT");
