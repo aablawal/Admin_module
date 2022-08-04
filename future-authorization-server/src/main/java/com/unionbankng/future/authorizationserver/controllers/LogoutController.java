@@ -56,13 +56,13 @@ public class LogoutController {
 
     }
 
-    @GetMapping("/v1/get_sessionId")
-    public ResponseEntity<APIResponse<String>> getSessionId(OAuth2Authentication auth) {
-
-        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-        return ResponseEntity.ok().body(new APIResponse("Logout successful",true,details.getSessionId()));
-
-    }
+//    @GetMapping("/v1/get_sessionId")
+//    public ResponseEntity<APIResponse<String>> getSessionId(OAuth2Authentication auth) {
+//
+//        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+//        return ResponseEntity.ok().body(new APIResponse("Logout successful",true,details.getSessionId()));
+//
+//    }
 
 
 }
