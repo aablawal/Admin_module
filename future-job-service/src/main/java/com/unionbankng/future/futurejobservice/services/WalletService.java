@@ -2,6 +2,7 @@ package com.unionbankng.future.futurejobservice.services;
 import com.unionbankng.future.futurejobservice.pojos.*;
 import com.unionbankng.future.futurejobservice.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.futurejobservice.util.App;
+import com.unionbankng.future.futurejobservice.util.UnsafeOkHttpClient;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -33,15 +34,10 @@ public class WalletService implements Serializable {
     @Value("${kula.walletPassword}")
     private String password;
 
+    OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
+
     @PostConstruct
     public void init() {
-
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(50, TimeUnit.SECONDS)
-                .build();
-
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(walletBaseURL)
                 .build();
