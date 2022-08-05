@@ -670,11 +670,10 @@ public class KYCService {
 
     }
 
-    public Response<AddressVerifyResponse> getAddressVerification(VerifyAddressRequest request) throws Exception {
+    public Response<AddressVerifyResponse<AddressVerificationDto>> getAddressVerification(VerifyAddressRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
 
-        Response<AddressVerifyResponse> response = kycServiceInterface.getAddressVerification(token, request).execute();
-        return response;
+        return kycServiceInterface.getAddressVerification(token, request).execute();
     }
 
     public void sendKycEmailUser(User user, String msg, String subject) {
@@ -734,7 +733,7 @@ public class KYCService {
         verifyAddressRequest.setLga(addressVerificationRequest.getLga());
         verifyAddressRequest.setImage(addressVerificationRequest.getImage());
 
-        Response<AddressVerifyResponse> response = null;
+        Response<AddressVerifyResponse<AddressVerificationDto>> response = null;
         try {
 
             //TEST DATA
@@ -755,7 +754,7 @@ public class KYCService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if (!response.isSuccessful())
+        if (!response.isSuccessful() || !response.body().isSuccess())
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                     false, "Request Failed");
 
