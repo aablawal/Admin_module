@@ -45,6 +45,6 @@ public interface KYCServiceInterface {
     Call<KycApiResponse<VerifyMeResponse>> getIdentityBiometrics(@Header("Authorization") String authorization, @Body IdentityBiometricsRequest identityBiometricsRequest);
 
     @POST(ADDRESS_VERIFICATION)
-    Call<VerifyMeAddressVerificationResponse> getAddressVerification(@Header("Authorization") String authorization, @Body VerifyAddressRequest addressVerificationRequestVerifyme);
+    Call<AddressVerifyResponse<AddressVerificationDto>> getAddressVerification(@Header("Authorization") String authorization, @Body VerifyAddressRequest addressVerificationRequestVerifyme);
 
 }
