@@ -645,7 +645,6 @@ public class KYCService {
 
             return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
                     true, null);
-
         } else {
             Kyc kyc = new Kyc();
             kyc.setVerificationStatus(false);
@@ -671,7 +670,7 @@ public class KYCService {
 
     }
 
-    public Response<VerifyMeAddressVerificationResponse> getAddressVerification(AddressVerificationRequestVerifyme request) throws Exception {
+    public Response<VerifyMeAddressVerificationResponse> getAddressVerification(VerifyAddressRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
 
         Response<VerifyMeAddressVerificationResponse> response = kycServiceInterface.getAddressVerification(token, request).execute();
@@ -716,39 +715,42 @@ public class KYCService {
         userPhone = app.toPhoneNumber(userPhone).replaceFirst("234", "0");
 
         Applicant applicant = new Applicant();
-        applicant.setDob(dateOfBirth);
-        applicant.setLastname(user.getLastName());
-        applicant.setIdNumber(userPhone);
-        applicant.setFirstname(user.getFirstName());
         applicant.setIdType(idType);
-        applicant.setPhone(userPhone);
 
-        AddressVerificationRequestVerifyme addressVerificationRequestVerifyme = new AddressVerificationRequestVerifyme();
-        addressVerificationRequestVerifyme.setCallbackUrl(kulaAddressWebhook);
-        addressVerificationRequestVerifyme.setApplicant(applicant);
-        addressVerificationRequestVerifyme.setLga(addressVerificationRequest.getLga());
-        addressVerificationRequestVerifyme.setState(addressVerificationRequest.getState());
-        addressVerificationRequestVerifyme.setStreet(addressVerificationRequest.getStreet());
-        addressVerificationRequestVerifyme.setLandmark(addressVerificationRequest.getLandmark());
-        addressVerificationRequestVerifyme.setUserId(user.getUuid());
+        VerifyAddressRequest verifyAddressRequest = new VerifyAddressRequest();
+        verifyAddressRequest.setCallbackUrl(kulaAddressWebhook);
+        verifyAddressRequest.setDob(dateOfBirth);
+        verifyAddressRequest.setUserId(user.getUuid());
+        verifyAddressRequest.setIdNumber(userPhone);
+        verifyAddressRequest.setCountry("NG");
+        verifyAddressRequest.setFirstName(user.getFirstName());
+        verifyAddressRequest.setLandmark(addressVerificationRequest.getLandmark());
+        verifyAddressRequest.setLastName(user.getLastName());
+        verifyAddressRequest.setPhone(userPhone);
+        verifyAddressRequest.setCity(addressVerificationRequest.getLga());
+        verifyAddressRequest.setStreet(addressVerificationRequest.getStreet());
+        verifyAddressRequest.setState(addressVerificationRequest.getState());
+        verifyAddressRequest.setEmail(user.getEmail());
+        verifyAddressRequest.setLga(addressVerificationRequest.getLga());
+        verifyAddressRequest.setImage(addressVerificationRequest.getImage());
 
 
         Response<VerifyMeAddressVerificationResponse> response = null;
         try {
 
             //TEST DATA
-            addressVerificationRequestVerifyme.setLandmark("Beside GTbank");
-            addressVerificationRequestVerifyme.setStreet("270 Murtala Muhammed Way, Alagomeji. Yaba");
-            addressVerificationRequestVerifyme.setLga("surulere");
-            addressVerificationRequestVerifyme.setState("lagos");
-            addressVerificationRequestVerifyme.getApplicant().setIdNumber("08121234567");
-            addressVerificationRequestVerifyme.getApplicant().setFirstname("john");
-            addressVerificationRequestVerifyme.getApplicant().setLastname("doe");
-            addressVerificationRequestVerifyme.getApplicant().setPhone("08121234567");
-            addressVerificationRequestVerifyme.getApplicant().setDob("04-04-1944");
-            addressVerificationRequestVerifyme.getApplicant().setIdType("KYC");
-            app.print("addressVerificationRequestVerifyMe request body: " + addressVerificationRequestVerifyme);
-            response = getAddressVerification(addressVerificationRequestVerifyme);
+//            verifyAddressRequest.setLandmark("Beside GTbank");
+//            verifyAddressRequest.setStreet("270 Murtala Muhammed Way, Alagomeji. Yaba");
+//            verifyAddressRequest.setLga("surulere");
+//            verifyAddressRequest.setState("lagos");
+//            verifyAddressRequest.getApplicant().setIdNumber("08121234567");
+//            verifyAddressRequest.getApplicant().setFirstname("john");
+//            verifyAddressRequest.getApplicant().setLastname("doe");
+//            verifyAddressRequest.getApplicant().setPhone("08121234567");
+//            verifyAddressRequest.getApplicant().setDob("04-04-1944");
+//            verifyAddressRequest.getApplicant().setIdType("KYC");
+            app.print("addressVerificationRequestVerifyMe request body: " + verifyAddressRequest);
+            response = getAddressVerification(verifyAddressRequest);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
