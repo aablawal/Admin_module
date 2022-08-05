@@ -670,10 +670,10 @@ public class KYCService {
 
     }
 
-    public Response<VerifyMeAddressVerificationResponse> getAddressVerification(VerifyAddressRequest request) throws Exception {
+    public Response<AddressVerifyResponse> getAddressVerification(VerifyAddressRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
 
-        Response<VerifyMeAddressVerificationResponse> response = kycServiceInterface.getAddressVerification(token, request).execute();
+        Response<AddressVerifyResponse> response = kycServiceInterface.getAddressVerification(token, request).execute();
         return response;
     }
 
@@ -734,7 +734,7 @@ public class KYCService {
         verifyAddressRequest.setLga(addressVerificationRequest.getLga());
         verifyAddressRequest.setImage(addressVerificationRequest.getImage());
 
-        Response<VerifyMeAddressVerificationResponse> response = null;
+        Response<AddressVerifyResponse> response = null;
         try {
 
             //TEST DATA
@@ -761,27 +761,25 @@ public class KYCService {
 
         KycAddressVerification kycAddressVerification = new KycAddressVerification();
         kycAddressVerification.setUserId(user.getUuid());
-        kycAddressVerification.setBirthdate(response.body() != null ? response.body().getData().getApplicant().getBirthdate() : null);
-        kycAddressVerification.setFirstname(response.body().getData().getApplicant().getFirstname());
-        kycAddressVerification.setLastname(response.body().getData().getApplicant().getLastname());
-        kycAddressVerification.setGender(response.body().getData().getApplicant().getGender());
-        kycAddressVerification.setMiddlename(response.body().getData().getApplicant().getMiddlename());
-        kycAddressVerification.setPhone(response.body().getData().getApplicant().getPhone());
-        kycAddressVerification.setIdType(response.body().getData().getApplicant().getIdType());
-        kycAddressVerification.setIdNumber(response.body().getData().getApplicant().getIdNumber());
-        kycAddressVerification.setPhoto(response.body().getData().getApplicant().getPhoto());
+        kycAddressVerification.setBirthdate(dateOfBirth);
+        kycAddressVerification.setFirstname(user.getFirstName());
+        kycAddressVerification.setLastname(user.getLastName());
+        kycAddressVerification.setGender(user.getGender());
+        kycAddressVerification.setPhone(userPhone);
+        kycAddressVerification.setIdNumber(userPhone);
+        kycAddressVerification.setPhoto(null);
 
-        kycAddressVerification.setResID(Long.valueOf(response.body().getData().getId()));
-        kycAddressVerification.setCountry(response.body().getData().getCountry());
-        kycAddressVerification.setCity(response.body().getData().getCity());
-        kycAddressVerification.setLga(response.body().getData().getLga());
-        kycAddressVerification.setStreet(response.body().getData().getStreet());
-        kycAddressVerification.setLattitude(response.body().getData().getLattitude());
-        kycAddressVerification.setLongitude(response.body().getData().getLongitude());
-        kycAddressVerification.setState(response.body().getData().getState());
-        kycAddressVerification.setReference(response.body().getData().getReference());
-        kycAddressVerification.setStatus(response.body().getData().getStatus().getStatus());
-        kycAddressVerification.setSubStatus(response.body().getData().getStatus().getSubStatus());
+//        kycAddressVerification.setResID(Long.valueOf(response.body().getData().getId()));
+//        kycAddressVerification.setCountry(response.body().getData().getCountry());
+//        kycAddressVerification.setCity(response.body().getData().getCity());
+//        kycAddressVerification.setLga(response.body().getData().getLga());
+//        kycAddressVerification.setStreet(response.body().getData().getStreet());
+//        kycAddressVerification.setLattitude(response.body().getData().getLattitude());
+//        kycAddressVerification.setLongitude(response.body().getData().getLongitude());
+//        kycAddressVerification.setState(response.body().getData().getState());
+//        kycAddressVerification.setReference(response.body().getData().getReference());
+//        kycAddressVerification.setStatus(response.body().getData().getStatus().getStatus());
+//        kycAddressVerification.setSubStatus(response.body().getData().getStatus().getSubStatus());
 
         kycAddressRepository.save(kycAddressVerification);
         return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
