@@ -734,7 +734,6 @@ public class KYCService {
         verifyAddressRequest.setLga(addressVerificationRequest.getLga());
         verifyAddressRequest.setImage(addressVerificationRequest.getImage());
 
-
         Response<VerifyMeAddressVerificationResponse> response = null;
         try {
 
@@ -749,8 +748,10 @@ public class KYCService {
 //            verifyAddressRequest.getApplicant().setPhone("08121234567");
 //            verifyAddressRequest.getApplicant().setDob("04-04-1944");
 //            verifyAddressRequest.getApplicant().setIdType("KYC");
+
             app.print("addressVerificationRequestVerifyMe request body: " + verifyAddressRequest);
             response = getAddressVerification(verifyAddressRequest);
+            app.print("addressVerificationRequestVerifyMe response body: " + response.body().toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
