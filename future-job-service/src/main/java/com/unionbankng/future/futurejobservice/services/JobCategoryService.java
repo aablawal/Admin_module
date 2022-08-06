@@ -72,14 +72,6 @@ public class JobCategoryService implements Serializable {
         }
     }
 
-    public APIResponse<List<JobSubcategory>> findTopSubcategories(){
-        List<JobSubcategory> jobSubcategoryList=jobSubcategoryRepository.findTopSubcategories().orElse(null);
-        if(jobSubcategoryList!=null)
-            return new APIResponse<>("success",true,jobSubcategoryList);
-        else
-            return  new APIResponse<>("No Category Available",false,null);
-    }
-
     public APIResponse<List<JobSubcategory>> findSubcategoryBySearch(String q){
         logger.info("Searching for ..."+q);
         List<JobSubcategory> jobSubcategoryList=jobSubcategoryRepository.findSubcategoryBySearch(q).orElse(null);

@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -24,6 +25,12 @@ public class JobSubcategory implements Serializable{
     private String description;
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_category_id")
+    @JsonBackReference(value = "category-subcategories")
+    private JobCategory jobCategory;
 
     @PrePersist
     public void setCreatedAt() {
