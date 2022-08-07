@@ -25,5 +25,9 @@
         <sqlFile dbms="h2,mssql"
                  path="db/migrations/migration-2.sql" />
     </changeSet>
+    <changeSet id="16170301465441-6" author="joan">
+        <sqlFile dbms="h2,mssql"
+                 path="db/migrations/migration-2.sql" />
+    </changeSet>
     <include file="db/changelog/db.skills-changelog.xml"/>
 </databaseChangeLog>
