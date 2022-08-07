@@ -40,9 +40,4 @@ public class JobCategoryController {
     public ResponseEntity<APIResponse> findSubcategoryBySearch(@RequestParam String q){
         return ResponseEntity.ok().body(jobCategoryService.findSubcategoryBySearch(q));
     }
-
-    @GetMapping("/v1/job/subcategories")
-    public ResponseEntity<APIResponse> findLatestSubcategories() {
-        return ResponseEntity.ok().body(jobCategoryService.findTopSubcategories());
-    }
 }
