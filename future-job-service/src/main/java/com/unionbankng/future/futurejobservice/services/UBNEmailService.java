@@ -50,7 +50,7 @@ public class UBNEmailService {
             app.print("Sending Email...");
             String authorization = String.format("Bearer %s", authService.getUBNAuthServerToken().getAccess_token());
             // app.print(authorization);
-            app.print("REQUEST: " + authorization + "THIS " +processEmailTemplate(body));
+            app.print(body);
             Response<UbnEmailResponse> responseCall = ubnEmailServiceInterface.sendEmail(authorization, processEmailTemplate(body)).execute();
             UbnEmailResponse response = responseCall.body();
             app.print("Response:");
