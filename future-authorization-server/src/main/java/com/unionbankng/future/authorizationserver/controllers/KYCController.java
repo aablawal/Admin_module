@@ -3,7 +3,6 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.enums.IdType;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
@@ -62,7 +61,9 @@ public class KYCController {
             @RequestParam(value = "idImage") MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
 
         VerifyKycRequest verifyKycRequest = app.getMapper().readValue(bioData, VerifyKycRequest.class);
+        app.print("Makanaki got here");
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        app.print("UserUuid: "+ authorizedUser.getUserUUID());
         User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
         if (user == null)
