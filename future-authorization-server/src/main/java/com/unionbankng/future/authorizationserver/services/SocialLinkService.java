@@ -1,8 +1,10 @@
 package com.unionbankng.future.authorizationserver.services;
 
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.SocialLink;
 import com.unionbankng.future.authorizationserver.enums.SocialMedia;
 import com.unionbankng.future.authorizationserver.pojos.UserSocialLink;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.repositories.SocialLinkRepository;
 import com.unionbankng.future.authorizationserver.utils.InstagramHandler;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +27,24 @@ public class SocialLinkService {
     private final Logger logger = LoggerFactory.getLogger(SocialLinkService.class);
     private final SocialLinkRepository socialLinkRepository;
 
+    private final ProfileRepository profileRepository;
+
     private final InstagramHandler instagramHandler;
 
     @Cacheable(value = "socialLink", key="#userId")
     public Optional<SocialLink> findByUserId(Long userId){
         return socialLinkRepository.findByUserId(userId);
+    }
+
+    public List<SocialLink> findAllByUserId(Long userId){
+
+        List<SocialLink> socialLinkList = new ArrayList<>();
+        Optional<List<SocialLink>> socialLinks = socialLinkRepository.findAllByUserId(userId);
+
+        if(socialLinks.isPresent()){
+            socialLinkList = socialLinks.get();
+        }
+        return socialLinkList;
     }
 
     @CacheEvict(value = "socialLink", key="#socialLink.userId")
@@ -52,12 +69,23 @@ public class SocialLinkService {
         List<SocialLink> allUserSocialLink = socialLinkRepository.findAllByUserId(userSocialLink.getUserId()).
                 orElse(new ArrayList<>());
 
-        for (SocialLink socialLink : allUserSocialLink) {
-            logger.info("deleting :" + socialLink.getSocialMedia().name());
-            socialLinkRepository.delete(socialLink);
-        }
+        Profile profile = profileRepository.findByUserId(userSocialLink.getUserId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
 
-        logger.info("previous social link successfully deleted");
+        if(!allUserSocialLink.isEmpty()){
+            for (SocialLink socialLink : allUserSocialLink) {
+                logger.info("deleting :" + socialLink.getSocialMedia().name());
+                socialLinkRepository.delete(socialLink);
+            }
+
+            logger.info("previous social link successfully deleted");
+
+            logger.info("Decrementing profile percentage completed");
+            profile.decrementPercentageComplete(10);
+            logger.info("Profile percentage completed decreased");
+        }
+        logger.info("Profile is --> " + profile);
         if(userSocialLink.getBehance() != null && !userSocialLink.getBehance().isBlank()){
             SocialLink socialLink = new SocialLink();
             socialLink.setUserId(userSocialLink.getUserId());
@@ -106,6 +134,14 @@ public class SocialLinkService {
             socialLinkRepository.save(socialLink);
         }
 
+        if (!socialLinkRepository.findAllByUserId(userSocialLink.getUserId()).isEmpty()){
+            logger.info("Incrementing profile percentage complete");
+            profile.incrementPercentageComplete(10);
+            logger.info("profile percentage complete incremented");
+        }
+
+        logger.info("Profile after social links update --> " + profile);
+        profileRepository.save(profile);
         logger.info("Social Link successfully updated");
 
     }

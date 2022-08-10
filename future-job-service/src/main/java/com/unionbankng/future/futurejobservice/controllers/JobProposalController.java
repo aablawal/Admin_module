@@ -51,6 +51,21 @@ public class JobProposalController {
         }
     }
 
+    @PostMapping(value = "/v2/job/apply", consumes = "multipart/form-data")
+    public ResponseEntity<APIResponse> applyForJob(@Valid @RequestParam(value = "data", required = true) String proposalData
+            ,@ApiIgnore OAuth2Authentication authentication,@RequestParam(value = "profileComplete") Integer percentageComplete) throws JsonProcessingException {
+
+        JobProposal appliedJob = service.applyForJob(authentication,proposalData, percentageComplete);
+        if (appliedJob != null) {
+            logger.info("Success");
+            return ResponseEntity.ok().body(new APIResponse("success", true, appliedJob));
+        }
+        else {
+            logger.info("Failed");
+            return ResponseEntity.ok().body(new APIResponse("failed", false, null));
+        }
+    }
+
     @GetMapping("/v1/job/proposal/{id}")
     public ResponseEntity<APIResponse> getProposalById(@PathVariable Long id, Model model) {
         return ResponseEntity.ok().body(
