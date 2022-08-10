@@ -35,10 +35,6 @@ public class ProfileService {
     private final SocialLinkService socialLinkService;
 
     private final ProfileSkillService profileSkillService;
-
-    private final UserService userService;
-
-    private final ProfileService profileService;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
     private final App app;
@@ -124,7 +120,7 @@ public class ProfileService {
         int percentageComplete = 0;
 
         // Get the user profile
-        Optional<Profile> profile = profileService.findByUserId(userId);
+        Optional<Profile> profile = findByUserId(userId);
         Profile savedProfile = new Profile();
 
         if(profile.isPresent()){
@@ -146,7 +142,7 @@ public class ProfileService {
         percentageComplete = experienceValue + bioValue + qualificationValue + profilePhotoValue + coverPhotoValue + skillValue + socialLinkValue;
         savedProfile.setPercentageComplete(percentageComplete);
 
-        return profileRepository.save(savedProfile);
+        return save(savedProfile);
 
     }
 

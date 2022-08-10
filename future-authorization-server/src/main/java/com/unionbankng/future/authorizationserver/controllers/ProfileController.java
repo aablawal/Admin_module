@@ -100,7 +100,7 @@ public class ProfileController {
     public ResponseEntity<APIResponse<Integer>> calculatePercentageProfileComplete(@PathVariable Long userId){
         app.print("Getting the percentage profile complete");
         Integer percentage = 0;
-        Profile profile = profileRepository.findByUserId(userId).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,"Profile not found"));
+        Profile profile = profileService.findByUserId(userId).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,"Profile not found"));
 
         if(profile.getPercentageComplete()>0){
             percentage = profile.getPercentageComplete();
