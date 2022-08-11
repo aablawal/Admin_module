@@ -735,6 +735,26 @@ public class KYCService {
         verifyAddressRequest.setImage(addressVerificationRequest.getImage());
         verifyAddressRequest.setClientRef("KULA_"+ app.makeUIID());
 
+        KycAddressVerification kycAddressVerification = new KycAddressVerification();
+        kycAddressVerification.setUserId(user.getUuid());
+        kycAddressVerification.setBirthdate(dateOfBirth);
+        kycAddressVerification.setFirstname(user.getFirstName());
+        kycAddressVerification.setLastname(user.getLastName());
+        kycAddressVerification.setGender(user.getGender());
+        kycAddressVerification.setPhone(userPhone);
+        kycAddressVerification.setIdNumber(userPhone);
+        kycAddressVerification.setPhoto(null);
+        kycAddressVerification.setReference(verifyAddressRequest.getClientRef());
+        kycAddressVerification.setCountry(verifyAddressRequest.getCountry());
+        kycAddressVerification.setCity(verifyAddressRequest.getCity());
+        kycAddressVerification.setLga(verifyAddressRequest.getLga());
+        kycAddressVerification.setStreet(verifyAddressRequest.getStreet());
+        kycAddressVerification.setState(verifyAddressRequest.getState());
+        kycAddressVerification.setStatus("PENDING");
+        kycAddressVerification.setSubStatus("PENDING");
+
+        kycAddressRepository.save(kycAddressVerification);
+
         Response<AddressVerifyResponse<AddressVerificationDto>> response = null;
         try {
 
@@ -760,33 +780,15 @@ public class KYCService {
             return new APIResponse<>(messageSource.getMessage("101", null, LocaleContextHolder.getLocale()),
                     false, "Request Failed");
 
-        KycAddressVerification kycAddressVerification = new KycAddressVerification();
-        kycAddressVerification.setUserId(user.getUuid());
-        kycAddressVerification.setBirthdate(dateOfBirth);
-        kycAddressVerification.setFirstname(user.getFirstName());
-        kycAddressVerification.setLastname(user.getLastName());
-        kycAddressVerification.setGender(user.getGender());
-        kycAddressVerification.setPhone(userPhone);
-        kycAddressVerification.setIdNumber(userPhone);
-        kycAddressVerification.setPhoto(null);
-        kycAddressVerification.setReference(response.body().getData().getClientRef());
-        kycAddressVerification.setCountry(response.body().getData().getCountry());
-        kycAddressVerification.setCity(response.body().getData().getCity());
-        kycAddressVerification.setLga(response.body().getData().getLga());
-        kycAddressVerification.setStreet(response.body().getData().getStreet());
-        kycAddressVerification.setState(response.body().getData().getState());
-        kycAddressVerification.setStatus(response.body().getData().getStatus().toString());
-        kycAddressVerification.setSubStatus(response.body().getData().getStatus().toString());
 
-        kycAddressRepository.save(kycAddressVerification);
         return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
                 true, "Address verification Request Submitted.");
     }
 
     public APIResponse<String> processWebhookRequest(@RequestBody AddressVerificationDto addressVerificationWebhookRequest) {
         if (addressVerificationWebhookRequest != null) {
-//            Long id = Long.valueOf(addressVerificationWebhookRequest.getResID());
             KycAddressVerification kycAddressVerification = kycAddressRepository.findByReference(addressVerificationWebhookRequest.getClientRef()).orElseThrow(null);
+
             User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
             if (user != null) {
                 if (addressVerificationWebhookRequest.getStatus().equals("VERIFIED")) {
