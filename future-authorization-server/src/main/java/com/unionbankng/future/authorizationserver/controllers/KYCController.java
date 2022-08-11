@@ -1,6 +1,5 @@
 package com.unionbankng.future.authorizationserver.controllers;
 
-import com.unionbankng.future.authorizationserver.customannotation.ValidFile;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
@@ -15,14 +14,12 @@ import com.unionbankng.future.authorizationserver.utils.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,11 +54,11 @@ public class KYCController {
 
     }
 
-    @PostMapping(path="/v1/kyc/id_verification", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping("/v1/kyc/id_verification")
     public APIResponse<String> verifyId(
             @Valid @RequestParam(value = "data") String bioData,
-            @RequestPart(value = "selfieImage", required = false) @NotEmpty(message = "Please select a file")  MultipartFile selfieImage,
-            @ValidFile @RequestPart(value = "idImage", required = false) @NotEmpty(message = "Please select a file") MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
+            @RequestPart(value = "selfieImage", required = false) MultipartFile selfieImage,
+            @RequestPart(value = "idImage", required = false) MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
 
         if(selfieImage.isEmpty() || idImage.isEmpty()){
             throw new MultipartException("Please select a file");
@@ -94,7 +91,6 @@ public class KYCController {
         return kycService.kycVerifyId(verifyKycRequest, selfieImage, idImage, user);
 
     }
-
 
     @PostMapping("/v1/kyc/address_verification")
     public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequest addressVerificationRequest, OAuth2Authentication authentication) throws Exception {
