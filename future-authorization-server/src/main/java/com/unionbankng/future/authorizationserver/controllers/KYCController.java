@@ -59,8 +59,8 @@ public class KYCController {
     @PostMapping("/v1/kyc/id_verification")
     public APIResponse<String> verifyId(
             @Valid @RequestParam(value = "data") String bioData,
-            @Validated @ValidFile @RequestParam(value = "selfieImage") MultipartFile selfieImage,
-            @Validated @ValidFile @RequestParam(value = "idImage") MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
+            @Validated @ValidFile @RequestParam(value = "selfieImage", required = false) MultipartFile selfieImage,
+            @Validated @ValidFile @RequestParam(value = "idImage", required = false) MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
 
         VerifyKycRequest verifyKycRequest = app.getMapper().readValue(bioData, VerifyKycRequest.class);
         app.print("Makanaki got here");
