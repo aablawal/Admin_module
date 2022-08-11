@@ -18,7 +18,7 @@ public class WebhookController {
 
 
     @PostMapping("kyc/verifyme")
-    public APIResponse<String> verifyAddress(@RequestBody AddressVerificationWebhookData addressVerificationWebhookRequest) {
+    public APIResponse<String> verifyAddress(@RequestBody AddressVerificationDto addressVerificationWebhookRequest) {
         app.print("Webhook received: " + addressVerificationWebhookRequest.toString());
         return kycService.processWebhookRequest(addressVerificationWebhookRequest);
     }

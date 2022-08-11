@@ -18,6 +18,7 @@ public class AddressVerificationDto {
     private String dob;
     private String userId;
     private Long resID;
+    private String clientRef;
     private String reference;
     private String callbackUrl;
     private String vendor;

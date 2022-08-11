@@ -19,5 +19,6 @@ public class VerifyAddressRequest {
     private String phone;
     private String email;
     private String dob;
+    private String clientRef;
     private String image;
 }
