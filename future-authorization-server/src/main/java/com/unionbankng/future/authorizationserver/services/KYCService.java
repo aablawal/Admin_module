@@ -706,7 +706,7 @@ public class KYCService {
                     false, "User Already verified");
 
         String idType = "KYC";
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirth = sdf.format(user.getDateOfBirth());
 
         // format the phone number
