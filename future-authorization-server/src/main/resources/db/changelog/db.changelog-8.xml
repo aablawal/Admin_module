@@ -101,4 +101,12 @@
     <changeSet author="chokeme (generated)" id="1601486582882-21">
         <dropColumn columnName="user_type" tableName="app_user"/>
     </changeSet>
+    <changeSet author="joan" id="1601486582880-1">
+        <addColumn tableName="profile">
+            <column name="profile_photo" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="profile">
+            <column name="percentage_complete" type="bigint"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

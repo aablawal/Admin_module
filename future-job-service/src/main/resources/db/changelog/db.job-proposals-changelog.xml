@@ -93,4 +93,9 @@
             <column name="payment_method" type="int"/>
         </addColumn>
     </changeSet>
+    <changeSet author="joan" id="1641380843151-11" >
+        <addColumn tableName="job_proposals">
+            <column name="cover_letter" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

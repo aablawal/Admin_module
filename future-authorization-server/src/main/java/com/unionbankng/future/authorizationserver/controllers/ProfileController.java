@@ -96,4 +96,27 @@ public class ProfileController {
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,profile));
     }
 
+    @GetMapping(value="/calculate-percentage/{userId}")
+    public ResponseEntity<APIResponse<Integer>> calculatePercentageProfileComplete(@PathVariable Long userId){
+        app.print("Getting the percentage profile complete");
+        Integer percentage = 0;
+        Profile profile = profileService.findByUserId(userId).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,"Profile not found"));
+
+        if(profile.getPercentageComplete()>0){
+            percentage = profile.getPercentageComplete();
+        }
+
+        // for profiles that may have been updated but don't have their percentage profile set
+        else if(profile.getPercentageComplete() == 0) {
+            profile = profileService.calculatePercentage(userId);
+            percentage = profile.getPercentageComplete();
+        }
+        else if(profile.getPercentageComplete() > 100){
+            return ResponseEntity.badRequest().body(new APIResponse<>("Percentage is over 100", false, percentage));
+        }
+
+
+        return ResponseEntity.ok(new APIResponse<>("Request Successful",true,percentage));
+    }
+
 }
