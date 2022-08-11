@@ -19,9 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,9 +59,13 @@ public class KYCController {
 
     @PostMapping(path="/v1/kyc/id_verification", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public APIResponse<String> verifyId(
-            @Valid @RequestParam(value = "data") String bioData,
-            @Validated @ValidFile @RequestPart(value = "selfieImage", required = false) MultipartFile selfieImage,
-            @Validated @ValidFile @RequestPart(value = "idImage", required = false) MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
+            @Validated  @RequestParam(value = "data") String bioData,
+            @ValidFile @RequestPart(value = "selfieImage", required = false) @NotEmpty(message = "Please select a file")  MultipartFile selfieImage,
+            @ValidFile @RequestPart(value = "idImage", required = false) @NotEmpty(message = "Please select a file") MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
+
+        if(selfieImage.isEmpty() || idImage.isEmpty()){
+            throw new MultipartException("Please select a file");
+        }
 
         VerifyKycRequest verifyKycRequest = app.getMapper().readValue(bioData, VerifyKycRequest.class);
         app.print("Makanaki got here");
