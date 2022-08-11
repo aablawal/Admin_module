@@ -38,7 +38,6 @@ public class KYCController {
     private final UserRepository userRepository;
     private final App app;
 
-
     @PostMapping("/v1/kyc/initiation")
     public APIResponse<Map<String, String>> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam(required = false) String dob) {
 
