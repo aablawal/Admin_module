@@ -100,7 +100,7 @@ public class ProfileController {
     @GetMapping(value="/calculate-percentage/{userId}")
     public ResponseEntity<APIResponse<Integer>> calculatePercentageProfileComplete(@PathVariable Long userId){
         app.print("Getting the percentage profile complete");
-        Integer percentage = 0;
+        int percentage = 0;
         Optional<Profile> optionalProfile = profileService.findByUserId(userId);
         Profile profile = new Profile();
 
