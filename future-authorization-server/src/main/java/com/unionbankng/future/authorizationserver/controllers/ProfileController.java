@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -100,12 +101,16 @@ public class ProfileController {
     public ResponseEntity<APIResponse<Integer>> calculatePercentageProfileComplete(@PathVariable Long userId){
         app.print("Getting the percentage profile complete");
         Integer percentage = 0;
-        Profile profile = profileService.findByUserId(userId).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,"Profile not found"));
+        Optional<Profile> optionalProfile = profileService.findByUserId(userId);
+        Profile profile = new Profile();
+
+        if(optionalProfile.isPresent()){
+            profile = optionalProfile.get();
+        }
 
         if(profile.getPercentageComplete()>0){
             percentage = profile.getPercentageComplete();
         }
-
         // for profiles that may have been updated but don't have their percentage profile set
         else if(profile.getPercentageComplete() == 0) {
             profile = profileService.calculatePercentage(userId);
