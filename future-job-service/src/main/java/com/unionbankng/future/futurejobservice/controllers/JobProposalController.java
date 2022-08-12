@@ -53,7 +53,7 @@ public class JobProposalController {
 
     @PostMapping(value = "/v2/job/apply", consumes = "multipart/form-data")
     public ResponseEntity<APIResponse> applyForJob(@Valid @RequestParam(value = "data", required = true) String proposalData
-            ,@ApiIgnore OAuth2Authentication authentication,@RequestParam(value = "profileComplete") Integer percentageComplete) throws JsonProcessingException {
+            ,@ApiIgnore OAuth2Authentication authentication,@RequestParam(value = "profileComplete") int percentageComplete) throws JsonProcessingException {
 
         JobProposal appliedJob = service.applyForJob(authentication,proposalData, percentageComplete);
         if (appliedJob != null) {

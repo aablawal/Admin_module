@@ -156,7 +156,7 @@ public class JobProposalService  implements Serializable {
             return null;
         }
     }
-    public JobProposal applyForJob(OAuth2Authentication authentication, String applicationData, Integer percentageComplete) {
+    public JobProposal applyForJob(OAuth2Authentication authentication, String applicationData, int percentageComplete) {
 
         if(percentageComplete != 100){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile must be complete to be able to apply for a job!");

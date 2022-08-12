@@ -49,7 +49,7 @@ public class Profile implements Serializable {
 
     @OneToMany
     private Set<ProfileSkill> skills = new HashSet<>();
-    private Integer percentageComplete = 0;
+    private int percentageComplete;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
