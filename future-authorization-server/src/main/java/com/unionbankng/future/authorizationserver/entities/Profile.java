@@ -49,7 +49,7 @@ public class Profile implements Serializable {
 
     @OneToMany
     private Set<ProfileSkill> skills = new HashSet<>();
-    private int percentageComplete;
+    private Integer percentageComplete;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -79,6 +79,15 @@ public class Profile implements Serializable {
 
     public void decrementPercentageComplete(int percentage){
         this.percentageComplete = percentageComplete - percentage;
+    }
+
+    public int getPercentageComplete(){
+        if(this.percentageComplete == null){
+            return 0;
+        }
+        else{
+            return this.percentageComplete;
+        }
     }
 
 }
