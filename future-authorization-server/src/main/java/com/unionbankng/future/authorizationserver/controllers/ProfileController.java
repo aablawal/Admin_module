@@ -103,12 +103,12 @@ public class ProfileController {
         int percentage = 0;
         Optional<Profile> optionalProfile = profileService.findByUserId(userId);
         Profile profile = new Profile();
-        profile.incrementPercentageComplete(20);
 
         if(optionalProfile.isPresent()){
             profile = optionalProfile.get();
         }
         app.print("I GOT HERE");
+        profile.incrementPercentageComplete(20);
         if(profile.getPercentageComplete()>0){
             app.print("PERCENTAGE GREATER THAN ZERO");
             percentage = profile.getPercentageComplete();
