@@ -34,7 +34,8 @@ public class ProfileService {
 
     private final SocialLinkService socialLinkService;
 
-    private final ProfileSkillService profileSkillService;
+    private final UserService userService;
+
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
     private final App app;
@@ -114,11 +115,12 @@ public class ProfileService {
         int bioValue = 0;
         int skillValue = 0;
         int socialLinkValue = 0;
-        int profilePhotoValue = 0;
-        int coverPhotoValue = 0;
+        int photoValue;
         int qualificationValue = 0;
-        int percentageComplete = 0;
+        int percentageComplete;
 
+        photoValue = checkPhotos(userId);
+        app.print("PHOTO VALUE: " + qualificationValue);
         // Get the user profile
         Optional<Profile> profile = findByUserId(userId);
         Profile savedProfile = new Profile();
@@ -136,23 +138,38 @@ public class ProfileService {
                 qualificationValue = 10;
             }
             app.print("QUALIFICATION VALUE: " + qualificationValue);
-            profilePhotoValue = savedProfile.getProfilePhoto()==null ? 0:15;
-            app.print("PROFILE PHOTO VALUE: " + profilePhotoValue);
-            coverPhotoValue = savedProfile.getCoverPhoto()==null ? 0:5;
-            app.print("COVER PHOTO VALUE: " + coverPhotoValue);
             skillValue = savedProfile.getSkills().size()==0 ? 0:20;
             app.print("SKILL VALUE: " + skillValue);
             socialLinkValue = socialLinkService.findAllByUserId(userId).size()==0 ? 0:10;
             app.print("SOCIAL LINK VALUE: " + socialLinkValue);
         }
 
-        percentageComplete = experienceValue + bioValue + qualificationValue + profilePhotoValue + coverPhotoValue + skillValue + socialLinkValue;
+        percentageComplete = experienceValue + bioValue + qualificationValue + photoValue + skillValue + socialLinkValue;
         savedProfile.setPercentageComplete(percentageComplete);
 
         app.print("PERCENTAGE COMPLETE SET");
 
         return save(savedProfile);
+    }
 
+    private int checkPhotos(Long userID){
+        Optional<User> aUser = userService.findById(userID);
+        User savedUser= new User();
+        int percentageForPhotos = 0;
+
+        if(aUser.isPresent()){
+            savedUser = aUser.get();
+        }
+
+        if(savedUser.getImg()!=null || savedUser.getImg().length()!=0){
+            percentageForPhotos += 15;
+        }
+
+        if(savedUser.getCoverImg()!=null || savedUser.getCoverImg().length()!=0){
+            percentageForPhotos += 5;
+        }
+
+        return percentageForPhotos;
     }
 
     public String getPhoneNumberByProfileId(Long profileId){
