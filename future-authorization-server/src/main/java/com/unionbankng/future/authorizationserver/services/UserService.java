@@ -1,8 +1,10 @@
 package com.unionbankng.future.authorizationserver.services;
 
 import com.google.code.ssm.api.ParameterValueKeyProvider;
+import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.pojos.PersonalInfoUpdateRequest;
+import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final FileStorageService fileStorageService;
     private final App app;
 
@@ -122,6 +125,7 @@ public class UserService {
     public User updateProfile(@ParameterValueKeyProvider Long userId, MultipartFile coverImg, MultipartFile img, PersonalInfoUpdateRequest request) throws IOException {
         app.print("Updating user profile");
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Profile not found"));
 
         if (img != null) {
             app.print("Updating user profile image");
@@ -129,9 +133,16 @@ public class UserService {
                 app.print("Deleting old image");
                 fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
                 app.print("Deleted old image");
+                app.print("Decrementing percentage profile complete");
+                profile.decrementPercentageComplete(15);
+                app.print("Percentage profile complete decreased");
             }
             String source = fileStorageService.storeFile(img, userId, BlobType.IMAGE);
             user.setImg(source);
+            profile.setProfilePhoto(source);
+            app.print("incrementing percentage profile complete");
+            profile.incrementPercentageComplete(15);
+            app.print("Percentage profile complete increased");
             app.print(source);
         }
 
@@ -141,12 +152,20 @@ public class UserService {
                 app.print("Deleting old cover image");
                 fileStorageService.deleteFileFromStorage(user.getCoverImg(), BlobType.IMAGE);
                 app.print("Deleted old cover image");
+                app.print("Decrementing percentage profile complete");
+                profile.decrementPercentageComplete(5);
+                app.print("Percentage profile complete decreased");
             }
             String source = fileStorageService.storeFile(coverImg, userId, BlobType.IMAGE);
             user.setCoverImg(source);
+            profile.setCoverPhoto(source);
+            app.print("incrementing percentage profile complete");
+            profile.incrementPercentageComplete(5);
+            app.print("Percentage profile complete increased");
             app.print(source);
         }
 
+        profileRepository.save(profile);
 
 //        Boolean isKeycloakPropertyChanged = !user.getLastName().equals(request.getLastName()) ||
 //                !user.getFirstName().equals(request.getFirstName());
