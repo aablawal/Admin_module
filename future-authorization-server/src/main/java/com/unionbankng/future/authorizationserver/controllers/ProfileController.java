@@ -108,7 +108,7 @@ public class ProfileController {
             profile = optionalProfile.get();
         }
         app.print("I GOT HERE");
-        profile.incrementPercentageComplete(20);
+        profile.setPercentageComplete(0);
         if(profile.getPercentageComplete()>0){
             app.print("PERCENTAGE GREATER THAN ZERO");
             percentage = profile.getPercentageComplete();

@@ -77,9 +77,10 @@ public class ProfileSkillService {
             profileSkill.setProfileId(profile.getId());
             profileSkillRepository.save(profileSkill);
             profile.getSkills().add(profileSkill);
-            profile.incrementPercentageComplete(20);
             profileRepository.save(profile);
         }
+
+        profile.incrementPercentageComplete(20);
 
     }
 
