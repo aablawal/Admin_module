@@ -127,10 +127,10 @@ public class ProfileService {
             savedProfile = profile.get();
             // For profiles that have already been updated but do not have the percentage complete value set
             Long profileId = savedProfile.getId();
-            experienceValue = experienceService.findByProfileId(profileId, Sort.by("created_at").ascending()).isEmpty()? 0:20;
+            experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()? 0:20;
             bioValue = profile.get().getBio().isEmpty()? 0:20;
-            if (!qualificationService.findAllByProfileId(profileId, Sort.by("created_at").ascending()).isEmpty()
-                    || !trainingService.findAllByProfileId(profileId, Sort.by("created_at").ascending()).isEmpty()){
+            if (!qualificationService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()
+                    || !trainingService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()){
                 qualificationValue = 10;
             }
             profilePhotoValue = profile.get().getProfilePhoto().isEmpty() ? 0:15;
