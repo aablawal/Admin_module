@@ -75,10 +75,12 @@ public class Profile implements Serializable {
     }
     public void incrementPercentageComplete(int percentage){
         this.percentageComplete = percentageComplete + percentage;
+        System.out.println("PERCENTAGE INCREMENTED BY " + percentage + "GIVES" + percentageComplete);
     }
 
     public void decrementPercentageComplete(int percentage){
         this.percentageComplete = percentageComplete - percentage;
+        System.out.println("PERCENTAGE DECREMENTED BY " + percentage + "GIVES" + percentageComplete);
     }
 
     public int getPercentageComplete(){
