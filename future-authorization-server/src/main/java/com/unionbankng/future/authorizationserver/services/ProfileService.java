@@ -135,11 +135,8 @@ public class ProfileService {
             }
             app.print("I GOT THE EXPERIENCE, BIOVALUE AND QUALIFICATION VALUE");
             profilePhotoValue = savedProfile.getProfilePhoto()==null ? 0:15;
-            app.print("HERE ISSUE 1");
             coverPhotoValue = savedProfile.getCoverPhoto()==null ? 0:5;
-            app.print("HERE ISSUE 2");
             skillValue = savedProfile.getSkills().size()==0 ? 0:20;
-            app.print("THE ISSUE WAS FROM SKILL VALUE");
             socialLinkValue = socialLinkService.findAllByUserId(userId).size()==0 ? 0:10;
 
             app.print("I GOT THE PROFILE VALUE, COVER PHOTO VALUE, SKILL VALUE AND SOCIAL LINK VALUE");
