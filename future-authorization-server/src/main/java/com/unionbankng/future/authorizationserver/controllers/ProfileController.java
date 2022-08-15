@@ -109,17 +109,11 @@ public class ProfileController {
         }
         app.print("I GOT HERE");
         profile.setPercentageComplete(0);
-        if(profile.getPercentageComplete()>0){
-            app.print("PERCENTAGE GREATER THAN ZERO");
-            percentage = profile.getPercentageComplete();
-        }
-        // for profiles that may have been updated but don't have their percentage profile set
-        else if(profile.getPercentageComplete() == 0) {
-            app.print("PERCENTAGE IS ZERO");
-            profile = profileService.calculatePercentage(userId);
-            percentage = profile.getPercentageComplete();
-        }
-        else if(profile.getPercentageComplete() > 100){
+
+        profile = profileService.calculatePercentage(userId);
+        percentage = profile.getPercentageComplete();
+
+        if(profile.getPercentageComplete() > 100){
             app.print("PERCENTAGE IS OVER 100");
             return ResponseEntity.badRequest().body(new APIResponse<>("Percentage is over 100", false, percentage));
         }

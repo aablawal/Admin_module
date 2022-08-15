@@ -128,18 +128,22 @@ public class ProfileService {
             // For profiles that have already been updated but do not have the percentage complete value set
             Long profileId = savedProfile.getId();
             experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()? 0:20;
+            app.print("EXPERIENCE VALUE: " + experienceValue);
             bioValue = savedProfile.getBio().length()==0 ? 0:20;
+            app.print("BIO VALUE: " + bioValue);
             if (!qualificationService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()
                     || !trainingService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()){
                 qualificationValue = 10;
             }
-            app.print("I GOT THE EXPERIENCE, BIOVALUE AND QUALIFICATION VALUE");
+            app.print("QUALIFICATION VALUE: " + qualificationValue);
             profilePhotoValue = savedProfile.getProfilePhoto()==null ? 0:15;
+            app.print("PROFILE PHOTO VALUE: " + profilePhotoValue);
             coverPhotoValue = savedProfile.getCoverPhoto()==null ? 0:5;
+            app.print("COVER PHOTO VALUE: " + coverPhotoValue);
             skillValue = savedProfile.getSkills().size()==0 ? 0:20;
+            app.print("SKILL VALUE: " + skillValue);
             socialLinkValue = socialLinkService.findAllByUserId(userId).size()==0 ? 0:10;
-
-            app.print("I GOT THE PROFILE VALUE, COVER PHOTO VALUE, SKILL VALUE AND SOCIAL LINK VALUE");
+            app.print("SOCIAL LINK VALUE: " + socialLinkValue);
         }
 
         percentageComplete = experienceValue + bioValue + qualificationValue + profilePhotoValue + coverPhotoValue + skillValue + socialLinkValue;
