@@ -115,12 +115,12 @@ public class ProfileService {
         int bioValue = 0;
         int skillValue = 0;
         int socialLinkValue = 0;
-        int photoValue;
+        int photoValue = 0;
         int qualificationValue = 0;
-        int percentageComplete;
+        int percentageComplete = 0;
 
         photoValue = checkPhotos(userId);
-        app.print("PHOTO VALUE: " + qualificationValue);
+        app.print("PHOTO VALUE: " + photoValue);
         // Get the user profile
         Optional<Profile> profile = findByUserId(userId);
         Profile savedProfile = new Profile();
@@ -129,7 +129,7 @@ public class ProfileService {
             savedProfile = profile.get();
             // For profiles that have already been updated but do not have the percentage complete value set
             Long profileId = savedProfile.getId();
-            experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()? 0:20;
+            experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).size()==0 ? 0:20;
             app.print("EXPERIENCE VALUE: " + experienceValue);
             bioValue = savedProfile.getBio().length()==0 ? 0:20;
             app.print("BIO VALUE: " + bioValue);
@@ -161,7 +161,9 @@ public class ProfileService {
             savedUser = aUser.get();
         }
 
+        app.print("BEFORE CALCULATING FOR IMAGE");
         if(savedUser.getImg()!=null || savedUser.getImg().length()!=0){
+            app.print("CALCULATING FOR IMAGE");
             percentageForPhotos += 15;
         }
 
