@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
+import com.unionbankng.future.authorizationserver.enums.AddressStatus;
 import com.unionbankng.future.authorizationserver.enums.IdType;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
@@ -791,7 +792,7 @@ public class KYCService {
 
             User user = userRepository.findByUuid(kycAddressVerification.getUserId()).orElse(null);
             if (user != null) {
-                if (addressVerificationWebhookRequest.getStatus().equals("VERIFIED")) {
+                if (addressVerificationWebhookRequest.getStatus().equals(AddressStatus.VERIFIED)) {
                     kycAddressVerification.setStatus(addressVerificationWebhookRequest.getStatus().toString());
                     kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getStatus().toString());
                     kycAddressRepository.save(kycAddressVerification);
@@ -801,8 +802,7 @@ public class KYCService {
                     // Send Email User
                     sendKycEmailUser(user, "kyc.verification.email.level.two.upgraded", "kyc.wallet.upgrade.email.subject");
                     return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
-                            true, "Address verification Completed");
-                } else {
+                            true, "Address verification Completed");} else {
                     // Update Kyc detail address
                     kycAddressVerification.setStatus(addressVerificationWebhookRequest.getStatus().toString());
                     kycAddressVerification.setSubStatus(addressVerificationWebhookRequest.getStatus().toString());

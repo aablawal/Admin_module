@@ -22,4 +22,6 @@ public class WebhookController {
         app.print("Webhook received: " + addressVerificationWebhookRequest.toString());
         return kycService.processWebhookRequest(addressVerificationWebhookRequest);
     }
+
+
 }
