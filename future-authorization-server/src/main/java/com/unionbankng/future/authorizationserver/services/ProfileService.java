@@ -133,14 +133,19 @@ public class ProfileService {
                     || !trainingService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()){
                 qualificationValue = 10;
             }
+            app.print("I GOT THE EXPERIENCE, BIOVALUE AND QUALIFICATION VALUE");
             profilePhotoValue = profile.get().getProfilePhoto().isEmpty() ? 0:15;
             coverPhotoValue = profile.get().getCoverPhoto().isEmpty() ? 0:5;
             skillValue = profileSkillService.findAllByProfileId(profileId, Pageable.unpaged()).isEmpty() ? 0:20;
             socialLinkValue = socialLinkService.findAllByUserId(userId).isEmpty() ? 0:10;
+
+            app.print("I GOT THE PROFILE VALUE, COVER PHOTO VALUE, SKILL VALUE AND SOCIAL LINK VALUE");
         }
 
         percentageComplete = experienceValue + bioValue + qualificationValue + profilePhotoValue + coverPhotoValue + skillValue + socialLinkValue;
         savedProfile.setPercentageComplete(percentageComplete);
+
+        app.print("PERCENTAGE COMPLETE SET");
 
         return save(savedProfile);
 
