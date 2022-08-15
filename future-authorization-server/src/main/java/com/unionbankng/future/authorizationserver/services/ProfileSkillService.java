@@ -65,7 +65,7 @@ public class ProfileSkillService {
         Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
 
-        if(!profile.getSkills().isEmpty()){
+        if(profile.getSkills().size()!=0){
             profile.getSkills().clear();
             app.print("Decrementing profile percentage complete");
             profile.decrementPercentageComplete(20);
@@ -77,9 +77,7 @@ public class ProfileSkillService {
             profileSkill.setProfileId(profile.getId());
             profileSkillRepository.save(profileSkill);
             profile.getSkills().add(profileSkill);
-            if(profileSkillRepository.findAllByProfileId(profile.getId(),Pageable.unpaged()).isEmpty()){
-                profile.incrementPercentageComplete(20);
-            }
+            profile.incrementPercentageComplete(20);
             profileRepository.save(profile);
         }
 
