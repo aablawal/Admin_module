@@ -78,15 +78,15 @@ public class ProfileService {
         }
         if(request.getPricePerHour() != null)
             profile.setPricePerHour(request.getPricePerHour());
-        if(request.getBio() != null) {
-            if(profile.getBio() == null){
+        if(request.getBio().length()>0) {
+            if(profile.getBio().isEmpty()){
                 app.print("Incrementing profile percentage complete");
                 profile.incrementPercentageComplete(20);
                 app.print("Profile percentage complete incremented");
             }
             profile.setBio(request.getBio());
         }
-        if(request.getBio() == null){
+        if(request.getBio().length()==0){
             profile.setBio(request.getBio());
             app.print("Decrementing profile percentage complete");
             profile.decrementPercentageComplete(20);
@@ -128,7 +128,7 @@ public class ProfileService {
             // For profiles that have already been updated but do not have the percentage complete value set
             Long profileId = savedProfile.getId();
             experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()? 0:20;
-            bioValue = savedProfile.getBio().isEmpty()? 0:20;
+            bioValue = savedProfile.getBio().length()==0 ? 0:20;
             if (!qualificationService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()
                     || !trainingService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()){
                 qualificationValue = 10;
