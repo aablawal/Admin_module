@@ -128,17 +128,19 @@ public class ProfileService {
             // For profiles that have already been updated but do not have the percentage complete value set
             Long profileId = savedProfile.getId();
             experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()? 0:20;
-            bioValue = profile.get().getBio().isEmpty()? 0:20;
+            bioValue = savedProfile.getBio().isEmpty()? 0:20;
             if (!qualificationService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()
                     || !trainingService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()){
                 qualificationValue = 10;
             }
             app.print("I GOT THE EXPERIENCE, BIOVALUE AND QUALIFICATION VALUE");
-            profilePhotoValue = profile.get().getProfilePhoto().isEmpty() ? 0:15;
-            coverPhotoValue = profile.get().getCoverPhoto().isEmpty() ? 0:5;
-            skillValue = profile.get().getSkills().isEmpty() ? 0:20;
+            profilePhotoValue = savedProfile.getProfilePhoto()==null ? 0:15;
+            app.print("HERE ISSUE 1");
+            coverPhotoValue = savedProfile.getCoverPhoto()==null ? 0:5;
+            app.print("HERE ISSUE 2");
+            skillValue = savedProfile.getSkills().size()==0 ? 0:20;
             app.print("THE ISSUE WAS FROM SKILL VALUE");
-            socialLinkValue = socialLinkService.findAllByUserId(userId).isEmpty() ? 0:10;
+            socialLinkValue = socialLinkService.findAllByUserId(userId).size()==0 ? 0:10;
 
             app.print("I GOT THE PROFILE VALUE, COVER PHOTO VALUE, SKILL VALUE AND SOCIAL LINK VALUE");
         }
