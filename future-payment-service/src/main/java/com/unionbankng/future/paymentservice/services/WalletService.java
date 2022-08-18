@@ -362,18 +362,18 @@ public class WalletService implements Serializable {
             WalletAuthResponse auth= getAuth();
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
-//                Response<ApiResponse<WalletGenericResponse>> response = walletServiceInterface.verifyPaystackTransaction(token, request).execute();
-//                app.print("Response:");
-//                app.print(response.body());
-//                app.print(response.code());
-//                if (response.isSuccessful()) {
-//                    app.print("verifyTransaction successful");
-//                    app.print(response.body());
-//                    return response.body();
-//
-//                } else {
-//                    return  new ApiResponse<>(response.message(),false,null);
-//                }
+                Response<ApiResponse<WalletGenericResponse>> response = walletServiceInterface.verifyPaystackTransaction(token, request).execute();
+                app.print("Response:");
+                app.print(response.body());
+                app.print(response.code());
+                if (response.isSuccessful()) {
+                    app.print("verifyTransaction successful");
+                    app.print(response.body());
+                    return null;
+
+                } else {
+                    return  new ApiResponse<>(response.message(),false,null);
+                }
             }else{
                 return  new ApiResponse<>("Unable to authenticate with wallet service",false,null);
             }
