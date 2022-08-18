@@ -44,7 +44,7 @@ public class PaystackApiHandler {
 	}
 
 	public Response<VerifyTransactionResponse> verifyTransaction(String transReference) throws IOException {
-
+		System.out.println("got here"+ transReference);
 		 return paystackService.verifyTransaction(transReference).execute();
 
 	}
