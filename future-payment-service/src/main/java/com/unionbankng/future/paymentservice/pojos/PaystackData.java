@@ -23,7 +23,7 @@ public class PaystackData {
 	    private String ip_address;
 	    private String fees;
 	    private String paid_at;
-//	    private PaystackAuth authorization;
+	    private PaystackAuth authorization;
 	    private PaystackMetaData metadata;
 	    
 

@@ -20,7 +20,7 @@ public class VerifyTransactionResponse {
     /**
      * contains details about the transaction
      */
-    private PaystackData data;
+    private PaystackDTO data;
 
 
 }
