@@ -3,29 +3,27 @@ package com.unionbankng.future.paymentservice.services;
 import com.unionbankng.future.paymentservice.pojos.*;
 import com.unionbankng.future.paymentservice.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.paymentservice.utils.App;
+import com.unionbankng.future.paymentservice.utils.JWTUserDetailsExtractor;
+import com.unionbankng.future.paymentservice.utils.PaystackApiHandler;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.annotation.PostConstruct;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
 import java.io.Serializable;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.security.cert.CertificateException;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.X509TrustManager;
 
 
 @Service
@@ -34,6 +32,7 @@ public class WalletService implements Serializable {
 
     private Logger logger = LoggerFactory.getLogger(WalletService.class);
     private WalletServiceInterface walletServiceInterface;
+    private PaystackApiHandler paystackApiHandler;
     private final App app;
 
 
@@ -338,6 +337,49 @@ public class WalletService implements Serializable {
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ApiResponse<>("Something went wrong",false, "101", null);
+        }
+    }
+
+    public ApiResponse<WalletGenericResponse> verifyTransaction(PaystackSDKResponse request, OAuth2Authentication details) {
+        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(details);
+
+        app.print("authorizedUser...."+authorizedUser.toString());
+        try {
+            app.print("Verifying transaction....");
+            Response<VerifyTransactionResponse> paystackResponse = paystackApiHandler.verifyTransaction(request.getTransactionRef());
+
+            app.print("Verifying transaction Response...."+ paystackResponse.toString());
+            if(!paystackResponse.isSuccessful())
+                return  new ApiResponse<>(paystackResponse.message(),false,null);
+
+            if(!paystackResponse.body().isStatus())
+                return  new ApiResponse<>(paystackResponse.body().getMessage(),false,null);
+
+            if(!paystackResponse.body().getData().getAmount().equals(request.getAmount()))
+                return  new ApiResponse<>(paystackResponse.body().getMessage(),false,null);
+
+            app.print("Verifying transaction Response....");
+            WalletAuthResponse auth= getAuth();
+            if(auth!=null) {
+                String token = "Bearer " + auth.getAccess_token();
+//                Response<ApiResponse<WalletGenericResponse>> response = walletServiceInterface.verifyPaystackTransaction(token, request).execute();
+//                app.print("Response:");
+//                app.print(response.body());
+//                app.print(response.code());
+//                if (response.isSuccessful()) {
+//                    app.print("verifyTransaction successful");
+//                    app.print(response.body());
+//                    return response.body();
+//
+//                } else {
+//                    return  new ApiResponse<>(response.message(),false,null);
+//                }
+            }else{
+                return  new ApiResponse<>("Unable to authenticate with wallet service",false,null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return  new ApiResponse<>("Something went wrong while verifying transaction",false,null);
         }
     }
 }

@@ -4,6 +4,8 @@ import com.unionbankng.future.paymentservice.pojos.*;
 import com.unionbankng.future.paymentservice.services.WalletService;
 import com.unionbankng.future.paymentservice.utils.App;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,6 +33,12 @@ public class WalletController {
         app.print("Interswitch Verify Transaction : " + transactionRef);
         request.setTxnref(transactionRef);
         return walletService.verifyTransaction(request);
+    }
+
+    @PostMapping("/verify-paystack-transaction")
+    public ApiResponse<WalletGenericResponse> handlePaystackVerifyTransaction(@Valid  @RequestBody PaystackSDKResponse request, OAuth2Authentication details)  {
+        app.print("Paystack Verify Transaction : " + request.getTransactionRef());
+        return walletService.verifyTransaction(request, details);
     }
 
     @PostMapping("/debit-wallet")

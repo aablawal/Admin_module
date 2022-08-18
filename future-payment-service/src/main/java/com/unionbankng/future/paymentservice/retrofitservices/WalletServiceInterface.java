@@ -1,7 +1,6 @@
 package com.unionbankng.future.paymentservice.retrofitservices;
 
 import com.unionbankng.future.paymentservice.pojos.*;
-import org.springframework.web.bind.annotation.PostMapping;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -48,6 +47,12 @@ public interface WalletServiceInterface {
     Call<ApiResponse<WalletGenericResponse>> verifyInterswitchTransaction(@Header("Authorization") String authorization,
                                                                           @Path("transactionRef") String transactionRef,
                                                                           @Body InterswitchSDKResponse request);
+    @POST("api/v1/paystack/verify")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<ApiResponse<WalletGenericResponse>> verifyPaystackTransaction(@Header("Authorization") String authorization,
+                                                                          @Body PaystackSDKResponse request);
 
 
     @GET("api/v1/interswitch/resolve-bank-account")
