@@ -158,7 +158,7 @@ public class JobProposalService  implements Serializable {
     }
     public JobProposal applyForJob(OAuth2Authentication authentication, String applicationData, int percentageComplete) {
 
-        if(percentageComplete != 100){
+        if(percentageComplete < 75){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile must be complete to be able to apply for a job!");
         }
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
