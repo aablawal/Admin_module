@@ -24,7 +24,7 @@ public class PaystackData {
 	    private String fees;
 	    private String paid_at;
 //	    private PaystackAuth authorization;
-//	    private PaystackMetaData metadata;
+	    private PaystackMetaData metadata;
 	    
 
 	    public PaystackData() {
