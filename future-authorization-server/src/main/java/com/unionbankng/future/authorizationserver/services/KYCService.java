@@ -712,7 +712,7 @@ public class KYCService {
 
         // format the phone number
         String userPhone = user.getPhoneNumber();
-        userPhone = app.toPhoneNumber(userPhone).replaceFirst("234", "0");
+        userPhone = app.toPhoneNumber(userPhone);
 
         Applicant applicant = new Applicant();
         applicant.setIdType(idType);
