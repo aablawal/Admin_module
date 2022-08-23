@@ -162,12 +162,18 @@ public class ProfileService {
         }
 
         app.print("BEFORE CALCULATING FOR IMAGE");
+
+        if(savedUser.getImg()==null && savedUser.getCoverImg()==null){
+            return percentageForPhotos;
+        }
+
         if(savedUser.getImg()!=null || savedUser.getImg().length()!=0){
-            app.print("CALCULATING FOR IMAGE");
+            app.print("CALCULATING FOR PROFILE IMAGE");
             percentageForPhotos += 15;
         }
 
         if(savedUser.getCoverImg()!=null || savedUser.getCoverImg().length()!=0){
+            app.print("CALCULATING FOR COVER IMAGE");
             percentageForPhotos += 5;
         }
 
