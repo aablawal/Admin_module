@@ -131,8 +131,13 @@ public class ProfileService {
             Long profileId = savedProfile.getId();
             experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).size()==0 ? 0:20;
             app.print("EXPERIENCE VALUE: " + experienceValue);
-            bioValue = savedProfile.getBio().length()==0 ? 0:20;
-            app.print("BIO VALUE: " + bioValue);
+            if(savedProfile.getBio()==null){
+                app.print("BIO VALUE: " + bioValue);
+            }
+            else{
+                bioValue = savedProfile.getBio().length()==0 ? 0:20;
+                app.print("BIO VALUE: " + bioValue);
+            }
             if (!qualificationService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()
                     || !trainingService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()){
                 qualificationValue = 10;
