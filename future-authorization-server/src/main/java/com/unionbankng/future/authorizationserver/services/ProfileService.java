@@ -169,6 +169,19 @@ public class ProfileService {
         app.print("BEFORE CALCULATING FOR IMAGE");
 
         if(savedUser.getImg()==null && savedUser.getCoverImg()==null){
+            app.print("NO PROFILE IMAGE, NO COVER IMAGE!");
+            return percentageForPhotos;
+        }
+
+        if (savedUser.getImg() != null && savedUser.getCoverImg() == null) {
+            percentageForPhotos = 15;
+
+            return percentageForPhotos;
+        }
+
+        if (savedUser.getCoverImg() != null && savedUser.getImg() == null){
+            percentageForPhotos = 5;
+
             return percentageForPhotos;
         }
 
