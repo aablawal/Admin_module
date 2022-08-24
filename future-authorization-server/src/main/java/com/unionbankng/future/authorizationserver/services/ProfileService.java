@@ -131,8 +131,13 @@ public class ProfileService {
             Long profileId = savedProfile.getId();
             experienceValue = experienceService.findByProfileId(profileId, Sort.by("createdAt").ascending()).size()==0 ? 0:20;
             app.print("EXPERIENCE VALUE: " + experienceValue);
-            bioValue = savedProfile.getBio().length()==0 ? 0:20;
-            app.print("BIO VALUE: " + bioValue);
+            if(savedProfile.getBio()==null){
+                app.print("BIO VALUE: " + bioValue);
+            }
+            else{
+                bioValue = savedProfile.getBio().length()==0 ? 0:20;
+                app.print("BIO VALUE: " + bioValue);
+            }
             if (!qualificationService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()
                     || !trainingService.findAllByProfileId(profileId, Sort.by("createdAt").ascending()).isEmpty()){
                 qualificationValue = 10;
@@ -162,12 +167,31 @@ public class ProfileService {
         }
 
         app.print("BEFORE CALCULATING FOR IMAGE");
+
+        if(savedUser.getImg()==null && savedUser.getCoverImg()==null){
+            app.print("NO PROFILE IMAGE, NO COVER IMAGE!");
+            return percentageForPhotos;
+        }
+
+        if (savedUser.getImg() != null && savedUser.getCoverImg() == null) {
+            percentageForPhotos = 15;
+
+            return percentageForPhotos;
+        }
+
+        if (savedUser.getCoverImg() != null && savedUser.getImg() == null){
+            percentageForPhotos = 5;
+
+            return percentageForPhotos;
+        }
+
         if(savedUser.getImg()!=null || savedUser.getImg().length()!=0){
-            app.print("CALCULATING FOR IMAGE");
+            app.print("CALCULATING FOR PROFILE IMAGE");
             percentageForPhotos += 15;
         }
 
         if(savedUser.getCoverImg()!=null || savedUser.getCoverImg().length()!=0){
+            app.print("CALCULATING FOR COVER IMAGE");
             percentageForPhotos += 5;
         }
 
