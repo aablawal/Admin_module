@@ -239,11 +239,13 @@ public class WalletService implements Serializable {
         request.setCustomerEmail(request.getCustomerEmail() == null ? authorizedUser.getUserEmail() : request.getCustomerEmail() );
         request.setCustomerName(request.getCustomerName() == null ? authorizedUser.getUserFullName() : request.getCustomerName() );
 
+        app.print("request...."+request);
         try {
             app.print("Verifying transaction Response....");
             WalletAuthResponse auth= getAuth();
             if(auth!=null) {
                 String token = "Bearer " + auth.getAccess_token();
+                app.print("wallet service token...." + token);
                 Response<ApiResponse<WalletGenericResponse>> response = walletServiceInterface.verifyPaystackTransaction(token, request).execute();
                 app.print("Response:");
                 app.print(response.body());
