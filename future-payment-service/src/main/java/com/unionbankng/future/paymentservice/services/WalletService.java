@@ -24,6 +24,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
@@ -226,6 +227,45 @@ public class WalletService implements Serializable {
         }
     }
 
+    public ApiResponse<WalletGenericResponse> verifyTransaction(PaystackSDKResponse request, OAuth2Authentication details) {
+        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(details);
+
+        if(Objects.isNull(authorizedUser)){
+            return  new ApiResponse<>("User details not found",false,null);
+        }
+
+        app.print("authorizedUser...."+authorizedUser);
+        request.setWalletId(request.getWalletId() == null ? authorizedUser.getWalletId() : request.getWalletId() );
+        request.setCustomerEmail(request.getCustomerEmail() == null ? authorizedUser.getUserEmail() : request.getCustomerEmail() );
+        request.setCustomerName(request.getCustomerName() == null ? authorizedUser.getUserFullName() : request.getCustomerName() );
+
+        try {
+            app.print("Verifying transaction Response....");
+            WalletAuthResponse auth= getAuth();
+            if(auth!=null) {
+                String token = "Bearer " + auth.getAccess_token();
+                Response<ApiResponse<WalletGenericResponse>> response = walletServiceInterface.verifyPaystackTransaction(token, request).execute();
+                app.print("Response:");
+                app.print(response.body());
+                app.print(response.code());
+                if (response.isSuccessful()) {
+                    app.print("verifyTransaction successful");
+                    app.print(response.body());
+                    return response.body();
+
+                } else {
+                    return  new ApiResponse<>(response.message(),false,null);
+                }
+            }else{
+                return  new ApiResponse<>("Unable to authenticate with wallet service",false,null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return  new ApiResponse<>("Something went wrong while verifying transaction",false,null);
+        }
+    }
+
+
     public ApiResponse<InterswitchAccountValidationResponse> validateBankAccount(String accountNo, String bankCode) {
         try {
             app.print("Validating Bank account....");
@@ -343,46 +383,4 @@ public class WalletService implements Serializable {
         }
     }
 
-    public ApiResponse<WalletGenericResponse> verifyTransaction(PaystackSDKResponse request, OAuth2Authentication details) {
-        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(details);
-
-        app.print("authorizedUser...."+authorizedUser.toString());
-        try {
-            app.print("Verifying transaction....");
-            Response<VerifyTransactionResponse> paystackResponse = paystackApiHandler.verifyTransaction(request.getTransactionRef());
-
-            app.print("Verifying transaction Response...."+ paystackResponse.toString());
-            if(!paystackResponse.isSuccessful())
-                return  new ApiResponse<>(paystackResponse.message(),false,null);
-
-            if(!paystackResponse.body().isStatus())
-                return  new ApiResponse<>(paystackResponse.body().getMessage(),false,null);
-
-            if(!paystackResponse.body().getData().getAmount().equals(request.getAmount()))
-                return  new ApiResponse<>(paystackResponse.body().getMessage(),false,null);
-
-            app.print("Verifying transaction Response....");
-            WalletAuthResponse auth= getAuth();
-            if(auth!=null) {
-                String token = "Bearer " + auth.getAccess_token();
-                Response<ApiResponse<WalletGenericResponse>> response = walletServiceInterface.verifyPaystackTransaction(token, request).execute();
-                app.print("Response:");
-                app.print(response.body());
-                app.print(response.code());
-                if (response.isSuccessful()) {
-                    app.print("verifyTransaction successful");
-                    app.print(response.body());
-                    return null;
-
-                } else {
-                    return  new ApiResponse<>(response.message(),false,null);
-                }
-            }else{
-                return  new ApiResponse<>("Unable to authenticate with wallet service",false,null);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return  new ApiResponse<>("Something went wrong while verifying transaction",false,null);
-        }
-    }
 }

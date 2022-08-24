@@ -37,7 +37,7 @@ public class WalletController {
 
     @PostMapping("/verify-paystack-transaction")
     public ApiResponse<WalletGenericResponse> handlePaystackVerifyTransaction(@Valid  @RequestBody PaystackSDKResponse request, OAuth2Authentication details)  {
-        app.print("Paystack Verify Transaction : " + request.getTransactionRef());
+        app.print("Paystack Verify Transaction : " + request.getTransactionReference());
         return walletService.verifyTransaction(request, details);
     }
 

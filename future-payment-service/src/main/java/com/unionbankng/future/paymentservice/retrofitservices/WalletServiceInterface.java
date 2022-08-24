@@ -47,7 +47,7 @@ public interface WalletServiceInterface {
     Call<ApiResponse<WalletGenericResponse>> verifyInterswitchTransaction(@Header("Authorization") String authorization,
                                                                           @Path("transactionRef") String transactionRef,
                                                                           @Body InterswitchSDKResponse request);
-    @POST("api/v1/paystack/verify")
+    @POST("/v1/wallet/fund_customer_wallet")
     @Headers({
             "Accept: application/json"
     })
