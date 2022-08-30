@@ -38,9 +38,9 @@ public class JobDTO {
     private Date createdAt;
     private String category;
     private String subCategory;
-    private Status job_proposal_status;
+    private Status jobProposalStatus;
     private Date startDate;
-    private Long  job_proposal_duration;
+    private Long  jobProposalDuration;
     private DeliveryType deliveryType;
-    private Date job_proposal_start_data;
+    private Date jobProposalStartDate;
 }
