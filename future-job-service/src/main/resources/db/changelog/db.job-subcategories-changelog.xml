@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+<changeSet author="joan" id="16170301465441-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="job_subcategories"/>
+            </not>
+        </preConditions>
+        <createTable tableName="job_subcategories">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="job_subcategoriesPK"/>
+            </column>
+            <column name="created_at" type="datetime2"/>
+            <column name="description" type="varchar (max)"/>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_category_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="joan" id="16170301465441-2" >
+        <addForeignKeyConstraint
+                baseColumnNames="job_category_id" baseTableName="job_subcategories"
+                constraintName="fk_job_category_id" deferrable="false"
+                referencedColumnNames="id" referencedTableName="job_categories" />
+    </changeSet>
+</databaseChangeLog>

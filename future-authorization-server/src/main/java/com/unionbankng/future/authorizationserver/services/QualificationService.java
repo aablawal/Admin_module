@@ -4,6 +4,7 @@ import com.unionbankng.future.authorizationserver.entities.Qualification;
 import com.unionbankng.future.authorizationserver.pojos.QualificationRequest;
 import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
+import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,6 +28,8 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final ProfileRepository profileRepository;
     private final FileStorageService fileStorageService;
+
+    private final App app;
 
 //    @Cacheable(value = "qualifications_by_profile", key="#profileId")
     public List<Qualification> findAllByProfileId(Long profileId, Sort sort){
@@ -55,12 +58,21 @@ public class QualificationService {
         Qualification qualification = qualificationRepository.findById(id).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Qualification not found"));
 
+        Profile profile = profileRepository.findById(qualification.getProfileId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+
         if(qualification.getMedia() != null) {
             int status = fileStorageService.deleteFileFromStorage(qualification.getMedia(), BlobType.IMAGE);
             if (status != 200)
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         }
         qualificationRepository.deleteById(id);
+        app.print("Qualification deleted");
+        app.print("Decrementing profile percentage completed");
+        profile.decrementPercentageComplete(10);
+        profileRepository.save(profile);
+        app.print("Profile percentage completed decreased");
     }
 
     @Caching(evict = {
@@ -84,7 +96,12 @@ public class QualificationService {
             String source = fileStorageService.storeFile(file, request.getProfileId(), BlobType.IMAGE);
             qualification.setMedia(source);
         }
-
+        if(qualificationRepository.findAllByProfileId(profile.getId(),Sort.by("createdAt").ascending()).isEmpty()){
+            app.print("Incrementing profile percentage complete");
+            profile.incrementPercentageComplete(10);
+            profileRepository.save(profile);
+            app.print("Profile percentage complete incremented");
+        }
         return qualificationRepository.save(qualification);
     }
 

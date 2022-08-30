@@ -3,7 +3,6 @@ package com.unionbankng.future.authorizationserver.controllers;
 import com.unionbankng.future.authorizationserver.entities.Kyc;
 import com.unionbankng.future.authorizationserver.entities.KycAddressVerification;
 import com.unionbankng.future.authorizationserver.entities.User;
-import com.unionbankng.future.authorizationserver.enums.IdType;
 import com.unionbankng.future.authorizationserver.pojos.*;
 import com.unionbankng.future.authorizationserver.repositories.KycAddressRepository;
 import com.unionbankng.future.authorizationserver.repositories.KycRepository;
@@ -17,6 +16,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
@@ -36,7 +36,6 @@ public class KYCController {
     private final KycAddressRepository kycAddressRepository;
     private final UserRepository userRepository;
     private final App app;
-
 
     @PostMapping("/v1/kyc/initiation")
     public APIResponse<Map<String, String>> initiateKYC(OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam(required = false) String dob) {
@@ -58,11 +57,17 @@ public class KYCController {
     @PostMapping("/v1/kyc/id_verification")
     public APIResponse<String> verifyId(
             @Valid @RequestParam(value = "data") String bioData,
-            @RequestParam(value = "selfieImage") MultipartFile selfieImage,
-            @RequestParam(value = "idImage") MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
+            @RequestPart(value = "selfieImage", required = false) MultipartFile selfieImage,
+            @RequestPart(value = "idImage", required = false) MultipartFile idImage, OAuth2Authentication authentication) throws Exception {
+
+        if(selfieImage.isEmpty() || idImage.isEmpty()){
+            throw new MultipartException("Please select a file");
+        }
 
         VerifyKycRequest verifyKycRequest = app.getMapper().readValue(bioData, VerifyKycRequest.class);
+        app.print("Makanaki got here");
         JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        app.print("UserUuid: "+ authorizedUser.getUserUUID());
         User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
 
         if (user == null)
@@ -87,14 +92,13 @@ public class KYCController {
 
     }
 
-
     @PostMapping("/v1/kyc/address_verification")
     public APIResponse<String> verifyAddress(@RequestBody AddressVerificationRequest addressVerificationRequest, OAuth2Authentication authentication) throws Exception {
         return kycService.VerifyAddress(addressVerificationRequest, authentication);
     }
 
     @PostMapping("/v1/kyc/verifyme/webhook")
-    public APIResponse<String> verifyId(@RequestBody AddressVerificationWebhookData addressVerificationWebhookRequest) {
+    public APIResponse<String> verifyId(@RequestBody AddressVerificationDto addressVerificationWebhookRequest) {
         app.print("Webhook received: " + addressVerificationWebhookRequest.toString());
         return kycService.processWebhookRequest(addressVerificationWebhookRequest);
     }

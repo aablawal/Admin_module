@@ -15,7 +15,7 @@ public interface KYCServiceInterface {
     String ID_FACEMATCH = "kycserv/api/v1/kyc/id";
     String NIN_FACEMATCH = "kycserv/api/v1/kyc/ninFacematch";
     String IDENTITY_BIOMETRICS = "kycserv/api/v1/kyc/identityBiometrics";
-    String ADDRESS_VERIFICATION = "kycserv/api/v1/kyc/submitAddress";
+    String ADDRESS_VERIFICATION = "kycserv/api/v1/kyc/address";
 
     @FormUrlEncoded
     @POST(OAUTH_URL)
@@ -45,6 +45,6 @@ public interface KYCServiceInterface {
     Call<KycApiResponse<VerifyMeResponse>> getIdentityBiometrics(@Header("Authorization") String authorization, @Body IdentityBiometricsRequest identityBiometricsRequest);
 
     @POST(ADDRESS_VERIFICATION)
-    Call<VerifyMeAddressVerificationResponse> getAddressVerification(@Header("Authorization") String authorization, @Body AddressVerificationRequestVerifyme addressVerificationRequestVerifyme);
+    Call<AddressVerifyResponse<AddressVerificationDto>> getAddressVerification(@Header("Authorization") String authorization, @Body VerifyAddressRequest addressVerificationRequestVerifyme);
 
 }

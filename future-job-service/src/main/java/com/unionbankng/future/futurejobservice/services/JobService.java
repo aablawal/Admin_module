@@ -1,11 +1,15 @@
 package com.unionbankng.future.futurejobservice.services;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
-import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.pojos.*;
-import com.unionbankng.future.futurejobservice.repositories.*;
+import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
+import com.unionbankng.future.futurejobservice.repositories.JobTeamRepository;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
@@ -23,11 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -472,6 +475,8 @@ public class JobService {
     }
     public Model findJobsByUserIdAndStatus(Long id,String status, Pageable pageable, Model model) {
         Page<Job> paginatedData= jobRepository.findJobsByUserIdAndStatus(pageable, id, status);
+//        Page<JobDTO> paginatedData= jobRepository.getJobsByUserIdAndStatus(pageable, id, status);
+        app.print(paginatedData.getContent().toString());
         Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
         return jobList;
     }

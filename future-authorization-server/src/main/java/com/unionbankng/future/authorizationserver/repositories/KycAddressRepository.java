@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface KycAddressRepository extends JpaRepository<KycAddressVerification,Long> {
     Optional<KycAddressVerification> findByResID(Long resID);
+    Optional<KycAddressVerification> findByReference(String resID);
 }

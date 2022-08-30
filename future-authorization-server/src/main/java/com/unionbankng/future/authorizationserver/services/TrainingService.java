@@ -7,6 +7,7 @@ import com.unionbankng.future.authorizationserver.pojos.TrainingRequest;
 import com.unionbankng.future.authorizationserver.repositories.ProfileRepository;
 import com.unionbankng.future.authorizationserver.repositories.QualificationRepository;
 import com.unionbankng.future.authorizationserver.repositories.TrainingRepository;
+import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.futureutilityservice.grpcserver.BlobType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,6 +29,8 @@ public class TrainingService {
 
     private final TrainingRepository trainingRepository;
     private final ProfileRepository profileRepository;
+
+    private final App app;
 
     @Cacheable(value = "trainings_by_profile", key="#profileId")
     public List<Training> findAllByProfileId(Long profileId, Sort sort){
@@ -57,7 +60,16 @@ public class TrainingService {
         Training training = trainingRepository.findById(id).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Training not found"));
 
+        Profile profile = profileRepository.findById(training.getProfileId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile not found")
+        );
+
         trainingRepository.deleteById(id);
+        app.print("Training deleted");
+        app.print("Decrementing profile percentage completed");
+        profile.decrementPercentageComplete(10);
+        profileRepository.save(profile);
+        app.print("Profile percentage completed decreased");
     }
 
 
@@ -76,7 +88,12 @@ public class TrainingService {
         training.setOrganization(request.getOrganization());
         training.setLinkOrId(request.getLinkOrId());
         training.setYearAwarded(request.getYearAwarded());
-
+        if(trainingRepository.findAllByProfileId(profile.getId(),Sort.by("createdAt").ascending()).isEmpty()){
+            app.print("Incrementing profile percentage complete");
+            profile.incrementPercentageComplete(10);
+            profileRepository.save(profile);
+            app.print("profile percentage complete incremented");
+        }
         return trainingRepository.save(training);
     }
 

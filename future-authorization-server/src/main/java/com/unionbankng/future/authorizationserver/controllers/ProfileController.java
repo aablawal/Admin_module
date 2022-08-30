@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -94,6 +95,33 @@ public class ProfileController {
         Profile profile = profileService.updateProfile(profileId, request);
         app.print("Finished updating user profile");
         return ResponseEntity.ok().body(new APIResponse<>("Profile updated successful",true,profile));
+    }
+
+    @GetMapping(value="/calculate-percentage/{userId}")
+    public ResponseEntity<APIResponse<Integer>> calculatePercentageProfileComplete(@PathVariable Long userId){
+        app.print("Getting the percentage profile complete");
+        int percentage = 0;
+        Optional<Profile> optionalProfile = profileService.findByUserId(userId);
+        Profile profile = new Profile();
+
+        if(optionalProfile.isPresent()){
+            profile = optionalProfile.get();
+        }
+        app.print("I GOT HERE");
+        profile.setPercentageComplete(0);
+
+        profile = profileService.calculatePercentage(userId);
+        percentage = profile.getPercentageComplete();
+
+        if(profile.getPercentageComplete() > 100){
+            app.print("PERCENTAGE IS OVER 100");
+            return ResponseEntity.badRequest().body(new APIResponse<>("Percentage is over 100", false, percentage));
+        }
+
+        app.print("DONE DONE DONE");
+
+
+        return ResponseEntity.ok(new APIResponse<>("Request Successful",true,percentage));
     }
 
 }

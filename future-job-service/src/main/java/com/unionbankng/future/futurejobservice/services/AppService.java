@@ -1,7 +1,9 @@
 package com.unionbankng.future.futurejobservice.services;
+
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.enums.JobType;
+import com.unionbankng.future.futurejobservice.pojos.JobDTO;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRateRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
@@ -45,6 +47,21 @@ public class AppService {
     public  Model getJobCollection(Page<Job> page,Model model){
         ArrayList<Map<String,Object>> baseList=new ArrayList<>();
         for (Job job: page.getContent()) {
+            Map<String,Object> data=new HashMap<>();
+            data.put("job",job);
+            data.put("proposals", jobProposalRepository.getCountByJobId(job.getId()));
+            if(job.getType()== JobType.TEAMS_PROJECT)
+                data.put("teams", jobTeamDetailsRepository.findByJobId(job.getId()));
+            else
+                data.put("teams",null);
+            baseList.add(data);
+        }
+        return  this.getPaginated(page,baseList,model);
+    }
+
+    public  Model findJobCollection(Page<JobDTO> page, Model model){
+        ArrayList<Map<String,Object>> baseList=new ArrayList<>();
+        for (JobDTO job: page.getContent()) {
             Map<String,Object> data=new HashMap<>();
             data.put("job",job);
             data.put("proposals", jobProposalRepository.getCountByJobId(job.getId()));
