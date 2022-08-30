@@ -1,7 +1,7 @@
 package com.unionbankng.future.paymentservice.utils;
 
 
-import com.unionbankng.future.paymentservice.pojos.VerifyTransactionResponse;
+import com.unionbankng.future.paymentservice.pojos.PaystackVerifyTransactionResponse;
 import com.unionbankng.future.paymentservice.retrofitservices.PaystackService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -44,7 +44,7 @@ public class PaystackApiHandler {
 				}).build();
 	}
 
-	public Response<VerifyTransactionResponse> verifyTransaction(String transReference) throws IOException {
+	public Response<PaystackVerifyTransactionResponse> verifyTransaction(String transReference) throws IOException {
 		System.out.println("got here"+ transReference);
 		 return paystackService.verifyTransaction(transReference).execute();
 

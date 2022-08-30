@@ -1,5 +1,7 @@
 package com.unionbankng.future.futurejobservice.repositories;
+
 import com.unionbankng.future.futurejobservice.entities.Job;
+import com.unionbankng.future.futurejobservice.pojos.JobDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,6 +30,9 @@ public interface JobRepository extends JpaRepository<Job,Long> {
 
     @Query(value = "SELECT * FROM jobs j WHERE (j.id in(SELECT jp.job_id FROM job_proposals jp where (jp.user_id=:id or jp.employer_id=:id) and jp.status=:status)  or j.oid=:id and status=:status) order by id desc", nativeQuery = true)
     Page<Job> findJobsByUserIdAndStatus(Pageable pageable, Long id, String status);
+
+    @Query(value = "SELECT j.*, jp.status job_proposal_status, jp.duration job_proposal_duration, jp.start_date job_proposal_start_data From jobs j join job_proposals jp on j.id = jp.job_id where ((jp.user_id=:id or jp.employer_id=:id) and jp.status=:status) or (j.oid=:id and j.status=:status) order by id desc", nativeQuery = true)
+    Page<JobDTO> getJobsByUserIdAndStatus(Pageable pageable, Long id, String status);
 
     @Query(value = "SELECT count(*) FROM jobs j WHERE j.oid=:userId", nativeQuery = true)
     Optional<Long> getTotalJobPostedByUserId(Long userId);
