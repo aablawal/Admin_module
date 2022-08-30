@@ -474,10 +474,10 @@ public class JobService {
         return jobList;
     }
     public Model findJobsByUserIdAndStatus(Long id,String status, Pageable pageable, Model model) {
-//        Page<Job> paginatedData= jobRepository.findJobsByUserIdAndStatus(pageable, id, status);
-        Page<JobDTO> paginatedData= jobRepository.getJobsByUserIdAndStatus(pageable, id, status);
+        Page<Job> paginatedData= jobRepository.findJobsByUserIdAndStatus(pageable, id, status);
+//        Page<JobDTO> paginatedData= jobRepository.getJobsByUserIdAndStatus(pageable, id, status);
         app.print(paginatedData.getContent().toString());
-        Model jobList=appService.findJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
+        Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
         return jobList;
     }
     public Model findJobsByOwnerIdAndStatus(Long id,String status, Pageable pageable, Model model) {
