@@ -31,7 +31,7 @@ public interface JobRepository extends JpaRepository<Job,Long> {
     @Query(value = "SELECT * FROM jobs j WHERE (j.id in(SELECT jp.job_id FROM job_proposals jp where (jp.user_id=:id or jp.employer_id=:id) and jp.status=:status)  or j.oid=:id and status=:status) order by id desc", nativeQuery = true)
     Page<Job> findJobsByUserIdAndStatus(Pageable pageable, Long id, String status);
 
-    @Query(value = "Select j.assessment, j.budget, j.categories, j.category, j.created_at, j.delivery_type, j.description, j.duration, j.goal, j.id, j.oid, j.publish_date, j.qualification, j.skills_required, j.status, j.sub_category, j.timeline, j.title, j.type, jp.start_date From jobs j join job_proposals jp on j.id = jp.job_id where ((jp.user_id=:id or jp.employer_id=:id) and jp.status=:status) or (j.oid=:id and j.status=:status) order by id desc;", nativeQuery = true)
+    @Query(value = "Select assessment, budget, categories, category, j.created_at created_at, delivery_type, description, j.duration duration, goal, j.id id, oid, publish_date, qualification, skills_required, j.status status, sub_category, timeline, title, j.type type, jp.start_date start_date From jobs j join job_proposals jp on j.id = jp.job_id where ((jp.user_id=:id or jp.employer_id=:id) and jp.status=:status) or (j.oid=:id and j.status=:status) order by j.id desc;", nativeQuery = true)
     Page<JobDTO> getJobsByUserIdAndStatus(Pageable pageable, Long id, String status);
 
     @Query(value = "SELECT count(*) FROM jobs j WHERE j.oid=:userId", nativeQuery = true)
