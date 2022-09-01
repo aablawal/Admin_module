@@ -21,7 +21,6 @@ public interface JobProposalRepository extends JpaRepository<JobProposal, Long> 
     Long getCountByJobId(Long jobId);
     @Query(value = "SELECT top(1) * FROM job_proposals p where p.job_id=:jobId and (p.user_id=:userId or p.employer_id=:userId ) and status not in('CA','IA') order by id desc", nativeQuery = true)
     JobProposal findProposalByUserId(Long jobId, Long userId);
-
     @Query(value = "SELECT top(1) start_date FROM job_proposals p where p.job_id=:jobId and (p.user_id=:userId or p.employer_id=:userId ) and status not in('CA','IA') order by id desc", nativeQuery = true)
     Date findProposalStartDateByUserId(Long jobId, Long userId);
 }
