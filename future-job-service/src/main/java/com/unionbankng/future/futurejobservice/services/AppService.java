@@ -3,7 +3,6 @@ package com.unionbankng.future.futurejobservice.services;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.pojos.JobDTO;
 import com.unionbankng.future.futurejobservice.repositories.JobProposalRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRateRepository;
 import com.unionbankng.future.futurejobservice.repositories.JobRepository;
@@ -59,12 +58,13 @@ public class AppService {
         return  this.getPaginated(page,baseList,model);
     }
 
-    public  Model findJobCollection(Page<JobDTO> page, Model model){
+    public  Model findJobCollection(Page<Job> page, Model model, long userId){
         ArrayList<Map<String,Object>> baseList=new ArrayList<>();
-        for (JobDTO job: page.getContent()) {
+        for (Job job: page.getContent()) {
             Map<String,Object> data=new HashMap<>();
             data.put("job",job);
             data.put("proposals", jobProposalRepository.getCountByJobId(job.getId()));
+            data.put("proposal_start_date", jobProposalRepository.findProposalStartDateByUserId(job.getId(),userId));
             if(job.getType()== JobType.TEAMS_PROJECT)
                 data.put("teams", jobTeamDetailsRepository.findByJobId(job.getId()));
             else

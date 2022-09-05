@@ -475,11 +475,17 @@ public class JobService {
     }
     public Model findJobsByUserIdAndStatus(Long id,String status, Pageable pageable, Model model) {
         Page<Job> paginatedData= jobRepository.findJobsByUserIdAndStatus(pageable, id, status);
-//        Page<JobDTO> paginatedData= jobRepository.getJobsByUserIdAndStatus(pageable, id, status);
-        app.print(paginatedData.getContent().toString());
         Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());
         return jobList;
     }
+
+    public Model findOngoingJobsByUserIdAndStatus(Long id,String status, Pageable pageable, Model model) {
+        Page<Job> paginatedData= jobRepository.findJobsByUserIdAndStatus(pageable, id, status);
+        app.print(paginatedData.getContent().toString());
+        Model jobList=appService.findJobCollection(paginatedData, model, id).addAttribute("currentPage",pageable.getPageNumber());
+        return jobList;
+    }
+
     public Model findJobsByOwnerIdAndStatus(Long id,String status, Pageable pageable, Model model) {
         Page<Job> paginatedData= jobRepository.findJobsByOwnerIdAndStatus(pageable, id, status);
         Model jobList=appService.getJobCollection(paginatedData,model).addAttribute("currentPage",pageable.getPageNumber());

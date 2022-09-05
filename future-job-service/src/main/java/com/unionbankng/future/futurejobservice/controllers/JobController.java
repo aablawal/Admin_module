@@ -1,28 +1,20 @@
 package com.unionbankng.future.futurejobservice.controllers;
+
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.enums.JobType;
-import com.unionbankng.future.futurejobservice.pojos.*;
-import com.unionbankng.future.futurejobservice.repositories.JobRepository;
+import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.services.JobService;
-import com.unionbankng.future.futurejobservice.services.UserService;
 import com.unionbankng.future.futurejobservice.util.App;
-import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
-import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -98,6 +90,12 @@ public class JobController {
     public ResponseEntity<APIResponse> getJobsByUserIdAndStatus(@PathVariable Long uid,@RequestParam String status, @RequestParam int page, @RequestParam int size, Model model){
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,service.findJobsByUserIdAndStatus(uid,status,PageRequest.of(page,size), model)));
+    }
+
+    @GetMapping("/v1/user/ongoingJobs/status/{uid}")
+    public ResponseEntity<APIResponse> getOngoingJobsByUserIdAndStatus(@PathVariable Long uid,@RequestParam String status, @RequestParam int page, @RequestParam int size, Model model){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,service.findOngoingJobsByUserIdAndStatus(uid,status,PageRequest.of(page,size), model)));
     }
     @GetMapping("/v1/my-job/list/{oid}")
     public ResponseEntity<APIResponse> getJobsByOwnerIdAndStatus(@PathVariable Long oid,@RequestParam String status, @RequestParam int page, @RequestParam int size, Model model){
