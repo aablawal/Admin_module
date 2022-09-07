@@ -46,18 +46,18 @@ public class WalletService implements Serializable {
     }
 
 
-    private String computeBasicAuthorization(){
-        String details=username+":"+password;
+    private String computeBasicAuthorization() {
+        String details = username + ":" + password;
         app.print(details);
-        return "Basic " +Base64.getEncoder().encodeToString(details.getBytes());
+        return "Basic " + Base64.getEncoder().encodeToString(details.getBytes());
     }
 
     public WalletAuthResponse getAuth() {
         try {
             app.print("Generating Wallet access token ....");
-            String  basicAuth=computeBasicAuthorization();
+            String basicAuth = computeBasicAuthorization();
             app.print(basicAuth);
-            Response<WalletAuthResponse> response = walletServiceInterface.getWalletServiceToken("password",username,password,basicAuth).execute();
+            Response<WalletAuthResponse> response = walletServiceInterface.getWalletServiceToken("password", username, password, basicAuth).execute();
             app.print("Response:");
             app.print(response);
             app.print(response.body());
@@ -79,26 +79,26 @@ public class WalletService implements Serializable {
             app.print("Request:");
             app.print(request);
 
-            WalletAuthResponse auth= getAuth();
-            if(auth!=null) {
+            WalletAuthResponse auth = getAuth();
+            if (auth != null) {
                 String token = "Bearer " + auth.getAccess_token();
-                Response<WalletDebitCreditResponse> response = walletServiceInterface.creditWallet(token,request).execute();
+                Response<WalletDebitCreditResponse> response = walletServiceInterface.creditWallet(token, request).execute();
                 app.print("Response:");
                 app.print(response);
                 app.print(response.body());
                 app.print(response.code());
                 if (response.isSuccessful()) {
-                    return  new APIResponse("Request Successful",true, response.body());
+                    return new APIResponse("Request Successful", true, response.body());
 
                 } else {
-                    return  new APIResponse(response.message(),false,null);
+                    return new APIResponse(response.message(), false, null);
                 }
-            }else{
-                return  new APIResponse("Unable to generate wallet auth token",false,null);
+            } else {
+                return new APIResponse("Unable to generate wallet auth token", false, null);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return  new APIResponse("Something went wrong",false,null);
+            return new APIResponse("Something went wrong", false, null);
 
         }
     }
@@ -108,29 +108,87 @@ public class WalletService implements Serializable {
             app.print("Crediting Wallet....");
             app.print("Request:");
             app.print(request);
-            WalletAuthResponse auth= getAuth();
-            if(auth!=null) {
+            WalletAuthResponse auth = getAuth();
+            if (auth != null) {
                 String token = "Bearer " + auth.getAccess_token();
-                Response<WalletDebitCreditResponse> response = walletServiceInterface.debitWallet(token,request).execute();
+                Response<WalletDebitCreditResponse> response = walletServiceInterface.debitWallet(token, request).execute();
                 app.print("Response:");
                 app.print(response);
                 app.print(response.body());
                 app.print(response.code());
                 if (response.isSuccessful()) {
-                    return  new APIResponse("Request Successful",true, response.body());
+                    return new APIResponse("Request Successful", true, response.body());
 
                 } else {
-                    return  new APIResponse(response.message(),false,null);
+                    return new APIResponse(response.message(), false, null);
                 }
-            }else{
-                return  new APIResponse("Unable to generate wallet auth token",false,null);
+            } else {
+                return new APIResponse("Unable to generate wallet auth token", false, null);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return  new APIResponse("Something went wrong",false,null);
+            return new APIResponse("Something went wrong", false, null);
 
         }
     }
 
+    public APIResponse<WalletDebitCreditResponse> Outflow(WalletDebitRequest request) {
+        try {
+            app.print("Wallet  to Wallet fund transfer....");
+            app.print("Request:");
+            app.print(request);
+            WalletAuthResponse auth = getAuth();
+            if (auth != null) {
+                String token = "Bearer " + auth.getAccess_token();
+                Response<WalletDebitCreditResponse> response = walletServiceInterface.outflow(token, request).execute();
+                app.print("Response:");
+                app.print(response);
+                app.print(response.body());
+                app.print(response.code());
+                if (response.isSuccessful()) {
+                    return new APIResponse("Request Successful", true, response.body());
+
+                } else {
+                    return new APIResponse(response.message(), false, null);
+                }
+            } else {
+                return new APIResponse("Unable to generate wallet auth token", false, null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new APIResponse("Something went wrong", false, null);
+
+        }
+    }
+
+
+    public APIResponse<WalletCreditDebitBulkResponse> bulkOutflow(WalletBulkDebitRequest request) {
+        try {
+            app.print("Bulk wallet fund transfer....");
+            app.print("Request:");
+            app.print(request);
+            WalletAuthResponse auth = getAuth();
+            if (auth != null) {
+                String token = "Bearer " + auth.getAccess_token();
+                Response<WalletDebitCreditResponse> response = walletServiceInterface.bulkOutflow(token, request).execute();
+                app.print("Response:");
+                app.print(response);
+                app.print(response.body());
+                app.print(response.code());
+                if (response.isSuccessful()) {
+                    return new APIResponse("Request Successful", true, response.body());
+
+                } else {
+                    return new APIResponse(response.message(), false, null);
+                }
+            } else {
+                return new APIResponse("Unable to generate wallet auth token", false, null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new APIResponse("Something went wrong", false, null);
+
+        }
+    }
 }
 
