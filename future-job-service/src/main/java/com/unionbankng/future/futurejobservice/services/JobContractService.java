@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -43,14 +44,22 @@ public class JobContractService implements Serializable {
     private  String token;
     @Value("${sidekiq.escrow.baseUrl}")
     private  String baseURL;
-    private  String escrowAccountName; //GL
-    private  String escrowAccountNumber;
+
+    @Value("${kula.float.gl.name}")
+    private  String kulaFloatAccountName;
+
+    @Value("${kula.float.gl.number}")
+    private  String kulaFloatAccountNumber;
+
+    @Value("${kula.model.wallet}")
+    private  String kulaWalletId;
+
+
+
     private  String kulaIncomeAccountName;//GL
     private  String kulaIncomeAccountNumber;
     private  String VATAccountName; //GL
     private  String VATAccountNumber;
-    private  String pepperestIncomeAccountName; //CASA
-    private  String pepperestIncomeAccountNumber;
     private  Logger logger = LoggerFactory.getLogger(JobContractService.class);
 
 
@@ -68,6 +77,7 @@ public class JobContractService implements Serializable {
     private final JobPaymentService jobPaymentService;
     private final  JobWalletPaymentService jobWalletPaymentService;
     private final JobTeamDetailsRepository jobTeamDetailsRepository;
+    private final WalletService walletService;
     private final JobContractDisputeRepository jobContractDisputeRepository;
     private final NotificationSender notificationSender;
     private final MessageSource messageSource;
@@ -166,13 +176,14 @@ public class JobContractService implements Serializable {
     public APIResponse approveJobProposal(String authToken,JwtUserDetail currentUser, JobContract contract) {
         try {
             JobProposal proposal = jobProposalRepository.findById(contract.getProposalId()).orElse(null);
-            if(Objects.isNull(proposal))
+            if (Objects.isNull(proposal))
                 return new APIResponse("Proposal not found", false, null);
 
             Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
-            if(Objects.isNull(job))
+            if (Objects.isNull(job))
                 return new APIResponse("Job not found", false, null);
 
+            String remark = "Approved Successfully";
             String contractReferenceId = app.makeUIID();
             String paymentReferenceId = app.makeUIID();
             contract.setPeppfees(0); //set peprest charges to zero
@@ -181,8 +192,6 @@ public class JobContractService implements Serializable {
             contract.setAppId(Integer.valueOf(appId));
             contract.setClearedAmount(0);
 
-            int status = 0;
-            String remark = null;
 
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
@@ -195,15 +204,48 @@ public class JobContractService implements Serializable {
             proposal.setLastModifiedDate(new Date());
             proposal.setStartDate(new Date());
             proposal.setEndDate(c.getTime());
+            contract.setPaymentMethod(PaymentMethod.WALLET);
 
-            if(contract.getPaymentMethod()==null)
-                contract.setPaymentMethod(PaymentMethod.BANK);
+            if (job != null) {
+                job.setStatus(Status.WP);
+                job.setLastModifiedDate(new Date());
+
+                if (job.getType() == JobType.TEAMS_PROJECT) {
+
+                    JobTeamDetails existingMember = jobTeamDetailsRepository.findByProposalId(proposal.getId());
+                    if (existingMember == null) {
+                        // save approved team member
+                        JobTeamDetails teamMember = new JobTeamDetails();
+                        teamMember.setImg(proposal.getImg());
+                        teamMember.setFullName(proposal.getFullName());
+                        teamMember.setEmail(proposal.getEmail());
+                        teamMember.setAmount(proposal.getBidAmount());
+                        teamMember.setJobId(proposal.getJobId());
+                        teamMember.setUserId(proposal.getUserId());
+                        teamMember.setProposalId(proposal.getId());
+                        teamMember.setEmployerId(proposal.getEmployerId());
+                        teamMember.setStatus(Status.AC);
+                        teamMember.setDescription(proposal.getAbout());
+                        teamMember.setPercentage(Long.valueOf(10));
+                        teamMember.setStartDate(new Date());
+                        teamMember.setEndDate(c.getTime());
+                        jobTeamDetailsRepository.save(teamMember);
+                    } else {
+                        existingMember.setStartDate(new Date());
+                        existingMember.setEndDate(c.getTime());
+                        existingMember.setStatus(Status.AC);
+                        jobTeamDetailsRepository.save(existingMember);
+                    }
+                }
+            } else {
+                logger.info("JOBSERVICE: Job not found");
+            }
+
 
             if (contract.getWorkMethod().equals("Milestone")) {
-                status = 1;
                 //fire notification
-                User user =userService.getUserById(proposal.getUserId());
-                if (user!=null) {
+                User user = userService.getUserById(proposal.getUserId());
+                if (user != null) {
                     NotificationBody body = new NotificationBody();
                     body.setBody(currentUser.getUserFullName() + " approved your contract and the amount will be paid to you base on the milestone you complete");
                     body.setSubject("Proposal Approval");
@@ -218,281 +260,70 @@ public class JobContractService implements Serializable {
                     notificationSender.pushNotification(body);
                 }
                 //end
-            } else {
-
-                try {
-                    //get configurations
-                    List<Config> configs = configService.getConfigs();
-                    app.print(configs);
-                    if (!configs.isEmpty()) {
-                        for (Config currentConfig : configs) {
-                            //#getting escrow account
-                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
-                                this.escrowAccountName = currentConfig.getValue();
-                            if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
-                                this.escrowAccountNumber = currentConfig.getValue();
-                        }
-                    }
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return new APIResponse("Unable to extract job service configurations", false, null);
-                }
-
-                app.print("###ESCROW ACCOUNT");
-                app.print(this.escrowAccountName);
-                app.print(this.escrowAccountNumber);
 
                 app.print("Contract Details:");
-                app.print(contract);
-
-                Boolean isPaid=false;
-
-                if(contract.getPaymentMethod().equals(PaymentMethod.WALLET)) {
-                    //transfer the amount to Kula main account from Wallet
-                    PaymentRequest payment = new PaymentRequest();
-                    payment.setProposalId(contract.getProposalId());
-                    payment.setAmount(contract.getAmount());
-                    payment.setNarration("Transfer from Employer to Escrow account for job Contract");
-                    payment.setCreditAccountName(escrowAccountName);
-                    payment.setCreditAccountNumber(escrowAccountNumber);
-                    payment.setCreditAccountType("GL");
-                    payment.setPaymentReference(paymentReferenceId);
-                    payment.setExecutedFor(contractReferenceId);
-                    payment.setContractReference(contractReferenceId);
-                    payment.setExecutedBy(currentUser.getUserUUID());
-                    payment.setExecutedByUsername(currentUser.getUserEmail());
-
-                    APIResponse paymentResponse = jobWalletPaymentService.debitWallet(currentUser, payment);
-                    if (paymentResponse.isSuccess()) {
-                        try {
-                            isPaid=true;
-                            //############### Activity Logging ###########
-                            ActivityLog log = new ActivityLog();
-                            log.setDescription("Employer payment to Escrow Successful for job "+job.getTitle());
-                            log.setRequestObject(app.toString(payment));
-                            log.setResponseObject(app.toString(paymentResponse));
-                            log.setUsername(currentUser.getUserEmail());
-                            log.setUserId(currentUser.getUserUUID());
-                            appLogger.log(log);
-                            //#########################################
-                        }catch (Exception ex){
-                            ex.printStackTrace();
-                        }
-                        contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
-                    } else {
-                        isPaid=false;
-                    }
-
-                }
-                else {
-                    //transfer the amount to Sidekiq main account
-                    PaymentRequest payment = new PaymentRequest();
-                    payment.setProposalId(contract.getProposalId());
-                    payment.setAmount(contract.getAmount());
-                    payment.setNarration("Transfer from Employer to Escrow account for job Contract");
-                    payment.setCreditAccountName(escrowAccountName);
-                    payment.setCreditAccountNumber(escrowAccountNumber);
-                    payment.setCreditAccountType("GL");
-                    payment.setDebitAccountName(contract.getEmployerAccountName());
-                    payment.setDebitAccountNumber(contract.getEmployerAccountNumber());
-                    payment.setDebitAccountType("CASA");
-                    payment.setPaymentReference(paymentReferenceId);
-                    payment.setExecutedFor(contractReferenceId);
-                    payment.setContractReference(contractReferenceId);
-                    payment.setExecutedBy(currentUser.getUserUUID());
-                    payment.setExecutedByUsername(currentUser.getUserEmail());
-
-                    APIResponse paymentResponse = jobPaymentService.makePayment(authToken,payment);
-                    if (paymentResponse.isSuccess()) {
-                        try {
-                            isPaid = true;
-                            //############### Activity Logging ###########
-                            ActivityLog log = new ActivityLog();
-                            log.setDescription("Employer payment to Escrow Successful for job " + job.getTitle());
-                            log.setRequestObject(app.toString(payment));
-                            log.setResponseObject(app.toString(paymentResponse));
-                            log.setUsername(currentUser.getUserEmail());
-                            log.setUserId(currentUser.getUserUUID());
-                            appLogger.log(log);
-                            //#########################################
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                        contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
-                    } else {
-                        isPaid = false;
-                    }
-                }
-
-                if(isPaid){
-
-                   if (job != null) {
-                        String[] params = {currentUser.getUserFullName(),String.valueOf(contract.getAmount()),job.getTitle()};
-                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider",params,LocaleContextHolder.getLocale());
-                        NotificationBody body = new NotificationBody();
-                        body.setBody(message);
-                        body.setSubject("Payment Successful");
-                        body.setActionType("REDIRECT");
-                        body.setAction("/job/ongoing/details/" + proposal.getJobId());
-                        body.setTopic("'Job'");
-                        body.setChannel("S");
-                        body.setPriority("NORMAL");
-                        body.setRecipient(proposal.getEmployerId());
-                        body.setRecipientEmail(currentUser.getUserEmail());
-                        body.setRecipientName(currentUser.getUserFullName());
-                        notificationSender.pushNotification(body);
-                    }
-
-                    app.print("Creating Escrow Request###################################");
-                    app.print("Escrow URL: "+baseURL);
-                    app.print("Escrow Token: "+token);
-
-                    JSONObject requestPayload = new JSONObject();
-                    requestPayload.put("appid",appId);
-                    requestPayload.put("referenceid",contract.getContractReference());
-                    requestPayload.put("user_email",contract.getUserEmail());
-                    requestPayload.put("amount",contract.getAmount());
-                    requestPayload.put("country",contract.getCountry());
-                    requestPayload.put("currency",contract.getCurrency());
-                    requestPayload.put("customer_email",contract.getFreelancerEmailAddress());
-                    requestPayload.put("merchant_email",contract.getEmployerEmailAddress());
-                    requestPayload.put("customer_account_number",contract.getFreelancerAccountNumber());
-                    requestPayload.put("merchant_account_number",contract.getEmployerAccountNumber());
-                    requestPayload.put("customer_bank_code","032");
-                    requestPayload.put("merchant_bank_code","032");
-                    requestPayload.put("customer_name",contract.getFreelancerAccountName());
-                    requestPayload.put("merchant_name",contract.getEmployerAccountName());
-                    requestPayload.put("customer_phone",contract.getFreelancerPhoneNumber());
-                    requestPayload.put("merchant_phone",contract.getEmployerPhoneNumber());
-                    requestPayload.put("peppfees",contract.getPeppfees());
-                    requestPayload.put("startdate",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate()));
-                    requestPayload.put("enddate", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate()));
-                    requestPayload.put("transfer_reference_id",contract.getContractReference() );
-
-                    app.print("Request Body");
-                    app.print(requestPayload);
-                    String endpoint=baseURL + "/Transaction/create";
-                    HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
-                    ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-                    if (response.getStatusCode().is2xxSuccessful()) {
-                        status = 1;
-                        remark = "success";
-
-                        app.print("Escrow response: "+response.getStatusCode().is2xxSuccessful());
-                        //fire notifications
-//                        NotificationBody body1 = new NotificationBody();
-//                        String[] params = {String.valueOf(contract.getAmount()), job.getTitle()};
-//                        String message = messageSource.getMessage("proposal.approval.successful.email-body.gig-provider", params, LocaleContextHolder.getLocale());
-//                        body1.setBody(message);
-//                        body1.setSubject("Job Proposal Approved");
-//                        body1.setActionType("REDIRECT");
-//                        body1.setAction("/job/ongoing/details/" + proposal.getJobId());
-//                        body1.setTopic("'Job'");
-//                        body1.setChannel("S");
-//                        body1.setPriority("YES");
-//                        body1.setRecipient(proposal.getEmployerId());
-//                        body1.setRecipientEmail(currentUser.getUserEmail());
-//                        body1.setRecipientName(currentUser.getUserFullName());
-//                        notificationSender.pushNotification(body1);
-
-                        User user =userService.getUserById(proposal.getUserId());
-                        app.print("freelancer>>>> "+user);
-                        if(user!=null) {
-                            NotificationBody body2 = new NotificationBody();
-                            String[] params1 = {currentUser.getUserFullName(),user.getFullName(),job.getTitle(),String.valueOf(contract.getAmount())};
-                            String message1 = messageSource.getMessage("proposal.approval.successful.email-body.freelancer", params1, LocaleContextHolder.getLocale());
-                            body2.setBody(message1);
-                            body2.setSubject("Proposal Approval");
-                            body2.setActionType("REDIRECT");
-                            body2.setAction("/job/ongoing/details/" + proposal.getJobId());
-                            body2.setTopic("'Job'");
-                            body2.setChannel("S");
-                            body2.setPriority("YES");
-                            body2.setRecipient(proposal.getUserId());
-                            body2.setRecipientEmail(user.getEmail());
-                            body2.setRecipientName(user.getFullName());
-                            notificationSender.pushNotification(body2);
-                        }
-
-                        //end
-                    } else {
-                        status = 0;
-                        remark = "Escrow transaction failed";
-                        logger.info("JOBSERVICE: Escrow transaction failed");
-                        logger.error("JOBSERVICE: Escrow " + response.getBody());
-
-                    }
-                } else {
-                    status = 0;
-                    remark ="Payment Failed";
-                }
-            }
-            if (status == 1) {
-                if (job != null) {
-                    job.setStatus(Status.WP);
-                    job.setLastModifiedDate(new Date());
-                    jobRepository.save(job);
-
-                    if (job.getType() == JobType.TEAMS_PROJECT) {
-
-                        JobTeamDetails existingMember = jobTeamDetailsRepository.findByProposalId(proposal.getId());
-                        if (existingMember == null) {
-                            // save approved team member
-                            JobTeamDetails teamMember = new JobTeamDetails();
-                            teamMember.setImg(proposal.getImg());
-                            teamMember.setFullName(proposal.getFullName());
-                            teamMember.setEmail(proposal.getEmail());
-                            teamMember.setAmount(proposal.getBidAmount());
-                            teamMember.setJobId(proposal.getJobId());
-                            teamMember.setUserId(proposal.getUserId());
-                            teamMember.setProposalId(proposal.getId());
-                            teamMember.setEmployerId(proposal.getEmployerId());
-                            teamMember.setStatus(Status.AC);
-                            teamMember.setDescription(proposal.getAbout());
-                            teamMember.setPercentage(Long.valueOf(10));
-                            teamMember.setStartDate(new Date());
-                            teamMember.setEndDate(c.getTime());
-                            jobTeamDetailsRepository.save(teamMember);
-                        } else {
-                            existingMember.setStartDate(new Date());
-                            existingMember.setEndDate(c.getTime());
-                            existingMember.setStatus(Status.AC);
-                            jobTeamDetailsRepository.save(existingMember);
-                        }
-                    }
-                } else {
-                    logger.info("JOBSERVICE: Job not found");
-                    remark = "Job not found";
-                }
-
                 app.print(contract);
                 JobContract savedContract = jobContractRepository.save(contract);
                 proposal.setContractId(savedContract.getId());
                 jobProposalRepository.save(proposal);
                 jobRepository.save(job);
 
-                try {
-                    //############### Activity Logging ###########
-                    ActivityLog log = new ActivityLog();
-                    log.setDescription("Contract Approved Successfully for job "+job.getTitle());
-                    log.setRequestObject(app.toString(contract));
-                    log.setResponseObject(app.toString(savedContract));
-                    log.setUsername("User Email: " + currentUser.getUserEmail());
-                    log.setUserId("User ID: " + currentUser.getUserUUID());
-                    log.setDate("Date and Time: " + new Date());
-                    appLogger.log(log);
-                    //#########################################
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
                 return new APIResponse(remark, true, savedContract);
-            } else {
-                logger.info("JOBSERVICE: Transaction failed");
-                return new APIResponse(remark, false, null);
-            }
 
+            } else {
+                app.print("Contract Details:");
+                app.print(contract);
+
+                //move funds from employer wallet to kula wallet
+                WalletDebitRequest debitGigProvider = new WalletDebitRequest();
+                debitGigProvider.setRef(paymentReferenceId);
+                debitGigProvider.setWalletId(currentUser.getWalletId());
+                debitGigProvider.setDestWalletId(kulaWalletId);
+                debitGigProvider.setNaration("Transfer from GIG provider wallet to kula model wallet");
+                debitGigProvider.setCurrencyCode("NGN");
+                debitGigProvider.setTotalAmount(BigDecimal.valueOf(contract.getAmount()));
+                debitGigProvider.setTotalAmountPlusCharges(BigDecimal.valueOf(contract.getAmount()));
+
+                APIResponse<WalletDebitCreditResponse> paymentResponse = walletService.Outflow(debitGigProvider);
+                if (paymentResponse.isSuccess() && paymentResponse.getPayload() != null) {
+
+                    WalletDebitCreditResponse paymentResponseData=paymentResponse.getPayload();
+
+                    if(paymentResponseData.getSuccess()) {
+
+
+
+                        app.print("Contract Details:");
+                        app.print(contract);
+                        JobContract savedContract = jobContractRepository.save(contract);
+                        proposal.setContractId(savedContract.getId());
+                        jobProposalRepository.save(proposal);
+                        jobRepository.save(job);
+
+                        try {
+                            //############### Activity Logging ###########
+                            ActivityLog log = new ActivityLog();
+                            log.setDescription("Contract Approved Successfully for job " + job.getTitle());
+                            log.setRequestObject(app.toString(contract));
+                            log.setResponseObject(app.toString(savedContract));
+                            log.setUsername("User Email: " + currentUser.getUserEmail());
+                            log.setUserId("User ID: " + currentUser.getUserUUID());
+                            log.setDate("Date and Time: " + new Date());
+                            appLogger.log(log);
+                            //#########################################
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                        return new APIResponse(remark, true, savedContract);
+
+                    }else{
+                        return new APIResponse(paymentResponseData.getMessage(), false, null);
+                    }
+                } else {
+                    return new APIResponse("Wallet to Wallet Payment failed", false, null);
+                }
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             return new APIResponse("Oops! An Error Occurred", false, null);
@@ -1325,233 +1156,122 @@ public class JobContractService implements Serializable {
                             contract.setLastModifiedDate(new Date());
                             contract.setInitialPaymentReferenceA(paymentReferenceId);
                             contract.setLastModifiedDate(new Date());
-                                                        Calendar c = Calendar.getInstance();
+                            Calendar c = Calendar.getInstance();
                             c.setTime(new Date());
                             c.add(Calendar.DATE, proposal.getDuration().intValue());
                             milestone.setEndDate(c.getTime());
                             milestone.setStartDate(new Date());
-
-                            try {
-                                //get configurations
-                                List<Config> configs = configService.getConfigs();
-                                app.print(configs);
-                                if (!configs.isEmpty()) {
-                                    for (Config currentConfig : configs) {
-                                        //#getting escrow account
-                                        if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
-                                            this.escrowAccountName = currentConfig.getValue();
-                                        if (currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
-                                            this.escrowAccountNumber = currentConfig.getValue();
-                                    }
-                                }
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                                return new APIResponse("Unable to extract job service configurations", false, null);
-                            }
-
-                            app.print("###ESCROW ACCOUNT");
-                            app.print(this.escrowAccountName);
-                            app.print(this.escrowAccountNumber);
-
-
-                            PaymentRequest payment = new PaymentRequest();
-                            payment.setProposalId(contract.getProposalId());
-                            payment.setAmount(milestone.getAmount());
-                            payment.setNarration("Transfer from Employer to Escrow account for Milestone " + milestone.getTitle());
-                            payment.setCreditAccountName(escrowAccountName);
-                            payment.setCreditAccountNumber(escrowAccountNumber);
-                            payment.setCreditAccountType("GL");
-                            payment.setDebitAccountName(contract.getEmployerAccountName());
-                            payment.setDebitAccountNumber(contract.getEmployerAccountNumber());
-                            payment.setDebitAccountType("CASA");
-                            payment.setPaymentReference(paymentReferenceId);
-                            payment.setExecutedFor(contract.getContractReference());
-                            payment.setContractReference(contract.getContractReference());
-                            payment.setExecutedBy(currentUser.getUserUUID());
-                            payment.setExecutedByUsername(currentUser.getUserEmail());
-
-                            APIResponse paymentResponse=jobPaymentService.makePayment(authToken,payment);
-                            if (paymentResponse.isSuccess()) {
-
-                                milestone.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
-                                contract.setInitialPaymentReferenceB(paymentResponse.getPayload().toString());
-
-                                app.print("###################################");
-                                app.print("Escrow URL: "+baseURL);
-                                app.print("Escrow Token: "+token);
-
-                                JSONObject requestPayload = new JSONObject();
-                                requestPayload.put("appid",appId);
-                                requestPayload.put("referenceid",milestone.getMilestoneReference());
-                                requestPayload.put("user_email",contract.getUserEmail());
-                                requestPayload.put("amount",milestone.getAmount());
-                                requestPayload.put("country",contract.getCountry());
-                                requestPayload.put("currency",contract.getCurrency());
-                                requestPayload.put("customer_email",contract.getFreelancerEmailAddress());
-                                requestPayload.put("merchant_email",contract.getEmployerEmailAddress());
-                                requestPayload.put("customer_account_number",contract.getFreelancerAccountNumber());
-                                requestPayload.put("merchant_account_number",contract.getEmployerAccountNumber());
-                                requestPayload.put("customer_bank_code","032");
-                                requestPayload.put("merchant_bank_code","032");
-                                requestPayload.put("customer_name",contract.getFreelancerAccountName());
-                                requestPayload.put("merchant_name",contract.getEmployerAccountName());
-                                requestPayload.put("customer_phone",contract.getFreelancerPhoneNumber());
-                                requestPayload.put("merchant_phone",contract.getEmployerPhoneNumber());
-                                requestPayload.put("peppfees",contract.getPeppfees());
-                                requestPayload.put("startdate",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getStartDate()));
-                                requestPayload.put("enddate", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(contract.getEndDate()));
-                                requestPayload.put("transfer_reference_id",milestone.getMilestoneReference() );
-
-                                app.print("Request Body");
-                                app.print(requestPayload);
-                                String endpoint=baseURL + "/Transaction/create";
-                                HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
-                                ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-
-                                if (response.getStatusCode().is2xxSuccessful()) {
-                                    jobRepository.save(job);
-                                    jobProposalRepository.save(proposal);
-                                    jobContractRepository.save(contract);
-                                    status = 1;
-                                    remark = "Escrow transaction succeeded";
-                                    logger.info("JOBSERVICE: Escrow transaction succeeded");
-                                } else {
-                                    status = 0;
-                                    remark = "Escrow transaction failed";
-                                    logger.info("JOBSERVICE: Escrow transaction failed");
-                                }
-
-                                try {
-                                    //############### Activity Logging ###########
-                                    ActivityLog log = new ActivityLog();
-                                    log.setDescription("Payment to Escrow Successful for Milestone of job "+job.getTitle());
-                                    log.setRequestObject(app.toString(payment));
-                                    log.setResponseObject(app.toString(paymentResponse));
-                                    log.setUsername(currentUser.getUserEmail());
-                                    log.setUserId(currentUser.getUserUUID());
-                                    appLogger.log(log);
-                                    //#########################################
-                                }catch (Exception ex){
-                                    ex.printStackTrace();
-                                }
-
-                                //done
-                            } else {
-                                status = 0;
-                                remark = paymentResponse.getMessage();
-                            }
+                            jobRepository.save(job);
+                            jobProposalRepository.save(proposal);
+                            jobContractRepository.save(contract);
+                            status = 1;
+                            //done
                         } else {
                             status = 0;
                             remark = "Contract not found";
-                            logger.error("JOBSERVICE: Contract not found");
                         }
                     } else {
                         status = 0;
-                        remark = "Proposal not found";
-                        logger.error("JOBSERVICE: Proposal not found");
+                        remark = "Contract not found";
+                        logger.error("JOBSERVICE: Contract not found");
                     }
-                }
-                else if(newStatus.equals(Status.RE)) {
-
-                    milestone.setStatus(Status.RE);
-                    milestone.setEndDate(new Date());
-                    JobMilestone savedMilestone = jobMilestoneRepository.save(milestone);
-
-                    if(savedMilestone!=null){
-
-                        JobProjectSubmission project=jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
-                        if(project!=null){
-                            project.setStatus(Status.RE);
-                            jobProjectSubmissionRepository.save(project);
-                        }
-                    }
-                    //fire notification
-                    Job currentJob = jobRepository.findById(milestone.getJobId()).orElse(null);
-                    User freelancer=userService.getUserById(milestone.getUserId());
-                    if (currentJob != null && freelancer!=null) {
-                        NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getUserFullName() + " rejected the milestone you submitted for " + currentJob.getTitle() + ".");
-                        body.setSubject("Milestone Rejected");
-                        body.setActionType("REDIRECT");
-                        body.setAction("/my-job/contract/milestones/" + milestone.getJobId() + "/" + milestone.getProposalId());
-                        body.setTopic("'Job'");
-                        body.setChannel("S");
-                        body.setRecipient(milestone.getUserId());
-                        body.setRecipientEmail(freelancer.getEmail());
-                        body.setRecipientName(freelancer.getFullName());
-                        notificationSender.pushNotification(body);
-                    }
-
-                    try {
-                        //############### Activity Logging ###########
-                        ActivityLog log = new ActivityLog();
-                        log.setDescription("Rejected Milestone for job "+currentJob.getTitle());
-                        log.setRequestObject(app.toString(milestone));
-                        log.setResponseObject(app.toString(savedMilestone));
-                        log.setUsername(currentUser.getUserEmail());
-                        log.setUserId(currentUser.getUserUUID());
-                        appLogger.log(log);
-                        //#########################################
-                    }catch (Exception ex){
-                        ex.printStackTrace();
-                    }
-
-                    //end
-                    return new APIResponse("success", true, savedMilestone);
-                }
-                else {
-                    app.print(milestone);
-                    status = 0;
-                    remark = "Milestone status mismatch";
-                    logger.error("JOBSERVICE: Milestone status mismatch");
-                }
-
-                if (status == 1) {
-                    //fire notification
-                    Job currentJob = jobRepository.findById(milestone.getJobId()).orElse(null);
-                    User freelancer=userService.getUserById(milestone.getUserId());
-
-                    if (currentJob != null && freelancer!=null) {
-                        NotificationBody body = new NotificationBody();
-                        body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for " + currentJob.getTitle() + ", you can proceed to start working on it");
-                        body.setSubject("Milestone Approval");
-                        body.setActionType("REDIRECT");
-                        body.setAction("/my-job/contract/milestones/" + milestone.getJobId() + "/" + milestone.getProposalId());
-                        body.setTopic("'Job'");
-                        body.setChannel("S");
-                        body.setRecipient(milestone.getUserId());
-                        body.setRecipientEmail(freelancer.getEmail());
-                        body.setRecipientName(freelancer.getFullName());
-                        notificationSender.pushNotification(body);
-                    }
-
-
-                    JobMilestone savedMilestone = jobMilestoneRepository.save(milestone);
-                    try {
-                        //############### Activity Logging ###########
-                        ActivityLog log = new ActivityLog();
-                        log.setDescription("Approved Milestone for job "+currentJob.getTitle());
-                        log.setRequestObject(app.toString(milestone));
-                        log.setResponseObject(app.toString(savedMilestone));
-                        log.setUsername(currentUser.getUserEmail());
-                        log.setUserId(currentUser.getUserUUID());
-                        appLogger.log(log);
-                        //#########################################
-                    }catch (Exception ex){
-                        ex.printStackTrace();
-                    }
-                    //end
-                         return new APIResponse("success", true, savedMilestone);
                 } else {
-                    logger.info("JOBSERVICE: Transaction failed");
-                    return new APIResponse(remark, false, null);
+                    status = 0;
+                    remark = "Proposal not found";
+                    logger.error("JOBSERVICE: Proposal not found");
                 }
+            } else if (newStatus.equals(Status.RE)) {
+
+                milestone.setStatus(Status.RE);
+                milestone.setEndDate(new Date());
+                JobMilestone savedMilestone = jobMilestoneRepository.save(milestone);
+
+                if (savedMilestone != null) {
+
+                    JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
+                    if (project != null) {
+                        project.setStatus(Status.RE);
+                        jobProjectSubmissionRepository.save(project);
+                    }
+                }
+                //fire notification
+                Job currentJob = jobRepository.findById(milestone.getJobId()).orElse(null);
+                User freelancer = userService.getUserById(milestone.getUserId());
+                if (currentJob != null && freelancer != null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getUserFullName() + " rejected the milestone you submitted for " + currentJob.getTitle() + ".");
+                    body.setSubject("Milestone Rejected");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/my-job/contract/milestones/" + milestone.getJobId() + "/" + milestone.getProposalId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(milestone.getUserId());
+                    body.setRecipientEmail(freelancer.getEmail());
+                    body.setRecipientName(freelancer.getFullName());
+                    notificationSender.pushNotification(body);
+                }
+
+                try {
+                    //############### Activity Logging ###########
+                    ActivityLog log = new ActivityLog();
+                    log.setDescription("Rejected Milestone for job " + currentJob.getTitle());
+                    log.setRequestObject(app.toString(milestone));
+                    log.setResponseObject(app.toString(savedMilestone));
+                    log.setUsername(currentUser.getUserEmail());
+                    log.setUserId(currentUser.getUserUUID());
+                    appLogger.log(log);
+                    //#########################################
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                //end
+                return new APIResponse("success", true, savedMilestone);
             } else {
-                logger.info("JOBSERVICE: Milestone request not found");
-                remark = "Milestone request not found";
-                return new APIResponse(remark, false, null);
+                app.print(milestone);
+                status = 0;
+                remark = "Milestone status mismatch";
+                logger.error("JOBSERVICE: Milestone status mismatch");
             }
+
+            if (status == 1) {
+                //fire notification
+                Job currentJob = jobRepository.findById(milestone.getJobId()).orElse(null);
+                User freelancer = userService.getUserById(milestone.getUserId());
+
+                if (currentJob != null && freelancer != null) {
+                    NotificationBody body = new NotificationBody();
+                    body.setBody(currentUser.getUserFullName() + " approved the milestone you submitted for " + currentJob.getTitle() + ", you can proceed to start working on it");
+                    body.setSubject("Milestone Approval");
+                    body.setActionType("REDIRECT");
+                    body.setAction("/my-job/contract/milestones/" + milestone.getJobId() + "/" + milestone.getProposalId());
+                    body.setTopic("'Job'");
+                    body.setChannel("S");
+                    body.setRecipient(milestone.getUserId());
+                    body.setRecipientEmail(freelancer.getEmail());
+                    body.setRecipientName(freelancer.getFullName());
+                    notificationSender.pushNotification(body);
+                }
+
+
+                try {
+                    //############### Activity Logging ###########
+                    ActivityLog log = new ActivityLog();
+                    log.setDescription("Approved Milestone for job " + currentJob.getTitle());
+                    log.setRequestObject(app.toString(milestone));
+                    log.setUsername(currentUser.getUserEmail());
+                    log.setUserId(currentUser.getUserUUID());
+                    appLogger.log(log);
+                    //#########################################
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                //end
+            }
+            JobMilestone savedMilestone = jobMilestoneRepository.save(milestone);
+            return new APIResponse("success", true, savedMilestone);
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return new APIResponse(ex.getMessage(), false, null);
@@ -1689,6 +1409,7 @@ public class JobContractService implements Serializable {
                     if (proposal == null)
                         return new APIResponse("No Proposal found for this Contract", false, null);
                     //check if job is available
+                    User freelancer = userService.getUserById(proposal.getUserId());
                     Job job = jobRepository.findById(contract.getJobId()).orElse(null);
                     if (job == null)
                         return new APIResponse("No Job history found for this Contract", false, null);
@@ -1714,7 +1435,6 @@ public class JobContractService implements Serializable {
                         double kulaIncomeRate=0;
                         double VATCharge = 0;
                         double kulaIncomeCharge = 0;
-                        double pepperestIncomeCharge = 0;
                         double freelancerIncomeAmount=0;
                         int TOTAL_JOBS_COMPLETED = 0;
                         boolean isPaid=false;
@@ -1736,12 +1456,6 @@ public class JobContractService implements Serializable {
                                     if (currentConfig.getReference().equals(ConfigReference.TOTAL_JOBS_COMPLETED))
                                         TOTAL_JOBS_COMPLETED = Integer.valueOf(currentConfig.getValue());
 
-                                    //#getting escrow account
-                                    if(currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NAME))
-                                        this.escrowAccountName=currentConfig.getValue();
-                                    if(currentConfig.getReference().equals(ConfigReference.ESCROW_ACCOUNT_NUMBER))
-                                        this.escrowAccountNumber=currentConfig.getValue();
-
                                     //#getting kula income account
                                     if(currentConfig.getReference().equals(ConfigReference.KULA_INCOME_ACCOUNT_NAME))
                                         this.kulaIncomeAccountName =currentConfig.getValue();
@@ -1753,12 +1467,6 @@ public class JobContractService implements Serializable {
                                         this.VATAccountName  =currentConfig.getValue();
                                     if(currentConfig.getReference().equals(ConfigReference.VAT_INCOME_ACCOUNT_NUMBER))
                                         this.VATAccountNumber =currentConfig.getValue();
-
-                                    //#getting vat income account
-                                    if(currentConfig.getReference().equals(ConfigReference.PEPPEREST_INCOME_ACCOUNT_NAME))
-                                        this.pepperestIncomeAccountName  =currentConfig.getValue();
-                                    if(currentConfig.getReference().equals(ConfigReference.PEPPEREST_INCOME_ACCOUNT_NUMBER))
-                                        this.pepperestIncomeAccountNumber =currentConfig.getValue();
                                 }
                             }
                         } catch (Exception ex) {
@@ -1772,298 +1480,218 @@ public class JobContractService implements Serializable {
 
                         kulaIncomeCharge=(kulaIncomeRate * depositedAmount) / 100;
 
-                        if (TOTAL_JOBS_COMPLETED < 100000) {
-                            pepperestIncomeCharge = 100;
-                        } else if (TOTAL_JOBS_COMPLETED >= 100000 && TOTAL_JOBS_COMPLETED < 200000) {
-                            pepperestIncomeCharge = 50;
+                       if(TOTAL_JOBS_COMPLETED >= 100000 && TOTAL_JOBS_COMPLETED < 200000) {
                             kulaIncomeCharge = kulaIncomeCharge + 50;
                         } else if (TOTAL_JOBS_COMPLETED >= 200000 && TOTAL_JOBS_COMPLETED < 300000) {
-                            pepperestIncomeCharge = 40;
                             kulaIncomeCharge = kulaIncomeCharge + 60;
                         } else {
-                            pepperestIncomeCharge = 30;
                             kulaIncomeCharge = kulaIncomeCharge + 70;
                         }
                         VATCharge = (VATRate * kulaIncomeCharge) / 100;
-                        freelancerIncomeAmount = (depositedAmount - pepperestIncomeCharge) - kulaIncomeCharge;
+                        freelancerIncomeAmount = (depositedAmount  - kulaIncomeCharge);
                         kulaIncomeCharge = kulaIncomeCharge - VATCharge;
 
                         app.print("VAT is "+VATCharge);
                         app.print("kula Income  is "+kulaIncomeCharge);
                         app.print("Freelancer charge is "+freelancerIncomeAmount);
-                        app.print("###ESCROW ACCOUNT");
-                        app.print(this.escrowAccountName);
-                        app.print(this.escrowAccountNumber);
                         app.print("###KULA INCOME ACCOUNT");
                         app.print(this.kulaIncomeAccountName);
                         app.print(this.kulaIncomeAccountNumber);
-                        app.print("###PEPPEREST INCOME ACCOUNT");
-                        app.print(this.pepperestIncomeAccountName);
-                        app.print(this.pepperestIncomeAccountNumber);
                         app.print("###VAT INCOME ACCOUNT");
                         app.print(this.VATAccountName);
                         app.print(this.VATAccountNumber);
 
 
 
-                        ArrayList<JobBulkPayment> bulkPaymentStack = new ArrayList<>();
+                        ArrayList<WalletDebitRequest>  recipients = new ArrayList<>();
                         String paymentReference = app.makeUIID();
                         String narration = "Settlement from Kula for " + job.getTitle();
 
-                        //Bulk transfers for settlement
-                        JobBulkPayment escrowAccount = new JobBulkPayment();
-                        escrowAccount.setAccountNumber(escrowAccountNumber);
-                        escrowAccount.setAccountName(escrowAccountName);
-                        escrowAccount.setNarration(narration);
-                        escrowAccount.setExecutedBy(currentUser.getUserUUID());
-                        escrowAccount.setExecutedByUsername(currentUser.getUserEmail());
-                        escrowAccount.setExecutedFor(contract.getContractReference());
-                        escrowAccount.setContractReference(contract.getContractReference());
-                        escrowAccount.setPaymentReference(paymentReference);
-                        escrowAccount.setCrDrFlag("D");
-                        escrowAccount.setAccountType("GL");
-                        escrowAccount.setTransactionId("1");
-                        escrowAccount.setAmount(0);
+                        Double payable= 0d;
+                        WalletBulkDebitRequest transferRequest = new WalletBulkDebitRequest();
+                        transferRequest.setWalletId(kulaWalletId);
+                        transferRequest.setCurrencyCode("NGN");
 
-                        //***Union Bank***
-                        JobBulkPayment kulaAccount = new JobBulkPayment();
-                        //###############
-
-                        JobBulkPayment escrowkulaAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
-                        escrowkulaAccountDebit.setAmount(kulaIncomeCharge);
-                        escrowkulaAccountDebit.setTransactionId("1");
-                        escrowkulaAccountDebit.setRemark("Debited by Kula to kula Income account for " + job.getTitle());
-                        //##############
-                        kulaAccount.setTransactionId("2");
-                        kulaAccount.setAccountName(kulaIncomeAccountName);
-                        kulaAccount.setAccountNumber(kulaIncomeAccountNumber);
-                        kulaAccount.setNarration(narration);
-                        kulaAccount.setExecutedByUsername(currentUser.getUserEmail());
-                        kulaAccount.setExecutedBy(currentUser.getUserUUID());
-                        kulaAccount.setRemark("Credit from Kula to kula Income account for " + job.getTitle());
-                        kulaAccount.setExecutedFor(contract.getContractReference());
-                        kulaAccount.setContractReference(contract.getContractReference());
-                        kulaAccount.setPaymentReference(paymentReference);
-                        kulaAccount.setCrDrFlag("C");
-                        kulaAccount.setAccountType("GL");
-                        kulaAccount.setAmount(kulaIncomeCharge);
-                        //############# add to bulk transfer stack ###########
-                        bulkPaymentStack.add(escrowkulaAccountDebit);
-                        bulkPaymentStack.add(kulaAccount);
+                        //kula income
+                        WalletDebitRequest kulaRecipient= new WalletDebitRequest();
+                        kulaRecipient.setCreditAccountName(kulaIncomeAccountName);
+                        kulaRecipient.setCreditAccountNumber(kulaIncomeAccountNumber);
+                        kulaRecipient.setRef("kula"+paymentReference);
+                        kulaRecipient.setNaration(narration);
+                        kulaRecipient.setCurrencyCode("NGN");
+                        kulaRecipient.setCreditAccountBranch("000");
+                        kulaRecipient.setCreditAccountBankCode("032");
+                        kulaRecipient.setCreditAccountType("GL");
+                        kulaRecipient.setTransactionType("INS");
+                        kulaRecipient.setTotalAmount(BigDecimal.valueOf(kulaIncomeCharge));
+                        kulaRecipient.setTotalAmountPlusCharges(BigDecimal.valueOf(kulaIncomeCharge));
+                        payable+=kulaIncomeCharge;
+                        recipients.add(kulaRecipient);
 
                         if (VATCharge > 0) {
-                            //***Union Bank***
-                            JobBulkPayment VATAccount = new JobBulkPayment();
-                            //###############
-                            JobBulkPayment escrowVATAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
-                            escrowVATAccountDebit.setAmount(VATCharge);
-                            escrowVATAccountDebit.setTransactionId("3");
-                            escrowVATAccountDebit.setRemark("Debited by Kula to VAT account for " + job.getTitle());
-                            //##############
-                            VATAccount.setTransactionId("4");
-                            VATAccount.setAccountName(VATAccountName);
-                            VATAccount.setAccountNumber(VATAccountNumber);
-                            VATAccount.setNarration(narration);
-                            VATAccount.setExecutedBy(currentUser.getUserUUID());
-                            VATAccount.setExecutedByUsername(currentUser.getUserEmail());
-                            VATAccount.setRemark("Credit from Kula to VAT account for " + job.getTitle());
-                            VATAccount.setExecutedFor(contract.getContractReference());
-                            VATAccount.setContractReference(contract.getContractReference());
-                            VATAccount.setPaymentReference(paymentReference);
-                            VATAccount.setCrDrFlag("C");
-                            VATAccount.setAccountType("GL");
-                            VATAccount.setAmount(VATCharge);
-                            //############# add to bulk transfer stack ###########
-                            bulkPaymentStack.add(escrowVATAccountDebit);
-                            bulkPaymentStack.add(VATAccount);
+                            //vat income
+                            WalletDebitRequest vatRecipient = new WalletDebitRequest();
+                            vatRecipient.setCreditAccountName(VATAccountName);
+                            vatRecipient.setCreditAccountNumber(VATAccountNumber);
+                            vatRecipient.setRef("vat" + paymentReference);
+                            vatRecipient.setNaration(narration);
+                            vatRecipient.setCurrencyCode("NGN");
+                            vatRecipient.setCreditAccountBranch("000");
+                            vatRecipient.setCreditAccountBankCode("032");
+                            vatRecipient.setCreditAccountType("GL");
+                            vatRecipient.setTransactionType("INS");
+                            vatRecipient.setTotalAmount(BigDecimal.valueOf(VATCharge));
+                            vatRecipient.setTotalAmountPlusCharges(BigDecimal.valueOf(VATCharge));
+                            payable+=VATCharge;
+                            recipients.add(vatRecipient);
                         }
 
 
-                        //***Pepperest***
-                        JobBulkPayment pepperestAccount = new JobBulkPayment();
-                        //##############
-                        JobBulkPayment escrowPepperestAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
-                        escrowPepperestAccountDebit.setAmount(pepperestIncomeCharge);
-                        escrowPepperestAccountDebit.setTransactionId("5");
-                        escrowPepperestAccountDebit.setRemark("Debited  by Kula for to Pepperest account for " + job.getTitle());
-                        //#############
-                        pepperestAccount.setTransactionId("6");
-                        pepperestAccount.setAccountName(pepperestIncomeAccountName);
-                        pepperestAccount.setAccountNumber(pepperestIncomeAccountNumber);
-                        pepperestAccount.setNarration(narration);
-                        pepperestAccount.setExecutedBy(currentUser.getUserUUID());
-                        pepperestAccount.setExecutedByUsername(currentUser.getUserEmail());
-                        pepperestAccount.setRemark("Credit from Kula to Pepperest account for " + job.getTitle());
-                        pepperestAccount.setExecutedFor(contract.getContractReference());
-                        pepperestAccount.setContractReference(contract.getContractReference());
-                        pepperestAccount.setPaymentReference(paymentReference);
-                        pepperestAccount.setCrDrFlag("C");
-                        pepperestAccount.setAccountType("CASA");
-                        pepperestAccount.setAmount(pepperestIncomeCharge);
-                        //############# add to bulk transfer stack ###########
-                        bulkPaymentStack.add(escrowPepperestAccountDebit);
-                        bulkPaymentStack.add(pepperestAccount);
-
-                        //***Freelancer***
-                        JobBulkPayment freelancerAccount = new JobBulkPayment();
-                        //##################
-                        JobBulkPayment escrowFreelancerAccountDebit = (JobBulkPayment) app.copy(escrowAccount);
-                        escrowFreelancerAccountDebit.setAmount(freelancerIncomeAmount);
-                        escrowFreelancerAccountDebit.setTransactionId("7");
-                        escrowFreelancerAccountDebit.setRemark("Debited by Kula to Freelancer account for " + job.getTitle());
-                        //update escrow account information with the payment for kula
-
-                       if(proposal.getPaymentMethod().equals(PaymentMethod.WALLET)) {
-                           //transfer the amount to Kula main account from Wallet
-                           PaymentRequest payment = new PaymentRequest();
-                           payment.setProposalId(contract.getProposalId());
-                           payment.setAmount(freelancerIncomeAmount);
-                           payment.setNarration("Credit from Kula to Freelancer account for " + job.getTitle());
-                           payment.setDebitAccountName(escrowAccountName);
-                           payment.setDebitAccountNumber(escrowAccountNumber);
-                           payment.setDebitAccountType("GL");
-                           payment.setPaymentReference(paymentReference);
-                           payment.setExecutedFor(contractReferenceId);
-                           payment.setContractReference(contractReferenceId);
-                           payment.setExecutedBy(currentUser.getUserUUID());
-                           payment.setExecutedByUsername(currentUser.getUserEmail());
-                           app.print("Request:");
-                           app.print(payment);
-                           APIResponse paymentResponse = jobWalletPaymentService.creditWallet(currentUser, payment);
-                           if (paymentResponse.isSuccess()) {
-                               isPaid=true;
-                               app.print("Wallet payment to freelancer successful");
-                               app.print(paymentResponse);
-                           }else{
-                               app.print("Wallet payment to freelancer failed ");
-                               app.print(paymentResponse);
-                           }
+                        //Freelancer income
+                        WalletDebitRequest freelancerRecipient= new WalletDebitRequest();
+                        freelancerRecipient.setRef("freelancer"+paymentReference);
+                        freelancerRecipient.setDestWalletId(freelancer.getWalletId());
+                        freelancerRecipient.setNaration(narration);
+                        freelancerRecipient.setCurrencyCode("NGN");
+                        freelancerRecipient.setTotalAmount(BigDecimal.valueOf(freelancerIncomeAmount));
+                        freelancerRecipient.setTotalAmountPlusCharges(BigDecimal.valueOf(freelancerIncomeAmount));
+                        payable+=freelancerIncomeAmount;
+                        recipients.add(freelancerRecipient);
 
 
-                       }else{
-                           //##################
-                           freelancerAccount.setTransactionId("8");
-                           freelancerAccount.setAccountName(contract.getFreelancerAccountName());
-                           freelancerAccount.setAccountNumber(contract.getFreelancerAccountNumber());
-                           freelancerAccount.setNarration(narration);
-                           freelancerAccount.setExecutedBy(currentUser.getUserUUID());
-                           freelancerAccount.setExecutedByUsername(currentUser.getUserEmail());
-                           freelancerAccount.setRemark("Credit from Kula to Freelancer account for " + job.getTitle());
-                           freelancerAccount.setExecutedFor(contract.getContractReference());
-                           freelancerAccount.setContractReference(contract.getContractReference());
-                           freelancerAccount.setPaymentReference(paymentReference);
-                           freelancerAccount.setCrDrFlag("C");
-                           freelancerAccount.setAccountType("CASA");
-                           freelancerAccount.setAmount(freelancerIncomeAmount);
-                       }
-                        //############# add to bulk transfer stack ###########
-                        bulkPaymentStack.add(escrowFreelancerAccountDebit);
-                        bulkPaymentStack.add(freelancerAccount);
-                        app.print(bulkPaymentStack);
+                        transferRequest.setRecipients(recipients);
+                        transferRequest.setTotalAmount(BigDecimal.valueOf(payable));
+                        transferRequest.setTotalAmountPlusCharges(BigDecimal.valueOf(payable));
 
-                        APIResponse apiResponse = jobPaymentService.makeBulkPayment(authToken,bulkPaymentStack);
-                        if (apiResponse.isSuccess()) {
-                            //update contract information
-                            contract.setKulaChargeRate(kulaIncomeRate);
-                            contract.setVATChargeRate(VATRate);
-                            contract.setEscrowCharges(pepperestIncomeCharge);
+                        app.print("Bulk wallet transfer Request:");
+                        app.print(transferRequest);
+                        APIResponse<WalletCreditDebitBulkResponse> apiResponse = walletService.bulkOutflow(transferRequest);
+                        if (apiResponse.isSuccess() && apiResponse.getPayload()!=null) {
 
-                            //update job
-                            if (contract.getWorkMethod().equals("Overall")) {
-                                contract.setIsSettled(true);
-                                contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
-                                contract.setEndDate(new Date());
-                                contract.setLastModifiedDate(new Date());
-                                contract.setClearedAmount(freelancerIncomeAmount);
-                                contract.setVat(VATCharge);
-                                contract.setCharges(kulaIncomeCharge+pepperestIncomeCharge);
-                                proposal.setEndDate(new Date());
-                                proposal.setStatus(Status.CO);
-                                contract.setStatus(Status.CO);
-                                job.setStatus(Status.CO);
-                                JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposal.getId(), proposal.getUserId());
-                                if (project != null) {
-                                    project.setStatus(Status.CO);
-                                    jobProjectSubmissionRepository.save(project);
-                                }
+                            WalletCreditDebitBulkResponse walletResponse=apiResponse.getPayload();
+                            if(walletResponse.isSuccess() && walletResponse.getData()!=null) {
 
-                            } else {
-                                contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
-                                contract.setLastModifiedDate(new Date());
-                                contract.setClearedAmount(contract.getClearedAmount()+ freelancerIncomeAmount);
-                                contract.setVat(contract.getVat()+ VATCharge);
-                                contract.setCharges(contract.getCharges()+ kulaIncomeCharge+pepperestIncomeCharge);
+                                List<WalletDebitCreditResponse> responses= walletResponse.getData();
 
-                                if (milestone != null) {
-                                    milestone.setStatus(Status.CO);
-                                    milestone.setEndDate(new Date());
-                                    milestone.setClearedAmount(freelancerIncomeAmount);
-                                    milestone.setVat(VATCharge);
-                                    milestone.setCharges(kulaIncomeCharge+pepperestIncomeCharge);
+                                app.print("Bulk transfer response:");
+                                app.print(responses);
 
-                                    JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
-                                    if (project != null) {
-                                        project.setStatus(Status.CO);
-                                        jobProjectSubmissionRepository.save(project);
+                                boolean isSuccess=true;
+                                String transactionMessage="Unable to complete transaction";
+                                for(WalletDebitCreditResponse response : responses){
+                                    if(response.getSuccess()==false){
+                                        isSuccess=false;
+                                        transactionMessage=response.getMessage();
+                                        break;
                                     }
-                                    jobMilestoneRepository.save(milestone);
                                 }
+
+                                if(isSuccess) {
+                                    //update contract information
+                                    contract.setKulaChargeRate(kulaIncomeRate);
+                                    contract.setVATChargeRate(VATRate);
+                                    contract.setEscrowCharges(0.0);
+
+                                    //update job
+                                    if (contract.getWorkMethod().equals("Overall")) {
+                                        contract.setIsSettled(true);
+                                        contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
+                                        contract.setEndDate(new Date());
+                                        contract.setLastModifiedDate(new Date());
+                                        contract.setClearedAmount(freelancerIncomeAmount);
+                                        contract.setVat(VATCharge);
+                                        contract.setCharges(kulaIncomeCharge);
+                                        proposal.setEndDate(new Date());
+                                        proposal.setStatus(Status.CO);
+                                        contract.setStatus(Status.CO);
+                                        job.setStatus(Status.CO);
+                                        JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByProposalAndUserId(proposal.getId(), proposal.getUserId());
+                                        if (project != null) {
+                                            project.setStatus(Status.CO);
+                                            jobProjectSubmissionRepository.save(project);
+                                        }
+
+                                    } else {
+                                        contract.setSettlementPaymentReferenceB(apiResponse.getPayload().toString());
+                                        contract.setLastModifiedDate(new Date());
+                                        contract.setClearedAmount(contract.getClearedAmount() + freelancerIncomeAmount);
+                                        contract.setVat(contract.getVat() + VATCharge);
+                                        contract.setCharges(contract.getCharges() + kulaIncomeCharge);
+
+                                        if (milestone != null) {
+                                            milestone.setStatus(Status.CO);
+                                            milestone.setEndDate(new Date());
+                                            milestone.setClearedAmount(freelancerIncomeAmount);
+                                            milestone.setVat(VATCharge);
+                                            milestone.setCharges(kulaIncomeCharge);
+
+                                            JobProjectSubmission project = jobProjectSubmissionRepository.findSubmittedProjectByContractReference(milestone.getMilestoneReference());
+                                            if (project != null) {
+                                                project.setStatus(Status.CO);
+                                                jobProjectSubmissionRepository.save(project);
+                                            }
+                                            jobMilestoneRepository.save(milestone);
+                                        }
+                                    }
+                                    job.setLastModifiedDate(new Date());
+
+                                    jobRepository.save(job);
+                                    jobProposalRepository.save(proposal);
+                                    jobContractRepository.save(contract);
+
+                                    try {
+                                        //update configurations table
+                                        Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS_COMPLETED);
+                                        if (existingConfig != null)
+                                            configService.updateConfig(ConfigReference.TOTAL_JOBS_COMPLETED, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
+                                        else
+                                            configService.updateConfig(ConfigReference.TOTAL_JOBS_COMPLETED, String.valueOf(1));
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+
+                                    if (freelancer != null) {
+                                        String[] params = {currentUser.getUserFullName(), String.valueOf(milestone.getAmount()), freelancer.getFullName(), job.getTitle()};
+                                        String message = messageSource.getMessage("payment.for.milestone.successful.email.body", params, LocaleContextHolder.getLocale());
+                                        NotificationBody body = new NotificationBody();
+                                        body.setBody(message);
+                                        body.setSubject("Payment Released to Freelancer");
+                                        body.setActionType("INFORMATION");
+                                        body.setTopic("'Job'");
+                                        body.setChannel("S");
+                                        body.setPriority("YES");
+                                        body.setRecipient(currentUser.getUserId());
+                                        body.setRecipientEmail(currentUser.getUserEmail());
+                                        body.setRecipientName(currentUser.getUserFullName());
+                                        notificationSender.pushNotification(body);
+                                    }
+
+                                    if (freelancer != null) {
+                                        NotificationBody body1 = new NotificationBody();
+                                        body1.setBody("Payment of NGN" + freelancerIncomeAmount + " posted to your bank account by " + currentUser.getUserFullName() + ".");
+                                        body1.setSubject("New Payment");
+                                        body1.setActionType("INFORMATION");
+                                        body1.setTopic("'Job'");
+                                        body1.setChannel("S");
+                                        body1.setPriority("YES");
+                                        body1.setRecipient(proposal.getEmployerId());
+                                        body1.setRecipientEmail(freelancer.getEmail());
+                                        body1.setRecipientName(freelancer.getFullName());
+                                        notificationSender.pushNotification(body1);
+                                    }
+
+                                    //respond
+                                    return new APIResponse("Request Successful", true, apiResponse.getPayload());
+                                }else{
+                                    return new APIResponse(transactionMessage ,false, null);
+                                }
+                            }else{
+                                return new APIResponse(walletResponse.getMessage() ,false, null);
                             }
-                            job.setLastModifiedDate(new Date());
-
-                            jobRepository.save(job);
-                            jobProposalRepository.save(proposal);
-                            jobContractRepository.save(contract);
-
-                            try {
-                                //update configurations table
-                                Config existingConfig = configService.getConfigByKey(ConfigReference.TOTAL_JOBS_COMPLETED);
-                                if (existingConfig != null)
-                                    configService.updateConfig(ConfigReference.TOTAL_JOBS_COMPLETED, String.valueOf(Integer.parseInt(existingConfig.getValue()) + 1));
-                                else
-                                    configService.updateConfig(ConfigReference.TOTAL_JOBS_COMPLETED, String.valueOf(1));
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
-                            User freelancer = userService.getUserById(proposal.getUserId());
-
-                            if(freelancer!=null) {
-                                String[] params = {currentUser.getUserFullName(),String.valueOf(milestone.getAmount()),freelancer.getFullName(),job.getTitle()};
-                                String message = messageSource.getMessage("payment.for.milestone.successful.email.body",params,LocaleContextHolder.getLocale());
-                                NotificationBody body = new NotificationBody();
-                                body.setBody(message);
-                                body.setSubject("Payment Released to Freelancer");
-                                body.setActionType("INFORMATION");
-                                body.setTopic("'Job'");
-                                body.setChannel("S");
-                                body.setPriority("YES");
-                                body.setRecipient(currentUser.getUserId());
-                                body.setRecipientEmail(currentUser.getUserEmail());
-                                body.setRecipientName(currentUser.getUserFullName());
-                                notificationSender.pushNotification(body);
-                            }
-
-                            if (freelancer != null) {
-                                NotificationBody body1 = new NotificationBody();
-                                body1.setBody("Payment of NGN" + freelancerIncomeAmount + " posted to your bank account by " + currentUser.getUserFullName() + ".");
-                                body1.setSubject("New Payment");
-                                body1.setActionType("INFORMATION");
-                                body1.setTopic("'Job'");
-                                body1.setChannel("S");
-                                body1.setPriority("YES");
-                                body1.setRecipient(proposal.getEmployerId());
-                                body1.setRecipientEmail(freelancer.getEmail());
-                                body1.setRecipientName(freelancer.getFullName());
-                                notificationSender.pushNotification(body1);
-                            }
-
-                            //respond
-                            return new APIResponse("Request Successful", true, apiResponse.getPayload());
                         } else {
                             return apiResponse;
                         }
-
                     } else {
                         return new APIResponse("Contract amount can't be ZERO", false, null);
                     }

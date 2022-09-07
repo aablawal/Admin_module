@@ -1,9 +1,6 @@
 package com.unionbankng.future.futurejobservice.retrofitservices;
 
-import com.unionbankng.future.futurejobservice.pojos.WalletAuthResponse;
-import com.unionbankng.future.futurejobservice.pojos.WalletCreditRequest;
-import com.unionbankng.future.futurejobservice.pojos.WalletDebitCreditResponse;
-import com.unionbankng.future.futurejobservice.pojos.WalletDebitRequest;
+import com.unionbankng.future.futurejobservice.pojos.*;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -31,4 +28,21 @@ public interface WalletServiceInterface {
             "Accept: application/json"
     })
     Call<WalletDebitCreditResponse> debitWallet(@Header("Authorization") String authorization, @Body WalletDebitRequest request);
+
+
+
+    @POST("/api/v1/wallet/outflow")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<WalletDebitCreditResponse> outflow(@Header("Authorization") String authorization, @Body WalletDebitRequest request);
+
+
+    @POST("/api/v1/wallet/bulk-outflow")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<WalletDebitCreditResponse> bulkOutflow(@Header("Authorization") String authorization, @Body WalletBulkDebitRequest request);
+
+
 }
