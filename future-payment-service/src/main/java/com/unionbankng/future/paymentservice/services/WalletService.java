@@ -176,7 +176,7 @@ public class WalletService implements Serializable {
 
     public WalletGenericResponse debitWallet(WalletDebitRequest request) {
         try {
-            app.print("Crediting Wallet....");
+            app.print("Debiting Wallet....");
             app.print("Request:");
             app.print(request);
             WalletAuthResponse auth= getAuth();

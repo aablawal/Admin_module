@@ -617,9 +617,9 @@ public class KYCService {
 
         app.print("Uploading user id....");
         String idFileName = "id-" + randomNumber + "-" + user.getUuid() + ".jpg";
-//        String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
-//        System.out.println("Saved image: >>>" + savedIdImageUrl);
-//        app.print("Uploaded... " + savedIdImageUrl);
+        String savedIdImageUrl = fileStorageService.storeFile(idImage, idFileName, BlobType.IMAGE);
+        System.out.println("Saved image: >>>" + savedIdImageUrl);
+        app.print("Uploaded... " + savedIdImageUrl);
 
         //todo: uncomment before moving to production
         if (responseData.getFirstName().equalsIgnoreCase(idRequest.getFirstName()) && responseData.getLastName().equalsIgnoreCase(idRequest.getLastName())) {
@@ -632,7 +632,7 @@ public class KYCService {
             kyc.setIdType(idRequest.getIdType().toString());
             kyc.setUserId(user.getUuid());
             kyc.setIdNUmber(verifyKycRequest.getIdNumber());
-//            kyc.setIdImage(savedIdImageUrl);
+            kyc.setIdImage(savedIdImageUrl);
             kyc.setIdType(idRequest.getIdType().toString());
             kyc.setSelfieImage(responseData.getPhotoUrl());
             kycRepository.save(kyc);
@@ -655,7 +655,7 @@ public class KYCService {
             kyc.setDob(String.valueOf(verifyKycRequest.getDob()));
             kyc.setUserId(user.getUuid());
             kyc.setIdNUmber(verifyKycRequest.getIdNumber());
-//            kyc.setIdImage(savedIdImageUrl);
+            kyc.setIdImage(savedIdImageUrl);
             kyc.setIdType(idRequest.getIdType().toString());
             kyc.setSelfieImage(responseData.getPhotoUrl());
             kycRepository.save(kyc);
@@ -673,7 +673,6 @@ public class KYCService {
 
     public Response<AddressVerifyResponse<AddressVerificationDto>> getAddressVerification(VerifyAddressRequest request) throws Exception {
         String token = "Bearer " + getAccessTokenForWalletServiceCache();
-
         return kycServiceInterface.getAddressVerification(token, request).execute();
     }
 
