@@ -203,7 +203,6 @@ public class JobContractService implements Serializable {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
             c.add(Calendar.DATE, proposal.getDuration()!=null?proposal.getDuration().intValue():10);
-
             contract.setEndDate(c.getTime());
             proposal.setEndDate(c.getTime());
             contract.setStartDate(new Date());
