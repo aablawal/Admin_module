@@ -37,6 +37,7 @@ public class UserService {
             user.setAccountNumber(response.getAccountNumber());
             user.setIsEnabled(response.getIsEnabled());
             user.setCreatedAt(response.getCreatedAt());
+            user.setWalletId(response.getWalletId());
 
             return user;
         }catch (Exception e){

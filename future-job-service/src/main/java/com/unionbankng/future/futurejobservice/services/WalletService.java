@@ -193,7 +193,7 @@ public class WalletService implements Serializable {
                 headers.setBearerAuth(auth.getAccess_token());
 
                 HttpEntity<WalletBulkDebitRequest> httpEntity = new HttpEntity<>(request, headers);
-                ResponseEntity<WalletDebitCreditResponse> response = restTemplate.postForEntity( url, httpEntity , WalletDebitCreditResponse.class );
+                ResponseEntity<WalletCreditDebitBulkResponse> response = restTemplate.postForEntity( url, httpEntity , WalletCreditDebitBulkResponse.class );
 
 //                Response<WalletDebitCreditResponse> response = walletServiceInterface.bulkOutflow(token, request).execute();
                 app.print("Response:");

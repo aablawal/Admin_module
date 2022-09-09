@@ -1409,6 +1409,8 @@ public class JobContractService implements Serializable {
                         return new APIResponse("No Proposal found for this Contract", false, null);
                     //check if job is available
                     User freelancer = userService.getUserById(proposal.getUserId());
+                    app.print("freelancer:");
+                    app.print(freelancer);
                     Job job = jobRepository.findById(contract.getJobId()).orElse(null);
                     if (job == null)
                         return new APIResponse("No Job history found for this Contract", false, null);
