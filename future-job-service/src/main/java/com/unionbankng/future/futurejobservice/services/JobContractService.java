@@ -1555,7 +1555,7 @@ public class JobContractService implements Serializable {
                         //Freelancer income
                         WalletDebitRequest freelancerRecipient= new WalletDebitRequest();
                         freelancerRecipient.setRef("freelancer"+paymentReference);
-                        freelancerRecipient.setDestWalletId(freelancer.getWalletId()!=null?freelancer.getWalletId():contract.getFreelancerWalletId());
+                        freelancerRecipient.setDestWalletId(contract.getFreelancerWalletId());
                         freelancerRecipient.setNaration(narration);
                         freelancerRecipient.setCurrencyCode("NGN");
                         freelancerRecipient.setTotalAmount(BigDecimal.valueOf(freelancerIncomeAmount));
