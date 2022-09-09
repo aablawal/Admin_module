@@ -193,17 +193,25 @@ public class JobContractService implements Serializable {
             contract.setClearedAmount(0);
 
 
+            app.print("proposal:");
+            app.print(proposal);
+            app.print("contract:");
+            app.print(contract);
+            app.print("Proposal Duration:");
+            app.print(proposal.getDuration());
+
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
             c.add(Calendar.DATE, proposal.getDuration().intValue());
+
             contract.setEndDate(c.getTime());
+            proposal.setEndDate(c.getTime());
             contract.setStartDate(new Date());
             contract.setStatus(Status.WP);
             proposal.setStatus(Status.WP);
             job.setStatus(Status.WP);
             proposal.setLastModifiedDate(new Date());
             proposal.setStartDate(new Date());
-            proposal.setEndDate(c.getTime());
             contract.setPaymentMethod(PaymentMethod.WALLET);
 
             if (job != null) {
