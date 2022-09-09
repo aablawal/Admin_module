@@ -8,7 +8,9 @@ import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -23,6 +25,8 @@ public class WalletService implements Serializable {
 
     private Logger logger = LoggerFactory.getLogger(WalletService.class);
     private WalletServiceInterface walletServiceInterface;
+
+    private final RestTemplate restTemplate;
     private final App app;
 
     @Value("${kula.walletBaseURL}")
@@ -142,17 +146,25 @@ public class WalletService implements Serializable {
                 String token = "Bearer " + auth.getAccess_token();
                 app.print("Token:");
                 app.print(token);
-                app.print(walletBaseURL+"/api/v1/wallet/outflow");
-                Response<WalletDebitCreditResponse> response = walletServiceInterface.outflow(token, request).execute();
+                String url=walletBaseURL+"/api/v1/wallet/outflow";
+
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+
+                HttpEntity<WalletDebitRequest> httpEntity = new HttpEntity<>(request, headers);
+                ResponseEntity<WalletDebitRequest> response = restTemplate.postForEntity( url, request , WalletDebitRequest.class );
+
+//                Response<WalletDebitCreditResponse> response = walletServiceInterface.outflow(token, request).execute();
                 app.print("Response:");
                 app.print(response);
-                app.print(response.body());
-                app.print(response.code());
-                if (response.isSuccessful()) {
-                    return new APIResponse("Request Successful", true, response.body());
+                app.print(response.getStatusCode());
+                app.print(response.getStatusCodeValue());
+                if (response.getStatusCode()== HttpStatus.ACCEPTED) {
+                    return new APIResponse("Request Successful", true, response.getBody());
 
                 } else {
-                    return new APIResponse(response.message(), false, null);
+                    return new APIResponse("Wallet transfer request failed", false, null);
                 }
             } else {
                 return new APIResponse("Unable to generate wallet auth token", false, null);
