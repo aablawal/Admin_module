@@ -202,7 +202,7 @@ public class JobContractService implements Serializable {
 
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
-            c.add(Calendar.DATE, proposal.getDuration()!=null?proposal.getDuration().intValue():10);
+            c.add(Calendar.DATE, proposal.getDuration() != null ? proposal.getDuration().intValue() : 10);
             contract.setEndDate(c.getTime());
             proposal.setEndDate(c.getTime());
             contract.setStartDate(new Date());
@@ -296,43 +296,29 @@ public class JobContractService implements Serializable {
                 app.print(paymentResponse.getPayload());
                 app.print(paymentResponse.getPayload());
                 if (paymentResponse.isSuccess() && paymentResponse.getPayload() != null) {
+                    app.print("Contract Details:");
+                    app.print(contract);
+                    JobContract savedContract = jobContractRepository.save(contract);
+                    proposal.setContractId(savedContract.getId());
+                    jobProposalRepository.save(proposal);
+                    jobRepository.save(job);
 
-                    WalletDebitCreditResponse paymentResponseData=paymentResponse.getPayload();
-
-                    app.print("paymentResponseData:");
-                    app.print(paymentResponseData);
-
-                    if(paymentResponseData.getSuccess()) {
-
-
-
-                        app.print("Contract Details:");
-                        app.print(contract);
-                        JobContract savedContract = jobContractRepository.save(contract);
-                        proposal.setContractId(savedContract.getId());
-                        jobProposalRepository.save(proposal);
-                        jobRepository.save(job);
-
-                        try {
-                            //############### Activity Logging ###########
-                            ActivityLog log = new ActivityLog();
-                            log.setDescription("Contract Approved Successfully for job " + job.getTitle());
-                            log.setRequestObject(app.toString(contract));
-                            log.setResponseObject(app.toString(savedContract));
-                            log.setUsername("User Email: " + currentUser.getUserEmail());
-                            log.setUserId("User ID: " + currentUser.getUserUUID());
-                            log.setDate("Date and Time: " + new Date());
-                            appLogger.log(log);
-                            //#########################################
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-
-                        return new APIResponse(remark, true, savedContract);
-
-                    }else{
-                        return new APIResponse(paymentResponseData.getMessage(), false, null);
+                    try {
+                        //############### Activity Logging ###########
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Contract Approved Successfully for job " + job.getTitle());
+                        log.setRequestObject(app.toString(contract));
+                        log.setResponseObject(app.toString(savedContract));
+                        log.setUsername("User Email: " + currentUser.getUserEmail());
+                        log.setUserId("User ID: " + currentUser.getUserUUID());
+                        log.setDate("Date and Time: " + new Date());
+                        appLogger.log(log);
+                        //#########################################
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
+
+                    return new APIResponse(remark, true, savedContract);
                 } else {
                     return new APIResponse("Wallet to Wallet Payment failed", false, null);
                 }
