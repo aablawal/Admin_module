@@ -151,7 +151,7 @@ public class WalletService implements Serializable {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setBearerAuth(token);
+                headers.setBearerAuth(auth.getAccess_token());
 
                 HttpEntity<WalletDebitRequest> httpEntity = new HttpEntity<>(request, headers);
                 ResponseEntity<WalletDebitRequest> response = restTemplate.postForEntity( url, httpEntity , WalletDebitRequest.class );
