@@ -293,9 +293,15 @@ public class JobContractService implements Serializable {
                 debitGigProvider.setTotalAmountPlusCharges(BigDecimal.valueOf(contract.getAmount()));
 
                 APIResponse<WalletDebitCreditResponse> paymentResponse = walletService.Outflow(debitGigProvider);
+                app.print("Payment Response:");
+                app.print(paymentResponse.getPayload());
+                app.print(paymentResponse.getPayload());
                 if (paymentResponse.isSuccess() && paymentResponse.getPayload() != null) {
 
                     WalletDebitCreditResponse paymentResponseData=paymentResponse.getPayload();
+
+                    app.print("paymentResponseData:");
+                    app.print(paymentResponseData);
 
                     if(paymentResponseData.getSuccess()) {
 

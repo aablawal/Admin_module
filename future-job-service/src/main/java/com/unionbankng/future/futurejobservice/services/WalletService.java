@@ -140,6 +140,8 @@ public class WalletService implements Serializable {
             WalletAuthResponse auth = getAuth();
             if (auth != null) {
                 String token = "Bearer " + auth.getAccess_token();
+                app.print("Token:");
+                app.print(token);
                 Response<WalletDebitCreditResponse> response = walletServiceInterface.outflow(token, request).execute();
                 app.print("Response:");
                 app.print(response);
