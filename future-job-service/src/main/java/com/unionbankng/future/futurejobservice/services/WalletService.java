@@ -158,10 +158,10 @@ public class WalletService implements Serializable {
 
 //                Response<WalletDebitCreditResponse> response = walletServiceInterface.outflow(token, request).execute();
                 app.print("Response:");
-                app.print(response);
                 app.print(response.getStatusCode());
                 app.print(response.getStatusCodeValue());
-                if (response.getStatusCode()== HttpStatus.ACCEPTED) {
+                app.print(response.getBody());
+                if (response.getStatusCode()== HttpStatus.OK) {
                     return new APIResponse("Request Successful", true, response.getBody());
 
                 } else {
