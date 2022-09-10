@@ -177,7 +177,7 @@ public class WalletService implements Serializable {
     }
 
 
-    public APIResponse<WalletCreditDebitBulkResponse> bulkOutflow(WalletBulkDebitRequest request) {
+    public APIResponse<WalletDebitCreditResponse> bulkOutflow(WalletBulkDebitRequest request) {
         try {
             app.print("Bulk wallet fund transfer....");
             app.print("Request:");
@@ -188,18 +188,20 @@ public class WalletService implements Serializable {
 
                 String url=walletBaseURL+"/api/v1/wallet/bulk-outflow";
 
+
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 headers.setBearerAuth(auth.getAccess_token());
 
                 HttpEntity<WalletBulkDebitRequest> httpEntity = new HttpEntity<>(request, headers);
-                ResponseEntity<WalletCreditDebitBulkResponse> response = restTemplate.postForEntity( url, httpEntity , WalletCreditDebitBulkResponse.class );
+                ResponseEntity<WalletDebitRequest> response = restTemplate.postForEntity( url, httpEntity , WalletDebitRequest.class );
 
 //                Response<WalletDebitCreditResponse> response = walletServiceInterface.bulkOutflow(token, request).execute();
                 app.print("Response:");
                 app.print(response.getStatusCode());
                 app.print(response.getStatusCodeValue());
                 app.print(response.getBody());
+
                 if (response.getStatusCode()==HttpStatus.OK) {
                     return new APIResponse("Request Successful", true, response.getBody());
 
