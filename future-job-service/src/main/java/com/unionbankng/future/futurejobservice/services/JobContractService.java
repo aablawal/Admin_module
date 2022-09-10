@@ -183,14 +183,12 @@ public class JobContractService implements Serializable {
             if (Objects.isNull(job))
                 return new APIResponse("Job not found", false, null);
 
-            if(contract.getFreelancerWalletId()==null){
-                return new APIResponse("Freelancer wallet address required", false, null);
-            }
             String remark = "Approved Successfully";
             String contractReferenceId = app.makeUIID();
             String paymentReferenceId = app.makeUIID();
             contract.setPeppfees(0); //set peprest charges to zero
             contract.setContractReference(contractReferenceId);
+            contract.setFreelancerWalletId(proposal.getWalletId());
             contract.setInitialPaymentReferenceA(paymentReferenceId);
             contract.setAppId(Integer.valueOf(appId));
             contract.setClearedAmount(0);
@@ -1555,7 +1553,7 @@ public class JobContractService implements Serializable {
                         //Freelancer income
                         WalletDebitRequest freelancerRecipient= new WalletDebitRequest();
                         freelancerRecipient.setRef("freelancer"+paymentReference);
-                        freelancerRecipient.setDestWalletId(contract.getFreelancerWalletId());
+                        freelancerRecipient.setDestWalletId(proposal.getWalletId());
                         freelancerRecipient.setNaration(narration);
                         freelancerRecipient.setCurrencyCode("NGN");
                         freelancerRecipient.setTotalAmount(BigDecimal.valueOf(freelancerIncomeAmount));

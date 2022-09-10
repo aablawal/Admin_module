@@ -171,6 +171,7 @@ public class JobProposalService  implements Serializable {
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
 
+
             boolean isEdited = false;
             if (application.getId()!= null)
                 isEdited = true;
