@@ -821,4 +821,10 @@ public class KYCService {
                     false, "Address verification failed");
         }
     }
+
+    public APIResponse<String> modifyId(User user) {
+        user = userRepository.save(user);
+        return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                true, "User's KYC level is now : "+ user.getKycLevel());
+    }
 }

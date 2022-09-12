@@ -10,7 +10,7 @@
             </column>
             <column name="request_object" type="varchar (max)"/>
             <column name="response_object" type="varchar (max)"/>
-            <column name="userId" type="varchar(255)">
+            <column name="user_id" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="username" type="varchar(255)">
