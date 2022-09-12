@@ -86,6 +86,7 @@ public class AppService {
         for (JobProposal proposal: page.getContent()) {
             Map<String,Object> data=new HashMap<>();
             data.put("proposal", proposal);
+            data.put("proposals", jobProposalRepository.getCountByJobId(proposal.getId()));
             data.put("teams",  jobTeamDetailsRepository.findByJobId(proposal.getJobId()));
             data.put("job",jobRepository.findById(proposal.getJobId()));
             data.put("rating",jobRateRepository.findByUserId(proposal.getUserId()));
