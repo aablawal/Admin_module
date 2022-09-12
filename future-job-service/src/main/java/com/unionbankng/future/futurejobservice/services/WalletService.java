@@ -153,7 +153,7 @@ public class WalletService implements Serializable {
                 headers.setBearerAuth(auth.getAccess_token());
 
                 HttpEntity<WalletDebitRequest> httpEntity = new HttpEntity<>(request, headers);
-                ResponseEntity<WalletDebitRequest> response = restTemplate.postForEntity( url, httpEntity , WalletDebitRequest.class );
+                ResponseEntity<WalletDebitCreditResponse> response = restTemplate.postForEntity( url, httpEntity , WalletDebitCreditResponse.class );
 
 //                Response<WalletDebitCreditResponse> response = walletServiceInterface.outflow(token, request).execute();
                 app.print("Response:");
@@ -194,7 +194,7 @@ public class WalletService implements Serializable {
                 headers.setBearerAuth(auth.getAccess_token());
 
                 HttpEntity<WalletBulkDebitRequest> httpEntity = new HttpEntity<>(request, headers);
-                ResponseEntity<WalletDebitRequest> response = restTemplate.postForEntity( url, httpEntity , WalletDebitRequest.class );
+                ResponseEntity<WalletDebitCreditResponse> response = restTemplate.postForEntity( url, httpEntity , WalletDebitCreditResponse.class );
 
 //                Response<WalletDebitCreditResponse> response = walletServiceInterface.bulkOutflow(token, request).execute();
                 app.print("Response:");
