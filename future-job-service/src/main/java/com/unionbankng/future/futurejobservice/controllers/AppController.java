@@ -22,13 +22,8 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 @RequestMapping(path = "api")
 public class AppController {
-
-    private final WalletService walletService;
-    private final JobPaymentService jobPaymentService;
+private final JobPaymentService jobPaymentService;
     private final NotificationSender notificationSender;
-    private final SMSSender smsSender;
-    private final TestService testService;
-    private final AppLogger appLogger;
     private final App app;
 
     @GetMapping("/v1/ping")
