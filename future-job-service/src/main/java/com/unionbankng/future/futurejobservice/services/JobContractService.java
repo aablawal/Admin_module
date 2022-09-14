@@ -1526,23 +1526,6 @@ public class JobContractService implements Serializable {
                                     ex.printStackTrace();
                                 }
 
-
-                                if (freelancer != null) {
-                                    String[] params = {currentUser.getUserFullName(), String.valueOf(milestone.getAmount()), freelancer.getFullName(), job.getTitle()};
-                                    String message = messageSource.getMessage("payment.for.milestone.successful.email.body", params, LocaleContextHolder.getLocale());
-                                    NotificationBody body = new NotificationBody();
-                                    body.setBody(message);
-                                    body.setSubject("Payment Released to Freelancer");
-                                    body.setActionType("INFORMATION");
-                                    body.setTopic("'Job'");
-                                    body.setChannel("S");
-                                    body.setPriority("YES");
-                                    body.setRecipient(currentUser.getUserId());
-                                    body.setRecipientEmail(currentUser.getUserEmail());
-                                    body.setRecipientName(currentUser.getUserFullName());
-                                    notificationSender.pushNotification(body);
-                                }
-
                                 if (freelancer != null) {
                                     NotificationBody body1 = new NotificationBody();
                                     body1.setBody("Payment of NGN" + freelancerIncomeAmount + " posted to your bank account by " + currentUser.getUserFullName() + ".");
