@@ -488,8 +488,6 @@ public class JobContractService implements Serializable {
                     proposal.setEndDate(extension.getDate());
                 }
 
-                if (response != null) {
-                    if (response.getStatusCode().is2xxSuccessful()) {
                         extension.setStatus(Status.AC);
                         extension.setLastModifiedBy(currentUser.getUserEmail());
                         extension.setLastModifiedDate(new Date());
@@ -532,14 +530,6 @@ public class JobContractService implements Serializable {
                         }
 
                         return extension;
-                    } else {
-                        logger.info("JOBSERVICE: Escrow transaction failed");
-                        return null;
-                    }
-                } else {
-                    logger.info("JOBSERVICE: Escrow transaction failed");
-                    return null;
-                }
 
             } else {
                 logger.info("JOBSERVICE: Extension request not found");
