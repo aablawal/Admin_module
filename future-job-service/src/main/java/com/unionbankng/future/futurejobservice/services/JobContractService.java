@@ -38,13 +38,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class JobContractService implements Serializable {
 
-    @Value("${sidekiq.escrow.appId}")
-    private String appId;
-    @Value("${sidekiq.escrow.token}")
-    private String token;
-    @Value("${sidekiq.escrow.baseUrl}")
-    private String baseURL;
-
     @Value("${kula.float.gl.name}")
     private String kulaFloatAccountName;
 
@@ -85,13 +78,6 @@ public class JobContractService implements Serializable {
     private final App app;
 
 
-    public HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setCacheControl("no-cache");
-        headers.add("Token", token);
-        return headers;
-    }
 
     public static long getDifferenceDays(Date d1, Date d2) {
         long diff = d2.getTime() - d1.getTime();
@@ -194,7 +180,7 @@ public class JobContractService implements Serializable {
             contract.setContractReference(contractReferenceId);
             contract.setFreelancerWalletId(proposal.getWalletId());
             contract.setInitialPaymentReferenceA(paymentReferenceId);
-            contract.setAppId(Integer.valueOf(appId));
+            contract.setAppId(200);
             contract.setClearedAmount(0);
 
 
@@ -490,38 +476,14 @@ public class JobContractService implements Serializable {
                     //set end date from today
                     contract.setEndDate(extension.getDate());
                     contract.setLastModifiedDate(new Date());
-
-                    app.print("###################################");
-                    app.print("Escrow URL: " + baseURL);
-                    app.print("Escrow Token: " + token);
-                    //start to extend escrow live
-
-                    JSONObject requestPayload = new JSONObject();
-                    requestPayload.put("appid", appId);
-                    requestPayload.put("referenceid", contract.getContractReference());
-                    requestPayload.put("user_email", contract.getUserEmail());
-                    requestPayload.put("new_date", extension.getDate().toString());
-                    requestPayload.put("action", "accept");
-                    requestPayload.put("reasons", extension.getReason());
-
-                    app.print("Request Body");
-                    app.print(requestPayload);
-                    String endpoint = baseURL + "/Transaction/reqExtension";
-                    HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
-                    response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-                    //done
-                    if (response.getStatusCode().is2xxSuccessful()) {
-                        app.print("Escrow response: " + response.getStatusCode().is2xxSuccessful());
-                        jobContractRepository.save(contract);
-                    } else
-                        logger.info("JOBSERVICE: Escrow transaction failed");
+                    jobContractRepository.save(contract);
                 }
 
                 Optional<JobProposal> proposalData = jobProposalRepository.findById(extension.getProposalId());
                 JobProposal proposal = proposalData.orElse(null);
                 if (proposal != null) {
                     proposal.setLastModifiedDate(new Date());
-                    proposal.setDuration((decodeDuration(proposal.getDuration(), proposal.getDurationType()) + getDifferenceDays(proposal.getEndDate(), extension.getDate())));
+//                    proposal.setDuration((decodeDuration(proposal.getDuration(), proposal.getDurationType()) + getDifferenceDays(proposal.getEndDate(), extension.getDate())));
                     proposal.setDurationType("D");
                     proposal.setEndDate(extension.getDate());
                 }
@@ -685,25 +647,6 @@ public class JobContractService implements Serializable {
             if (attachments != null)
                 request.setAttachment(attachments);
 
-            app.print("###################################");
-            app.print("Escrow URL: " + baseURL);
-            app.print("Escrow Token: " + token);
-
-            JSONObject requestPayload = new JSONObject();
-            requestPayload.put("appid", appId);
-            requestPayload.put("referenceid", request.getReferenceId());
-            requestPayload.put("dispute_referenceid", request.getContractReference());
-            requestPayload.put("dispute_category", "contract-" + request.getContractId().toString());
-            requestPayload.put("dispute_description", request.getDescription());
-
-            app.print("Request Body");
-            app.print(requestPayload);
-            String endpoint = baseURL + "/Dispute/reportDispute";
-            HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
-            response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-            //done
-            if (response.getStatusCode().is2xxSuccessful()) {
-                //fire notification
                 JobContractDispute dispute = jobContractDisputeRepository.save(request);
                 User employer = userService.getUserById(dispute.getEmployerId());
 
@@ -745,11 +688,6 @@ public class JobContractService implements Serializable {
                     logger.info("JOBSERV: Unable to raise a dispute, the dispute request is not valid");
                     return new APIResponse("Unable to raise a dispute, the dispute request is not valid", false, null);
                 }
-            } else {
-                logger.info("JOBSERVICE: Escrow transaction failed");
-                return new APIResponse("Escrow transaction failed", false, null);
-            }
-            //end
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -898,26 +836,8 @@ public class JobContractService implements Serializable {
                             contract.setEndDate(new Date());
                             contract.setIsSettled(true);
                             contract.setSettlement(contract.getContractReference());
-
-                            app.print("###################################");
-                            app.print("Escrow URL: " + baseURL);
-                            app.print("Escrow Token: " + token);
-                            //start to release escrow amount to freelancer
-
-                            JSONObject requestPayload = new JSONObject();
-                            requestPayload.put("appid", appId);
-                            requestPayload.put("referenceid", contract.getContractReference());
-                            requestPayload.put("user_email", contract.getUserEmail());
-                            requestPayload.put("reasons", "Job Completed");
-
-                            app.print("Request Body");
-                            app.print(requestPayload);
-                            String endpoint = baseURL + "/Transaction/release";
-                            HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
-                            ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
                             //done
 
-                            if (response.getStatusCode().is2xxSuccessful()) {
                                 APIResponse settlementResponse = this.settleContractById(authToken, authentication, contract.getContractReference());
                                 if (settlementResponse.isSuccess()) {
 
@@ -1002,11 +922,7 @@ public class JobContractService implements Serializable {
                                     }
                                 }
                                 return settlementResponse;
-                                //end
-                            } else {
-                                logger.info("JOBSERV: Escrow transaction Failed");
-                                return new APIResponse("Escrow Transaction Failed", false, null);
-                            }
+
                         } else {
                             logger.info("JOBSERV: Unable to end inActive contract");
                             return new APIResponse("Unable to end inActive contract", false, null);
@@ -1150,7 +1066,6 @@ public class JobContractService implements Serializable {
                     Job job = jobRepository.findById(proposal.getJobId()).orElse(null);
                     if (proposal != null) {
                         proposal.setStatus(Status.WP);
-                        //send milestone amount to escrow
                         JobContract contract = jobContractRepository.findById(proposal.getContractId()).orElse(null);
                         if (contract != null) {
 
@@ -1300,25 +1215,6 @@ public class JobContractService implements Serializable {
                     if (project != null) {
                         contract.setLastModifiedDate(new Date());
 
-                        app.print("###################################");
-                        app.print("Escrow URL: " + baseURL);
-                        app.print("Escrow Token: " + token);
-
-
-                        JSONObject requestPayload = new JSONObject();
-                        requestPayload.put("appid", appId);
-                        requestPayload.put("referenceid", milestone.getMilestoneReference());
-                        requestPayload.put("user_email", contract.getUserEmail());
-                        requestPayload.put("reasons", "Milestone Completed");
-
-                        app.print("Request Body");
-                        app.print(requestPayload);
-                        String endpoint = baseURL + "/Transaction/release";
-                        HttpEntity<String> requestEntity = new HttpEntity<>(requestPayload.toString(), this.getHeaders());
-                        ResponseEntity<String> response = rest.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-                        //done
-                        if (response.getStatusCode().is2xxSuccessful()) {
-
                             APIResponse settlementResponse = this.settleContractById(authToken, authentication, milestone.getMilestoneReference());
                             if (settlementResponse.isSuccess()) {
 
@@ -1368,10 +1264,6 @@ public class JobContractService implements Serializable {
                             }
                             return settlementResponse;
 
-                        } else {
-                            logger.info("JOBSERVICE: Escrow transaction failed");
-                            return new APIResponse("Escrow transaction failed", false, null);
-                        }
                     } else {
                         logger.info("JOBSERVICE: Project request not found");
                         return new APIResponse("Project request history not found", false, null);
