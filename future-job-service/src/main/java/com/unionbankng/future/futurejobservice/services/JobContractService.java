@@ -299,31 +299,36 @@ public class JobContractService implements Serializable {
                 APIResponse<WalletDebitCreditResponse> paymentResponse = walletService.Outflow(debitGigProvider);
                 app.print("Payment Response:");
                 app.print(paymentResponse.getPayload());
-                app.print(paymentResponse.getPayload());
                 if (paymentResponse.isSuccess() && paymentResponse.getPayload() != null) {
-                    app.print("Contract Details:");
-                    app.print(contract);
-                    JobContract savedContract = jobContractRepository.save(contract);
-                    proposal.setContractId(savedContract.getId());
-                    jobProposalRepository.save(proposal);
-                    jobRepository.save(job);
 
-                    try {
-                        //############### Activity Logging ###########
-                        ActivityLog log = new ActivityLog();
-                        log.setDescription("Contract Approved Successfully for job " + job.getTitle());
-                        log.setRequestObject(app.toString(contract));
-                        log.setResponseObject(app.toString(savedContract));
-                        log.setUsername("User Email: " + currentUser.getUserEmail());
-                        log.setUserId("User ID: " + currentUser.getUserUUID());
-                        log.setDate("Date and Time: " + new Date());
-                        appLogger.log(log);
-                        //#########################################
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                    WalletDebitCreditResponse response = paymentResponse.getPayload();
+                    if(response.getSuccess()==true) {
+                        app.print("Contract Details:");
+                        app.print(contract);
+                        JobContract savedContract = jobContractRepository.save(contract);
+                        proposal.setContractId(savedContract.getId());
+                        jobProposalRepository.save(proposal);
+                        jobRepository.save(job);
+
+                        try {
+                            //############### Activity Logging ###########
+                            ActivityLog log = new ActivityLog();
+                            log.setDescription("Contract Approved Successfully for job " + job.getTitle());
+                            log.setRequestObject(app.toString(contract));
+                            log.setResponseObject(app.toString(savedContract));
+                            log.setUsername("User Email: " + currentUser.getUserEmail());
+                            log.setUserId("User ID: " + currentUser.getUserUUID());
+                            log.setDate("Date and Time: " + new Date());
+                            appLogger.log(log);
+                            //#########################################
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                        return new APIResponse(remark, true, savedContract);
+                    }else{
+                        return new APIResponse(response.getMessage(), false, null);
                     }
-
-                    return new APIResponse(remark, true, savedContract);
                 } else {
                     return new APIResponse("Wallet to Wallet Payment failed", false, null);
                 }
@@ -1570,10 +1575,13 @@ public class JobContractService implements Serializable {
                         app.print(transferRequest);
                         APIResponse<WalletDebitCreditResponse> paymentResponse = walletService.bulkOutflow(transferRequest);
 
+                        app.print("Payment Response:");
+                        app.print(paymentResponse.getPayload());
+
                         if (paymentResponse.isSuccess() && paymentResponse.getPayload() != null) {
 
                             WalletDebitCreditResponse walletResponse = paymentResponse.getPayload();
-                            if (walletResponse.getSuccess() && walletResponse.getCode().equals("00")) {
+                            if (walletResponse.getSuccess()==true) {
                                 contract.setKulaChargeRate(kulaIncomeRate);
                                 contract.setVATChargeRate(VATRate);
                                 contract.setEscrowCharges(0.0);
