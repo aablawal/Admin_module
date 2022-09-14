@@ -578,6 +578,7 @@ public class KYCService {
 
         String selfieImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(selfieImage.getBytes());
         Date dateOfBirth = user.getDateOfBirth();
+        app.print("dateOfBirth: >>"+ dateOfBirth);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthString = formatter.format(dateOfBirth);
 
