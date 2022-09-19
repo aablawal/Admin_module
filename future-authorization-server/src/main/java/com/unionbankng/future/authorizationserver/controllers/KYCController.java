@@ -97,6 +97,23 @@ public class KYCController {
         return kycService.VerifyAddress(addressVerificationRequest, authentication);
     }
 
+
+    @PostMapping("/v1/kyc/modify_kyc/{kyc_level}")
+    public APIResponse<String> verifyAddress(@PathVariable int kyc_level, OAuth2Authentication authentication) throws Exception {
+        JwtUserDetail authorizedUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        app.print("UserUuid: "+ authorizedUser.getUserUUID());
+        User user = userRepository.findByUuid(authorizedUser.getUserUUID()).orElse(null);
+
+        if (user == null)
+            return new APIResponse<>("Authentication Failed", false, null);
+
+        if (user.getKycLevel() == kyc_level)
+            return new APIResponse<>(messageSource.getMessage("User's KYC level is "+ kyc_level + "already", null, LocaleContextHolder.getLocale()), false, null);
+        app.print("KYC level before update: "+user.getKycLevel());
+        user.setKycLevel(kyc_level);
+        return kycService.modifyId(user);
+    }
+
     @PostMapping("/v1/kyc/verifyme/webhook")
     public APIResponse<String> verifyId(@RequestBody AddressVerificationDto addressVerificationWebhookRequest) {
         app.print("Webhook received: " + addressVerificationWebhookRequest.toString());

@@ -92,11 +92,11 @@ public class JobProposalService  implements Serializable {
                 application.setSupportingFiles(supporting_file_names);
 
 
-            app.print(application);
             if(application.getPaymentMethod()==null)
                 application.setPaymentMethod(PaymentMethod.BANK);
 
             JobProposal proposal = repository.save(application);
+            app.print(application);
             if (proposal != null) {
 
                 if (job != null) {
@@ -188,6 +188,7 @@ public class JobProposalService  implements Serializable {
             application.setPaymentMethod(PaymentMethod.WALLET);
 
             JobProposal proposal = repository.save(application);
+            app.print(application);
             if (proposal != null) {
 
                 if (job != null) {
