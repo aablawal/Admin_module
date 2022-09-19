@@ -58,6 +58,7 @@ public class JobContract implements Serializable {
     private String employerAccountNumber;
     @NotNull
     private String freelancerAccountName;
+    private String freelancerWalletId;
     @NotNull
     private String freelancerAccountNumber;
     private String freelancerPhoneNumber;

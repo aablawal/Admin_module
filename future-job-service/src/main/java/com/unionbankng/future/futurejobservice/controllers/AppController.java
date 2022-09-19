@@ -22,22 +22,12 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 @RequestMapping(path = "api")
 public class AppController {
-
-    private final WalletService walletService;
-    private final JobPaymentService jobPaymentService;
+private final JobPaymentService jobPaymentService;
     private final NotificationSender notificationSender;
-    private final SMSSender smsSender;
-    private final TestService testService;
-    private final AppLogger appLogger;
     private final App app;
 
     @GetMapping("/v1/ping")
     public ResponseEntity<APIResponse<String>> pingService(){
-        app.print("Pinging....");
-        SMS sms= new SMS();
-        sms.setRecipient("+2348064160204");
-        sms.setMessage("This is just Test");
-        smsSender.sendSMS(sms);
         return ResponseEntity.ok().body( new APIResponse("Service is Up", true, "Live"));
     }
 

@@ -21,10 +21,10 @@ public interface UBNAccountAPIService {
     @GET("account/id-card/type")
     Call<AccountIdTypesResponse> getSupportedIdCardTypes(@Header("Authorization") String token, @Header("ChannelCode") String channelCode);
 
-    @POST("ubnmiserv/secured/fundstransfer")
+    @POST("MiservAPI/MiservPS/secured/fundstransfer")
     Call<UBNFundTransferResponse> fundsTransferUBN(@Query("access_token") String accessToken, @Body UBNFundTransferRequest request);
 
-    @POST("ubnmiserv/secured/cbamultipleposting")
+    @POST("MiservAPI/MiservPS/secured/cbamultipleposting")
     Call<UBNBulkFundTransferResponse> bulkFundsTransferUBN(@Query("access_token") String accessToken, @Body UBNBulkFundTransferRequest request);
 
     @POST("ubnmiserv/secured/cbacustomeraccountenquiry")

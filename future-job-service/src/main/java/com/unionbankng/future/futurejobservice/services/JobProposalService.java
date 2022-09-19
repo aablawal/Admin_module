@@ -170,6 +170,8 @@ public class JobProposalService  implements Serializable {
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
+
+
             boolean isEdited = false;
             if (application.getId()!= null)
                 isEdited = true;
@@ -183,9 +185,7 @@ public class JobProposalService  implements Serializable {
                 application.setStatus(Status.PE);
             }
 
-            app.print(application);
-            if(application.getPaymentMethod()==null)
-                application.setPaymentMethod(PaymentMethod.BANK);
+            application.setPaymentMethod(PaymentMethod.WALLET);
 
             JobProposal proposal = repository.save(application);
             if (proposal != null) {
