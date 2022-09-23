@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.services;
 
+import com.unionbankng.future.futurejobservice.entities.Bundle;
 import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.entities.JobProposal;
 import com.unionbankng.future.futurejobservice.enums.JobType;
