@@ -238,7 +238,6 @@ public class JobService {
             Job job = app.getMapper().readValue(jobData, Job.class);
             job.setStatus(Status.AC);
 
-
             app.print("Job Request:");
             app.print(job);
 

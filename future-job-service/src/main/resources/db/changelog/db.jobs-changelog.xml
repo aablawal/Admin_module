@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="ACER NITRO 5 (generated)" id="1605865713516-2">
+<changeSet author="ACER NITRO 5 (generated)" id="1605865713516-2">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="jobs"/>
@@ -86,6 +86,20 @@
     <changeSet author="aliyura (generated)" id="1625052436571-3">
         <addColumn tableName="jobs">
             <column name="terms" type="bit"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="aliyura (generated)" id="1625052436571-4">
+        <dropNotNullConstraint tableName="jobs" columnName="categories" columnDataType="varchar(255)"/>
+<!--        <dropNotNullConstraint tableName="jobs" columnName="goal" columnDataType="varchar(255)"/>-->
+        <dropNotNullConstraint tableName="jobs" columnName="type" columnDataType="varchar(255)"/>
+        <addColumn tableName="jobs">
+            <column name="category" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="jobs">
+            <column name="sub_category" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="jobs">
+            <column name="delivery_type" type="varchar(255)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
