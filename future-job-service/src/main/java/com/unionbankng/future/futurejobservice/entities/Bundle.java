@@ -74,7 +74,6 @@ public class Bundle implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastModifiedDate;
     private Boolean terms;
-    @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     private String category;
