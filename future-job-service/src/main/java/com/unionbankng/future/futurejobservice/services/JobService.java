@@ -245,10 +245,10 @@ public class JobService {
 
             if(job.getBudget()>=1000) {
 
-                app.print("Attached Files");
+//                app.print("Attached Files");
 //                app.print("Supporting Files:" + supporting_files.length);
                 //save files if not null
-                if (supporting_files.length > 0)
+                if (supporting_files != null && supporting_files.length > 0)
                     supporting_file_names = this.fileStoreService.storeFiles(supporting_files, "kula");
 
                 //cross verify if attached files processed
