@@ -44,7 +44,7 @@ public class BundleController {
     }
 
     @GetMapping("/v1/bundle/getbundles")
-    public ResponseEntity<APIResponse> getBundles(@PathVariable int page, int size){
+    public ResponseEntity<APIResponse> getBundles(@RequestParam int page, @RequestParam int size){
         return ResponseEntity.ok().body(
                 new APIResponse("success",true,bundleService.findAllBundles(page, size)));
     }
