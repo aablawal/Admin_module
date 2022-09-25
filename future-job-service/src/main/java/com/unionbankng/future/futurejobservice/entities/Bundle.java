@@ -13,9 +13,8 @@ import java.util.List;
 
 @Table(name="bundle")
 @Entity
-@Getter
-@Setter
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Bundle implements Serializable {
