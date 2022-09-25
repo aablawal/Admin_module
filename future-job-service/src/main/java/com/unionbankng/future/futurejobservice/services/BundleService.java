@@ -88,6 +88,7 @@ public class BundleService {
     public APIResponse findAllBundles(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Bundle> bundles = bundleRepository.findAll(pageable).toList();
+        app.print("bundles>>>>>>>: "+bundles);
 
         if(bundles.isEmpty())
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bundles not found");
