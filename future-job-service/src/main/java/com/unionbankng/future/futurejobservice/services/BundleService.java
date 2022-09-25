@@ -2,6 +2,7 @@ package com.unionbankng.future.futurejobservice.services;
 
 import com.google.gson.Gson;
 import com.unionbankng.future.futurejobservice.entities.Bundle;
+import com.unionbankng.future.futurejobservice.entities.Job;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
@@ -11,6 +12,7 @@ import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +35,7 @@ public class BundleService {
     private final JobService jobService;
     private final App app;
     private final AppLogger appLogger;
+    private final ModelMapper modelMapper;
     private Logger logger = LoggerFactory.getLogger(BundleService.class);
 
     public APIResponse postABundle(OAuth2Authentication authentication, String bundleData, MultipartFile[] supporting_files) {
@@ -95,11 +98,11 @@ public class BundleService {
     }
 
     public APIResponse postJobWithBundle(OAuth2Authentication authentication, Long id) {
-        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         Bundle bundle = bundleRepository.findById(id).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bundle not found"));
         app.print("bundle: "+ bundle);
+        Job job = modelMapper.map(bundle, Job.class);
         Gson gson = new Gson();
-        String jobData = gson.toJson(bundle);
+        String jobData = gson.toJson(job);
         try {
             return jobService.postAJob(authentication, jobData, null);
 
