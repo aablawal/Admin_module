@@ -99,6 +99,7 @@ public class BundleService {
 
     public APIResponse postJobWithBundle(OAuth2Authentication authentication, Long id) {
         Bundle bundle = bundleRepository.findById(id).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bundle not found"));
+        bundle.setCreatedAt(null);
         app.print("bundle: "+ bundle);
         Job job = modelMapper.map(bundle, Job.class);
         Gson gson = new Gson();
