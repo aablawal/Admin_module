@@ -235,6 +235,8 @@ public class JobService {
         try {
             JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
             String supporting_file_names = null;
+            app.print("Jobdata Request:");
+            app.print(jobData);
             Job job = app.getMapper().readValue(jobData, Job.class);
             job.setStatus(Status.AC);
 
