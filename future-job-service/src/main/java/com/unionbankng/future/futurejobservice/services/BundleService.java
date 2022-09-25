@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.services;
 
+import com.google.gson.Gson;
 import com.unionbankng.future.futurejobservice.entities.Bundle;
 import com.unionbankng.future.futurejobservice.enums.Status;
 import com.unionbankng.future.futurejobservice.pojos.APIResponse;
@@ -97,7 +98,8 @@ public class BundleService {
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
         Bundle bundle = bundleRepository.findById(id).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bundle not found"));
         app.print("bundle: "+ bundle);
-        String jobData = bundle.toString();
+        Gson gson = new Gson();
+        String jobData = gson.toJson(bundle);
         try {
             return jobService.postAJob(authentication, jobData, null);
 
