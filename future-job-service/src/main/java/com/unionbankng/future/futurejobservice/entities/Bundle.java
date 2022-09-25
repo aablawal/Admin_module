@@ -1,5 +1,6 @@
 package com.unionbankng.future.futurejobservice.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unionbankng.future.futurejobservice.enums.DeliveryType;
 import com.unionbankng.future.futurejobservice.enums.JobType;
 import com.unionbankng.future.futurejobservice.enums.Status;
@@ -66,11 +67,14 @@ public class Bundle implements Serializable {
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     private Status status;
+    @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
     private Date publishDate;
+    @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastModifiedDate;
     private Boolean terms;
+    @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     private String category;
