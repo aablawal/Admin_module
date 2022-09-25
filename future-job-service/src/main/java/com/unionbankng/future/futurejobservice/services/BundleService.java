@@ -6,15 +6,12 @@ import com.unionbankng.future.futurejobservice.pojos.APIResponse;
 import com.unionbankng.future.futurejobservice.pojos.ActivityLog;
 import com.unionbankng.future.futurejobservice.pojos.JwtUserDetail;
 import com.unionbankng.future.futurejobservice.repositories.BundleRepository;
-import com.unionbankng.future.futurejobservice.repositories.JobTeamDetailsRepository;
 import com.unionbankng.future.futurejobservice.util.App;
 import com.unionbankng.future.futurejobservice.util.AppLogger;
 import com.unionbankng.future.futurejobservice.util.JWTUserDetailsExtractor;
-import com.unionbankng.future.futurejobservice.util.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -88,7 +85,6 @@ public class BundleService {
     public APIResponse findAllBundles(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Bundle> bundles = bundleRepository.findAll(pageable).toList();
-        app.print("bundles>>>>>>>: "+bundles);
 
         if(bundles.isEmpty())
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bundles not found");
