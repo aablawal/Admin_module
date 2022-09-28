@@ -16,6 +16,7 @@
     <include file="db/changelog/db.chat-files-changelog.xml"/>
     <include file="db/changelog/db.configs-changelog.xml"/>
     <include file="db/changelog/db.test-changelog.xml"/>
+    <include file="db/changelog/db.bundles-changelog.xml"/>
     <include file="db/changelog/db.job-subcategories-changelog.xml"/>
     <changeSet id="16170301465441-4" author="joan">
         <sqlFile dbms="h2,mssql"

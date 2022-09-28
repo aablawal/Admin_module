@@ -93,12 +93,10 @@ public class App {
         String userPhone = phoneNumber;
         if (phoneNumber.startsWith("+234")) {
             userPhone = phoneNumber.substring(1);
-        } else {
-            if (phoneNumber.startsWith("0")) {
+        } else if(phoneNumber.startsWith("0")){
                 userPhone = "234" + phoneNumber.substring(1);
-            } else {
-                userPhone = "234" + phoneNumber;
-            }
+        } else if(!phoneNumber.startsWith("234")){
+            userPhone = "234" + phoneNumber;
         }
         return userPhone;
     }
@@ -120,4 +118,5 @@ public class App {
 //        return "172.17.255.255";
         return ipAddress;
     }
+
 }

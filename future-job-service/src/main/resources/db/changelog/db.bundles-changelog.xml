@@ -62,69 +62,7 @@
             <column name="itemized_list" type="varchar(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-14">
-        <createTable tableName="wallet_transactions">
-            <column autoIncrement="true" name="id" type="bigint">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="wallet_transactionsPK"/>
-            </column>
-            <column name="account_branch" type="varchar(255)"/>
-            <column name="account_name" type="varchar(255)"/>
-            <column name="account_number" type="varchar(255)"/>
-            <column name="account_type" type="varchar(255)"/>
-            <column name="contract_reference" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_at" type="datetime2"/>
-            <column name="currency_code" type="varchar(255)"/>
-            <column name="executed_by_username" type="varchar(255)"/>
-            <column name="last_modified_date" type="datetime2"/>
-            <column name="narration" type="varchar(255)"/>
-            <column name="payment_reference" type="varchar(255)"/>
-            <column name="total_amount" type="numeric(19, 2)"/>
-            <column name="total_amount_plus_charges" type="numeric(19, 2)"/>
-            <column name="transaction_type" type="varchar(255)"/>
-            <column name="user_id" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="wallet_id" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
     <changeSet author="union (generated)" id="1663763641835-15">
         <addForeignKeyConstraint baseColumnNames="id" baseTableName="item_list" constraintName="FKcf6g7et3ta8vufgpkd7l0ogwb" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bundle" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-1">
-        <addNotNullConstraint columnDataType="varchar(255)" columnName="categories" tableName="jobs" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-2">
-        <addNotNullConstraint columnDataType="double precision" columnName="charges" tableName="job_contracts" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-3">
-        <addNotNullConstraint columnDataType="double precision" columnName="charges" tableName="job_milestones" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-4">
-        <addNotNullConstraint columnDataType="double precision" columnName="cleared_amount" tableName="job_milestones" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-5">
-        <dropNotNullConstraint columnDataType="varchar(255)" columnName="description" tableName="job_milestones"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-6">
-        <addNotNullConstraint columnDataType="datetime" columnName="end_date" tableName="job_milestones" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-7">
-        <addNotNullConstraint columnDataType="varchar(255)" columnName="status" tableName="job_contract_extension" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-8">
-        <dropNotNullConstraint columnDataType="varchar(255)" columnName="title" tableName="skills"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-9">
-        <addNotNullConstraint columnDataType="varchar(255)" columnName="type" tableName="jobs" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-10">
-        <addNotNullConstraint columnDataType="double precision" columnName="vat" tableName="job_contracts" validate="true"/>
-    </changeSet>
-    <changeSet author="union (generated)" id="1663763641835-11">
-        <addNotNullConstraint columnDataType="double precision" columnName="vat" tableName="job_milestones" validate="true"/>
     </changeSet>
 </databaseChangeLog>

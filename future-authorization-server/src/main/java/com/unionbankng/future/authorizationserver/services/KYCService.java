@@ -578,6 +578,7 @@ public class KYCService {
 
         String selfieImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(selfieImage.getBytes());
         Date dateOfBirth = user.getDateOfBirth();
+        app.print("dateOfBirth: >>"+ dateOfBirth);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthString = formatter.format(dateOfBirth);
 
@@ -820,5 +821,11 @@ public class KYCService {
             return new APIResponse<>("Webhook Data not Found",
                     false, "Address verification failed");
         }
+    }
+
+    public APIResponse<String> modifyId(User user) {
+        user = userRepository.save(user);
+        return new APIResponse<>(messageSource.getMessage("000", null, LocaleContextHolder.getLocale()),
+                true, "User's KYC level is now : "+ user.getKycLevel());
     }
 }
