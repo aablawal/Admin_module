@@ -86,6 +86,12 @@ public class BundleService {
         return  new APIResponse("Request Successful",true, bundle);
     }
 
+    public APIResponse deleteBundleById(Long id) {
+        Bundle bundle = bundleRepository.findById(id).orElseThrow(  ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bundle not found"));
+        bundleRepository.delete(bundle);
+        return  new APIResponse("bundle deleted Successful",true, bundle);
+    }
+
     public APIResponse findAllBundles(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Bundle> bundles = bundleRepository.findAll(pageable).toList();
