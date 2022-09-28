@@ -59,6 +59,9 @@ public class JobProposalService  implements Serializable {
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
+            application.setFullName(currentUser.getUserFullName());
+            application.setImg(currentUser.getUserImg());
+
             boolean isEdited = false;
             if (application.getId()!= null)
                 isEdited = true;
@@ -170,6 +173,8 @@ public class JobProposalService  implements Serializable {
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
+            application.setFullName(currentUser.getUserFullName());
+            application.setImg(currentUser.getUserImg());
 
 
             boolean isEdited = false;
