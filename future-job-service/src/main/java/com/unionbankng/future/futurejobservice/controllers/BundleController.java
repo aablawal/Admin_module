@@ -52,7 +52,7 @@ public class BundleController {
     @DeleteMapping("/v1/bundle/delete/{bundle_id}")
     public ResponseEntity<APIResponse> deleteBundles(@PathVariable Long bundle_id){
         return ResponseEntity.ok().body(
-                new APIResponse("success",true,bundleService.deleteBundleById(bundle_id));
+                new APIResponse("success",true,bundleService.deleteBundleById(bundle_id)));
     }
 
 }
