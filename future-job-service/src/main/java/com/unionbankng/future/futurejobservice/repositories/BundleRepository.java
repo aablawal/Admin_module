@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BundleRepository extends JpaRepository<Bundle, Long> {
 
     Page<Bundle> findAll(Pageable pageable);
+
+    void deleteById(Long aLong);
 }

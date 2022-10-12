@@ -49,4 +49,10 @@ public class BundleController {
                 new APIResponse("success",true,bundleService.findAllBundles(page, size)));
     }
 
+    @DeleteMapping("/v1/bundle/delete/{bundle_id}")
+    public ResponseEntity<APIResponse> deleteBundles(@PathVariable Long bundle_id){
+        return ResponseEntity.ok().body(
+                new APIResponse("success",true,bundleService.deleteBundleById(bundle_id)));
+    }
+
 }
