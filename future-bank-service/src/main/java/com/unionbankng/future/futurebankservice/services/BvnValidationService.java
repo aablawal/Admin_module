@@ -54,6 +54,8 @@ public class BvnValidationService {
 
         if (response.isSuccessful() && response.body().getData()!=null) {
             app.print("Success block");
+            app.print(response.body().getData());
+           dob = dob == null ? response.body().getData().getDateOfBirth() : dob;
             initiateKYC(authToken, bvn, dob);
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
@@ -70,4 +72,5 @@ public class BvnValidationService {
         app.print("###DOB: " + (dob == null ? "null" : dob));
         futureAuthServiceHandler.initiateKYC(authToken, bvn, dob);
     }
+
 }
