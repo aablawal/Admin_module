@@ -623,8 +623,8 @@ public class KYCService {
         app.print("Uploaded... " + savedIdImageUrl);
 
         //todo: uncomment before moving to production
-        if (responseData.getFirstName().equalsIgnoreCase(idRequest.getFirstName()) && responseData.getLastName().equalsIgnoreCase(idRequest.getLastName())) {
-//        if(true){
+//        if (responseData.getFirstName().equalsIgnoreCase(idRequest.getFirstName()) && responseData.getLastName().equalsIgnoreCase(idRequest.getLastName())) {
+        if(true){
             Kyc kyc = new Kyc();
             kyc.setVerificationStatus(true);
             kyc.setFirstName(user.getFirstName());
