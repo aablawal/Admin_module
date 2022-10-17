@@ -139,7 +139,7 @@ public class WalletService implements Serializable {
                 user.setWalletId(response.body().get("walletId"));
                 userRepository.save(user);
 
-                String mailSubject = messageSource.getMessage("Kula Wallet Creation", null, LocaleContextHolder.getLocale());
+                String mailSubject = "Kula Wallet Creation";
                 String[] mailBodyArgs = {user.getFirstName(),response.body().get("walletId")};
                 String mailBody = messageSource.getMessage("kula.wallet.creation.success.body", mailBodyArgs, LocaleContextHolder.getLocale());
                 emailSender.sendEmail(user.getEmail(), user.getFirstName(), mailSubject, mailBody, "hello@kula.work");
