@@ -96,10 +96,6 @@ public class UserService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
 
-
-        Boolean isKeycloakPropertyChanged = !user.getLastName().equals(request.getLastName()) ||
-                !user.getFirstName().equals(request.getFirstName());
-
         if (request.getLastName() != null) {
             user.setLastName(request.getLastName());
         }

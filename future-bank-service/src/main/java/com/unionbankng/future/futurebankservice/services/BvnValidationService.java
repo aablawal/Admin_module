@@ -2,15 +2,22 @@ package com.unionbankng.future.futurebankservice.services;
 
 import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.util.App;
+import com.unionbankng.future.futurebankservice.util.JWTUserDetailsExtractor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import retrofit2.Response;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +29,11 @@ public class BvnValidationService {
 
     private final FutureAuthServiceHandler futureAuthServiceHandler;
 
+    @Value("${kula.base-url}")
+    private String kulaBaseUrl;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     public ResponseEntity<APIResponse<BVNValidationResponse>> validateCustomerBVN(String bvn, String dob) throws IOException {
 
@@ -43,7 +55,7 @@ public class BvnValidationService {
         }
     }
 
-    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(String authToken, String bvn, String otp, String dob) throws IOException {
+    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(String authToken, OAuth2Authentication authentication, String bvn, String otp, String dob) throws IOException {
 
         VerifyBvnRequest request = new VerifyBvnRequest();
         request.setBvn(bvn);
@@ -55,8 +67,29 @@ public class BvnValidationService {
         if (response.isSuccessful() && response.body().getData()!=null) {
             app.print("Success block");
             app.print(response.body().getData());
-           dob = dob == null ? response.body().getData().getDateOfBirth() : dob;
+            ValidateBvnResponse bvnData= response.body().getData();
+            dob = dob == null ? bvnData.getDateOfBirth() : dob;
             initiateKYC(authToken, bvn, dob);
+
+            JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+
+            UserNameUpdateRequest updateRequest = new UserNameUpdateRequest();
+            updateRequest.setFirstName(app.toTitleCase(bvnData.getFirstName()));
+            updateRequest.setLastName(app.toTitleCase(bvnData.getLastName()));
+
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                HttpEntity<UserNameUpdateRequest> entity = new HttpEntity<>(updateRequest, headers);
+
+                restTemplate.exchange(
+                        kulaBaseUrl + "/v1/users/" + currentUser.getUserUUID() + "/update_profile_details", HttpMethod.POST, entity, String.class).getBody();
+                app.print("User name updated with name on their BVN");
+
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+
             return ResponseEntity.ok().body(new APIResponse<>(response.message(), true, response.body()));
         } else {
             app.print("Failure block");

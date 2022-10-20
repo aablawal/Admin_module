@@ -35,8 +35,10 @@ import com.unionbankng.future.futurebankservice.pojos.*;
 import com.unionbankng.future.futurebankservice.services.BvnValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import retrofit2.Response;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -55,8 +57,8 @@ public class BVNController {
     }
 
     @PostMapping("/v1/bvn/verify_bvn")
-    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestHeader(value="Authorization") String authorization, @RequestParam String bvn, @RequestParam String otp, @RequestParam(required = false) String dob) throws IOException {
-        return bvnValidationService.verifyCustomerBVN(authorization, bvn,otp, dob);
+    public ResponseEntity<APIResponse<BVNVerificationResponse>> verifyCustomerBVN(@RequestHeader(value="Authorization") String authorization, @ApiIgnore OAuth2Authentication authentication, @RequestParam String bvn, @RequestParam String otp, @RequestParam(required = false) String dob) throws IOException {
+        return bvnValidationService.verifyCustomerBVN(authorization,authentication, bvn,otp, dob);
     }
 
 }

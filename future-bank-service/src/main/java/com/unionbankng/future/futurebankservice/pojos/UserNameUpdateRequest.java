@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UserNameUpdateRequest {
-    private String accountCode;
-    private String name;
+    private String firstName;
+    private String lastName;
 }
