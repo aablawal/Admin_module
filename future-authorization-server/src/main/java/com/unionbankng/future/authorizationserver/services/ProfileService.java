@@ -79,15 +79,15 @@ public class ProfileService {
         }
         if(request.getPricePerHour() != null)
             profile.setPricePerHour(request.getPricePerHour());
-        if(request.getBio().length()>0) {
-            if(profile.getBio().isEmpty()){
+        if(request.getBio()==null) {
+            if(profile.getBio()==null){
                 app.print("Incrementing profile percentage complete");
                 profile.incrementPercentageComplete(20);
                 app.print("Profile percentage complete incremented");
             }
             profile.setBio(request.getBio());
         }
-        if(request.getBio().length()==0){
+        if(request.getBio()==null){
             profile.setBio(request.getBio());
             app.print("Decrementing profile percentage complete");
             profile.decrementPercentageComplete(20);

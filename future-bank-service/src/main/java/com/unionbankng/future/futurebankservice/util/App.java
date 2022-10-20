@@ -74,18 +74,7 @@ public class App {
 
     public Long generateOTP(){
         Random rnd = new Random();
-//        String number = String.valueOf(rnd.nextInt(999999));
-//        if(number.length()<6){
-//            if(number.length()==5)
-//                number=number+"9";
-//            if(number.length()==4)
-//                number=number+"99";
-//            if(number.length()==3)
-//                number=number+"999";
-//        }
-//        return  Long.valueOf(number);
         return Long.valueOf(100000 + rnd.nextInt(900000));
-
     }
 
     public String toPhoneNumber(String phoneNumber) {
