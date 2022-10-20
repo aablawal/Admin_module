@@ -74,22 +74,24 @@ public class Profile implements Serializable {
 
     }
     public void incrementPercentageComplete(int percentage){
-        this.percentageComplete = percentageComplete + percentage;
+//        this.percentageComplete = percentageComplete + percentage;
         System.out.println("PERCENTAGE INCREMENTED BY " + percentage + "GIVES" + percentageComplete);
     }
 
     public void decrementPercentageComplete(int percentage){
-        this.percentageComplete = percentageComplete - percentage;
+//        this.percentageComplete = percentageComplete - percentage;
         System.out.println("PERCENTAGE DECREMENTED BY " + percentage + "GIVES" + percentageComplete);
     }
 
     public int getPercentageComplete(){
-        if(this.percentageComplete == null){
-            return 0;
-        }
-        else{
-            return this.percentageComplete;
-        }
+//        if(this.percentageComplete == null){
+//            return 0;
+//        }
+//        else{
+//            return this.percentageComplete;
+//        }
+        System.out.println("PERCENTAGE DECREMENTED BY "  + "GIVES" + percentageComplete);
+        return 0;
     }
 
 }
