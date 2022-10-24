@@ -31,8 +31,8 @@ import java.util.Arrays;
 @Configuration
 public class MemcachedConfig extends AbstractSSMConfiguration {
 
-    @Value( "${memcached.service.host}" )
-    private String memcachedHost;
+//    @Value( "${memcached.service.host}" )
+    private String memcachedHost = "127.0.0.1";
 
     @Value( "${memcached.service.port}" )
     private int memcachedPort;

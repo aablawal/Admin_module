@@ -30,7 +30,7 @@ public class JobTeamDetails  implements Serializable {
     private  String email;
     @NotNull
     private  Long jobId;
-    private   Long amount;
+    private  Long amount;
     private Long percentage;
     @Temporal(TemporalType.TIMESTAMP)
     private  Date startDate;

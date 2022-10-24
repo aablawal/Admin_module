@@ -1,4 +1,5 @@
 package com.unionbankng.future.futureutilityservice.config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,11 @@ import java.util.Map;
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 	@Value("${sidekiq.jwt.signing_key}")
+
 	private String jwtSigningKey;
+
+
+
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {

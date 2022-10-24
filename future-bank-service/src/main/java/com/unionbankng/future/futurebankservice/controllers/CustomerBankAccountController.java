@@ -69,4 +69,9 @@ public class CustomerBankAccountController {
 
     }
 
+    @GetMapping("/v1/test")
+    public String test() {
+        return "Test";
+    }
+
 }

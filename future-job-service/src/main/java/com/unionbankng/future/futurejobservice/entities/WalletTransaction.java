@@ -27,7 +27,7 @@ public class WalletTransaction implements Serializable {
     @NotNull
     private  String walletId;
     private BigDecimal totalAmountPlusCharges;
-    private BigDecimal  totalAmount;
+    private BigDecimal totalAmount;
     private String currencyCode;
     private String accountType;
     private String accountBranch;

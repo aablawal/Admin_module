@@ -105,6 +105,7 @@ public class RegistrationService {
         app.print("##############LOGIN WITH GOOGLE");
         // generate uuid for user
         ThirdPartyOauthResponse thirdPartyOauthResponse = googleOauthProvider.authentcate(request.getThirdPartyToken());
+
         if (userService.existsByEmail(request.getEmail()) || userService.existsByUsername(request.getUsername())) {
             User existingUser=userService.findByEmail(request.getEmail()).orElse(
                     userService.findByUsername(request.getUsername()).orElse(null)
