@@ -11,9 +11,11 @@ import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.CryptoService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -27,13 +29,18 @@ public class RegistrationService {
 
     private final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
 
+    @Value("${kula.encryption.key}")
+    private String encryptionKey;
     private final MessageSource messageSource;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final UserConfirmationTokenService userConfirmationTokenService;
     private final ProfileService profileService;
     private  final GoogleOauthProvider googleOauthProvider;
+
+    private  final CryptoService cryptoService;
     private final App app;
+
 
     private PasswordValidator passwordValidator  = PasswordValidator.
             buildValidator(false, true, true, 6, 40);
@@ -73,11 +80,12 @@ public class RegistrationService {
 
         // generate uuid for user
         String generatedUuid = app.makeUIID();
+        String decryptedPassword=cryptoService.decryptAES(request.getPassword(),encryptionKey);
         User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
                 .kycLevel(0)
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())
                 .email(request.getEmail()).username(request.getEmail()).dialingCode(request.getDialingCode()).phoneNumber(request.getPhoneNumber()).isEnabled(Boolean.FALSE)
-                .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername())
+                .uuid(generatedUuid).password(passwordEncoder.encode(decryptedPassword)).username(request.getUsername())
                 .authProvider(request.getAuthProvider()).build();
 
         user = userService.save(user);

@@ -9,7 +9,9 @@ import com.unionbankng.future.authorizationserver.repositories.LoginRepository;
 import com.unionbankng.future.authorizationserver.services.UserConfirmationTokenService;
 import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.authorizationserver.utils.AppLogger;
+import com.unionbankng.future.authorizationserver.utils.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +27,12 @@ import java.util.Map;
 
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
+
+    @Value("${kula.encryption.key}")
+    private String encryptionKey;
+
+    @Autowired
+    private CryptoService cryptoService;
     @Autowired
     private GoogleOauthProvider googleOauthProvider;
     @Autowired
@@ -51,6 +59,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
 //        this.logger.info(String.format("token is : %s",thirdPartyOauthToken));
         String username = auth.getPrincipal() == null ? "NONE_PROVIDED" : auth.getName();
+
         boolean cacheWasUsed = true;
         FutureDAOUserDetails user = (FutureDAOUserDetails)this.getUserCache().getUserFromCache(username);
 
@@ -132,7 +141,9 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             throw new BadCredentialsException(this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         } else {
             String presentedPassword = authentication.getCredentials().toString();
-            if (!this.getPasswordEncoder().matches(presentedPassword, userDetails.getPassword())) {
+            String decryptedPassword=cryptoService.decrypt(presentedPassword,encryptionKey);
+
+            if (!this.getPasswordEncoder().matches(decryptedPassword, userDetails.getPassword())) {
                 this.logger.debug("Authentication failed: password does not match stored value");
                 throw new BadCredentialsException(this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
             }
