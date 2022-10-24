@@ -1,4 +1,5 @@
 package com.unionbankng.future.futurejobservice.repositories;
+
 import com.unionbankng.future.futurejobservice.entities.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +15,13 @@ public interface JobRepository extends JpaRepository<Job,Long> {
     @Query(value = "SELECT * FROM jobs j where j.oid=:id and j.status not in('IA','CA') order by id desc", nativeQuery = true)
     Page<Job> findByOid(Pageable pageable, Long id);
 
-    @Query(value = "SELECT * FROM jobs j where j.type=:type and (j.status='AC' or (j.status='WP' and j.type='TEAMS_PROJECT')) order by id desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM jobs j where j.type=:type and (j.status='AC' or (j.status='WP')) order by id desc", nativeQuery = true)
     Page<Job> findByType(Pageable pageable, String type);
 
-    @Query(value = "SELECT * FROM jobs j where j.type=:type and j.categories like %:category% and (j.status='AC' or (j.status='WP' and j.type='TEAMS_PROJECT')) order by id desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM jobs j where j.type=:type and j.category like %:category% and (j.status='AC' or (j.status='WP')) order by id desc", nativeQuery = true)
     Page<Job> findByTypeAndCategory(Pageable pageable, String type, String category);
 
-    @Query(value = "SELECT * FROM jobs j where j.type=:type and j.status='AC' and (j.title like %:question% or j.description like %:question% or j.categories like %:question% or j.skills_required like %:question%) order by id desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM jobs j where j.type=:type and j.status='AC' and (j.title like %:question% or j.description like %:question% or j.category like %:question% or j.skills_required like %:question%) order by id desc", nativeQuery = true)
     Page<Job> findBySearch(Pageable pageable, String question, String type);
 
     @Query(value = "SELECT * FROM jobs j where j.oid=:id and j.status=:status order by id desc", nativeQuery = true)

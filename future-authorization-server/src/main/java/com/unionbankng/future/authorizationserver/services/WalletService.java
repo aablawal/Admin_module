@@ -7,11 +7,14 @@ import com.unionbankng.future.authorizationserver.pojos.WalletAuthResponse;
 import com.unionbankng.future.authorizationserver.repositories.UserRepository;
 import com.unionbankng.future.authorizationserver.retrofitservices.WalletServiceInterface;
 import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -33,6 +36,10 @@ public class WalletService implements Serializable {
     private Logger logger = LoggerFactory.getLogger(WalletService.class);
     private WalletServiceInterface walletServiceInterface;
     private final UserRepository userRepository;
+
+    private final EmailSender emailSender;
+
+    private final MessageSource messageSource;
     private final App app;
 
 
@@ -97,10 +104,23 @@ public class WalletService implements Serializable {
         if (bvn == null || !app.validBvn(bvn))
             return new APIResponse("Provide user verified BVN Number", false, null);
 
+
         String userId = user.getUuid();
         String customerName = user.getFirstName() + " " + user.getLastName();
 
         try {
+
+            user.setBvn(bvn);
+            user.setKycLevel(1);
+            user.setBvn(bvn);
+            user.setKycLevel(1);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
+            if(dob != null){
+                Date dateOfBirth = formatter.parse(dob);
+                user.setDateOfBirth(dateOfBirth);
+            }
+            userRepository.save(user);
+
             WalletAuthResponse auth = getAuth();
 
             if (auth == null)
@@ -117,12 +137,13 @@ public class WalletService implements Serializable {
             if (response.body() != null && Objects.equals(response.body().get("code"), "000")) {
                 app.print("Wallet created successfully");
                 user.setWalletId(response.body().get("walletId"));
-                user.setBvn(bvn);
-                user.setKycLevel(1);
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
-                Date dateOfBirth = formatter.parse(dob);
-                user.setDateOfBirth(dateOfBirth);
                 userRepository.save(user);
+
+                String mailSubject = "Kula Wallet Creation";
+                String[] mailBodyArgs = {user.getFirstName(),response.body().get("walletId")};
+                String mailBody = messageSource.getMessage("kula.wallet.creation.success.body", mailBodyArgs, LocaleContextHolder.getLocale());
+                emailSender.sendEmail(user.getEmail(), user.getFirstName(), mailSubject, mailBody, "hello@kula.work");
+
                 return new APIResponse("BVN Added", true, user);
             } else {
                 return new APIResponse<>("Sorry, Wallet creation failed at this time, try again soon!", false, null);

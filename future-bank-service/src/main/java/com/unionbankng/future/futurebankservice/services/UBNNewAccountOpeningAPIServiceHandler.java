@@ -60,7 +60,7 @@ public class UBNNewAccountOpeningAPIServiceHandler {
         if(response == null)
             return null;
 
-//        logger.info("access token is : {}",response.getAccess_token());
+        logger.info("access token is : {}",response.getAccess_token());
 
         String authorization = String.format("Bearer %s",response.getAccess_token());
         return ubnAccountAPIService.getSupportedIdCardTypes(authorization,"01").execute();

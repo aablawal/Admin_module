@@ -2,8 +2,6 @@ package com.unionbankng.future.paymentservice.pojos;
 
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class VerifyTransactionResponse {

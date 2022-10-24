@@ -4,15 +4,15 @@ import lombok.Data;
 
 @Data
 public class AddressVerificationRequest {
-    private String firstname;
-    private String surname;
+    private String firstName;
+    private String lastName;
     private String phone;
     private String email;
     private String dob;
-    private String callbackURL;
     private String buildingNumber;
     private String street;
     private String landmark;
+    private String lga;
     private String state;
     private String city;
     private String country;

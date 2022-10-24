@@ -16,4 +16,19 @@
     <include file="db/changelog/db.chat-files-changelog.xml"/>
     <include file="db/changelog/db.configs-changelog.xml"/>
     <include file="db/changelog/db.test-changelog.xml"/>
+    <include file="db/changelog/db.bundles-changelog.xml"/>
+    <include file="db/changelog/db.job-subcategories-changelog.xml"/>
+    <changeSet id="16170301465441-4" author="joan">
+        <sqlFile dbms="h2,mssql"
+                 path="db/migrations/migration-1.sql" />
+    </changeSet>
+    <changeSet id="16170301465441-5" author="joan">
+        <sqlFile dbms="h2,mssql"
+                 path="db/migrations/migration-2.sql" />
+    </changeSet>
+    <include file="db/changelog/db.skills-changelog.xml"/>
+    <changeSet id="16170301465441-6" author="joan">
+        <sqlFile dbms="h2,mssql"
+                 path="db/migrations/migration-3.sql" />
+    </changeSet>
 </databaseChangeLog>

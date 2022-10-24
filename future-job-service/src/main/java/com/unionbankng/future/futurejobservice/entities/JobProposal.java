@@ -55,9 +55,11 @@ public class JobProposal implements Serializable {
     private String accountNumber;
     private String accountName;
     private String accountType;
+    private String walletId;
     private Boolean isApplied;
     private String branchCode;
     private PaymentMethod paymentMethod;
+    private String coverLetter;
     @Column(length=3, nullable=false)
     @Enumerated(EnumType.STRING)
     private Status status;

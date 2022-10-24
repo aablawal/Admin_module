@@ -50,6 +50,7 @@ public class UBNEmailService {
             app.print("Sending Email...");
             String authorization = String.format("Bearer %s", authService.getUBNAuthServerToken().getAccess_token());
             // app.print(authorization);
+            app.print(body);
             Response<UbnEmailResponse> responseCall = ubnEmailServiceInterface.sendEmail(authorization, processEmailTemplate(body)).execute();
             UbnEmailResponse response = responseCall.body();
             app.print("Response:");
@@ -66,7 +67,6 @@ public class UBNEmailService {
         try {
             Context ctx = new Context(LocaleContextHolder.getLocale());
             if (emailBody.getRecipients().size() == 1) {
-                ctx.setVariable("name", "Dear " + emailBody.getRecipients().get(0).getDisplayName()+ ",");
                 ctx.setVariable("footname", emailBody.getRecipients().get(0).getDisplayName());
                 ctx.setVariable("year", Calendar.getInstance().get(Calendar.YEAR));
             } else {

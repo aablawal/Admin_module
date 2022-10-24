@@ -59,6 +59,9 @@ public class JobProposalService  implements Serializable {
             application.setIsApplied(true);
             application.setCreatedAt(new Date());
             application.setLastModifiedDate(new Date());
+            application.setFullName(currentUser.getUserFullName());
+            application.setImg(currentUser.getUserImg());
+
             boolean isEdited = false;
             if (application.getId()!= null)
                 isEdited = true;
@@ -92,11 +95,11 @@ public class JobProposalService  implements Serializable {
                 application.setSupportingFiles(supporting_file_names);
 
 
-            app.print(application);
             if(application.getPaymentMethod()==null)
                 application.setPaymentMethod(PaymentMethod.BANK);
 
             JobProposal proposal = repository.save(application);
+            app.print(application);
             if (proposal != null) {
 
                 if (job != null) {
@@ -106,7 +109,7 @@ public class JobProposalService  implements Serializable {
                         Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
                         User employer =userService.getUserById(proposal.getEmployerId());
                         if (currentJob != null && employer!=null ) {
-                            String[] params = {currentJob.getTitle()};
+                            String[] params = {employer.getFullName(),currentJob.getTitle()};
                             String message = messageSource.getMessage("proposal.submission.successful.email-body", params, LocaleContextHolder.getLocale());
                             NotificationBody body = new NotificationBody();
                             body.setBody(message);
@@ -127,13 +130,109 @@ public class JobProposalService  implements Serializable {
 
                     try {
                         //############### Activity Logging ###########
+                        app.print("Applied for "+job.getTitle()+ " and forward to event bus");
                         ActivityLog log = new ActivityLog();
-                        log.setDescription("Applied for "+job.getTitle());
+                        log.setDescription("Applied for "+ job.getTitle());
                         log.setRequestObject(app.toString(application));
                         log.setResponseObject(app.toString(proposal));
                         log.setUsername(currentUser.getUserEmail());
                         log.setUserId(currentUser.getUserUUID());
                         appLogger.log(log);
+                        app.print("Sending Job Activity log to Service Bus "+ job);
+                        //#########################################
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
+                    return proposal;
+                } else {
+                    logger.info("JOBSERVICE: Unable to save Job");
+                    return null;
+                }
+            } else {
+                logger.info("JOBSERVICE: Unable to save Proposal");
+                return null;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public JobProposal applyForJob(OAuth2Authentication authentication, String applicationData, int percentageComplete) {
+
+        if(percentageComplete < 75){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile must be complete to be able to apply for a job!");
+        }
+        JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        try {
+            app.print(applicationData);
+            JobProposal application = new ObjectMapper().readValue(applicationData, JobProposal.class);
+
+            Job job = jobRepository.findById(application.getJobId()).orElse(null);
+            application.setIsApplied(true);
+            application.setCreatedAt(new Date());
+            application.setLastModifiedDate(new Date());
+            application.setFullName(currentUser.getUserFullName());
+            application.setImg(currentUser.getUserImg());
+
+
+            boolean isEdited = false;
+            if (application.getId()!= null)
+                isEdited = true;
+
+            if (isEdited) {
+                if (application.getStatus().equals(Status.RE)) {
+                    application.setStatus(Status.PE);
+                }
+            }
+            else {
+                application.setStatus(Status.PE);
+            }
+
+            application.setPaymentMethod(PaymentMethod.WALLET);
+
+            JobProposal proposal = repository.save(application);
+            app.print(application);
+            if (proposal != null) {
+
+                if (job != null) {
+
+                    if (!isEdited) {
+                        //fire notification
+                        Job currentJob = jobRepository.findById(proposal.getJobId()).orElse(null);
+                        User employer =userService.getUserById(proposal.getEmployerId());
+                        if (currentJob != null && employer!=null ) {
+                            String[] params = {employer.getFullName(),currentJob.getTitle()};
+                            String message = messageSource.getMessage("proposal.submission.successful.email-body", params, LocaleContextHolder.getLocale());
+                            NotificationBody body = new NotificationBody();
+                            body.setBody(message);
+                            body.setSubject("New Proposal");
+                            body.setActionType("REDIRECT");
+                            body.setAction("/my-job/proposals/" + proposal.getJobId());
+                            body.setTopic("'Job'");
+                            body.setChannel("S");
+                            body.setRecipient(proposal.getEmployerId());
+                            body.setRecipientEmail(employer.getEmail());
+                            body.setRecipientName(employer.getFullName());
+                            body.setPriority("YES");
+
+                            notificationSender.pushNotification(body);
+                        }
+                    }
+                    //end
+
+                    try {
+                        //############### Activity Logging ###########
+                        app.print("Applied for "+job.getTitle()+ " and forward to event bus");
+                        ActivityLog log = new ActivityLog();
+                        log.setDescription("Applied for "+ job.getTitle());
+                        log.setRequestObject(app.toString(application));
+                        log.setResponseObject(app.toString(proposal));
+                        log.setUsername(currentUser.getUserEmail());
+                        log.setUserId(currentUser.getUserUUID());
+                        appLogger.log(log);
+                        app.print("Sending Job Activity log to Service Bus "+ job);
                         //#########################################
                     }catch (Exception ex){
                         ex.printStackTrace();

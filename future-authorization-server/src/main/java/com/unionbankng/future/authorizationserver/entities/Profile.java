@@ -28,6 +28,8 @@ public class Profile implements Serializable {
     @Column(nullable = false, unique = true)
     private Long userId;
 
+    private String profilePhoto;
+
     private String coverPhoto;
 
     @Enumerated(EnumType.STRING)
@@ -47,6 +49,7 @@ public class Profile implements Serializable {
 
     @OneToMany
     private Set<ProfileSkill> skills = new HashSet<>();
+    private Integer percentageComplete;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -69,6 +72,26 @@ public class Profile implements Serializable {
     public boolean equals(Object profile) {
         return this.id.equals(((Profile)profile).getId());
 
+    }
+    public void incrementPercentageComplete(int percentage){
+//        this.percentageComplete = percentageComplete + percentage;
+        System.out.println("PERCENTAGE INCREMENTED BY " + percentage + "GIVES" + percentageComplete);
+    }
+
+    public void decrementPercentageComplete(int percentage){
+//        this.percentageComplete = percentageComplete - percentage;
+        System.out.println("PERCENTAGE DECREMENTED BY " + percentage + "GIVES" + percentageComplete);
+    }
+
+    public int getPercentageComplete(){
+//        if(this.percentageComplete == null){
+//            return 0;
+//        }
+//        else{
+//            return this.percentageComplete;
+//        }
+        System.out.println("PERCENTAGE DECREMENTED BY "  + "GIVES" + percentageComplete);
+        return 0;
     }
 
 }

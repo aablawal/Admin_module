@@ -7,11 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,24 +26,24 @@ public class App {
     public void log(String message) {
         logger.info(message);
     }
-    public void print(Object obj){
+
+    public void print(Object obj) {
         try {
-            ObjectMapper myObjectMapper= new ObjectMapper();
+            ObjectMapper myObjectMapper = new ObjectMapper();
             myObjectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             logger.info(myObjectMapper.writeValueAsString(obj));
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     public String makeUIID() {
         UUID referenceId = Generators.timeBasedGenerator().generate();
-        return   referenceId.toString().replaceAll("-", "");
+        return referenceId.toString().replaceAll("-", "");
 
     }
-    public boolean validImage(String fileName)
-    {
+
+    public boolean validImage(String fileName) {
         String regex = "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$";
         Pattern p = Pattern.compile(regex);
         if (fileName == null) {
@@ -61,16 +66,17 @@ public class App {
 
     public boolean validNumber(String number) {
         if (number.startsWith("+234"))
-           number= number.replace("+234", "0");
+            number = number.replace("+234", "0");
         Pattern pattern = Pattern.compile("^\\d{11}$");
         Matcher matcher = pattern.matcher(number);
         return matcher.matches();
     }
-    public ObjectMapper getMapper(){
+
+    public ObjectMapper getMapper() {
         return new ObjectMapper();
     }
 
-    public Long generateOTP(){
+    public Long generateOTP() {
         Random rnd = new Random();
 //        String number = String.valueOf(rnd.nextInt(999999));
 //        if(number.length()<6){
@@ -90,13 +96,47 @@ public class App {
         String userPhone = phoneNumber;
         if (phoneNumber.startsWith("+234")) {
             userPhone = phoneNumber.substring(1);
-        } else {
-            if (phoneNumber.startsWith("0")) {
-                userPhone = "234" + phoneNumber.substring(1);
-            } else {
-                userPhone = "234" + phoneNumber;
-            }
+        } else if (phoneNumber.startsWith("0")) {
+            userPhone = "234" + phoneNumber.substring(1);
+        } else if (!phoneNumber.startsWith("234")) {
+            userPhone = "234" + phoneNumber;
         }
         return userPhone;
     }
+
+    public String getClientDevice() {
+        return "Google Chrome";
+    }
+
+    public String getClientMACAddress() {
+        HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.
+                        currentRequestAttributes()).
+                        getRequest();
+
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+
+//        return "172.17.255.255";
+        return ipAddress;
+    }
+
+    public String toTitleCase(String text) {
+        String WORD_SEPARATOR = " ";
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+
+        return Arrays
+                .stream(text.split(WORD_SEPARATOR))
+                .map(word -> word.isEmpty()
+                        ? word
+                        : Character.toTitleCase(word.charAt(0)) + word
+                        .substring(1)
+                        .toLowerCase())
+                .collect(Collectors.joining(WORD_SEPARATOR));
+    }
+
 }

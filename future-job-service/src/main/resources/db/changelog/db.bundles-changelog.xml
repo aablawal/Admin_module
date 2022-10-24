@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.6.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <changeSet author="union (generated)" id="1663763641835-12">
+        <createTable tableName="bundle">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="bundlePK"/>
+            </column>
+            <column name="assessment" type="varchar(255)"/>
+            <column name="budget" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="categories" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="varchar(255)"/>
+            <column name="created_at" type="datetime2"/>
+            <column name="delivery_type" type="int"/>
+            <column name="description" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration" type="varchar(255)"/>
+            <column name="goal" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="interview" type="bit">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invitation_id" type="varchar(255)"/>
+            <column name="last_modified_date" type="datetime2"/>
+            <column name="nda_files" type="varchar (max)"/>
+            <column name="oid" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_terms" type="varchar(255)"/>
+            <column name="publish_date" type="datetime2"/>
+            <column name="qualification" type="varchar(255)"/>
+            <column name="sample_product" type="varchar(255)"/>
+            <column name="skills_required" type="varchar(255)"/>
+            <column name="status" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sub_category" type="varchar(255)"/>
+            <column name="supporting_files" type="varchar(255)"/>
+            <column name="team" type="varchar(255)"/>
+            <column name="team_expertise_level" type="varchar(255)"/>
+            <column name="team_size" type="bigint"/>
+            <column name="terms" type="bit"/>
+            <column name="timeline" type="varchar(255)"/>
+            <column name="title" type="varchar (max)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="union (generated)" id="1663763641835-13">
+        <createTable tableName="item_list">
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="itemized_list" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="union (generated)" id="1663763641835-15">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="item_list" constraintName="FKcf6g7et3ta8vufgpkd7l0ogwb" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bundle" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

@@ -11,6 +11,7 @@ import com.unionbankng.future.authorizationserver.utils.App;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -63,7 +64,13 @@ public class ProfileSkillService {
 
         Profile profile = profileRepository.findByUserId(request.getUserId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile Not Found"));
-        profile.getSkills().clear();
+
+        if(profile.getSkills().size()!=0){
+            profile.getSkills().clear();
+            app.print("Decrementing profile percentage complete");
+            profile.decrementPercentageComplete(20);
+            app.print("profile percentage complete decremented");
+        }
         for(String skill : request.getSkills()){
             ProfileSkill profileSkill = new ProfileSkill();
             profileSkill.setSkillName(skill);
@@ -72,6 +79,8 @@ public class ProfileSkillService {
             profile.getSkills().add(profileSkill);
             profileRepository.save(profile);
         }
+
+        profile.incrementPercentageComplete(20);
 
     }
 
