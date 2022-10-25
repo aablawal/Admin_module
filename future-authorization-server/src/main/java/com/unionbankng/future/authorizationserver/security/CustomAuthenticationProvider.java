@@ -143,6 +143,15 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             String presentedPassword = authentication.getCredentials().toString();
             String decryptedPassword=cryptoService.decrypt(presentedPassword,encryptionKey);
 
+            app.print("System Password:");
+            app.print(decryptedPassword);
+
+            app.print("User Password:");
+            app.print(userDetails.getPassword());
+
+            app.print("Match:");
+            app.print(this.getPasswordEncoder().matches(decryptedPassword, userDetails.getPassword()));
+
             if (!this.getPasswordEncoder().matches(decryptedPassword, userDetails.getPassword())) {
                 this.logger.debug("Authentication failed: password does not match stored value");
                 throw new BadCredentialsException(this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
