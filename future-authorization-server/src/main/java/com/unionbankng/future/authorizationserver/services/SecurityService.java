@@ -1,13 +1,16 @@
 package com.unionbankng.future.authorizationserver.services;
 
+import com.unionbankng.future.authorizationserver.entities.PasswordHistory;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.RecipientType;
 import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ChangePasswordRequest;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
+import com.unionbankng.future.authorizationserver.repositories.PasswordHistoryRepository;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.CryptoService;
 import com.unionbankng.future.authorizationserver.utils.EmailSender;
 import com.unionbankng.future.authorizationserver.utils.Utility;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +25,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class SecurityService {
 
+
+    @Value("${kula.encryption.key}")
+    private String encryptionKey;
+
+    private final PasswordHistoryRepository passwordHistoryRepository;
     private final UserService userService;
     private final MemcachedHelperService memcachedHelperService;
     private final Logger logger = LoggerFactory.getLogger(SecurityService.class);
@@ -37,6 +43,9 @@ public class SecurityService {
     private final EmailSender emailSender;
     private final PasswordEncoder encoder;
     private final App app;
+    private  final CryptoService cryptoService;
+
+
     private PasswordValidator passwordValidator = PasswordValidator.
             buildValidator(false, true, true, 6, 40);
 
@@ -106,13 +115,38 @@ public class SecurityService {
         user.setPassword(encoder.encode(password));
         user.setIsEnabled(Boolean.TRUE);
 
-        userService.save(user);
-        memcachedHelperService.clear(token);
+        boolean isPasswordOkay=true;
+        List<PasswordHistory> previousPassword= passwordHistoryRepository.findByUuid(user.getUuid()).orElse(null);
+        if(previousPassword!=null){
+            for (PasswordHistory history : previousPassword) {
+                String passwordCipher=history.getPassword();
+                String decryptedPassword=cryptoService.decrypt(passwordCipher,encryptionKey);
 
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new APIResponse("Password reset successful",true,null));
+                if(password.equals(decryptedPassword))
+                     isPasswordOkay=false;
+            }
+        }
 
 
+        if(isPasswordOkay) {
+            //save password history
+            PasswordHistory history = new PasswordHistory();
+            history.setUuid(user.getUuid());
+            history.setPassword(cryptoService.encrypt(password, encryptionKey));
+            history.setCreatedAt(new Date());
+
+
+            userService.save(user);
+            passwordHistoryRepository.save(history);
+            memcachedHelperService.clear(token);
+
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new APIResponse("Password reset successful", true, null));
+
+        }else{
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new APIResponse("You already used this password on kula before, kindly provide a different password",false,null));
+        }
     }
 
     public ResponseEntity<APIResponse> changePassword(ChangePasswordRequest request){

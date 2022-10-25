@@ -1,6 +1,7 @@
 package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.controllers.RegistrationController;
+import com.unionbankng.future.authorizationserver.entities.PasswordHistory;
 import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.ProfileType;
@@ -9,6 +10,7 @@ import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ErrorResponse;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
+import com.unionbankng.future.authorizationserver.repositories.PasswordHistoryRepository;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.App;
 import com.unionbankng.future.authorizationserver.utils.CryptoService;
@@ -23,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
@@ -33,6 +37,9 @@ public class RegistrationService {
     private String encryptionKey;
     private final MessageSource messageSource;
     private final UserService userService;
+
+    private final PasswordHistoryRepository passwordHistoryRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final UserConfirmationTokenService userConfirmationTokenService;
     private final ProfileService profileService;
@@ -81,6 +88,14 @@ public class RegistrationService {
         // generate uuid for user
         String generatedUuid = app.makeUIID();
         String decryptedPassword=cryptoService.decryptAES(request.getPassword(),encryptionKey);
+
+        //save password history
+        PasswordHistory history = new PasswordHistory();
+        history.setUuid(generatedUuid);
+        history.setPassword(cryptoService.encrypt(request.getPassword(), encryptionKey));
+        history.setCreatedAt( new Date());
+
+
         User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
                 .kycLevel(0)
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())
@@ -90,6 +105,8 @@ public class RegistrationService {
 
         user = userService.save(user);
         app.print("Saved user");
+
+        passwordHistoryRepository.save(history);
 
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();
