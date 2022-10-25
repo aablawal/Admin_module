@@ -61,6 +61,8 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         String username = auth.getPrincipal() == null ? "NONE_PROVIDED" : auth.getName();
         app.print("Username:");
         app.print(username);
+        app.print("Key");
+        app.print(encryptionKey);
         username= cryptoService.decrypt(username,encryptionKey);
         app.print("Decrypted username");
         app.print(username);
