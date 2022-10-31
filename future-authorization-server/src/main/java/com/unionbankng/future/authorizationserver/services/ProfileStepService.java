@@ -14,7 +14,11 @@ public class ProfileStepService {
     public void incrementPercentageComplete(Long userId, int percentage) {
         Profile profile = profileRepository.findByUserId(userId).orElse(null);
         if (profile != null) {
+            if(profile.getPercentageComplete()==null)
+                profile.setPercentageComplete(0);
             int value = profile.getPercentageComplete() + percentage;
+            if(value >100)
+                value=100;
             profile.setPercentageComplete(value);
             profileRepository.save(profile);
         }
@@ -23,7 +27,11 @@ public class ProfileStepService {
     public void decrementPercentageComplete(Long userId, int percentage) {
         Profile profile = profileRepository.findByUserId(userId).orElse(null);
         if (profile != null) {
+            if(profile.getPercentageComplete()==null)
+                profile.setPercentageComplete(0);
             int value = profile.getPercentageComplete() - percentage;
+            if(value<0)
+                value=0;
             profile.setPercentageComplete(value);
             profileRepository.save(profile);
         }
