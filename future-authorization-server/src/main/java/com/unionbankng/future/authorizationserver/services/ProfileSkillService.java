@@ -29,6 +29,8 @@ public class ProfileSkillService {
     private final ProfileRepository profileRepository;
     private final App app;
 
+    private  final  ProfileStepService profileStepService;
+
     public Page<ProfileSkill> findAllByProfileId (Long profileId, Pageable pageable){
         return profileSkillRepository.findAllByProfileId(profileId,pageable);
     }
@@ -68,7 +70,7 @@ public class ProfileSkillService {
         if(profile.getSkills().size()!=0){
             profile.getSkills().clear();
             app.print("Decrementing profile percentage complete");
-            profile.decrementPercentageComplete(20);
+            profileStepService.decrementPercentageComplete(profile.getId(),20);
             app.print("profile percentage complete decremented");
         }
         for(String skill : request.getSkills()){
@@ -80,7 +82,7 @@ public class ProfileSkillService {
             profileRepository.save(profile);
         }
 
-        profile.incrementPercentageComplete(20);
+        profileStepService.incrementPercentageComplete(profile.getId(),20);
 
     }
 

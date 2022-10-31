@@ -38,6 +38,8 @@ public class ProfileService {
 
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+
+    private final ProfileStepService profileStepService;
     private final App app;
 
 
@@ -82,7 +84,7 @@ public class ProfileService {
         if(request.getBio()==null) {
             if(profile.getBio()==null){
                 app.print("Incrementing profile percentage complete");
-                profile.incrementPercentageComplete(20);
+                profileStepService.incrementPercentageComplete(profile.getId(),20);
                 app.print("Profile percentage complete incremented");
             }
             profile.setBio(request.getBio());
@@ -90,7 +92,7 @@ public class ProfileService {
         if(request.getBio()==null){
             profile.setBio(request.getBio());
             app.print("Decrementing profile percentage complete");
-            profile.decrementPercentageComplete(20);
+            profileStepService.decrementPercentageComplete(profile.getId(),20);
             app.print("Profile percentage complete decremented");
         }
         if(request.getIsEmployer() != null)

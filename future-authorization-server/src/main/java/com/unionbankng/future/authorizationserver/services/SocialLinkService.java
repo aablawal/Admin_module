@@ -31,6 +31,8 @@ public class SocialLinkService {
 
     private final InstagramHandler instagramHandler;
 
+    private  final  ProfileStepService profileStepService;
+
     @Cacheable(value = "socialLink", key="#userId")
     public Optional<SocialLink> findByUserId(Long userId){
         return socialLinkRepository.findByUserId(userId);
@@ -82,7 +84,7 @@ public class SocialLinkService {
             logger.info("previous social link successfully deleted");
 
             logger.info("Decrementing profile percentage completed");
-            profile.decrementPercentageComplete(10);
+            profileStepService.decrementPercentageComplete(profile.getId(),10);
             logger.info("Profile percentage completed decreased");
         }
         logger.info("Profile is --> " + profile);
@@ -136,7 +138,7 @@ public class SocialLinkService {
 
         if (!socialLinkRepository.findAllByUserId(userSocialLink.getUserId()).isEmpty()){
             logger.info("Incrementing profile percentage complete");
-            profile.incrementPercentageComplete(10);
+            profileStepService.incrementPercentageComplete(profile.getId(),10);
             logger.info("profile percentage complete incremented");
         }
 

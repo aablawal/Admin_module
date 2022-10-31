@@ -29,6 +29,8 @@ public class QualificationService {
     private final ProfileRepository profileRepository;
     private final FileStorageService fileStorageService;
 
+    private  final  ProfileStepService profileStepService;
+
     private final App app;
 
 //    @Cacheable(value = "qualifications_by_profile", key="#profileId")
@@ -70,7 +72,7 @@ public class QualificationService {
         qualificationRepository.deleteById(id);
         app.print("Qualification deleted");
         app.print("Decrementing profile percentage completed");
-        profile.decrementPercentageComplete(10);
+        profileStepService.decrementPercentageComplete(profile.getId(),10);
         profileRepository.save(profile);
         app.print("Profile percentage completed decreased");
     }
@@ -98,7 +100,7 @@ public class QualificationService {
         }
         if(qualificationRepository.findAllByProfileId(profile.getId(),Sort.by("createdAt").ascending()).isEmpty()){
             app.print("Incrementing profile percentage complete");
-            profile.incrementPercentageComplete(10);
+            profileStepService.incrementPercentageComplete(profile.getId(),10);
             profileRepository.save(profile);
             app.print("Profile percentage complete incremented");
         }
