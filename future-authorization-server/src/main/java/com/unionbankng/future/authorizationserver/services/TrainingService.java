@@ -30,6 +30,7 @@ public class TrainingService {
     private final TrainingRepository trainingRepository;
     private final ProfileRepository profileRepository;
 
+    private  final  ProfileStepService profileStepService;
     private final App app;
 
     @Cacheable(value = "trainings_by_profile", key="#profileId")
@@ -67,7 +68,7 @@ public class TrainingService {
         trainingRepository.deleteById(id);
         app.print("Training deleted");
         app.print("Decrementing profile percentage completed");
-        profile.decrementPercentageComplete(10);
+        profileStepService.decrementPercentageComplete(profile.getId(),10);
         profileRepository.save(profile);
         app.print("Profile percentage completed decreased");
     }
@@ -90,7 +91,7 @@ public class TrainingService {
         training.setYearAwarded(request.getYearAwarded());
         if(trainingRepository.findAllByProfileId(profile.getId(),Sort.by("createdAt").ascending()).isEmpty()){
             app.print("Incrementing profile percentage complete");
-            profile.incrementPercentageComplete(10);
+            profileStepService.incrementPercentageComplete(profile.getId(),10);
             profileRepository.save(profile);
             app.print("profile percentage complete incremented");
         }

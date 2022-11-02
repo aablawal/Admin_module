@@ -22,4 +22,5 @@
     <include file="db/changelog/db.changelog-17.xml"/>
     <include file="db/changelog/db.user-address-verifications.changelog.xml" />
     <include file="db/changelog/db.user-identity-verifications.changelog.xml"/>
+    <include file="db/changelog/db.password-history.changelog.xml"/>
 </databaseChangeLog>

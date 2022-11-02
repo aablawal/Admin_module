@@ -31,6 +31,7 @@ public class ExperienceService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
+    private final  ProfileStepService profileStepService;
     private final App app;
 
 
@@ -73,7 +74,8 @@ public class ExperienceService {
         experienceRepository.deleteById(id);
         app.print("Experience deleted");
         app.print("Decrementing profile percentage completed");
-        profile.decrementPercentageComplete(20);
+        profileStepService.decrementPercentageComplete(profile.getId(),20);
+
         app.print("Profile percentage completed decreased");
         profileRepository.save(profile);
     }
@@ -99,7 +101,7 @@ public class ExperienceService {
         }
         if(experienceRepository.findByProfileId(profile.getId(),Sort.by("createdAt").ascending()).isEmpty()){
             System.out.println("Incrementing percentage profile complete decreased");
-            profile.incrementPercentageComplete(10);
+            profileStepService.incrementPercentageComplete(profile.getId(),10);
             profileRepository.save(profile);
             System.out.println("Percentage profile complete increased");
         }

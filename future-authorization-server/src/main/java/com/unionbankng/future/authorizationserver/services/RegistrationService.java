@@ -1,6 +1,7 @@
 package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.controllers.RegistrationController;
+import com.unionbankng.future.authorizationserver.entities.PasswordHistory;
 import com.unionbankng.future.authorizationserver.entities.Profile;
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.ProfileType;
@@ -9,11 +10,14 @@ import com.unionbankng.future.authorizationserver.pojos.APIResponse;
 import com.unionbankng.future.authorizationserver.pojos.ErrorResponse;
 import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import com.unionbankng.future.authorizationserver.pojos.ThirdPartyOauthResponse;
+import com.unionbankng.future.authorizationserver.repositories.PasswordHistoryRepository;
 import com.unionbankng.future.authorizationserver.security.PasswordValidator;
 import com.unionbankng.future.authorizationserver.utils.App;
+import com.unionbankng.future.authorizationserver.utils.CryptoService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -21,19 +25,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
 
     private final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
 
+    @Value("${kula.encryption.key}")
+    private String encryptionKey;
     private final MessageSource messageSource;
     private final UserService userService;
+
+    private final PasswordHistoryRepository passwordHistoryRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final UserConfirmationTokenService userConfirmationTokenService;
     private final ProfileService profileService;
     private  final GoogleOauthProvider googleOauthProvider;
+
+    private  final CryptoService cryptoService;
     private final App app;
+
 
     private PasswordValidator passwordValidator  = PasswordValidator.
             buildValidator(false, true, true, 6, 40);
@@ -73,15 +87,26 @@ public class RegistrationService {
 
         // generate uuid for user
         String generatedUuid = app.makeUIID();
+        String decryptedPassword=cryptoService.decryptAES(request.getPassword(),encryptionKey);
+
+        //save password history
+        PasswordHistory history = new PasswordHistory();
+        history.setUuid(generatedUuid);
+        history.setPassword(cryptoService.encrypt(request.getPassword(), encryptionKey));
+        history.setCreatedAt( new Date());
+
+
         User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
                 .kycLevel(0)
                 .phoneNumber(request.getPhoneNumber()).dialingCode(request.getDialingCode())
                 .email(request.getEmail()).username(request.getEmail()).dialingCode(request.getDialingCode()).phoneNumber(request.getPhoneNumber()).isEnabled(Boolean.FALSE)
-                .uuid(generatedUuid).password(passwordEncoder.encode(request.getPassword())).username(request.getUsername())
+                .uuid(generatedUuid).password(passwordEncoder.encode(decryptedPassword)).username(request.getUsername())
                 .authProvider(request.getAuthProvider()).build();
 
         user = userService.save(user);
         app.print("Saved user");
+
+        passwordHistoryRepository.save(history);
 
         //create basic profile
         Profile profile = Profile.builder().profileType(ProfileType.BASIC).userId(user.getId()).build();

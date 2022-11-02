@@ -31,6 +31,8 @@ public class UserService {
     private final FileStorageService fileStorageService;
     private final App app;
 
+    private final ProfileStepService profileStepService;
+
 
 //    @Cacheable(value = "user", key = "#id")
     public Optional<User> findById(Long id) {
@@ -130,14 +132,14 @@ public class UserService {
                 fileStorageService.deleteFileFromStorage(user.getImg(), BlobType.IMAGE);
                 app.print("Deleted old image");
                 app.print("Decrementing percentage profile complete");
-                profile.decrementPercentageComplete(15);
+                profileStepService.decrementPercentageComplete(profile.getId(),15);
                 app.print("Percentage profile complete decreased");
             }
             String source = fileStorageService.storeFile(img, userId, BlobType.IMAGE);
             user.setImg(source);
             profile.setProfilePhoto(source);
             app.print("incrementing percentage profile complete");
-            profile.incrementPercentageComplete(15);
+            profileStepService.incrementPercentageComplete(profile.getId(),15);
             app.print("Percentage profile complete increased");
             app.print(source);
         }
@@ -149,14 +151,14 @@ public class UserService {
                 fileStorageService.deleteFileFromStorage(user.getCoverImg(), BlobType.IMAGE);
                 app.print("Deleted old cover image");
                 app.print("Decrementing percentage profile complete");
-                profile.decrementPercentageComplete(5);
+                profileStepService.decrementPercentageComplete(profile.getId(),5);
                 app.print("Percentage profile complete decreased");
             }
             String source = fileStorageService.storeFile(coverImg, userId, BlobType.IMAGE);
             user.setCoverImg(source);
             profile.setCoverPhoto(source);
             app.print("incrementing percentage profile complete");
-            profile.incrementPercentageComplete(5);
+            profileStepService.incrementPercentageComplete(profile.getId(),5);
             app.print("Percentage profile complete increased");
             app.print(source);
         }
