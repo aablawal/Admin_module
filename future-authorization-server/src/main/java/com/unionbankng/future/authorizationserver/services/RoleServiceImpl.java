@@ -51,40 +51,41 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public ResponseEntity<APIResponse> createRole(RoleRequest request) {
-        Role role = roleRepository.findByRoleFunction(request.getRoleFunction().toUpperCase());
+        Role role = roleRepository.findByRoleFunction(request.getRoleFunction().trim().toUpperCase());
 
         if (role ==  null) {
-            if (request.getRoleFunction().equalsIgnoreCase(ADMINISTRATOR)) {
+            if (request.getRoleFunction().trim().equalsIgnoreCase(ADMINISTRATOR)) {
                 Collection<Permission> permissions = ADMINISTRATOR_PERMISSIONS.stream().map(Permission::new).collect(Collectors.toList());
                permissionRepository.saveAll(permissions);
-               role = new Role(request.getRole().toUpperCase(), request.getRoleFunction().toUpperCase());
+               role = new Role(request.getRole().trim().toUpperCase(), request.getRoleFunction().trim().toUpperCase());
                role.setPermissions(permissions);
-            } else if (request.getRoleFunction().equalsIgnoreCase(IT_CONTROL)) {
+            } else if (request.getRoleFunction().trim().equalsIgnoreCase(IT_CONTROL)) {
                 Collection<Permission> permissions = IT_PERMISSIONS.stream().map(Permission::new).collect(Collectors.toList());
                 permissionRepository.saveAll(permissions);
-                role = new Role(request.getRole().toUpperCase(), request.getRoleFunction().toUpperCase());
+                role = new Role(request.getRole().trim().toUpperCase(), request.getRoleFunction().trim().toUpperCase());
                 role.setPermissions(permissions);
-            } else if (request.getRoleFunction().equalsIgnoreCase(PRODUCT_TEAM)) {
+            } else if (request.getRoleFunction().trim().equalsIgnoreCase(PRODUCT_TEAM)) {
                 Collection<Permission> permissions = PRODUCT_TEAM_PERMISSIONS.stream().map(Permission::new).collect(Collectors.toList());
                 permissionRepository.saveAll(permissions);
-                role = new Role(request.getRole().toUpperCase(), request.getRoleFunction().toUpperCase());
+                role = new Role(request.getRole().trim().toUpperCase(), request.getRoleFunction().trim().toUpperCase());
                 role.setPermissions(permissions);
-            } else if (request.getRoleFunction().equalsIgnoreCase(CPC)) {
+            } else if (request.getRoleFunction().trim().equalsIgnoreCase(CPC)) {
                 Collection<Permission> permissions = CPC_PERMISSIONS.stream().map(Permission::new).collect(Collectors.toList());
                 permissionRepository.saveAll(permissions);
-                role = new Role(request.getRole().toUpperCase(), request.getRoleFunction().toUpperCase());
+                role = new Role(request.getRole().trim().toUpperCase(), request.getRoleFunction().trim().toUpperCase());
                 role.setPermissions(permissions);
-            } else if (request.getRoleFunction().equalsIgnoreCase(OPERATIONS_SETTLEMENT_AND_RECONCILIATION)) {
+            } else if (request.getRoleFunction().trim().equalsIgnoreCase(OPERATIONS_SETTLEMENT_AND_RECONCILIATION)) {
                 Collection<Permission> permissions = OPERATIONS_SETTLEMENT_AND_RECONCILIATION_PERMISSIONS.stream().map(Permission::new).collect(Collectors.toList());
                 permissionRepository.saveAll(permissions);
-                role = new Role(request.getRole().toUpperCase(), request.getRoleFunction().toUpperCase());
+                role = new Role(request.getRole().trim().toUpperCase(), request.getRoleFunction().trim().toUpperCase());
                 role.setPermissions(permissions);
-            } else if (request.getRoleFunction().equalsIgnoreCase(HELP_DESK)) {
+            } else if (request.getRoleFunction().trim().equalsIgnoreCase(HELP_DESK)) {
                 Collection<Permission> permissions = HELP_DESK_PERMISSIONS.stream().map(Permission::new).collect(Collectors.toList());
                 permissionRepository.saveAll(permissions);
-                role = new Role(request.getRole().toUpperCase(), request.getRoleFunction().toUpperCase());
+                role = new Role(request.getRole().trim().toUpperCase(), request.getRoleFunction().trim().toUpperCase());
                 role.setPermissions(permissions);
             }
+            role = new Role(request.getRole().trim().toUpperCase(), request.getRoleFunction().trim().toUpperCase());
             roleRepository.save(role);
         }
         return ResponseEntity.ok(new APIResponse<>("Role Created Successfully", true, role));
