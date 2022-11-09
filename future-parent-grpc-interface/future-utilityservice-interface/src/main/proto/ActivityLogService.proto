@@ -1,0 +1,38 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.unionbankng.future.futureutilityservice.grpcserver;
+
+
+message ActivityLogSearchRequest {
+  string query = 1;
+  int32 pageNo = 2;
+  int32 pageSize = 3;
+  string sortBy = 4;
+  string sortDir = 5;
+}
+
+message ActivityLogDto{
+
+
+  string userId = 1;
+  string username = 2;
+  string device = 3;
+  string ipAddress = 4;
+  string description = 5;
+
+
+}
+
+message ActivityLogResponse {
+  repeated ActivityLogDto content = 1;
+  int32 pageNo = 2;
+  int32 pageSize = 3;
+  double totalElements = 4;
+  int32 totalPages = 5;
+  bool last = 6;
+
+}
+
+service ActivityLogService {
+  rpc getActivityLogs(ActivityLogSearchRequest) returns (  ActivityLogResponse);
+}

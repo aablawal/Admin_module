@@ -1,4 +1,5 @@
 package com.unionbankng.future.authorizationserver.utils;
+import com.unionbankng.future.authorizationserver.enums.Role;
 import com.unionbankng.future.authorizationserver.pojos.JwtUserDetail;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
@@ -15,6 +16,7 @@ public class JWTUserDetailsExtractor {
 
         return JwtUserDetail.builder().
                  userId(((Integer) detailsMap.get("userId")).longValue())
+
                 .userFullName(detailsMap.get("userFullName").toString())
                 .userUUID(detailsMap.get("userUUID").toString())
                 .userEmail(detailsMap.get("userEmail").toString()).userImg(userImg)
@@ -28,6 +30,7 @@ public class JWTUserDetailsExtractor {
                 .city(detailsMap.get("city")==null?"Unknown":detailsMap.get("city").toString())
                 .zipCode(detailsMap.get("zipCode")==null?"Unknown":detailsMap.get("zipCode").toString())
                 .gender(detailsMap.get("gender")==null?"Unknown":detailsMap.get("gender").toString())
+                .role(detailsMap.get("role")==null?"Unknown":detailsMap.get("role").toString())
                 .build();
 
     }

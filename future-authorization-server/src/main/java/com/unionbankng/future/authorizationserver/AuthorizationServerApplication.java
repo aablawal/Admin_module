@@ -21,4 +21,5 @@ public class AuthorizationServerApplication {
 	public GrpcAuthenticationReader grpcAuthenticationReader() {
 		return new BasicGrpcAuthenticationReader();
 	}
+
 }

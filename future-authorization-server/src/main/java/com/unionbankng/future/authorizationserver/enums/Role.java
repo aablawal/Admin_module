@@ -1,2 +1,11 @@
-package com.unionbankng.future.authorizationserver.enums;public class Role {
+package com.unionbankng.future.authorizationserver.enums;
+
+public enum Role {
+
+    SUPER_ADMIN,
+
+    ADMIN,
+
+    USER
+
 }

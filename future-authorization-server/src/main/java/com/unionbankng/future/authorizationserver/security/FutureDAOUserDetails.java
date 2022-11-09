@@ -26,7 +26,7 @@ public class FutureDAOUserDetails extends User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
     	Collection<SimpleGrantedAuthority> c = new ArrayList<>();
-    	c.add(new SimpleGrantedAuthority("USER"));
+    	c.add(new SimpleGrantedAuthority(getRole()));
     	return c;
     }
 

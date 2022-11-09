@@ -2,6 +2,7 @@ package com.unionbankng.future.authorizationserver.pojos;
 
 import com.unionbankng.future.authorizationserver.enums.AuthProvider;
 import com.unionbankng.future.authorizationserver.enums.ProfileType;
+import com.unionbankng.future.authorizationserver.enums.Role;
 import com.unionbankng.future.authorizationserver.interfaces.ThirdPartyOauthProvider;
 import lombok.Data;
 
@@ -23,6 +24,11 @@ public class RegistrationRequest {
     private String thirdPartyToken;
     @NotNull
     private AuthProvider authProvider;
+    private String department;
+    private Role role;
+    private String branchCode;
+    private String roleFunction;
+
 
 
 }

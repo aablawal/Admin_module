@@ -55,8 +55,8 @@ public class KYCService {
     private String baseURL;
     @Value("#{${kyc.service.credentials}}")
     private Map<String, String> credentials;
-    @Value("${kula.kyc.address.webhook}")
-    private String kulaAddressWebhook;
+//    @Value("${kula.kyc.address.webhook}")
+    private String kulaAddressWebhook = "https://testapi.kula.work/authserv/api/v1/webhooks/kyc/verifyme";
     private KYCServiceInterface kycServiceInterface;
     private String accessTokenForKycService;
     private Date tokenExpiryTime;

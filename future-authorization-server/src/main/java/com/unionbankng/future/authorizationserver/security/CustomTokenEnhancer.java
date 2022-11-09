@@ -32,6 +32,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         additionalInfo.put("gender", user.getGender());
         additionalInfo.put("walletId", user.getWalletId());
         additionalInfo.put("zipCode", user.getZipCode());
+        additionalInfo.put("role", user.getRole());
 
 
         ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);

@@ -17,6 +17,7 @@ public class JwtUserDetail {
     private String firstName;
     private String lastName;
     private String userAddress;
+    private String role;
     private String city;
     private String gender;
     private String zipCode;

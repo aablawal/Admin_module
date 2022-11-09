@@ -1,8 +1,5 @@
 package com.unionbankng.future.authorizationserver.entities;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,6 +10,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PasswordHistory implements Serializable {
 
     private static final long serialVersionUID = 1L;

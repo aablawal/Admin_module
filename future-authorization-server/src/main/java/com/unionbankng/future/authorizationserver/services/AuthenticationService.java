@@ -168,8 +168,12 @@ public class AuthenticationService {
 
 
     public APIResponse validatePhoneNumber(OAuth2Authentication authentication, String phone) {
+        // TODO
+        System.out.println(authentication);
         JwtUserDetail currentUser = JWTUserDetailsExtractor.getUserDetailsFromAuthentication(authentication);
+        System.out.println(currentUser);
         User user = userRepository.findByUuid(currentUser.getUserUUID()).orElse(null);
+        System.out.println(user);
         String phoneNumber=app.toPhoneNumber(phone);
         List<User> users=userRepository.findAllByPhoneNumber(phoneNumber).orElse(null);
         if(users==null) {

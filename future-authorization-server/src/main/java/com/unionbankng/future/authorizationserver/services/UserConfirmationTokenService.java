@@ -2,6 +2,7 @@ package com.unionbankng.future.authorizationserver.services;
 
 import com.unionbankng.future.authorizationserver.entities.User;
 import com.unionbankng.future.authorizationserver.enums.RecipientType;
+import com.unionbankng.future.authorizationserver.enums.Role;
 import com.unionbankng.future.authorizationserver.pojos.EmailAddress;
 import com.unionbankng.future.authorizationserver.pojos.EmailBody;
 import com.unionbankng.future.authorizationserver.pojos.TokenConfirm;
@@ -60,12 +61,20 @@ public class UserConfirmationTokenService {
             URL url = new URL(generatedURL);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 
-//            logger.info("Sending confirmation to {}", user);
-//            logger.info("Activation Link:" +  uri.toASCIIString());
+            logger.info("Sending confirmation to {}", user);
+            logger.info("Activation Link:" +  uri.toASCIIString());
+            EmailBody emailBody;
+            if (user.getRole().equalsIgnoreCase(Role.ADMIN.name()) ||user.getRole().equalsIgnoreCase(Role.SUPER_ADMIN.name())  ) {
+                emailBody = EmailBody.builder().body(messageSource.getMessage("admin.message", new String[]{ uri.toASCIIString()}, LocaleContextHolder.getLocale())
+                        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
+                        .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(user.getEmail()).displayName(user.toString()).build())).build();
+            } else {
+                emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{ uri.toASCIIString()}, LocaleContextHolder.getLocale())
+                        ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
+                        .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(user.getEmail()).displayName(user.toString()).build())).build();
 
-            EmailBody emailBody = EmailBody.builder().body(messageSource.getMessage("welcome.message", new String[]{ uri.toASCIIString()}, LocaleContextHolder.getLocale())
-                    ).sender(EmailAddress.builder().displayName("Kula Team").email(emailSenderAddress).build()).subject("Registration Confirmation")
-                    .recipients(Arrays.asList(EmailAddress.builder().recipientType(RecipientType.TO).email(user.getEmail()).displayName(user.toString()).build())).build();
+            }
+
 
             emailSender.sendEmail(emailBody);
             logger.info("Message Queued successfully");

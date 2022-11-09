@@ -88,6 +88,15 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider;
 
+
+    private String role;
+
+    private String roleFunction;
+
+    private String branchCode;
+
+    private String department;
+
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -96,7 +105,6 @@ public class User implements Serializable {
     private Date dateUpdated;
 
     public User(User user){
-        this.isEnabled = user.getIsEnabled();
         this.id = user.getId();
         this.img = user.getImg();
         this.coverImg = user.getCoverImg();
@@ -116,6 +124,9 @@ public class User implements Serializable {
         this.gender=user.getGender();
         this.walletId=user.getWalletId();
         this.zipCode = user.getZipCode();
+        this.role = user.getRole();
+        this.isEnabled = user.getIsEnabled();
+        this.department = user.getDepartment();
     }
 
     @PrePersist

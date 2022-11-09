@@ -1,6 +1,5 @@
 package com.unionbankng.future.authorizationserver.entities;
 
-import com.unionbankng.future.authorizationserver.enums.Role;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,23 +13,28 @@ import java.util.Collection;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Roles implements Serializable {
+public class Role implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+
+    private String role;
 
     private String roleFunction;
 
 //    @ManyToMany(mappedBy = "roles")
 //    private Collection<User> users;
 
+
+    public Role(String role, String roleFunction) {
+        this.role = role;
+        this.roleFunction = roleFunction;
+    }
+
     @ManyToMany
-    @JoinTable(
-            name = "roles_permissions",
+    @JoinTable(name = "roles_permissions",
             joinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(

@@ -3,6 +3,7 @@ package com.unionbankng.future.futurejobservice.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.sun.xml.bind.v2.TODO;
 import com.unionbankng.future.futurejobservice.entities.*;
 import com.unionbankng.future.futurejobservice.enums.ConfigReference;
 import com.unionbankng.future.futurejobservice.enums.JobType;
@@ -37,15 +38,15 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class JobContractService implements Serializable {
+//TO DO
+//    @Value("${kula.float.gl.name}")
+    private String kulaFloatAccountName = "Marcus Float Account";
 
-    @Value("${kula.float.gl.name}")
-    private String kulaFloatAccountName;
+//    @Value("${kula.float.gl.number}")
+    private String kulaFloatAccountNumber = "250990144";
 
-    @Value("${kula.float.gl.number}")
-    private String kulaFloatAccountNumber;
-
-    @Value("${kula.model.wallet}")
-    private String kulaWalletId;
+//    @Value("${kula.model.wallet}")
+    private String kulaWalletId = "0010233131";
 
 
     private String kulaIncomeAccountName;//GL

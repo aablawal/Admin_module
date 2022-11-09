@@ -5,7 +5,7 @@ import com.unionbankng.future.authorizationserver.pojos.RegistrationRequest;
 import org.springframework.http.ResponseEntity;
 
 
-public interface AdminServices {
+public interface AdminService {
 
     ResponseEntity<APIResponse> createAdmin(RegistrationRequest request);
     ResponseEntity<APIResponse>  updateUser(Long userId, RegistrationRequest request);
